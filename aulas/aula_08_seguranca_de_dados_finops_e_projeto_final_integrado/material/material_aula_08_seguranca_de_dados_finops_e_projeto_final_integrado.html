@@ -3,36 +3,457 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Material Aula 08</title>
+    <title>Material Aula 08 — Segurança de Dados, FinOps e Projeto Final Integrado</title>
     <link rel="stylesheet" href="../../../assets/styles.css" />
     <style data-design-tokens>:root{--bg:#fff;--color:#000000}body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}a:hover{opacity:.8}a:focus{outline:2px solid #000000}</style>
-</head>
+  </head>
   <body class="material">
     <main class="page">
+
       <section class="content-block">
-        <p class="meta">Aula 08 • 11/06/2026</p>
+        <p class="meta">Aula 08 &nbsp;•&nbsp; 11/06/2026 &nbsp;•&nbsp; 19h00 – 22h00</p>
         <h1>Segurança de Dados, FinOps e Projeto Final Integrado</h1>
         <p class="summary">
-          Material inicial para consolidar a etapa final da disciplina com
-          governança avançada, custos e revisão da arquitetura.
+          Este material aprofunda os conceitos apresentados nos slides da Aula 08
+          e fecha a disciplina com uma visão integrada. Cobre o AWS Lake Formation
+          para governança de dados com controle de acesso fino, as práticas de
+          FinOps para redução de custo em workloads analíticos, as melhores práticas
+          de segurança para o pipeline completo, e a revisão do fluxo integrado
+          end-to-end construído ao longo das 8 aulas.
         </p>
-        <h2>Tópicos-base</h2>
+      </section>
+
+      <!-- =========================================================
+           MÓDULO 1 — LAKE FORMATION E GOVERNANÇA
+      ========================================================== -->
+      <section class="content-block">
+        <h2>Módulo 1 — AWS Lake Formation: Governança de Dados em Escala</h2>
+
+        <h3>Por que o IAM sozinho não é suficiente para governança de dados</h3>
+        <p>
+          O AWS IAM controla o acesso a APIs da AWS: quem pode chamar o
+          <code>s3:GetObject</code>, quem pode criar um Glue Crawler, quem pode
+          executar uma query no Athena. Mas o IAM não entende dados — ele não sabe
+          que dentro de um bucket S3 existem dados sensíveis de clientes ao lado
+          de dados públicos de catálogo de produtos.
+        </p>
+        <p>
+          O resultado prático é que, com apenas IAM, você precisaria criar um bucket
+          separado para cada nível de sensibilidade de dado, ou dar acesso total ao
+          bucket inteiro a qualquer usuário que precise de qualquer dado dentro dele.
+          Nenhuma das duas opções escala bem em um Data Lake com dezenas de fontes,
+          centenas de tabelas e múltiplos perfis de acesso.
+        </p>
+        <p>
+          O AWS Lake Formation resolve isso adicionando uma camada de controle de acesso
+          no nível de tabela, coluna e linha sobre o Glue Data Catalog. Em vez de
+          gerenciar permissões de bucket S3 no IAM, você gerencia permissões de
+          database/tabela/coluna no Lake Formation, e ele traduz isso para permissões
+          no nível de objeto S3 automaticamente.
+        </p>
+
+        <h3>Conceitos do Lake Formation</h3>
+        <p>
+          <strong>Data Administrators:</strong> usuários com permissão de administrar o
+          Lake Formation. Eles concedem permissões a outros usuários e definem quais
+          buckets S3 estão registrados como parte do Lake.
+        </p>
+        <p>
+          <strong>Registered locations:</strong> prefixos S3 que estão sob governança
+          do Lake Formation. Após o registro, o acesso a esses prefixos é controlado
+          pelo Lake Formation em vez de pelo IAM diretamente.
+        </p>
+        <p>
+          <strong>Data permissions:</strong> permissões no nível de database, tabela,
+          coluna ou linha. Exemplos:
+        </p>
         <ul>
-          <li>Lake Formation e controle fino de acesso.</li>
-          <li>Custos operacionais e otimização de consultas.</li>
-          <li>Resumo arquitetural e troubleshooting final.</li>
+          <li>Analista de BI: SELECT nas colunas não-sensíveis da tabela
+          <code>trusted_clientes</code>, sem acesso às colunas <code>cpf</code>
+          e <code>data_nascimento</code>.</li>
+          <li>Cientista de dados: SELECT em todas as tabelas do database <code>trusted</code>,
+          mas sem acesso ao database <code>raw</code>.</li>
+          <li>Engenheiro de dados: CREATE TABLE, ALTER TABLE, INSERT, SELECT em todos
+          os databases do lake.</li>
         </ul>
+        <p>
+          <strong>Column-level security (CLS):</strong> o Lake Formation pode mascarar
+          ou excluir colunas inteiras para determinados usuários. Um analista que
+          consulta a tabela de clientes via Athena simplesmente não verá as colunas
+          para as quais não tem permissão — elas não aparecem no resultado da query.
+        </p>
+        <p>
+          <strong>Row-level security (RLS):</strong> via Lake Formation filters, é possível
+          restringir quais linhas um usuário pode ver. Por exemplo, um analista regional
+          só pode ver registros onde <code>regiao = 'Sul'</code>.
+        </p>
+
+        <h3>Data Catalog e descoberta de dados sensíveis</h3>
+        <p>
+          O AWS Glue Sensitive Data Detection (baseado em Macie) pode escanear tabelas
+          no Catalog para identificar automaticamente dados pessoais (PII): números de CPF,
+          cartões de crédito, emails, telefones. Os resultados são registrados e podem
+          ser usados para aplicar automaticamente as políticas de CLS/RLS corretas.
+        </p>
+      </section>
+
+      <!-- =========================================================
+           MÓDULO 2 — SEGURANÇA DO PIPELINE
+      ========================================================== -->
+      <section class="content-block">
+        <h2>Módulo 2 — Melhores Práticas de Segurança para o Pipeline Completo</h2>
+
+        <h3>Criptografia em repouso e em trânsito</h3>
+        <p>
+          <strong>Em repouso (at rest):</strong> todo dado no S3 deve ser criptografado.
+          Use SSE-S3 (chave gerenciada pela AWS, sem custo extra) para dados internos
+          de baixa sensibilidade, ou SSE-KMS (AWS Key Management Service) para dados
+          sensíveis onde você precisa de controle sobre a chave de criptografia,
+          auditoria de uso da chave via CloudTrail, e possibilidade de revogar acesso
+          invalidando a chave.
+        </p>
+        <p>
+          <strong>Em trânsito (in transit):</strong> toda comunicação com serviços AWS
+          usa HTTPS/TLS por padrão. Nunca use endpoints HTTP não criptografados.
+          Para conexões JDBC de Glue para RDS, certifique-se de que a conexão está
+          configurada com SSL.
+        </p>
+
+        <h3>VPC e isolamento de rede</h3>
+        <p>
+          Para pipelines de produção, execute Glue Jobs e outras cargas de trabalho
+          dentro de uma VPC (Virtual Private Cloud) em vez de na rede pública da AWS.
+          Isso permite:
+        </p>
+        <ul>
+          <li>Comunicação com RDS e outros bancos de dados sem expô-los à internet.</li>
+          <li>Controle de saída via Security Groups e NACLs (Network Access Control Lists).</li>
+          <li>Uso de VPC Endpoints para S3 e outros serviços AWS, eliminando tráfego
+          pela internet mesmo para serviços públicos.</li>
+        </ul>
+
+        <h3>CloudTrail: auditoria de todas as chamadas de API</h3>
+        <p>
+          O AWS CloudTrail registra todas as chamadas de API feitas na conta AWS:
+          quem fez, de onde (IP), quando, qual ação, em qual recurso, e qual foi
+          o resultado. Para governança de dados, o CloudTrail permite auditar:
+        </p>
+        <ul>
+          <li>Quem acessou quais objetos no S3 (via S3 Data Events).</li>
+          <li>Quais queries foram executadas no Athena.</li>
+          <li>Quem criou ou modificou tabelas no Glue Catalog.</li>
+          <li>Quais mudanças foram feitas em políticas IAM e no Lake Formation.</li>
+        </ul>
+        <p>
+          Configure o CloudTrail para enviar logs para um bucket S3 separado e
+          de longa retenção, e ative a validação de integridade dos logs para
+          garantir que não foram modificados.
+        </p>
+
+        <h3>Gestão de segredos com AWS Secrets Manager</h3>
+        <p>
+          Senhas de banco de dados, chaves de API e outros segredos nunca devem
+          ser hardcoded em código ou armazenados em variáveis de ambiente não
+          criptografadas. O AWS Secrets Manager armazena, rotaciona automaticamente
+          e controla o acesso a segredos. Em Glue Jobs, use o SDK do Secrets Manager
+          para buscar a senha do banco em tempo de execução:
+        </p>
+        <pre><code>import boto3
+import json
+
+def get_secret(secret_name):
+    client = boto3.client('secretsmanager', region_name='us-east-1')
+    response = client.get_secret_value(SecretId=secret_name)
+    return json.loads(response['SecretString'])
+
+rds_creds = get_secret('prod/rds/datalake')
+</code></pre>
+      </section>
+
+      <!-- =========================================================
+           MÓDULO 3 — FINOPS
+      ========================================================== -->
+      <section class="content-block">
+        <h2>Módulo 3 — FinOps para Workloads Analíticos</h2>
+
+        <h3>O que é FinOps</h3>
+        <p>
+          FinOps (Financial Operations) é a prática de gestão financeira em cloud que
+          une equipes de engenharia, finanças e negócio para otimizar custos sem
+          sacrificar performance ou agilidade. O princípio central é: quem usa os
+          recursos é responsável por gerenciar seus custos — não apenas o time de
+          infra ou financeiro.
+        </p>
+
+        <h3>Principais alavancas de custo em workloads analíticos na AWS</h3>
+
+        <h4>Amazon S3</h4>
+        <ul>
+          <li>Use S3 Lifecycle policies para migrar dados para classes mais baratas
+          (Standard-IA, Glacier) após períodos de inatividade. Dados Raw com mais
+          de 90 dias raramente são relidos.</li>
+          <li>Ative S3 Intelligent-Tiering para dados com padrões de acesso imprevisíveis —
+          o S3 move automaticamente os objetos entre tiers sem custo de monitoramento
+          adicional acima de 128 KB.</li>
+          <li>Monitore e delete versões antigas de objetos em buckets com versionamento
+          habilitado. Versões antigas acumulam custo sem valor se não houver processo
+          de limpeza.</li>
+        </ul>
+
+        <h4>Amazon Athena</h4>
+        <ul>
+          <li>Converta dados de CSV/JSON para Parquet com compressão Snappy.
+          Uma tabela de 1 TB em CSV pode ser reduzida para 100-200 GB em Parquet,
+          reduzindo o custo por query em 5-10x.</li>
+          <li>Adicione particionamento às tabelas mais consultadas. Filtros por
+          partição eliminam o scan de dados irrelevantes.</li>
+          <li>Configure Athena Workgroups com limites de bytes por query para evitar
+          queries acidentalmente custosas de analistas.</li>
+          <li>Use o Athena Query Results Cache para queries repetitivas — resultados
+          de queries idênticas são reutilizados por até 7 dias sem custo adicional.</li>
+        </ul>
+
+        <h4>AWS Glue</h4>
+        <ul>
+          <li>Dimensione o número de DPUs corretamente. Muitos jobs são configurados
+          com 10 DPUs quando 2-3 seriam suficientes. Use o Glue Job Metrics para
+          identificar jobs com baixa utilização de workers.</li>
+          <li>Prefira Glue Flex execution tier (40% mais barato que Standard) para
+          jobs não urgentes que podem tolerar latência variável.</li>
+          <li>Configure o número máximo de retries adequado — um job que falha 3 vezes
+          cobra 3x o custo de execução.</li>
+        </ul>
+
+        <h4>Amazon Redshift</h4>
+        <ul>
+          <li>Use o Redshift Serverless para workloads intermitentes — você paga
+          por RPU (Redshift Processing Unit) segundo enquanto consultas estão rodando,
+          sem custo em períodos ociosos.</li>
+          <li>Configure o Redshift Auto Pause para clusters provisionados — pausa
+          automática após X minutos de inatividade e retoma na próxima query.</li>
+          <li>Use Redshift Spectrum para dados históricos que são consultados com
+          baixa frequência, mantendo apenas dados quentes no cluster.</li>
+          <li>Execute VACUUM regularmente para reclamar espaço de linhas deletadas
+          e manter a performance de scan.</li>
+        </ul>
+
+        <h3>Tags de custo: visibilidade por projeto e equipe</h3>
+        <p>
+          Todo recurso AWS deve ser tagueado com metadados de negócio: projeto,
+          equipe, ambiente (dev/prod), e centro de custo. As tags são propagadas
+          automaticamente para o AWS Cost Explorer e AWS Budgets, permitindo
+          visualizar e alertar sobre custos por dimensão de negócio, não apenas
+          por serviço.
+        </p>
+        <p>
+          Configure AWS Budgets com alertas quando o custo mensal de uma tag específica
+          atingir 80% e 100% do orçamento definido. Isso permite intervenção
+          proativa antes que o orçamento seja estourado.
+        </p>
+      </section>
+
+      <!-- =========================================================
+           MÓDULO 4 — PIPELINE INTEGRADO
+      ========================================================== -->
+      <section class="content-block">
+        <h2>Módulo 4 — Revisão: O Pipeline Integrado da Disciplina</h2>
+
+        <h3>Fluxo completo end-to-end</h3>
+        <p>
+          Ao longo das 8 aulas, construímos os blocos de um pipeline analítico completo
+          na AWS. O fluxo integrado funciona da seguinte forma:
+        </p>
+        <ol>
+          <li>
+            <strong>Aula 01 — Fundação de segurança:</strong> criação das roles IAM
+            (GlueJobRole, etc.), grupos de usuários (DataEngineers, DataScientists),
+            e políticas de menor privilégio. Todo o pipeline roda com as identidades
+            corretas definidas nesta aula.
+          </li>
+          <li>
+            <strong>Aula 02 — Data Lake no S3:</strong> bucket criado com estrutura
+            de prefixos Raw/Trusted/Refined, versionamento e criptografia habilitados.
+            Primeira exploração com Athena.
+          </li>
+          <li>
+            <strong>Aula 03 — Fontes de dados:</strong> dados de RDS extraídos via CDC
+            com DMS para S3 Raw. Tabela DynamoDB exportada via PITR para S3 Raw.
+            Ambas as fontes alimentam a camada Raw do lake.
+          </li>
+          <li>
+            <strong>Aula 04 — Streaming:</strong> eventos em tempo real chegando via
+            Kinesis Firehose, entregues ao S3 Raw com particionamento dinâmico por data e tipo.
+          </li>
+          <li>
+            <strong>Aula 05 — ETL e catálogo:</strong> Glue Crawlers descobrem o schema
+            dos dados Raw. Glue Jobs transformam Raw → Trusted (limpeza, tipagem, Parquet).
+            Glue Catalog mantém o metastore central.
+          </li>
+          <li>
+            <strong>Aula 06 — Data Warehouse:</strong> dados da camada Refined são
+            carregados no Redshift via COPY command. Star schema criado para análise
+            de vendas. Redshift Spectrum acessa dados históricos no S3 sem mover.
+          </li>
+          <li>
+            <strong>Aula 07 — Confiabilidade:</strong> DAG no MWAA orquestra a sequência
+            Crawler → ETL → Crawler → Carga Redshift com retries configurados.
+            CloudWatch Alarms alertam sobre falhas. SLOs definidos para freshness
+            e completeness.
+          </li>
+          <li>
+            <strong>Aula 08 — Governança e custo:</strong> Lake Formation controla
+            o acesso fino por tabela e coluna. Lifecycle policies no S3 otimizam custo.
+            CloudTrail audita todos os acessos. Tags aplicadas em todos os recursos.
+          </li>
+        </ol>
+
+        <h3>Arquiteturas Lambda e Kappa aplicadas ao pipeline da disciplina</h3>
+        <p>
+          O pipeline construído ao longo da disciplina implementa uma arquitetura
+          <strong>Lambda</strong>: existe um caminho batch (CDC do RDS via DMS,
+          processado em Glue Jobs que rodam periodicamente) e um caminho streaming
+          (Kinesis Firehose entregando eventos em near real-time ao S3).
+          Os consumidores finais (Redshift, Athena) combinam as visões das duas fontes.
+        </p>
+        <p>
+          Uma evolução para <strong>Kappa</strong> seria migrar também a extração do
+          RDS para um stream contínuo (Kinesis + DMS em modo CDC streaming),
+          eliminando o caminho batch e unificando toda a ingestão em um único
+          paradigma de eventos. O trade-off é maior complexidade de reprocessamento
+          histórico e necessidade de maior retenção no stream.
+        </p>
+      </section>
+
+      <!-- =========================================================
+           MÓDULO 5 — LABORATÓRIO
+      ========================================================== -->
+      <section class="content-block">
+        <h2>Módulo 5 — Laboratório: Governança com Lake Formation e Revisão Final</h2>
+        <p>
+          A prática utiliza o ambiente <strong>AWS Student</strong>.
+          O foco é explorar as configurações do Lake Formation e revisar o pipeline construído.
+        </p>
+
+        <h3>Passo 1 — Configurar o Lake Formation</h3>
+        <ol>
+          <li>No console AWS, acesse <strong>AWS Lake Formation</strong>.</li>
+          <li>Se for o primeiro acesso, clique em <strong>Get started</strong>.</li>
+          <li>Em <strong>Administrators</strong>, verifique se seu usuário está listado.
+          Se não estiver, clique em <strong>Add myself</strong>.</li>
+          <li>Em <strong>Data lake settings</strong>, desmarque a opção
+          <strong>"Use only IAM access control for new databases and tables"</strong>.
+          Isso ativa o controle pelo Lake Formation.</li>
+          <li>Clique em <strong>Save</strong>.</li>
+          <li><strong>Validação:</strong> a configuração do Lake Formation está ativa.</li>
+        </ol>
+
+        <h3>Passo 2 — Registrar a localização S3</h3>
+        <ol>
+          <li>No menu lateral do Lake Formation, clique em <strong>Data lake locations</strong>.</li>
+          <li>Clique em <strong>Register location</strong>.</li>
+          <li>Em <strong>Amazon S3 location</strong>, insira o bucket do Data Lake:
+          <code>s3://seu-bucket-datalake/</code></li>
+          <li>Em <strong>IAM role</strong>, selecione a LakeFormationServiceRole
+          (ou crie uma nova com as permissões necessárias).</li>
+          <li>Clique em <strong>Register location</strong>.</li>
+          <li><strong>Validação:</strong> o bucket aparece na lista de localizações registradas.</li>
+        </ol>
+
+        <h3>Passo 3 — Conceder permissões granulares de tabela</h3>
+        <ol>
+          <li>No Lake Formation, clique em <strong>Permissions</strong> e depois em
+          <strong>Data lake permissions</strong>.</li>
+          <li>Clique em <strong>Grant</strong>.</li>
+          <li>Em <strong>IAM users and roles</strong>, selecione o usuário
+          <code>engenheiro-dados-lab</code> criado na Aula 01.</li>
+          <li>Em <strong>LF-Tags or catalog resources</strong>, selecione
+          <strong>Named data catalog resources</strong>.</li>
+          <li>Database: <code>datalake_lab</code>. Table: <strong>All tables</strong>.</li>
+          <li>Em <strong>Table permissions</strong>, marque: <strong>SELECT, DESCRIBE</strong>.</li>
+          <li>Clique em <strong>Grant</strong>.</li>
+          <li><strong>Validação:</strong> a permissão aparece na lista com o usuário,
+          database e tipo de acesso corretos.</li>
+        </ol>
+
+        <h3>Passo 4 — Cheklist de revisão do pipeline completo</h3>
+        <ol>
+          <li>Verifique que o bucket S3 está com criptografia SSE-S3 habilitada
+          (Aula 02).</li>
+          <li>Confirme que a GlueJobRole tem as permissões mínimas necessárias
+          e não usa <code>"Resource": "*"</code> sem necessidade (Aula 01).</li>
+          <li>Verifique que a camada Raw tem prefixos com o formato Hive
+          (<code>chave=valor</code>) para particionamento automático (Aula 02).</li>
+          <li>Confirme que os dados da camada Trusted estão em formato Parquet
+          com compressão Snappy (Aula 05).</li>
+          <li>Verifique que o CloudWatch Alarm de falha do Glue Job está configurado
+          e com estado OK (Aula 07).</li>
+          <li>Confirme que os recursos estão tagueados com <code>projeto=datalake-mba</code>
+          e <code>ambiente=lab</code>.</li>
+          <li>Ao final do lab, delete os recursos criados para evitar cobranças:
+          Glue Jobs, Crawlers, tabelas do Catalog, DynamoDB table, Firehose stream.
+          O bucket S3 pode ser mantido se o lab for encerrado com o ambiente.</li>
+          <li><strong>Validação final:</strong> você consegue descrever cada componente
+          do pipeline e sua relação com os outros sem consultar o material.</li>
+        </ol>
+      </section>
+
+      <!-- =========================================================
+           EXERCÍCIOS DE FIXAÇÃO
+      ========================================================== -->
+      <section class="content-block">
         <h2>Exercícios de fixação</h2>
         <ol>
-          <li>Propor uma política básica de governança com Lake Formation.</li>
-          <li>Listar três ações práticas de FinOps para workloads analíticos.</li>
-          <li>Descrever o fluxo completo do pipeline final da disciplina.</li>
+          <li>
+            <strong>Governança com Lake Formation:</strong> uma empresa de saúde armazena
+            dados de pacientes no Data Lake. A tabela <code>trusted_pacientes</code> tem
+            as colunas: <code>paciente_id</code>, <code>nome</code>, <code>cpf</code>,
+            <code>data_nascimento</code>, <code>diagnostico</code>, <code>medico_responsavel</code>.
+            Defina uma matriz de permissões para três perfis — médico, pesquisador e
+            auditor —, especificando para cada perfil quais colunas podem ser vistas,
+            com ou sem máscara, e justificando com base em requisitos de LGPD.
+          </li>
+          <li>
+            <strong>Otimização FinOps:</strong> a conta AWS do time de dados está
+            custando R$ 15.000/mês. A análise do Cost Explorer mostra: 40% em Athena
+            (queries sem particionamento em CSV), 30% em Glue (jobs com 10 DPUs para
+            datasets de 500 MB), 20% em S3 (todos os dados em Standard incluindo 5 anos
+            de histórico), 10% em outros. Estime o potencial de redução de cada categoria
+            e descreva as ações concretas para implementar cada otimização.
+          </li>
+          <li>
+            <strong>Pipeline end-to-end:</strong> descreva o fluxo completo de dados
+            de uma compra realizada em um e-commerce — desde o INSERT no banco de dados
+            de produção até estar disponível em um dashboard de vendas em tempo real
+            e em um relatório histórico mensal. Para cada etapa, identifique o serviço
+            AWS utilizado nesta disciplina, o formato dos dados, a latência esperada,
+            e o mecanismo de recuperação de falhas.
+          </li>
+          <li>
+            <strong>Arquitetura Lambda versus Kappa — decisão final:</strong> com base
+            em tudo que foi visto na disciplina, você está projetando a arquitetura
+            de dados para uma empresa de logística com 10 milhões de entregas/mês.
+            Os dados vêm de sistemas OLTP, GPS de veículos (streaming), e APIs de
+            terceiros (batch diário). O time de BI precisa de dashboards diários e
+            o time de operações precisa de alertas em 2 minutos. Escolha entre Lambda
+            e Kappa (ou uma combinação), justifique sua escolha, e esboce a arquitetura
+            com os serviços AWS específicos para cada componente.
+          </li>
+          <li>
+            <strong>Checklist de segurança:</strong> antes de fazer o deploy de um
+            pipeline de dados para produção, você precisa garantir que atende a todos
+            os requisitos de segurança. Crie um checklist de pelo menos 10 itens
+            verificáveis (não genéricos — cada item deve especificar o serviço AWS,
+            a configuração exata e como verificar que está correto), cobrindo:
+            IAM, criptografia, rede, auditoria, governança de dados e FinOps.
+          </li>
         </ol>
-        <footer class="actions">
-          <a class="button" href="../slides/slide_aula_08_seguranca_de_dados_finops_e_projeto_final_integrado.html">Voltar ao slide</a>
-          <a class="button" href="../../../index.html">Voltar ao índice</a>
-        </footer>
       </section>
+
+      <footer class="actions">
+        <a class="button" href="../slides/slide_aula_08_seguranca_de_dados_finops_e_projeto_final_integrado.html">Voltar ao slide</a>
+        <a class="button" href="../../../index.html">Voltar ao índice</a>
+      </footer>
+
     </main>
   </body>
 </html>
