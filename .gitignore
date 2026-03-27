@@ -25,6 +25,8 @@ build/
 .parcel-cache/
 coverage/
 .nyc_output/
+test-results/
+playwright-report/
 *.tsbuildinfo
 
 # Environment and local config
