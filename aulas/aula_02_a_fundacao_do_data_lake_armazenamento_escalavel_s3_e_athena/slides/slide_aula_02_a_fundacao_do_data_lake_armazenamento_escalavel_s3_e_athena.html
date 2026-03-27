@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js/dist/reset.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js/dist/reveal.css" />
     <link rel="stylesheet" href="../../../assets/reveal_custom.css" />
-  </head>
+    <style data-design-tokens>:root{--bg:#fff;--color:#000000}body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}a:hover{opacity:.8}a:focus{outline:2px solid #000000}</style>
+</head>
   <body>
     <div class="reveal">
       <div class="slides">
@@ -35,37 +36,34 @@
               <span class="deck-kicker">Agenda</span>
               <h2 class="deck-title">O que vai acontecer nesta aula</h2>
             </div>
-            <table class="deck-table">
-              <thead>
-                <tr>
-                  <th>Horário</th>
-                  <th>Formato</th>
-                  <th>Conteúdo</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>19h00 - 20h00</td>
-                  <td>Teoria</td>
-                  <td>Amazon S3 profundo, buckets, camadas do Data Lake e particionamento.</td>
-                </tr>
-                <tr>
-                  <td>20h00 - 20h45</td>
-                  <td>Teoria</td>
-                  <td>Amazon Athena, consulta serverless, formatos de arquivo e boas práticas.</td>
-                </tr>
-                <tr>
-                  <td>20h45 - 21h00</td>
-                  <td>Intervalo</td>
-                  <td>Pausa e preparação do ambiente prático.</td>
-                </tr>
-                <tr>
-                  <td>21h00 - 22h00</td>
-                  <td>Prática com AWS Student</td>
-                  <td>Estruturação do Data Lake no S3, upload de dados raw e primeira exploração com Athena.</td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="deck-grid">
+              <article class="deck-card">
+                <h3>19h00 – 20h00 · Teoria</h3>
+                <ul>
+                  <li>Amazon S3 profundo, buckets e camadas do Data Lake.</li>
+                  <li>Particionamento e organização de prefixos.</li>
+                </ul>
+              </article>
+              <article class="deck-card">
+                <h3>20h00 – 20h45 · Teoria</h3>
+                <ul>
+                  <li>Amazon Athena: consulta serverless.</li>
+                  <li>Formatos de arquivo e boas práticas.</li>
+                </ul>
+              </article>
+              <article class="deck-card">
+                <h3>20h45 – 21h00 · Intervalo</h3>
+                <ul>
+                  <li>Pausa e preparação do ambiente prático.</li>
+                </ul>
+              </article>
+              <article class="deck-card">
+                <h3>21h00 – 22h00 · Prática</h3>
+                <ul>
+                  <li>Estruturar Data Lake no S3, upload raw e primeira exploração com Athena.</li>
+                </ul>
+              </article>
+            </div>
             <div class="deck-footer">
               <span>Slide 2 de abertura</span>
               <div class="deck-links">
@@ -319,32 +317,24 @@
               <span class="deck-kicker">Consulta</span>
               <h2 class="deck-title">Como reduzir custo e ganhar performance no Athena</h2>
             </div>
-            <table class="deck-table">
-              <thead>
-                <tr>
-                  <th>Boa prática</th>
-                  <th>Efeito</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Usar Parquet</td>
-                  <td>Lê menos dados e acelera consultas.</td>
-                </tr>
-                <tr>
-                  <td>Filtrar por partição</td>
-                  <td>Evita scan desnecessário de diretórios inteiros.</td>
-                </tr>
-                <tr>
-                  <td>Evitar pequenos arquivos em excesso</td>
-                  <td>Reduz overhead operacional e de leitura.</td>
-                </tr>
-                <tr>
-                  <td>Separar bem raw e curated</td>
-                  <td>Evita schema inconsistente e consumo indevido.</td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="deck-grid">
+              <article class="deck-card">
+                <h3>Usar Parquet</h3>
+                <ul><li>Lê menos dados e acelera consultas.</li></ul>
+              </article>
+              <article class="deck-card">
+                <h3>Filtrar por partição</h3>
+                <ul><li>Evita scan desnecessário de diretórios inteiros.</li></ul>
+              </article>
+              <article class="deck-card">
+                <h3>Evitar arquivos pequenos</h3>
+                <ul><li>Reduz overhead operacional e de leitura.</li></ul>
+              </article>
+              <article class="deck-card">
+                <h3>Separar raw e curated</h3>
+                <ul><li>Evita schema inconsistente e consumo indevido.</li></ul>
+              </article>
+            </div>
             <div class="deck-footer">
               <span>Bloco teórico 2</span>
               <div class="deck-links">
@@ -395,37 +385,24 @@
               <span class="deck-kicker">Prática</span>
               <h2 class="deck-title">Roteiro do laboratório com AWS Student</h2>
             </div>
-            <table class="deck-table">
-              <thead>
-                <tr>
-                  <th>Etapa</th>
-                  <th>Ação</th>
-                  <th>Resultado esperado</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>1</td>
-                  <td>Acessar o ambiente AWS Student e validar região e permissões.</td>
-                  <td>Ambiente preparado para o laboratório.</td>
-                </tr>
-                <tr>
-                  <td>2</td>
-                  <td>Criar bucket e prefixos `raw/`, `trusted/` e `refined/`.</td>
-                  <td>Estrutura inicial do lake criada.</td>
-                </tr>
-                <tr>
-                  <td>3</td>
-                  <td>Fazer upload de arquivos CSV ou JSON para a zona raw.</td>
-                  <td>Dados disponíveis no S3.</td>
-                </tr>
-                <tr>
-                  <td>4</td>
-                  <td>Criar tabela no Athena e consultar os dados.</td>
-                  <td>Primeira exploração validada.</td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="deck-grid">
+              <article class="deck-card">
+                <h3>Etapa 1</h3>
+                <ul><li>Acessar AWS Student e validar região e permissões.</li></ul>
+              </article>
+              <article class="deck-card">
+                <h3>Etapa 2</h3>
+                <ul><li>Criar bucket com prefixos <code>raw/</code>, <code>trusted/</code> e <code>refined/</code>.</li></ul>
+              </article>
+              <article class="deck-card">
+                <h3>Etapa 3</h3>
+                <ul><li>Fazer upload de arquivos CSV ou JSON para a zona raw.</li></ul>
+              </article>
+              <article class="deck-card">
+                <h3>Etapa 4</h3>
+                <ul><li>Criar tabela no Athena e executar a primeira consulta.</li></ul>
+              </article>
+            </div>
             <div class="deck-footer">
               <span>Prática 21h00 - 22h00</span>
               <div class="deck-links">

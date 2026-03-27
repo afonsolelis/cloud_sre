@@ -16,12 +16,14 @@ ccsre_pratica/
 ├── playwright.config.ts
 ├── index.html
 ├── assets/
-│   └── styles.css
+│   ├── styles.css
+│   └── reveal_custom.css
 ├── specs/
 │   ├── estrutura_curso.md
 │   ├── design_system.md
 │   └── repositorio_de_aulas.md
 ├── tests/
+│   ├── README.md
 │   ├── fixtures/
 │   │   └── helpers.ts
 │   └── specs/
@@ -48,7 +50,8 @@ Define a estrutura canônica de pastas, convenções de nomenclatura e contratos
 - Pastas de aula: `aula_XX_tema_resumido/` (snake_case, dois dígitos)
 - Slides: `slide_aula_XX_tema.html`
 - Materiais: `material_aula_XX_tema.html`
-- Fundo branco, texto preto, HTML responsivo
+- Fundo branco (`#FFFFFF`), texto preto (`#000000`)
+- Dinâmica: 19h00 às 22h00 (teoria + prática com AWS Student)
 
 ### 2. Design System (`specs/design_system.md`)
 
@@ -66,24 +69,20 @@ Define o sistema visual para manter consistência entre index, slides e materiai
 - Destaque: tons neutros de alto contraste
 - Tipografia: hierarquia clara, boa legibilidade
 - Espaçamento: ritmo consistente entre blocos
-- Bordas: discretas, evitar excesso de arredondamento
+- Bordas: discretas, evitar excesso de arredondamento (máx 16px)
+- Sombras: sutis para organização visual
 
-**Componentes obrigatórios:**
-- Botões e links com aparência consistente
-- Navegação cruzada entre slides, materiais e índice
-- Cards e painéis com padrão uniforme
-- Cabeçalhos e rodapés com hierarquia clara
-
-### 3. Repositório de Aulas (`specs/repositorio_de_aulas.md`)
+### 3. Repositório de Aulas (`repositorio_de_aulas.md`)
 
 Define regras de conteúdo e navegação obrigatória.
 
-**Regras para slides:**
-- Devem usar **reveal.js**
+**Regras para slides (reveal.js):**
 - Slide 1: Capa com título e ano (2026)
 - Slide 2: Agenda da aula
 - Slide 3: Placeholder de conteúdo
 - Links obrigatórios: material da aula + index.html
+- Foco único por tela, evitar poluição visual
+- Texto breve, detalhes longos vão para o material
 
 **Regras para materiais:**
 - Devem espelhar tópicos do slide correspondente
@@ -183,11 +182,13 @@ Agente, crie o slide e material para a aula X conforme specs/repositorio_de_aula
 - Reportar violações de conformidade
 
 **Arquivos de teste:**
-| Arquivo | Spec Validada | Descrição |
-|---------|---------------|-----------|
-| `tests/specs/estrutura_curso.spec.ts` | `estrutura_curso.md` | Nomenclatura, estrutura de pastas, prefixos de arquivo |
-| `tests/specs/design_system.spec.ts` | `design_system.md` | Cores, tipografia, componentes, responsividade |
-| `tests/specs/repositorio_de_aulas.spec.ts` | `repositorio_de_aulas.md` | Conteúdo de slides/materiais, navegação, reveal.js |
+
+| Arquivo | Spec Validada | Tests para |
+|---------|---------------|------------|
+| `tests/specs/estrutura_curso.spec.ts` | `estrutura_curso.md` | Pastas (aula_, snake_case, 2 dígitos), Arquivos (slide_, material_, snake_case), Estrutura (slides/, material/), Estilo (fundo branco, texto preto) |
+| `tests/specs/design_system.spec.ts` | `design_system.md` | Cores (contraste, destaque), Tipografia (hierarquia, legibilidade), Espaçamento (padding uniforme), Bordas (máx 16px), Sombras (sutis), Navegação (hover, focus), Responsividade (viewport, mobile) |
+| `tests/specs/repositorio_de_aulas.spec.ts` | `repositorio_de_aulas.md` | **Slides:** reveal.js, capa (título+2026), agenda, placeholder, links (material, index), foco único, sem poluição |
+| | | **Materiais:** título, data, resumo, Exercícios de fixação, links (slide, index), passo a passo, textos longos |
 
 **Comandos disponíveis:**
 ```bash
@@ -223,8 +224,7 @@ Agente, execute os testes para validar conformidade com as specs
 
 - [ ] Refatorar estrutura de pastas para convenção canônica (`aula_XX_tema/`)
 - [ ] Migrar slides para reveal.js
-- [ ] Criar `assets/styles.css` compartilhado
-- [ ] Preencher conteúdo completo dos slides
+- [ ] Preencher conteúdo completo dos slides (capa, agenda, conteúdo)
 - [ ] Desenvolver exercícios dos labs
 - [ ] Adicionar exemplos de código e scripts
 - [ ] Incluir diagramas de arquitetura

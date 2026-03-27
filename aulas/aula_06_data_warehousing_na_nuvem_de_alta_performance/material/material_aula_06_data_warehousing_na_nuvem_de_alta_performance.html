@@ -3,35 +3,363 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Material Aula 06</title>
+    <title>Material Aula 06 — Data Warehousing na Nuvem de Alta Performance</title>
     <link rel="stylesheet" href="../../../assets/styles.css" />
+    <style data-design-tokens>:root{--bg:#fff;--color:#000000}body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}a:hover{opacity:.8}a:focus{outline:2px solid #000000}</style>
   </head>
   <body class="material">
     <main class="page">
+
       <section class="content-block">
-        <p class="meta">Aula 06 • 21/05/2026</p>
+        <p class="meta">Aula 06 &nbsp;•&nbsp; 21/05/2026 &nbsp;•&nbsp; 19h00 – 22h00</p>
         <h1>Data Warehousing na Nuvem de Alta Performance</h1>
         <p class="summary">
-          Material inicial para consolidar conceitos de modelagem analítica,
-          performance de consulta e integração com o Data Lake.
+          Este material aprofunda os conceitos apresentados nos slides da Aula 06.
+          Cobre a arquitetura MPP do Amazon Redshift, as decisões físicas de distribution
+          style e sort keys, a carga de dados com o COPY command, a modelagem analítica
+          com star schema, e a integração entre Data Warehouse e Data Lake via
+          Redshift Spectrum.
         </p>
-        <h2>Tópicos-base</h2>
+      </section>
+
+      <!-- =========================================================
+           MÓDULO 1 — ARQUITETURA REDSHIFT
+      ========================================================== -->
+      <section class="content-block">
+        <h2>Módulo 1 — Arquitetura MPP do Amazon Redshift</h2>
+
+        <h3>O que é MPP e por que importa</h3>
+        <p>
+          MPP (Massively Parallel Processing) é um modelo de processamento onde uma query
+          é decomposta em tarefas menores executadas simultaneamente em múltiplos nós.
+          No Redshift, o nó leader recebe a query do cliente, cria um plano de execução
+          e distribui as tarefas para os nós compute. Cada nó compute processa apenas
+          os dados armazenados nele, em paralelo com todos os outros. O leader coleta
+          os resultados parciais, os combina e retorna para o cliente.
+        </p>
+        <p>
+          O resultado prático é que uma query que escaneia 1 bilhão de linhas pode ser
+          processada em segundos quando distribuída por dezenas de nós compute, cada
+          um processando uma fatia dos dados em paralelo. Isso é fundamentalmente
+          diferente de um banco relacional tradicional (como PostgreSQL), que processa
+          queries em um único servidor.
+        </p>
+
+        <h3>Armazenamento colunar no Redshift</h3>
+        <p>
+          O Redshift usa armazenamento colunar (como Parquet): os dados de cada coluna
+          são armazenados sequencialmente no disco, separados dos dados das outras colunas.
+          Quando uma query precisa de apenas algumas colunas de uma tabela com dezenas,
+          o Redshift lê apenas os blocos das colunas necessárias. A combinação de
+          armazenamento colunar com compressão específica por tipo de dado (Run Length
+          Encoding para colunas com muita repetição, Delta para séries temporais, etc.)
+          pode reduzir o tamanho físico dos dados em 3-5x em relação ao armazenamento
+          row-based não comprimido.
+        </p>
+
+        <h3>Distribution styles: como os dados são distribuídos entre nós</h3>
+        <p>
+          A escolha do distribution style define como as linhas de uma tabela são
+          distribuídas entre os nós compute. Essa decisão impacta diretamente
+          a performance de queries que fazem JOIN entre tabelas.
+        </p>
         <ul>
-          <li>MPP e organização física de tabelas no Redshift.</li>
-          <li>Modelagem estrela com fatos e dimensões.</li>
-          <li>Consultas híbridas com Redshift Spectrum.</li>
+          <li>
+            <strong>DISTSTYLE EVEN:</strong> o Redshift distribui linhas em round-robin
+            entre os nós. Cada nó tem aproximadamente a mesma quantidade de dados.
+            Bom para tabelas sem padrão claro de JOIN. O problema é que JOINs entre
+            duas tabelas EVEN exigem movimento de dados (redistribuição) entre nós —
+            operação custosa chamada de <em>data movement</em>.
+          </li>
+          <li>
+            <strong>DISTSTYLE KEY (DISTKEY):</strong> linhas com o mesmo valor de
+            DISTKEY são armazenadas no mesmo nó. Quando duas tabelas grandes têm
+            o mesmo DISTKEY e são unidas por essa coluna, o JOIN acontece localmente
+            em cada nó sem movimentação de dados. Escolha o DISTKEY pela coluna mais
+            frequente em JOINs, com alta cardinalidade e distribuição uniforme.
+          </li>
+          <li>
+            <strong>DISTSTYLE ALL:</strong> uma cópia completa da tabela é armazenada
+            em cada nó. JOINs com essa tabela nunca precisam de redistribuição.
+            Use apenas para tabelas pequenas e raramente modificadas (dimensões
+            pequenas em star schemas), pois o custo de armazenamento e de WRITE
+            cresce linearmente com o número de nós.
+          </li>
+          <li>
+            <strong>DISTSTYLE AUTO:</strong> o Redshift escolhe automaticamente o melhor
+            estilo com base no tamanho da tabela. Recomendado para começar.
+          </li>
         </ul>
+
+        <h3>Sort keys: otimizando leituras com zone maps</h3>
+        <p>
+          O sort key define a ordem física em que os dados são armazenados nos blocos de disco.
+          O Redshift mantém <em>zone maps</em> — metadados que registram o valor mínimo e máximo
+          de cada bloco para as colunas de sort key. Quando uma query filtra por uma coluna de
+          sort key (ex.: <code>WHERE data_venda BETWEEN '2026-01-01' AND '2026-03-31'</code>),
+          o Redshift usa os zone maps para pular blocos inteiros que não contêm dados no
+          intervalo filtrado, sem lê-los.
+        </p>
+        <p>
+          Tipos de sort key:
+        </p>
+        <ul>
+          <li><strong>COMPOUND SORTKEY:</strong> os dados são ordenados pela primeira coluna,
+          depois pela segunda dentro de grupos da primeira, etc. Mais eficiente para filtros
+          que usam as colunas na mesma ordem do sort key.</li>
+          <li><strong>INTERLEAVED SORTKEY:</strong> trata cada coluna de sort key com igual
+          importância. Melhor quando os filtros variam amplamente entre diferentes colunas.</li>
+        </ul>
+      </section>
+
+      <!-- =========================================================
+           MÓDULO 2 — MODELAGEM ANALÍTICA
+      ========================================================== -->
+      <section class="content-block">
+        <h2>Módulo 2 — Modelagem Analítica: Star Schema</h2>
+
+        <h3>Modelo estrela: fatos e dimensões</h3>
+        <p>
+          O star schema (modelagem estrela) é o padrão de modelagem dimensional usado em
+          Data Warehouses. Uma tabela de fatos central contém as métricas numéricas
+          mensuráveis (vendas, receita, quantidade), e tabelas de dimensão ao redor
+          descrevem o contexto (quem, quando, onde, o quê).
+        </p>
+        <p>
+          Exemplo de star schema para análise de vendas:
+        </p>
+        <ul>
+          <li><strong>Fato: fato_vendas</strong> — colunas: pedido_id (SK), cliente_sk (FK),
+          produto_sk (FK), data_sk (FK), loja_sk (FK), quantidade, valor_unit, valor_total,
+          desconto. Cada linha é uma venda individual.</li>
+          <li><strong>Dim: dim_cliente</strong> — cliente_sk, nome, segmento, cidade, estado, pais.</li>
+          <li><strong>Dim: dim_produto</strong> — produto_sk, nome, categoria, subcategoria, marca, preco_lista.</li>
+          <li><strong>Dim: dim_data</strong> — data_sk, data, dia_semana, mes, trimestre, ano, is_fim_semana, is_feriado.</li>
+          <li><strong>Dim: dim_loja</strong> — loja_sk, nome, regiao, tipo (fisica/online), gerente.</li>
+        </ul>
+        <p>
+          As tabelas de dimensão são desnormalizadas — atributos que em um modelo OLTP
+          seriam separados em múltiplas tabelas (ex.: cidade, estado, país em tabelas separadas)
+          são "achatados" em uma única dimensão. Isso elimina JOINs em profundidade e
+          simplifica as queries dos analistas.
+        </p>
+
+        <h3>COPY command: a forma eficiente de carregar dados</h3>
+        <p>
+          O COPY é o comando otimizado para cargas em massa no Redshift. Em vez de
+          múltiplos INSERTs individuais (que são lentos porque o Redshift precisa manter
+          os índices e estatísticas a cada inserção), o COPY carrega dados diretamente
+          do S3 em paralelo para os nós compute.
+        </p>
+        <p>
+          Exemplo de COPY de arquivos Parquet do S3:
+        </p>
+        <pre><code>COPY schema_vendas.fato_vendas
+FROM 's3://meu-datalake/refined/produto=vendas/ano=2026/mes=04/'
+IAM_ROLE 'arn:aws:iam::123456789:role/RedshiftCopyRole'
+FORMAT AS PARQUET;
+</code></pre>
+        <p>
+          Após uma carga com COPY, execute sempre <code>ANALYZE</code> para atualizar
+          as estatísticas do query planner e <code>VACUUM</code> para reorganizar os dados
+          e reclamar espaço de linhas deletadas.
+        </p>
+      </section>
+
+      <!-- =========================================================
+           MÓDULO 3 — REDSHIFT SPECTRUM
+      ========================================================== -->
+      <section class="content-block">
+        <h2>Módulo 3 — Redshift Spectrum: Data Warehouse + Data Lake</h2>
+
+        <h3>O que é o Redshift Spectrum</h3>
+        <p>
+          O Redshift Spectrum permite executar queries SQL sobre dados armazenados no S3
+          diretamente do Redshift, sem precisar carregar os dados no cluster.
+          Ele usa uma frota separada de nós (independente do cluster Redshift)
+          para escanear e processar os dados no S3, e retorna os resultados para
+          o nó leader do Redshift para combinação com dados internos.
+        </p>
+        <p>
+          Isso cria um padrão híbrido poderoso: dados quentes e frequentemente consultados
+          ficam carregados no Redshift (acesso rápido, custo de armazenamento maior),
+          enquanto dados históricos ou raramente consultados ficam no S3 (armazenamento
+          barato) e são acessados via Spectrum quando necessário.
+        </p>
+
+        <h3>Configurando o Spectrum</h3>
+        <p>
+          Para usar o Spectrum, você precisa:
+        </p>
+        <ol>
+          <li>Criar um external schema no Redshift apontando para o Glue Data Catalog.</li>
+          <li>As tabelas externas no Catalog ficam automaticamente visíveis no Redshift
+          via esse schema.</li>
+        </ol>
+        <pre><code>CREATE EXTERNAL SCHEMA spectrum_raw
+FROM DATA CATALOG
+DATABASE 'datalake_lab'
+IAM_ROLE 'arn:aws:iam::123456789:role/RedshiftSpectrumRole'
+CREATE EXTERNAL DATABASE IF NOT EXISTS;
+</code></pre>
+        <p>
+          Após isso, você pode fazer JOINs entre tabelas internas do Redshift e tabelas
+          externas no S3 na mesma query:
+        </p>
+        <pre><code>SELECT c.nome, SUM(f.valor_total) AS receita_total
+FROM schema_vendas.fato_vendas f
+JOIN spectrum_raw.trusted_pedidos s3_p ON f.pedido_id = s3_p.pedido_id
+JOIN schema_vendas.dim_cliente c ON f.cliente_sk = c.cliente_sk
+WHERE f.data_sk BETWEEN 20260101 AND 20260430
+GROUP BY c.nome
+ORDER BY receita_total DESC
+LIMIT 10;
+</code></pre>
+      </section>
+
+      <!-- =========================================================
+           MÓDULO 4 — LABORATÓRIO
+      ========================================================== -->
+      <section class="content-block">
+        <h2>Módulo 4 — Laboratório: Explorando o Redshift com o Query Editor</h2>
+        <p>
+          Devido a restrições de custo no ambiente AWS Student, o laboratório usa o
+          <strong>Redshift Serverless</strong> (se disponível no lab) ou o
+          <strong>Redshift Query Editor v2</strong> para explorar conceitos.
+          Siga os passos adaptando para o que estiver disponível no seu ambiente.
+        </p>
+
+        <h3>Passo 1 — Acessar ou provisionar o Redshift</h3>
+        <ol>
+          <li>No console AWS, acesse <strong>Amazon Redshift</strong>.</li>
+          <li>Se o lab já tiver um cluster ou workgroup serverless, clique nele para acessar.</li>
+          <li>Se não houver, clique em <strong>Try Amazon Redshift Serverless</strong>
+          e siga o assistente de configuração com as configurações padrão.</li>
+          <li>Aguarde o status ficar <strong>Available</strong>.</li>
+          <li><strong>Validação:</strong> você consegue acessar o <strong>Query Editor v2</strong>.</li>
+        </ol>
+
+        <h3>Passo 2 — Criar o schema e as tabelas dimensão e fato</h3>
+        <ol>
+          <li>No Query Editor v2, crie um novo script e execute:</li>
+        </ol>
+        <pre><code>CREATE SCHEMA IF NOT EXISTS vendas;
+
+CREATE TABLE vendas.dim_cliente (
+    cliente_sk INT IDENTITY(1,1),
+    cliente_id VARCHAR(20) NOT NULL,
+    nome       VARCHAR(100),
+    segmento   VARCHAR(50),
+    cidade     VARCHAR(50),
+    estado     CHAR(2)
+)
+DISTSTYLE ALL;
+
+CREATE TABLE vendas.dim_data (
+    data_sk    INT,
+    data       DATE,
+    ano        SMALLINT,
+    mes        SMALLINT,
+    dia        SMALLINT,
+    trimestre  SMALLINT
+)
+DISTSTYLE ALL
+SORTKEY (data);
+
+CREATE TABLE vendas.fato_vendas (
+    pedido_sk   BIGINT IDENTITY(1,1),
+    pedido_id   VARCHAR(20),
+    cliente_sk  INT,
+    data_sk     INT,
+    valor       DECIMAL(10,2),
+    status      VARCHAR(20)
+)
+DISTKEY (cliente_sk)
+SORTKEY (data_sk);
+</code></pre>
+        <ol start="2">
+          <li>Insira dados de exemplo nas dimensões:</li>
+        </ol>
+        <pre><code>INSERT INTO vendas.dim_cliente (cliente_id, nome, segmento, cidade, estado)
+VALUES ('C001','Ana Silva','premium','São Paulo','SP'),
+       ('C002','João Lima','standard','Rio de Janeiro','RJ');
+
+INSERT INTO vendas.dim_data VALUES
+(20260401, '2026-04-01', 2026, 4, 1, 2),
+(20260402, '2026-04-02', 2026, 4, 2, 2);
+
+INSERT INTO vendas.fato_vendas (pedido_id, cliente_sk, data_sk, valor, status)
+VALUES ('P001', 1, 20260401, 150.00, 'entregue'),
+       ('P002', 2, 20260401, 89.90, 'processando'),
+       ('P003', 1, 20260402, 320.50, 'entregue');
+</code></pre>
+        <ol start="3">
+          <li>Execute uma query analítica com JOIN:</li>
+        </ol>
+        <pre><code>SELECT c.nome, d.data, SUM(f.valor) AS total
+FROM vendas.fato_vendas f
+JOIN vendas.dim_cliente c ON f.cliente_sk = c.cliente_sk
+JOIN vendas.dim_data d ON f.data_sk = d.data_sk
+WHERE f.status = 'entregue'
+GROUP BY c.nome, d.data
+ORDER BY total DESC;
+</code></pre>
+        <ol start="4">
+          <li><strong>Validação:</strong> a query retorna os totais por cliente e data
+          apenas para pedidos entregues.</li>
+        </ol>
+      </section>
+
+      <!-- =========================================================
+           EXERCÍCIOS DE FIXAÇÃO
+      ========================================================== -->
+      <section class="content-block">
         <h2>Exercícios de fixação</h2>
         <ol>
-          <li>Explicar o impacto de distribution style em consultas analíticas.</li>
-          <li>Montar um exemplo simples de star schema.</li>
-          <li>Comparar carga física no Redshift com leitura externa via Spectrum.</li>
+          <li>
+            <strong>Distribution style na prática:</strong> uma tabela de fatos de vendas
+            tem 500 milhões de linhas e é frequentemente unida com uma tabela de clientes
+            de 2 milhões de linhas. Justifique qual distribution style você escolheria
+            para cada tabela, explicando o impacto na movimentação de dados durante
+            o JOIN e na performance geral da query.
+          </li>
+          <li>
+            <strong>Star schema design:</strong> uma empresa de streaming de música precisa
+            de um Data Warehouse para analisar o comportamento de usuários. Descreva
+            um star schema completo com pelo menos uma tabela de fatos e quatro dimensões,
+            especificando as colunas principais de cada tabela, o DISTKEY e SORTKEY
+            recomendado para cada uma, e um exemplo de query analítica que beneficiaria
+            desse design.
+          </li>
+          <li>
+            <strong>Redshift versus Athena:</strong> compare o Amazon Redshift e o Amazon
+            Athena em termos de custo, performance, manutenção e casos de uso adequados.
+            Para cada afirmação a seguir, indique qual serviço é mais adequado e justifique:
+            (a) consultas ad-hoc exploratórias por analistas; (b) dashboards de BI com SLA
+            de resposta em 2 segundos; (c) queries históricas sobre dados de 5 anos atrás.
+          </li>
+          <li>
+            <strong>COPY versus INSERT:</strong> um engenheiro está carregando 100 milhões
+            de linhas no Redshift usando INSERTs individuais em um loop Python.
+            O processo está levando 8 horas. Explique por que o COPY é muito mais eficiente,
+            descreva o processo otimizado com COPY desde o S3, e liste três boas práticas
+            adicionais para carga eficiente no Redshift.
+          </li>
+          <li>
+            <strong>Lake Formation + Spectrum:</strong> descreva uma arquitetura onde
+            dados históricos (mais de 2 anos) ficam no S3 Glacier e são consultados via
+            Redshift Spectrum, enquanto dados recentes estão carregados diretamente no
+            Redshift. Como o Glue Data Catalog e o Spectrum facilitam essa arquitetura híbrida?
+            Quais são as implicações de custo?
+          </li>
         </ol>
-        <footer class="actions">
-          <a class="button" href="../slides/slide_aula_06_data_warehousing_na_nuvem_de_alta_performance.html">Voltar ao slide</a>
-          <a class="button" href="../../../index.html">Voltar ao índice</a>
-        </footer>
       </section>
+
+      <footer class="actions">
+        <a class="button" href="../slides/slide_aula_06_data_warehousing_na_nuvem_de_alta_performance.html">Voltar ao slide</a>
+        <a class="button" href="../../../index.html">Voltar ao índice</a>
+      </footer>
+
     </main>
   </body>
 </html>

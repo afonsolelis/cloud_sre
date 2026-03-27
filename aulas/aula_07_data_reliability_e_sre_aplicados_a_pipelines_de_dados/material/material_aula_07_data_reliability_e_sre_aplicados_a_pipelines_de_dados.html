@@ -3,35 +3,400 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Material Aula 07</title>
+    <title>Material Aula 07 — Data Reliability e SRE Aplicados a Pipelines de Dados</title>
     <link rel="stylesheet" href="../../../assets/styles.css" />
+    <style data-design-tokens>:root{--bg:#fff;--color:#000000}body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}a:hover{opacity:.8}a:focus{outline:2px solid #000000}</style>
   </head>
   <body class="material">
     <main class="page">
+
       <section class="content-block">
-        <p class="meta">Aula 07 • 28/05/2026</p>
+        <p class="meta">Aula 07 &nbsp;•&nbsp; 28/05/2026 &nbsp;•&nbsp; 19h00 – 22h00</p>
         <h1>Data Reliability e SRE Aplicados a Pipelines de Dados</h1>
         <p class="summary">
-          Material inicial para apoiar a discussão sobre confiabilidade,
-          monitoramento e recuperação de falhas em pipelines.
+          Este material aprofunda os conceitos apresentados nos slides da Aula 07.
+          Cobre os princípios de Site Reliability Engineering (SRE) aplicados a pipelines
+          de dados, a definição de SLOs e SLAs para entrega de dados, o uso do Amazon
+          CloudWatch para observabilidade, e as ferramentas de orquestração resiliente
+          — MWAA (Managed Workflows for Apache Airflow) e AWS Step Functions —
+          com estratégias de retry e recuperação de falhas.
         </p>
-        <h2>Tópicos-base</h2>
+      </section>
+
+      <!-- =========================================================
+           MÓDULO 1 — SRE PARA DADOS
+      ========================================================== -->
+      <section class="content-block">
+        <h2>Módulo 1 — SRE Aplicado a Pipelines de Dados</h2>
+
+        <h3>O que é SRE e como se aplica a dados</h3>
+        <p>
+          Site Reliability Engineering (SRE) é uma disciplina que aplica práticas de
+          engenharia de software a operações de infraestrutura, com o objetivo de criar
+          sistemas escaláveis e altamente confiáveis. Originada no Google, a SRE define
+          métricas objetivas de confiabilidade (SLOs) e usa automação para reduzir
+          o trabalho manual repetitivo (toil).
+        </p>
+        <p>
+          Para pipelines de dados, a SRE se manifesta como <strong>Data Reliability Engineering</strong>:
+          garantir que os dados cheguem ao destino correto, no tempo correto,
+          com a qualidade correta. Assim como um serviço web tem um SLO de disponibilidade
+          (ex.: 99,9% de uptime), um pipeline de dados pode ter um SLO de freshness
+          (ex.: dados disponíveis com no máximo 4 horas de atraso) e de completeness
+          (ex.: no máximo 0,01% de registros perdidos).
+        </p>
+
+        <h3>SLIs, SLOs e SLAs para pipelines de dados</h3>
+        <p>
+          <strong>SLI (Service Level Indicator):</strong> uma métrica quantitativa que mede
+          um aspecto do comportamento do pipeline. Exemplos para pipelines de dados:
+        </p>
         <ul>
-          <li>Observabilidade orientada a dados.</li>
-          <li>SLOs e métricas de saúde do pipeline.</li>
-          <li>Orquestração resiliente e tratamento de erro.</li>
+          <li><em>Freshness:</em> tempo entre a chegada do dado na fonte e a disponibilidade
+          na camada Trusted. Medido em minutos ou horas.</li>
+          <li><em>Completeness:</em> percentual de registros esperados que efetivamente
+          chegaram ao destino. Ex.: 99,98% dos eventos de um sistema foram ingeridos.</li>
+          <li><em>Accuracy:</em> percentual de registros com valores corretos (sem erros
+          de transformação ou corrupção).</li>
+          <li><em>Availability:</em> percentual do tempo em que o pipeline está operacional
+          e processando dados.</li>
         </ul>
+        <p>
+          <strong>SLO (Service Level Objective):</strong> o alvo definido para um SLI.
+          Exemplo: "o pipeline de vendas deve entregar dados com freshness menor que 60 minutos
+          em 99,5% do tempo em qualquer janela de 30 dias."
+        </p>
+        <p>
+          <strong>SLA (Service Level Agreement):</strong> o acordo formal entre o provedor
+          (equipe de dados) e o consumidor (time de BI, time de negócio), geralmente com
+          consequências contratuais se o SLO não for atingido. O SLA é mais conservador
+          que o SLO — se o SLO interno é 99,5%, o SLA externo pode ser 99%.
+        </p>
+
+        <h3>Error budgets: aceitando falhas de forma controlada</h3>
+        <p>
+          O error budget é a quantidade de falha permitida antes que o SLO seja violado.
+          Se o SLO é 99,5% de freshness em 30 dias, o error budget é 0,5% de 30 dias
+          = 3,6 horas de falha permitida por mês. Quando o error budget está esgotado,
+          a prioridade da equipe deve mudar de novas features para estabilidade e
+          redução de toil.
+        </p>
+      </section>
+
+      <!-- =========================================================
+           MÓDULO 2 — CLOUDWATCH
+      ========================================================== -->
+      <section class="content-block">
+        <h2>Módulo 2 — Amazon CloudWatch: Observabilidade para Pipelines</h2>
+
+        <h3>Os três pilares da observabilidade</h3>
+        <p>
+          Observabilidade é a capacidade de inferir o estado interno de um sistema
+          a partir de suas saídas externas. Os três pilares são:
+        </p>
+        <ul>
+          <li>
+            <strong>Métricas:</strong> valores numéricos agregados ao longo do tempo.
+            Exemplos: número de registros processados por hora, latência média de
+            execução de um Glue Job, número de falhas em 24h. No CloudWatch, as métricas
+            são armazenadas com granularidade de 1 segundo (high resolution) ou 1 minuto
+            (standard) e podem ser visualizadas em dashboards.
+          </li>
+          <li>
+            <strong>Logs:</strong> registros textuais de eventos que ocorreram no sistema.
+            Exemplos: stack traces de erros em Glue Jobs, mensagens de progresso de pipelines,
+            logs de acesso do Athena. No CloudWatch Logs, os logs são organizados em
+            Log Groups (um por aplicação/serviço) e Log Streams (um por instância/execução).
+          </li>
+          <li>
+            <strong>Traces:</strong> registro do fluxo de uma requisição ou job através
+            de múltiplos serviços. O AWS X-Ray fornece tracing distribuído para entender
+            onde o tempo é gasto em pipelines com múltiplos componentes.
+          </li>
+        </ul>
+
+        <h3>CloudWatch Alarms para pipelines de dados</h3>
+        <p>
+          Um CloudWatch Alarm monitora uma métrica e executa uma ação quando o valor
+          cruza um limiar. Para pipelines de dados, alarmes essenciais incluem:
+        </p>
+        <ul>
+          <li><strong>Glue Job failures:</strong> alarme quando o número de execuções
+          com erro excede 1 em qualquer período de 1 hora.</li>
+          <li><strong>Kinesis iterator age:</strong> alarme quando o GetRecords.IteratorAgeMilliseconds
+          do Kinesis excede 60.000 ms (indicando que o consumidor está atrasado em relação
+          ao produtor).</li>
+          <li><strong>Athena query scan volume:</strong> alarme quando uma única query
+          escaneia mais de 100 GB (indicando query problemática ou mal otimizada).</li>
+          <li><strong>S3 bucket size:</strong> alarme quando o bucket cresce mais de
+          X% ao dia em relação à média histórica (anomalia de volume que pode indicar
+          problema de duplicação).</li>
+        </ul>
+        <p>
+          A ação típica de um alarme é publicar uma notificação no SNS (Simple Notification Service),
+          que então pode enviar emails, mensagens Slack via Lambda, ou disparar uma função
+          de remediação automática.
+        </p>
+
+        <h3>CloudWatch Logs Insights para análise de falhas</h3>
+        <p>
+          O Logs Insights é um motor de query para pesquisar e analisar logs no CloudWatch.
+          Exemplo de query para encontrar erros em logs de Glue Jobs nas últimas 24h:
+        </p>
+        <pre><code>fields @timestamp, @message
+| filter @message like /ERROR/
+| sort @timestamp desc
+| limit 50
+</code></pre>
+        <p>
+          O Logs Insights suporta agregações, filtros com regex, e funções de estatística,
+          tornando-o poderoso para análise de incidentes e identificação de padrões
+          de falha recorrentes.
+        </p>
+      </section>
+
+      <!-- =========================================================
+           MÓDULO 3 — ORQUESTRAÇÃO RESILIENTE
+      ========================================================== -->
+      <section class="content-block">
+        <h2>Módulo 3 — Orquestração Resiliente: MWAA e Step Functions</h2>
+
+        <h3>Por que orquestração é crítica</h3>
+        <p>
+          Um pipeline de dados típico é composto por múltiplas etapas com dependências:
+          o job de transformação Trusted só deve rodar depois que o Crawler Raw terminar;
+          o job de Refined só deve rodar depois que o Trusted estiver completo;
+          a notificação ao time de BI só deve ser enviada após validações de qualidade.
+          Executar essas etapas manualmente é insustentável e propenso a erros.
+          Um orquestrador gerencia essas dependências automaticamente e define o que
+          fazer quando uma etapa falha.
+        </p>
+
+        <h3>Amazon MWAA: Apache Airflow gerenciado</h3>
+        <p>
+          O MWAA (Managed Workflows for Apache Airflow) é o serviço gerenciado da AWS
+          para executar o Apache Airflow. O Airflow usa DAGs (Directed Acyclic Graphs)
+          escritas em Python para definir pipelines. Cada nó do DAG é uma Task (uma
+          unidade de trabalho), e as arestas definem as dependências entre tasks.
+        </p>
+        <p>
+          Exemplo de DAG Airflow simples para o pipeline da disciplina:
+        </p>
+        <pre><code>from airflow import DAG
+from airflow.providers.amazon.aws.operators.glue import GlueJobOperator
+from airflow.providers.amazon.aws.operators.glue_crawler import GlueCrawlerOperator
+from datetime import datetime, timedelta
+
+default_args = {
+    'owner': 'data-engineering',
+    'retries': 2,
+    'retry_delay': timedelta(minutes=5),
+    'email_on_failure': True,
+    'email': ['alertas@empresa.com']
+}
+
+with DAG(
+    dag_id='pipeline_vendas_diario',
+    default_args=default_args,
+    schedule_interval='0 6 * * *',  # Todo dia às 06h00
+    start_date=datetime(2026, 4, 1),
+    catchup=False
+) as dag:
+
+    crawl_raw = GlueCrawlerOperator(
+        task_id='crawl_raw',
+        config={'Name': 'crawler-raw-lab'}
+    )
+
+    etl_trusted = GlueJobOperator(
+        task_id='etl_raw_to_trusted',
+        job_name='etl-raw-to-trusted-pedidos'
+    )
+
+    crawl_trusted = GlueCrawlerOperator(
+        task_id='crawl_trusted',
+        config={'Name': 'crawler-trusted-lab'}
+    )
+
+    crawl_raw >> etl_trusted >> crawl_trusted
+</code></pre>
+        <p>
+          O parâmetro <code>retries=2</code> faz o Airflow tentar reexecutar uma task
+          que falhou até 2 vezes adicionais, com 5 minutos de intervalo entre tentativas.
+          Isso cobre falhas transitórias (ex.: timeout de rede, throttling da AWS)
+          sem intervenção manual.
+        </p>
+
+        <h3>AWS Step Functions: orquestração serverless</h3>
+        <p>
+          O Step Functions é uma alternativa serverless ao MWAA para orquestração de
+          workflows. Em vez de Python, os workflows são definidos em Amazon States Language
+          (JSON). Cada estado pode invocar uma Lambda, um Glue Job, um ECS Task, ou aguardar
+          um evento.
+        </p>
+        <p>
+          Vantagens do Step Functions sobre MWAA:
+        </p>
+        <ul>
+          <li>Sem servidor para gerenciar — sem preocupação com escalabilidade do scheduler.</li>
+          <li>Integração nativa com praticamente todos os serviços AWS via SDK integrations.</li>
+          <li>Visualização do estado de execução em tempo real no console.</li>
+          <li>Custo baseado em transições de estado (paga por execução, não por hora de servidor).</li>
+        </ul>
+        <p>
+          Vantagens do MWAA sobre Step Functions:
+        </p>
+        <ul>
+          <li>Airflow é uma plataforma open-source com enorme ecossistema de providers e plugins.</li>
+          <li>Portabilidade: a mesma DAG pode rodar on-premises, em qualquer cloud, ou no MWAA.</li>
+          <li>Interface web rica para monitoramento, reexecução de tasks individuais e debugging.</li>
+          <li>Melhor para pipelines complexos com muitas dependências e lógica condicional sofisticada.</li>
+        </ul>
+
+        <h3>Retry patterns: estratégias de recuperação</h3>
+        <p>
+          Não basta configurar retries — é preciso configurar retries corretos.
+          Alguns padrões essenciais:
+        </p>
+        <ul>
+          <li>
+            <strong>Exponential backoff:</strong> aumenta o tempo de espera exponencialmente
+            entre tentativas (1s, 2s, 4s, 8s). Reduz a sobrecarga em sistemas que estão
+            sob pressão. Evita o "retry storm" onde múltiplos clientes tentam simultaneamente.
+          </li>
+          <li>
+            <strong>Jitter:</strong> adiciona um componente aleatório ao intervalo de retry.
+            Evita que múltiplos jobs que falharam ao mesmo tempo façam retry exatamente
+            ao mesmo instante, sobrecarregando o sistema novamente.
+          </li>
+          <li>
+            <strong>Dead letter queue (DLQ):</strong> após o número máximo de tentativas,
+            o evento ou job que falhou é movido para uma fila DLQ para análise posterior.
+            Evita perda silenciosa de dados e permite investigar e reprocessar
+            manualmente os casos problemáticos.
+          </li>
+          <li>
+            <strong>Circuit breaker:</strong> interrompe tentativas quando o sistema
+            detecta falhas sistemáticas (não apenas transitórias), evitando desperdício
+            de recursos e cascata de falhas.
+          </li>
+        </ul>
+      </section>
+
+      <!-- =========================================================
+           MÓDULO 4 — LABORATÓRIO
+      ========================================================== -->
+      <section class="content-block">
+        <h2>Módulo 4 — Laboratório: Configurando Alarmes no CloudWatch</h2>
+        <p>
+          A prática utiliza o ambiente <strong>AWS Student</strong>.
+          O objetivo é criar um alarme no CloudWatch que notifique quando um Glue Job falha.
+        </p>
+
+        <h3>Passo 1 — Executar um Glue Job e explorar os logs</h3>
+        <ol>
+          <li>No console AWS, acesse <strong>AWS Glue</strong> e execute o job criado na Aula 05.</li>
+          <li>Aguarde a conclusão (sucesso ou falha).</li>
+          <li>Clique no job e na aba <strong>Runs</strong>, clique na execução mais recente.</li>
+          <li>Clique em <strong>Output logs</strong> para abrir o CloudWatch Logs.</li>
+          <li>Explore os logs: procure por mensagens de progresso, erros (se houver)
+          e o tempo de execução.</li>
+          <li><strong>Validação:</strong> você consegue localizar nos logs o início
+          e o fim da execução do job.</li>
+        </ol>
+
+        <h3>Passo 2 — Criar um alarme de falha do Glue Job</h3>
+        <ol>
+          <li>Acesse o <strong>Amazon CloudWatch</strong> no console AWS.</li>
+          <li>No menu lateral, clique em <strong>Alarms</strong> e depois em
+          <strong>Create alarm</strong>.</li>
+          <li>Clique em <strong>Select metric</strong>.</li>
+          <li>Navegue para <strong>Glue</strong> e depois <strong>Job Metrics</strong>.</li>
+          <li>Procure pelo seu job e selecione a métrica <strong>glue.driver.aggregate.numFailedTasks</strong>.</li>
+          <li>Configure: período = <strong>5 minutos</strong>, estatística = <strong>Sum</strong>.</li>
+          <li>Em <strong>Conditions</strong>: tipo = <strong>Static</strong>,
+          quando a métrica for <strong>Greater than</strong> <code>0</code>.</li>
+          <li>Em <strong>Actions</strong>:
+            <ul>
+              <li>Em caso de alarme, enviar notificação para um tópico SNS.</li>
+              <li>Clique em <strong>Create new topic</strong>.</li>
+              <li>Nome do tópico: <code>alertas-pipeline-dados</code>.</li>
+              <li>Email de notificação: insira seu email.</li>
+              <li>Clique em <strong>Create topic</strong>.</li>
+            </ul>
+          </li>
+          <li>Nome do alarme: <code>glue-job-failure-alert</code>.</li>
+          <li>Clique em <strong>Create alarm</strong>.</li>
+          <li>Verifique seu email e confirme a inscrição no SNS topic.</li>
+          <li><strong>Validação:</strong> o alarme aparece no painel do CloudWatch
+          com status <strong>OK</strong> (assumindo que o job não falhou recentemente).</li>
+        </ol>
+
+        <h3>Passo 3 — Criar um CloudWatch Dashboard</h3>
+        <ol>
+          <li>No CloudWatch, clique em <strong>Dashboards</strong> e depois em
+          <strong>Create dashboard</strong>.</li>
+          <li>Nome: <code>pipeline-monitoramento</code>.</li>
+          <li>Clique em <strong>Create dashboard</strong>.</li>
+          <li>Adicione um widget de <strong>Alarm status</strong> mostrando o alarme criado.</li>
+          <li>Adicione um widget de <strong>Metric</strong> mostrando o histórico de execuções
+          do Glue Job.</li>
+          <li>Salve o dashboard.</li>
+          <li><strong>Validação:</strong> o dashboard exibe o status do alarme e as métricas
+          do job em uma única tela.</li>
+        </ol>
+      </section>
+
+      <!-- =========================================================
+           EXERCÍCIOS DE FIXAÇÃO
+      ========================================================== -->
+      <section class="content-block">
         <h2>Exercícios de fixação</h2>
         <ol>
-          <li>Definir dois SLOs para um pipeline crítico de ingestão.</li>
-          <li>Comparar MWAA e Step Functions em um caso prático.</li>
-          <li>Descrever uma estratégia mínima de retry com alerta.</li>
+          <li>
+            <strong>Definindo SLOs para um pipeline:</strong> um pipeline de dados alimenta
+            um dashboard de vendas que é consultado pelo time comercial toda manhã às 08h.
+            Os dados vêm de um RDS via CDC, passam por um Glue Job de transformação,
+            e são carregados no Redshift. Defina dois SLOs para esse pipeline —
+            um de freshness e um de completeness — especificando: o SLI exato, o objetivo
+            numérico, a janela de avaliação, e como você mediria cada SLI tecnicamente.
+          </li>
+          <li>
+            <strong>MWAA versus Step Functions:</strong> uma empresa está decidindo entre
+            MWAA e Step Functions para orquestrar um pipeline que: roda diariamente,
+            tem 15 etapas sequenciais, usa Glue Jobs, Lambda e ECS Tasks, e precisa
+            de reexecução manual de etapas individuais quando algo falha. Liste os critérios
+            decisivos para cada opção e faça uma recomendação fundamentada.
+          </li>
+          <li>
+            <strong>Retry storm e solução:</strong> um pipeline processa 500 jobs paralelos.
+            Todos falham simultaneamente devido a um throttling da AWS. Os jobs são configurados
+            para retry imediato após 1 segundo. Explique o que acontece a seguir (retry storm),
+            por que isso piora o problema, e como configurar exponential backoff com jitter
+            para evitar essa situação.
+          </li>
+          <li>
+            <strong>Investigação de incidente com CloudWatch:</strong> às 03h, o alarme de
+            falha do Glue Job disparou. Descreva o processo de investigação passo a passo:
+            quais logs você consultaria, quais métricas você observaria, como distinguiria
+            uma falha transitória de uma falha sistemática, e qual seria o critério para
+            decidir entre reprocessar automaticamente ou escalar para a equipe.
+          </li>
+          <li>
+            <strong>Data quality como SLO:</strong> além de freshness e completeness,
+            proponha dois SLOs de qualidade de dados para um pipeline de ingestão de
+            transações financeiras. Para cada SLO, especifique: o que é medido, como
+            implementar a medição tecnicamente na AWS (serviço, métrica), o valor alvo,
+            e a ação automática a ser tomada quando o SLO for violado.
+          </li>
         </ol>
-        <footer class="actions">
-          <a class="button" href="../slides/slide_aula_07_data_reliability_e_sre_aplicados_a_pipelines_de_dados.html">Voltar ao slide</a>
-          <a class="button" href="../../../index.html">Voltar ao índice</a>
-        </footer>
       </section>
+
+      <footer class="actions">
+        <a class="button" href="../slides/slide_aula_07_data_reliability_e_sre_aplicados_a_pipelines_de_dados.html">Voltar ao slide</a>
+        <a class="button" href="../../../index.html">Voltar ao índice</a>
+      </footer>
+
     </main>
   </body>
 </html>

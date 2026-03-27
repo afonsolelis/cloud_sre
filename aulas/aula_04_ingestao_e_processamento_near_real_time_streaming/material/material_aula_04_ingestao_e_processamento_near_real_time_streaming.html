@@ -3,35 +3,353 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Material Aula 04</title>
+    <title>Material Aula 04 — Ingestão e Processamento Near Real-time com Streaming</title>
     <link rel="stylesheet" href="../../../assets/styles.css" />
+    <style data-design-tokens>:root{--bg:#fff;--color:#000000}body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}a:hover{opacity:.8}a:focus{outline:2px solid #000000}</style>
   </head>
   <body class="material">
     <main class="page">
+
       <section class="content-block">
-        <p class="meta">Aula 04 • 07/05/2026</p>
+        <p class="meta">Aula 04 &nbsp;•&nbsp; 07/05/2026 &nbsp;•&nbsp; 19h00 – 22h00</p>
         <h1>Ingestão e Processamento Near Real-time com Streaming</h1>
         <p class="summary">
-          Material inicial para discutir arquitetura de ingestão contínua,
-          trade-offs de latência e persistência de eventos.
+          Este material aprofunda os conceitos apresentados nos slides da Aula 04.
+          Cobre a arquitetura de ingestão contínua de eventos na AWS com Amazon Kinesis
+          Data Streams e Kinesis Data Firehose, os trade-offs de latência e throughput,
+          a entrega automatizada para o S3 com particionamento por tempo, e uma visão
+          geral do Amazon EMR para processamento distribuído de grande escala.
         </p>
-        <h2>Tópicos-base</h2>
+      </section>
+
+      <!-- =========================================================
+           MÓDULO 1 — STREAMING VS BATCH
+      ========================================================== -->
+      <section class="content-block">
+        <h2>Módulo 1 — Streaming versus Batch: quando cada um se aplica</h2>
+
+        <h3>O que é processamento em batch?</h3>
+        <p>
+          No modelo batch, os dados são acumulados por um período (hora, dia, semana)
+          e processados em bloco ao final desse período. É o modelo mais simples e
+          amplamente utilizado: jobs noturnos que transformam os dados do dia anterior,
+          relatórios gerados semanalmente, snapshots diários de tabelas operacionais.
+          O custo de infraestrutura tende a ser menor porque os recursos de computação
+          são usados intensamente por períodos curtos e ficam ociosos o restante do tempo.
+        </p>
+        <p>
+          O batch tem uma limitação inerente: a latência mínima é igual ao tamanho
+          da janela de acumulação. Se o job roda a cada hora, os dados têm no mínimo
+          zero e no máximo 60 minutos de atraso. Para casos de uso que exigem reagir
+          a eventos em segundos ou minutos, o batch não é adequado.
+        </p>
+
+        <h3>O que é streaming near real-time?</h3>
+        <p>
+          No modelo streaming, os dados são processados à medida que chegam, com
+          latência que pode variar de milissegundos (true real-time) a alguns minutos
+          (near real-time). Casos de uso típicos incluem: detecção de fraude em
+          transações de cartão de crédito, monitoramento de métricas de aplicação,
+          personalização de experiência do usuário em tempo real, e alertas
+          operacionais baseados em séries temporais de logs.
+        </p>
+        <p>
+          O streaming exige infraestrutura persistente — os consumidores precisam estar
+          rodando continuamente —, o que eleva o custo operacional em comparação com
+          o batch. A escolha entre os dois modelos deve ser guiada pelo SLA de
+          latência do caso de uso: se o negócio pode esperar algumas horas, use batch;
+          se precisa reagir em minutos, use streaming.
+        </p>
+
+        <h3>Arquitetura Lambda e Kappa</h3>
+        <p>
+          A <strong>Arquitetura Lambda</strong> combina um caminho batch (para dados históricos
+          e correção de erros) com um caminho de streaming (para dados recentes com baixa latência).
+          Os consumidores finais consultam ambos os resultados e combinam as visões.
+          É poderosa mas complexa de manter — dois pipelines, duas bases de código, dois conjuntos
+          de testes.
+        </p>
+        <p>
+          A <strong>Arquitetura Kappa</strong> simplifica esse modelo: usa apenas o caminho
+          de streaming, reprocessando dados históricos ao reiniciar o consumer desde o
+          início do stream quando necessário. Requer que o sistema de streaming suporte
+          retenção longa de dados (ex.: Kinesis com retenção de 7 dias, ou Kafka com
+          retenção indefinida). É a abordagem preferida quando os dados chegam principalmente
+          via eventos em tempo real.
+        </p>
+      </section>
+
+      <!-- =========================================================
+           MÓDULO 2 — KINESIS DATA STREAMS
+      ========================================================== -->
+      <section class="content-block">
+        <h2>Módulo 2 — Amazon Kinesis Data Streams</h2>
+
+        <h3>Conceitos fundamentais</h3>
+        <p>
+          O Kinesis Data Streams é um serviço de streaming gerenciado para ingestão
+          de dados em tempo real. Os dados são organizados em <strong>shards</strong>:
+          cada shard suporta até 1 MB/s ou 1.000 registros/s de escrita, e até
+          2 MB/s de leitura. O throughput total do stream é a soma dos shards.
+        </p>
+        <p>
+          Os dados ficam retidos no stream por até 365 dias (padrão: 24 horas),
+          e múltiplos consumidores podem ler o mesmo stream independentemente,
+          cada um mantendo sua própria posição de leitura (sequence number).
+          Isso é fundamentalmente diferente de filas (como SQS), onde uma mensagem
+          consumida desaparece.
+        </p>
+        <p>
+          A <strong>partition key</strong> determina em qual shard um registro vai parar:
+          o Kinesis aplica um hash MD5 sobre a partition key e mapeia o resultado
+          para um shard. Escolha uma partition key com alta cardinalidade para
+          distribuir uniformemente os registros entre shards e evitar hot shards.
+        </p>
+
+        <h3>Produtores e consumidores</h3>
+        <p>
+          <strong>Produtores</strong> são qualquer sistema que envia dados ao stream.
+          Exemplos: aplicações web enviando eventos de clique com o SDK da AWS,
+          logs de aplicação via Kinesis Agent, dispositivos IoT via MQTT bridge,
+          e outros serviços AWS como CloudWatch Logs.
+        </p>
+        <p>
+          <strong>Consumidores</strong> são os sistemas que leem do stream.
+          Exemplos: funções AWS Lambda (trigger nativo do Kinesis), aplicações
+          rodando no EC2 com a Kinesis Client Library (KCL), Apache Flink
+          via Amazon Managed Service for Apache Flink, e o Kinesis Data Firehose.
+        </p>
+
+        <h3>Modos de capacidade</h3>
+        <p>
+          O Kinesis Data Streams opera em dois modos:
+        </p>
         <ul>
-          <li>Fluxos de eventos e logs.</li>
-          <li>Kinesis para ingestão e entrega no Data Lake.</li>
-          <li>EMR como base para processamento distribuído.</li>
+          <li>
+            <strong>Provisioned:</strong> você define o número de shards manualmente.
+            Custo por shard-hora. Use quando o volume de dados é previsível.
+          </li>
+          <li>
+            <strong>On-Demand:</strong> o Kinesis escala automaticamente com base no throughput
+            observado. Custo por GB ingerido e lido. Use para cargas imprevisíveis ou
+            durante fases de crescimento rápido.
+          </li>
         </ul>
+      </section>
+
+      <!-- =========================================================
+           MÓDULO 3 — KINESIS DATA FIREHOSE
+      ========================================================== -->
+      <section class="content-block">
+        <h2>Módulo 3 — Amazon Kinesis Data Firehose</h2>
+
+        <h3>Firehose versus Data Streams: qual a diferença?</h3>
+        <p>
+          O Kinesis Data Firehose é um serviço de entrega gerenciado: ele recebe dados
+          (diretamente de produtores ou de um Kinesis Data Stream) e os entrega
+          para um destino como S3, Redshift, OpenSearch ou um endpoint HTTP,
+          sem que você precise gerenciar consumidores ou código de entrega.
+        </p>
+        <p>
+          A principal característica do Firehose é o <strong>buffering</strong>:
+          ele acumula dados por um intervalo de tempo (1 a 900 segundos) ou
+          até atingir um tamanho (1 MB a 128 MB) antes de escrever no destino.
+          Isso transforma um fluxo contínuo de pequenos eventos em arquivos
+          razoavelmente grandes no S3, evitando o problema de arquivos pequenos.
+        </p>
+        <p>
+          O Firehose não retém dados — após a entrega, os dados não ficam disponíveis
+          para releitura como no Data Streams. Se você precisa que múltiplos consumidores
+          independentes processem o mesmo evento, use Data Streams como fonte primária
+          e conecte o Firehose como um dos consumidores.
+        </p>
+
+        <h3>Entrega no S3 com particionamento dinâmico</h3>
+        <p>
+          O Firehose suporta particionamento dinâmico: você define um prefixo
+          usando expressões com campos extraídos dos registros. Por exemplo:
+          <code>raw/evento=!{partitionKeyFromQuery:tipo}/ano=!{timestamp:yyyy}/mes=!{timestamp:MM}/dia=!{timestamp:dd}/</code>
+        </p>
+        <p>
+          Isso cria automaticamente a hierarquia de partições no S3 baseada
+          no conteúdo dos eventos e no timestamp de entrega, compatível com
+          o formato Hive que o Glue Catalog reconhece.
+        </p>
+
+        <h3>Transformação inline com Lambda</h3>
+        <p>
+          O Firehose permite associar uma função Lambda para transformar os registros
+          antes da entrega. A Lambda recebe batches de registros em base64, processa
+          cada um (filtra, converte, enriquece) e retorna os registros transformados.
+          Casos de uso comuns: remover campos sensíveis (PII masking), converter
+          JSON para Parquet via schema registry, e filtrar eventos irrelevantes
+          para não armazenar no S3.
+        </p>
+      </section>
+
+      <!-- =========================================================
+           MÓDULO 4 — EMR
+      ========================================================== -->
+      <section class="content-block">
+        <h2>Módulo 4 — Amazon EMR: Processamento Distribuído de Grande Escala</h2>
+
+        <h3>O que é o EMR e quando usá-lo</h3>
+        <p>
+          O Amazon Elastic MapReduce (EMR) é um serviço gerenciado de cluster para
+          executar frameworks de processamento distribuído como Apache Spark, Apache Hadoop,
+          Apache Hive, Presto e outros. Ele provisiona e configura o cluster automaticamente,
+          incluindo instalação dos frameworks, configuração de rede e integração com S3.
+        </p>
+        <p>
+          O EMR é a escolha certa quando você precisa de:
+        </p>
+        <ul>
+          <li>Processamento de volumes muito grandes (terabytes a petabytes) que excedem
+          a capacidade de um único servidor.</li>
+          <li>Jobs Spark complexos com múltiplas transformações, shuffles intensivos
+          e uso de ML libraries (MLlib, PyTorch distribuído).</li>
+          <li>Controle fino sobre a configuração do Spark (memória, paralelismo, serialização)
+          que não é possível no AWS Glue.</li>
+          <li>Frameworks específicos não suportados pelo Glue (ex.: Presto para queries
+          SQL interativas em escala, Apache Hudi para tabelas transacionais no lake).</li>
+        </ul>
+        <p>
+          Para pipelines ETL de complexidade média, o AWS Glue (serverless) é preferível
+          ao EMR por não exigir gerenciamento de cluster. O EMR compensa quando a
+          flexibilidade e o poder de computação superam a complexidade operacional.
+        </p>
+
+        <h3>EMR Serverless: o melhor dos dois mundos</h3>
+        <p>
+          O EMR Serverless elimina o gerenciamento de cluster: você define uma aplicação
+          (Spark ou Hive), submete jobs, e a AWS provisiona e desprovisiona os workers
+          automaticamente. Você paga pelo vCPU, memória e storage usados durante
+          a execução do job. É a evolução natural para equipes que precisam da
+          flexibilidade do Spark sem a complexidade operacional de clusters EMR tradicionais.
+        </p>
+      </section>
+
+      <!-- =========================================================
+           MÓDULO 5 — LABORATÓRIO
+      ========================================================== -->
+      <section class="content-block">
+        <h2>Módulo 5 — Laboratório: Configurando um Fluxo de Streaming com Kinesis Firehose</h2>
+        <p>
+          A prática utiliza o ambiente <strong>AWS Student</strong>.
+          O objetivo é criar um delivery stream do Kinesis Firehose que entregue dados
+          JSON para o S3 com particionamento por data.
+        </p>
+
+        <h3>Passo 1 — Criar um Kinesis Data Firehose Delivery Stream</h3>
+        <ol>
+          <li>No console AWS, acesse <strong>Amazon Kinesis</strong> e clique em
+          <strong>Kinesis Data Firehose</strong>.</li>
+          <li>Clique em <strong>Create Firehose stream</strong>.</li>
+          <li>Em <strong>Source</strong>, selecione <strong>Direct PUT</strong>
+          (dados enviados diretamente para o Firehose, sem um Data Stream intermediário).</li>
+          <li>Em <strong>Destination</strong>, selecione <strong>Amazon S3</strong>.</li>
+          <li>Em <strong>Firehose stream name</strong>, insira: <code>datalake-eventos-firehose</code>.</li>
+          <li>Em <strong>S3 bucket</strong>, selecione o bucket criado nas aulas anteriores.</li>
+          <li>Em <strong>S3 bucket prefix</strong>, insira:
+          <code>raw/fonte=firehose/ano=!{timestamp:yyyy}/mes=!{timestamp:MM}/dia=!{timestamp:dd}/</code></li>
+          <li>Em <strong>S3 bucket error output prefix</strong>, insira:
+          <code>raw/firehose-errors/ano=!{timestamp:yyyy}/mes=!{timestamp:MM}/</code></li>
+          <li>Em <strong>Buffer hints</strong>, configure:
+            <ul>
+              <li>Buffer size: <strong>1 MB</strong> (mínimo para o lab)</li>
+              <li>Buffer interval: <strong>60 seconds</strong></li>
+            </ul>
+          </li>
+          <li>Clique em <strong>Create Firehose stream</strong>.</li>
+          <li><strong>Validação:</strong> o delivery stream aparece com status <strong>Active</strong>.</li>
+        </ol>
+
+        <h3>Passo 2 — Enviar eventos de teste via AWS CLI ou console</h3>
+        <ol>
+          <li>No console do Firehose, clique no stream criado.</li>
+          <li>Clique em <strong>Test with demo data</strong> para enviar registros de exemplo.</li>
+          <li>Aguarde o intervalo de buffer (60 segundos) expirar.</li>
+          <li>Acesse o S3 e navegue até o prefixo
+          <code>raw/fonte=firehose/</code>
+          para confirmar que os arquivos foram criados com a estrutura de particionamento por data.</li>
+          <li><strong>Validação:</strong> arquivos JSON aparecem no S3 nos prefixos corretos com
+          o particionamento <code>ano/mes/dia</code>.</li>
+        </ol>
+
+        <h3>Passo 3 — Criar tabela no Athena para os dados do Firehose</h3>
+        <ol>
+          <li>Acesse o <strong>Amazon Athena</strong>.</li>
+          <li>Execute o DDL para criar a tabela sobre os dados entregues pelo Firehose:</li>
+        </ol>
+        <pre><code>CREATE EXTERNAL TABLE datalake_lab.raw_eventos_firehose (
+  aproximateArrivalTimestamp BIGINT,
+  kinesisRecordMetadata STRUCT&lt;shardId: STRING&gt;,
+  data STRING
+)
+PARTITIONED BY (ano STRING, mes STRING, dia STRING)
+ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe'
+LOCATION 's3://seu-bucket/raw/fonte=firehose/';
+</code></pre>
+        <ol start="3">
+          <li>Execute <code>MSCK REPAIR TABLE datalake_lab.raw_eventos_firehose;</code>
+          para registrar as partições existentes.</li>
+          <li>Execute uma query de validação:
+          <code>SELECT * FROM datalake_lab.raw_eventos_firehose LIMIT 5;</code></li>
+          <li><strong>Validação:</strong> os registros enviados pelo Firehose aparecem no resultado.</li>
+        </ol>
+      </section>
+
+      <!-- =========================================================
+           EXERCÍCIOS DE FIXAÇÃO
+      ========================================================== -->
+      <section class="content-block">
         <h2>Exercícios de fixação</h2>
         <ol>
-          <li>Diferenciar Data Streams e Data Firehose em um cenário real.</li>
-          <li>Desenhar um fluxo para eventos JSON chegando ao S3.</li>
-          <li>Explicar quando usar processamento distribuído no pipeline.</li>
+          <li>
+            <strong>Data Streams versus Firehose:</strong> uma fintech precisa processar
+            transações de cartão de crédito para detectar fraudes em tempo real (latência
+            de 2-3 segundos) E armazenar todas as transações no Data Lake para análise
+            histórica (latência de 5 minutos é aceitável). Descreva a arquitetura usando
+            Kinesis Data Streams e Firehose, explicando o papel de cada serviço e por que
+            você não poderia usar apenas um deles neste cenário.
+          </li>
+          <li>
+            <strong>Dimensionamento de shards:</strong> um sistema de monitoramento de
+            aplicação gera 2.500 eventos por segundo, cada evento com média de 500 bytes.
+            Calcule o número mínimo de shards necessários no Kinesis Data Streams
+            justificando os cálculos com os limites por shard. Considere também uma
+            margem de segurança de 20%.
+          </li>
+          <li>
+            <strong>Particionamento no Firehose:</strong> você precisa entregar eventos
+            de um aplicativo mobile (com campos <code>platform</code>: iOS/Android,
+            <code>event_type</code>: click/purchase/view, e <code>timestamp</code>)
+            para o S3 com particionamento que facilite queries no Athena por plataforma
+            e data. Escreva o prefixo S3 com as expressões de particionamento dinâmico
+            corretas para o Firehose.
+          </li>
+          <li>
+            <strong>EMR versus Glue:</strong> um pipeline precisa processar 2 TB de
+            logs de servidor por dia, aplicando transformações complexas com múltiplos
+            joins e agregações, convertendo para Parquet particionado. Liste os critérios
+            que fariam você escolher EMR em vez de AWS Glue para este caso, e vice-versa.
+            Qual seria sua recomendação para este cenário específico?
+          </li>
+          <li>
+            <strong>Arquitetura Lambda x Kappa:</strong> descreva com suas palavras a
+            diferença entre as arquiteturas Lambda e Kappa para pipelines de dados.
+            Identifique um caso de uso onde Lambda seria necessariamente superior a Kappa,
+            e outro onde Kappa seria suficiente e mais simples. Justifique com base
+            nos requisitos de latência, complexidade operacional e reprocessamento histórico.
+          </li>
         </ol>
-        <footer class="actions">
-          <a class="button" href="../slides/slide_aula_04_ingestao_e_processamento_near_real_time_streaming.html">Voltar ao slide</a>
-          <a class="button" href="../../../index.html">Voltar ao índice</a>
-        </footer>
       </section>
+
+      <footer class="actions">
+        <a class="button" href="../slides/slide_aula_04_ingestao_e_processamento_near_real_time_streaming.html">Voltar ao slide</a>
+        <a class="button" href="../../../index.html">Voltar ao índice</a>
+      </footer>
+
     </main>
   </body>
 </html>

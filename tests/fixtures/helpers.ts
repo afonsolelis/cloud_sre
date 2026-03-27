@@ -10,7 +10,7 @@ export const test = base.extend<{
   assetsDir: string;
 }>({
   projectRoot: async ({}, use) => {
-    const root = path.resolve(__dirname, '..');
+    const root = path.resolve(__dirname, '../..');
     await use(root);
   },
   specsDir: async ({ projectRoot }, use) => {
