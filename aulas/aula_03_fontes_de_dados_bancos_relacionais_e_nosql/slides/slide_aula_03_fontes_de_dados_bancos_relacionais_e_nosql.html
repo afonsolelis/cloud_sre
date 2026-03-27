@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aula 03 - Fontes de Dados: Bancos Relacionais e NoSQL</title>
+    <!-- CSS do Reveal.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reset.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
+    <!-- Tema claro com alto contraste conforme spec visual -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/simple.min.css" id="theme">
+    <!-- CSS compartilhado -->
+    <link rel="stylesheet" href="../../../assets/styles.css">
+    <style>
+        /* Ajustes visuais exigidos pelo Design System */
+        .reveal .slides section {
+            font-family: Arial, sans-serif;
+            color: #111;
+        }
+        .reveal a {
+            color: #000;
+            text-decoration: underline;
+        }
+        .reveal h1, .reveal h2, .reveal h3 {
+            color: #000;
+            font-weight: bold;
+        }
+        .navigation-links {
+            margin-top: 50px;
+            font-size: 0.6em;
+            padding: 15px;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+            
+            <!-- Slide 1: Capa -->
+            <section>
+                <h1>Fontes de Dados:<br>Bancos Relacionais e NoSQL</h1>
+                <h3>MBA em Engenharia de Dados - Aula 03 (2026)</h3>
+                <p><small>CLOUD COMPUTING E SRA - VISÃO PRÁTICA COM AWS</small></p>
+                <div class="navigation-links">
+                    <a href="../material/material_aula_03_fontes_de_dados_bancos_relacionais_e_nosql.html">📖 Ir para Material de Apoio</a> | 
+                    <a href="../../../index.html">🏠 Voltar ao Índice</a>
+                </div>
+            </section>
+
+            <!-- Slide 2: Agenda OBRIGATÓRIA -->
+            <section>
+                <h2>Agenda e Dinâmica da Aula</h2>
+                <div style="text-align: left; max-width: 800px; margin: 0 auto; line-height: 1.4; font-size: 0.8em;">
+                    <p><strong>19h00 - 20h00 (Teoria Exclusiva)</strong></p>
+                    <ul>
+                        <li>O ecossistema transacional (Amazon RDS) e extração CDC.</li>
+                        <li>Entendendo o ecossistema NoSQL de alto throughput em tempo real com Amazon DynamoDB.</li>
+                    </ul>
+                    <hr>
+                    <p><strong>20h00 - 22h00 (Prática Exclusiva)</strong></p>
+                    <ul>
+                        <li><strong>Ambiente OBRIGATÓRIO:</strong> <code>AWS Student</code>.</li>
+                        <li><strong>Hands-on:</strong> Modelagem Single-Table e importação/exportação no DynamoDB para S3 (O início de nosso Data Lake).</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Slide 3: Placeholder/Conteúdo Inicial -->
+            <section>
+                <h2>Introdução: Fontes Transacionais</h2>
+                <p>Nossos Data Lakes nascem da necessidade de analisar dados que servem nativamente a sistemas operacionais transacionais do dia-a-dia.</p>
+                <ul style="font-size: 0.8em;">
+                    <li><strong>Bancos Relacionais (SQL):</strong> Estruturados, normalizados, focados em integridade referencial.</li>
+                    <li>O processamento analítico (OLAP) pesa em bancos focados em transações (OLTP). Precisamos levá-los para um Data Warehouse ou Data Lake!</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Amazon RDS</h2>
+                <ul style="font-size: 0.8em;">
+                    <li>Serviço de banco de dados relacional (PaaS) totalmente gerenciado.</li>
+                    <li>Motores suportados: PostgreSQL, MySQL, MariaDB, Oracle, SQL Server.</li>
+                    <li>Amazon Aurora: Motor Enterprise criado nativamente na nuvem.</li>
+                    <li><strong>Como os dados saem do RDS?</strong> Utilizamos pipelines de CDC (Change Data Capture) como o serviço <i>AWS Database Migration Service (DMS)</i>.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Por que Bancos NoSQL?</h2>
+                <p>Quando escalar verticalmente (Adicionar RAM/CPU) um banco relacional não é suficiente.</p>
+                <ul style="font-size: 0.8em;">
+                    <li>Performance previsível em milissegundos, independente da quantidade de dados (<math>O(1)</math>).</li>
+                    <li>Escalabilidade horizontal infinita (Sharding) tratada de forma transparente para nós da Engenharia de Dados.</li>
+                    <li>Esquema de dados hiper flexível.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Amazon DynamoDB (Chave-Valor)</h2>
+                <ul style="font-size: 0.8em;">
+                    <li>Banco de dados NoSQL chave-valor e documento totalmente gerenciado (Serverless).</li>
+                    <li>Replicação Multi-AZ automática.</li>
+                    <li>Modelagem foca na arquitetura <em>Single-Table Design</em> (Tabelas únicas contendo múltiplos tipos de registros de sua aplicação).</li>
+                    <li>Completamente baseado em cobranças por Requisições em massa (RCU/WCU).</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Componentes do DynamoDB</h2>
+                <ul style="text-align: left; margin: 0 auto; display: inline-block; font-size: 0.8em; line-height: 1.5;">
+                    <li><strong>Partition Key (PK):</strong> Como os dados serão agrupados e espalhados nas AZs. OBRIGATÓRIA.</li>
+                    <li><strong>Sort Key (SK):</strong> Como ordenamos dados dentro da mesma PK. OPCIONAL.</li>
+                    <li><strong>GSI (Global Secondary Index):</strong> A verdadeira magia do DynamoDB. Criar projeções indexadas secundárias para consultar o dado de diferentes perspectivas de acesso.</li>
+                </ul>
+            </section>
+
+            <!-- Início da Prática -->
+            <section>
+                <h2>Fim da Teoria (20h00)</h2>
+                <h3>Iniciando o Hands-on 👨‍💻</h3>
+                <p>Acesse o portal do Bootcamp e ative a console AWS.</p>
+                <ul style="font-size: 0.8em; margin-top: 20px;">
+                    <li>Ambiente: <code>AWS Student</code></li>
+                    <li>Região: <code>us-east-1</code> (N. Virginia)</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Hands-on: O DynamoDB para a Eng. de Dados</h2>
+                <ol style="font-size: 0.75em; line-height: 1.6;">
+                    <li>Entenda a Console do DynamoDB.</li>
+                    <li>Crie uma Tabela: <strong>"Ecommerce_Transactions_MBA"</strong> na região <code>us-east-1</code>.</li>
+                    <li>PK: <code>userID</code> | SK: <code>timestamp</code>.</li>
+                    <li>Use "Explore Items" inserindo compras variadas com diferentes colunas JSON (livre de schema).</li>
+                    <li><strong>Integração S3:</strong> Habilite "Point-in-time recovery" (PITR) em gerencimento e Export Data to S3. Jogue a baseline do NoSQL em um bucket RAW nativo!</li>
+                </ol>
+            </section>
+
+            <!-- Encerramento -->
+            <section>
+                <h2>Encerramento (22h00)</h2>
+                <p>🚨 Limpeza do Ambiente 🚨<br><small>Apague tabelas DynamoDB e os Buckets de trabalho.</small></p>
+                <div class="navigation-links" style="margin-top: 20px;">
+                    <a href="../material/material_aula_03_fontes_de_dados_bancos_relacionais_e_nosql.html">📖 Ir para Material de Apoio</a> | 
+                    <a href="../../../index.html">🏠 Voltar ao Índice</a>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- Scripts do Reveal.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+    <script>
+        Reveal.initialize({
+            controls: true,
+            progress: true,
+            center: true,
+            hash: true,
+            transition: 'slide'
+        });
+    </script>
+</body>
+</html>

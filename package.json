@@ -1,0 +1,14 @@
+{
+  "name": "ccsre_pratica",
+  "version": "1.0.0",
+  "description": "Repositório de aulas - CLOUD COMPUTING E SRA - MBA em Engenharia de Dados",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.45.0"
+  }
+}

@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Slide Aula 02</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js/dist/reset.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js/dist/reveal.css" />
+    <link rel="stylesheet" href="../../../assets/reveal_custom.css" />
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <section>
+          <div class="deck-shell">
+            <div>
+              <span class="deck-kicker">Cloud Computing e SRA</span>
+              <h1 class="deck-title">A Fundação do Data Lake: Armazenamento Escalável com S3 e Athena</h1>
+              <p class="deck-meta">Aula 02 • 23/04/2026</p>
+              <p class="deck-year">2026</p>
+              <p class="deck-subtitle">Estrutura de armazenamento analítico na AWS com foco em S3, camadas e consultas serverless.</p>
+            </div>
+            <div class="deck-footer">
+              <span>Slide de capa</span>
+              <div class="deck-links">
+                <a class="deck-link" href="../material/material_aula_02_a_fundacao_do_data_lake_armazenamento_escalavel_s3_e_athena.html">Material</a>
+                <a class="deck-link" href="../../../index.html">Índice</a>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section>
+          <div class="deck-shell">
+            <div>
+              <span class="deck-kicker">Agenda</span>
+              <h2 class="deck-title">O que vai acontecer nesta aula</h2>
+            </div>
+            <table class="deck-table">
+              <thead>
+                <tr>
+                  <th>Horário</th>
+                  <th>Formato</th>
+                  <th>Conteúdo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>19h00 - 20h00</td>
+                  <td>Teoria</td>
+                  <td>Amazon S3 profundo, buckets, camadas do Data Lake e particionamento.</td>
+                </tr>
+                <tr>
+                  <td>20h00 - 20h45</td>
+                  <td>Teoria</td>
+                  <td>Amazon Athena, consulta serverless, formatos de arquivo e boas práticas.</td>
+                </tr>
+                <tr>
+                  <td>20h45 - 21h00</td>
+                  <td>Intervalo</td>
+                  <td>Pausa e preparação do ambiente prático.</td>
+                </tr>
+                <tr>
+                  <td>21h00 - 22h00</td>
+                  <td>Prática com AWS Student</td>
+                  <td>Estruturação do Data Lake no S3, upload de dados raw e primeira exploração com Athena.</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="deck-footer">
+              <span>Slide 2 de abertura</span>
+              <div class="deck-links">
+                <a class="deck-link" href="../material/material_aula_02_a_fundacao_do_data_lake_armazenamento_escalavel_s3_e_athena.html">Material</a>
+                <a class="deck-link" href="../../../index.html">Índice</a>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section>
+          <div class="deck-shell">
+            <div>
+              <span class="deck-kicker">Objetivos</span>
+              <h2 class="deck-title">Resultados esperados ao final da aula</h2>
+              <p class="deck-summary">A aula precisa deixar claro como armazenar, organizar e consultar dados no lake de forma escalável.</p>
+            </div>
+            <div class="deck-placeholder">
+              <div class="deck-panel">
+                <strong>Você deve sair sabendo</strong>
+                <ul>
+                  <li>Como estruturar buckets e prefixos por camada.</li>
+                  <li>Como escolher formatos e particionamento.</li>
+                  <li>Como o Athena consulta dados diretamente no S3.</li>
+                </ul>
+              </div>
+              <div class="deck-panel">
+                <strong>Entrega prática</strong>
+                <ul>
+                  <li>Bucket organizado por zonas do Data Lake.</li>
+                  <li>Conjunto de arquivos raw enviado ao S3.</li>
+                  <li>Consulta inicial executada com Athena.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="deck-footer">
+              <span>Slide 3 mínimo exigido pela spec</span>
+              <div class="deck-links">
+                <a class="deck-link" href="../material/material_aula_02_a_fundacao_do_data_lake_armazenamento_escalavel_s3_e_athena.html">Material</a>
+                <a class="deck-link" href="../../../index.html">Índice</a>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section>
+          <div class="deck-shell">
+            <div>
+              <span class="deck-kicker">Fundação</span>
+              <h2 class="deck-title">Por que o S3 vira a fundação do Data Lake</h2>
+            </div>
+            <div class="deck-columns">
+              <div class="deck-panel">
+                <strong>Motivos principais</strong>
+                <ul>
+                  <li>Escala praticamente ilimitada.</li>
+                  <li>Durabilidade alta para dados brutos e históricos.</li>
+                  <li>Separação entre armazenamento e processamento.</li>
+                  <li>Integração nativa com Athena, Glue, Redshift e EMR.</li>
+                </ul>
+              </div>
+              <div class="deck-panel">
+                <strong>Leitura de arquitetura</strong>
+                <ul>
+                  <li>S3 armazena.</li>
+                  <li>Athena consulta.</li>
+                  <li>Glue cataloga.</li>
+                  <li>Outros serviços processam sem mover tudo para um banco único.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="deck-callout">
+              Um Data Lake bem desenhado começa menos pelo volume e mais pela disciplina de organização desde o primeiro bucket.
+            </div>
+            <div class="deck-footer">
+              <span>Bloco teórico 1</span>
+              <div class="deck-links">
+                <a class="deck-link" href="../material/material_aula_02_a_fundacao_do_data_lake_armazenamento_escalavel_s3_e_athena.html">Material</a>
+                <a class="deck-link" href="../../../index.html">Índice</a>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section>
+          <div class="deck-shell">
+            <div>
+              <span class="deck-kicker">Camadas</span>
+              <h2 class="deck-title">Estrutura recomendada: Raw, Trusted e Refined</h2>
+            </div>
+            <div class="deck-grid">
+              <article class="deck-card">
+                <h3>Raw / Bronze</h3>
+                <ul>
+                  <li>Recebe dado como chegou da origem.</li>
+                  <li>Baixa transformação.</li>
+                  <li>Serve para auditoria e reprocessamento.</li>
+                </ul>
+              </article>
+              <article class="deck-card">
+                <h3>Trusted / Silver</h3>
+                <ul>
+                  <li>Dados limpos, padronizados e tipados.</li>
+                  <li>Qualidade melhorada.</li>
+                  <li>Ponto de consumo analítico intermediário.</li>
+                </ul>
+              </article>
+              <article class="deck-card">
+                <h3>Refined / Gold</h3>
+                <ul>
+                  <li>Dados agregados por domínio ou produto.</li>
+                  <li>Prontos para dashboards e análises de negócio.</li>
+                  <li>Maior semântica, menor ambiguidade.</li>
+                </ul>
+              </article>
+              <article class="deck-card">
+                <h3>Regra operacional</h3>
+                <ul>
+                  <li>Não pule camadas sem motivo claro.</li>
+                  <li>Defina responsabilidade de cada zona.</li>
+                  <li>Evite misturar dado bruto com dado curado.</li>
+                </ul>
+              </article>
+            </div>
+            <div class="deck-footer">
+              <span>Bloco teórico 1</span>
+              <div class="deck-links">
+                <a class="deck-link" href="../material/material_aula_02_a_fundacao_do_data_lake_armazenamento_escalavel_s3_e_athena.html">Material</a>
+                <a class="deck-link" href="../../../index.html">Índice</a>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section>
+          <div class="deck-shell">
+            <div>
+              <span class="deck-kicker">Particionamento</span>
+              <h2 class="deck-title">Particionamento estratégico no S3</h2>
+            </div>
+            <div class="deck-columns">
+              <div class="deck-panel">
+                <strong>Quando faz sentido</strong>
+                <ul>
+                  <li>Leitura por data, região, tenant ou domínio.</li>
+                  <li>Consultas filtram subconjuntos recorrentes.</li>
+                  <li>Volume cresce continuamente.</li>
+                </ul>
+              </div>
+              <div class="deck-panel">
+                <strong>Quando atrapalha</strong>
+                <ul>
+                  <li>Partições demais com poucos arquivos em cada uma.</li>
+                  <li>Estrutura de pastas sem alinhamento com consulta.</li>
+                  <li>Explosão de pequenos arquivos.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="deck-callout">
+              Regra prática: partição boa é a que reduz leitura sem tornar a escrita e a manutenção mais caras do que o ganho.
+            </div>
+            <div class="deck-footer">
+              <span>Bloco teórico 1</span>
+              <div class="deck-links">
+                <a class="deck-link" href="../material/material_aula_02_a_fundacao_do_data_lake_armazenamento_escalavel_s3_e_athena.html">Material</a>
+                <a class="deck-link" href="../../../index.html">Índice</a>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section>
+          <div class="deck-shell">
+            <div>
+              <span class="deck-kicker">Boas práticas</span>
+              <h2 class="deck-title">Formato de arquivo, compressão e lifecycle</h2>
+            </div>
+            <div class="deck-grid">
+              <article class="deck-card">
+                <h3>CSV e JSON</h3>
+                <ul>
+                  <li>Ótimos para ingestão simples e interoperabilidade.</li>
+                  <li>Custam mais em leitura analítica.</li>
+                </ul>
+              </article>
+              <article class="deck-card">
+                <h3>Parquet</h3>
+                <ul>
+                  <li>Formato colunar.</li>
+                  <li>Menor custo e melhor performance no Athena.</li>
+                </ul>
+              </article>
+              <article class="deck-card">
+                <h3>Compressão</h3>
+                <ul>
+                  <li>Reduz storage e leitura desnecessária.</li>
+                  <li>Deve ser combinada com um bom particionamento.</li>
+                </ul>
+              </article>
+              <article class="deck-card">
+                <h3>Lifecycle</h3>
+                <ul>
+                  <li>Move dados frios para classes mais baratas.</li>
+                  <li>Ajuda a controlar custo sem perder histórico.</li>
+                </ul>
+              </article>
+            </div>
+            <div class="deck-footer">
+              <span>Bloco teórico 1</span>
+              <div class="deck-links">
+                <a class="deck-link" href="../material/material_aula_02_a_fundacao_do_data_lake_armazenamento_escalavel_s3_e_athena.html">Material</a>
+                <a class="deck-link" href="../../../index.html">Índice</a>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section>
+          <div class="deck-shell">
+            <div>
+              <span class="deck-kicker">Athena</span>
+              <h2 class="deck-title">O que é o Amazon Athena no ecossistema analítico</h2>
+            </div>
+            <div class="deck-placeholder">
+              <div class="deck-panel">
+                <strong>Ideia central</strong>
+                <ul>
+                  <li>Executa SQL sem servidor dedicado.</li>
+                  <li>Lê dados diretamente do S3.</li>
+                  <li>Paga por volume lido.</li>
+                </ul>
+              </div>
+              <div class="deck-panel">
+                <strong>Dependências de qualidade</strong>
+                <ul>
+                  <li>Schema coerente.</li>
+                  <li>Particionamento útil.</li>
+                  <li>Formato eficiente.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="deck-callout">
+              Athena não corrige um lake mal organizado. Ele expõe rapidamente os custos das más decisões de layout.
+            </div>
+            <div class="deck-footer">
+              <span>Bloco teórico 2</span>
+              <div class="deck-links">
+                <a class="deck-link" href="../material/material_aula_02_a_fundacao_do_data_lake_armazenamento_escalavel_s3_e_athena.html">Material</a>
+                <a class="deck-link" href="../../../index.html">Índice</a>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section>
+          <div class="deck-shell">
+            <div>
+              <span class="deck-kicker">Consulta</span>
+              <h2 class="deck-title">Como reduzir custo e ganhar performance no Athena</h2>
+            </div>
+            <table class="deck-table">
+              <thead>
+                <tr>
+                  <th>Boa prática</th>
+                  <th>Efeito</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Usar Parquet</td>
+                  <td>Lê menos dados e acelera consultas.</td>
+                </tr>
+                <tr>
+                  <td>Filtrar por partição</td>
+                  <td>Evita scan desnecessário de diretórios inteiros.</td>
+                </tr>
+                <tr>
+                  <td>Evitar pequenos arquivos em excesso</td>
+                  <td>Reduz overhead operacional e de leitura.</td>
+                </tr>
+                <tr>
+                  <td>Separar bem raw e curated</td>
+                  <td>Evita schema inconsistente e consumo indevido.</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="deck-footer">
+              <span>Bloco teórico 2</span>
+              <div class="deck-links">
+                <a class="deck-link" href="../material/material_aula_02_a_fundacao_do_data_lake_armazenamento_escalavel_s3_e_athena.html">Material</a>
+                <a class="deck-link" href="../../../index.html">Índice</a>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section>
+          <div class="deck-shell">
+            <div>
+              <span class="deck-kicker">Transição</span>
+              <h2 class="deck-title">Da teoria para a prática</h2>
+            </div>
+            <div class="deck-grid">
+              <article class="deck-card">
+                <h3>Até aqui</h3>
+                <ul>
+                  <li>Estrutura das camadas definida.</li>
+                  <li>Critérios de layout e performance alinhados.</li>
+                </ul>
+              </article>
+              <article class="deck-card">
+                <h3>Agora no AWS Student</h3>
+                <ul>
+                  <li>Criar buckets e prefixos.</li>
+                  <li>Enviar arquivos de exemplo.</li>
+                  <li>Executar a primeira query no Athena.</li>
+                </ul>
+              </article>
+            </div>
+            <div class="deck-callout">
+              A prática começa às 21h00. O objetivo não é só "fazer funcionar", mas validar que o desenho escolhido simplifica a exploração dos dados.
+            </div>
+            <div class="deck-footer">
+              <span>Fechamento da teoria</span>
+              <div class="deck-links">
+                <a class="deck-link" href="../material/material_aula_02_a_fundacao_do_data_lake_armazenamento_escalavel_s3_e_athena.html">Material</a>
+                <a class="deck-link" href="../../../index.html">Índice</a>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section>
+          <div class="deck-shell">
+            <div>
+              <span class="deck-kicker">Prática</span>
+              <h2 class="deck-title">Roteiro do laboratório com AWS Student</h2>
+            </div>
+            <table class="deck-table">
+              <thead>
+                <tr>
+                  <th>Etapa</th>
+                  <th>Ação</th>
+                  <th>Resultado esperado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>Acessar o ambiente AWS Student e validar região e permissões.</td>
+                  <td>Ambiente preparado para o laboratório.</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>Criar bucket e prefixos `raw/`, `trusted/` e `refined/`.</td>
+                  <td>Estrutura inicial do lake criada.</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>Fazer upload de arquivos CSV ou JSON para a zona raw.</td>
+                  <td>Dados disponíveis no S3.</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>Criar tabela no Athena e consultar os dados.</td>
+                  <td>Primeira exploração validada.</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="deck-footer">
+              <span>Prática 21h00 - 22h00</span>
+              <div class="deck-links">
+                <a class="deck-link" href="../material/material_aula_02_a_fundacao_do_data_lake_armazenamento_escalavel_s3_e_athena.html">Material</a>
+                <a class="deck-link" href="../../../index.html">Índice</a>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section>
+          <div class="deck-shell">
+            <div>
+              <span class="deck-kicker">Hands-on</span>
+              <h2 class="deck-title">Passo a passo operacional</h2>
+            </div>
+            <div class="deck-columns">
+              <div class="deck-panel">
+                <strong>No S3</strong>
+                <ol>
+                  <li>Criar um bucket com nome único.</li>
+                  <li>Criar prefixos para `raw/`, `trusted/` e `refined/`.</li>
+                  <li>Enviar um arquivo de origem para `raw/`.</li>
+                </ol>
+              </div>
+              <div class="deck-panel">
+                <strong>No Athena</strong>
+                <ol>
+                  <li>Definir output location para resultados.</li>
+                  <li>Criar tabela externa apontando para `raw/`.</li>
+                  <li>Executar `SELECT * LIMIT 10` para validar leitura.</li>
+                </ol>
+              </div>
+            </div>
+            <div class="deck-callout">
+              Se a consulta estiver lenta ou cara, volte ao desenho do storage. Em Data Lake, performance começa no layout, não na query.
+            </div>
+            <div class="deck-footer">
+              <span>Prática guiada</span>
+              <div class="deck-links">
+                <a class="deck-link" href="../material/material_aula_02_a_fundacao_do_data_lake_armazenamento_escalavel_s3_e_athena.html">Material</a>
+                <a class="deck-link" href="../../../index.html">Índice</a>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section>
+          <div class="deck-shell">
+            <div>
+              <span class="deck-kicker">Checklist</span>
+              <h2 class="deck-title">Checklist final da Aula 2</h2>
+            </div>
+            <div class="deck-grid">
+              <article class="deck-card">
+                <h3>Estrutura</h3>
+                <ul>
+                  <li>Bucket criado.</li>
+                  <li>Camadas organizadas.</li>
+                  <li>Dados raw enviados.</li>
+                </ul>
+              </article>
+              <article class="deck-card">
+                <h3>Consulta</h3>
+                <ul>
+                  <li>Tabela criada no Athena.</li>
+                  <li>Query simples executada com sucesso.</li>
+                  <li>Output de resultados configurado.</li>
+                </ul>
+              </article>
+              <article class="deck-card">
+                <h3>Aprendizado</h3>
+                <ul>
+                  <li>Entendimento de camadas do lake.</li>
+                  <li>Critérios básicos de particionamento.</li>
+                  <li>Impacto do formato na performance.</li>
+                </ul>
+              </article>
+              <article class="deck-card">
+                <h3>Próxima conexão</h3>
+                <ul>
+                  <li>A próxima aula entra em fontes relacionais e NoSQL.</li>
+                  <li>Essas fontes alimentarão o lake criado hoje.</li>
+                </ul>
+              </article>
+            </div>
+            <div class="deck-footer">
+              <span>Encerramento</span>
+              <div class="deck-links">
+                <a class="deck-link" href="../material/material_aula_02_a_fundacao_do_data_lake_armazenamento_escalavel_s3_e_athena.html">Material</a>
+                <a class="deck-link" href="../../../index.html">Índice</a>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js/dist/reveal.js"></script>
+    <script>
+      Reveal.initialize({ hash: true, controls: true, progress: true, center: true });
+    </script>
+  </body>
+</html>
