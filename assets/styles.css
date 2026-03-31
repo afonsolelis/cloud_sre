@@ -112,6 +112,13 @@ footer {
   margin-top: 28px;
 }
 
+.logo-full {
+  display: block;
+  height: 48px;
+  width: auto;
+  margin-bottom: 18px;
+}
+
 @media (max-width: 640px) {
   .page {
     width: min(100% - 20px, 1100px);

@@ -1,0 +1,14 @@
+{
+  "logo_full": {
+    "url": "https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_e4vyyw.png",
+    "alt": "Universidade Presbiteriana Mackenzie",
+    "description": "Logo Mackenzie completo (M + texto Mackenzie)",
+    "usage": ["index.html", "primeiro slide de cada aula (capa)"]
+  },
+  "logo_mini": {
+    "url": "https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png",
+    "alt": "Mackenzie",
+    "description": "Logo Mackenzie mini (apenas M)",
+    "usage": ["todos os slides (canto inferior esquerdo, persistente)"]
+  }
+}

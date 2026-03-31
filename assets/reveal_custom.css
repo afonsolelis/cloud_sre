@@ -180,6 +180,24 @@
   font-size: 0.68em;
 }
 
+.deck-logo-full {
+  display: block;
+  height: 54px;
+  width: auto;
+  margin-bottom: 10px;
+}
+
+.slide-logo-mini {
+  position: fixed;
+  bottom: 14px;
+  left: 14px;
+  height: 28px;
+  width: auto;
+  opacity: 0.6;
+  z-index: 100;
+  pointer-events: none;
+}
+
 @media (max-width: 900px) {
   .deck-grid,
   .deck-placeholder,
