@@ -1,121 +1,132 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Slide Aula 08</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js/dist/reset.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js/dist/reveal.css" />
-    <link rel="stylesheet" href="../../../assets/reveal_custom.css" />
-    <style data-design-tokens>:root{--bg:#fff;--color:#000000}body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}a:hover{opacity:.8}a:focus{outline:2px solid #000000}</style>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aula 08 — Seguranca de Dados, FinOps e Projeto Final Integrado</title>
+  <link href="../../../assets/slides.css" rel="stylesheet">
+  <style data-design-tokens>:root{--bg:#fff;--color:#000000}body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}a:hover{opacity:.8}a:focus{outline:2px solid #000000}</style>
 </head>
-  <body>
-    <div class="reveal">
-      <div class="slides">
-        <section>
-          <div class="deck-shell">
-            <div>
-              <img class="deck-logo-full" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_e4vyyw.png" alt="Universidade Presbiteriana Mackenzie" />
-              <span class="deck-kicker">Cloud Computing e SRA</span>
-              <h1 class="deck-title">Segurança de Dados, FinOps e Projeto Final Integrado</h1>
-              <p class="deck-meta">Aula 08 • 11/06/2026</p>
-              <p class="deck-year">2026</p>
-              <p class="deck-subtitle">Fechamento da disciplina com governança refinada, custos analíticos e revisão do pipeline integrado.</p>
-            </div>
-            <div class="deck-footer">
-              <span>Slide de capa</span>
-              <div class="deck-links">
-                <a class="deck-link" href="../material/material_aula_08_seguranca_de_dados_finops_e_projeto_final_integrado.html">Material</a>
-                <a class="deck-link" href="../../../index.html">Índice</a>
-              </div>
-            </div>
-          </div>
-        </section>
-        <section>
-          <div class="deck-shell">
-            <div>
-              <span class="deck-kicker">Agenda</span>
-              <h2 class="deck-title">O que vai acontecer nesta aula</h2>
-            </div>
-            <div class="deck-grid">
-              <article class="deck-card">
-                <h3>Bloco 1</h3>
-                <ul>
-                  <li>Lake Formation e governança escalável.</li>
-                  <li>Controle fino de acesso a dados.</li>
-                </ul>
-              </article>
-              <article class="deck-card">
-                <h3>Bloco 2</h3>
-                <ul>
-                  <li>FinOps para analytics.</li>
-                  <li>Otimização de consultas e custos.</li>
-                </ul>
-              </article>
-              <article class="deck-card">
-                <h3>Bloco 3</h3>
-                <ul>
-                  <li>Resumo Lambda versus Kappa.</li>
-                  <li>Troubleshooting do pipeline final.</li>
-                </ul>
-              </article>
-              <article class="deck-card">
-                <h3>Entrega esperada</h3>
-                <ul>
-                  <li>Visão consolidada da arquitetura final.</li>
-                  <li>Checklist de segurança, custo e operação.</li>
-                </ul>
-              </article>
-            </div>
-            <div class="deck-footer">
-              <span>Slide 2 de abertura</span>
-              <div class="deck-links">
-                <a class="deck-link" href="../material/material_aula_08_seguranca_de_dados_finops_e_projeto_final_integrado.html">Material</a>
-                <a class="deck-link" href="../../../index.html">Índice</a>
-              </div>
-            </div>
-          </div>
-        </section>
-        <section>
-          <div class="deck-shell">
-            <div>
-              <span class="deck-kicker">Placeholder</span>
-              <h2 class="deck-title">Slide inicial para evolução do conteúdo</h2>
-              <p class="deck-summary">Estrutura pronta para consolidar o fechamento da disciplina com visão integrada de segurança, custo e operação.</p>
-            </div>
-            <div class="deck-placeholder">
-              <div class="deck-panel">
-                <strong>Conteúdo a desenvolver</strong>
-                <ul>
-                  <li>Políticas com Lake Formation.</li>
-                  <li>Ações práticas de FinOps.</li>
-                  <li>Fluxo completo do pipeline final.</li>
-                </ul>
-              </div>
-              <div class="deck-panel">
-                <strong>Próximos incrementos</strong>
-                <ul>
-                  <li>Adicionar arquitetura consolidada.</li>
-                  <li>Inserir checklist de troubleshooting.</li>
-                  <li>Detalhar a revisão final da disciplina.</li>
-                </ul>
-              </div>
-            </div>
-            <div class="deck-footer">
-              <span>Slide 3 mínimo exigido pela spec</span>
-              <div class="deck-links">
-                <a class="deck-link" href="../material/material_aula_08_seguranca_de_dados_finops_e_projeto_final_integrado.html">Material</a>
-                <a class="deck-link" href="../../../index.html">Índice</a>
-              </div>
-            </div>
-          </div>
-        </section>
+<body>
+  <div class="slide-container">
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 1 — CAPA                                               -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <img class="deck-logo-full" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_e4vyyw.png" alt="Universidade Presbiteriana Mackenzie" />
+          <span class="deck-kicker">Cloud Computing e SRA</span>
+          <h1 class="deck-title">Seguranca de Dados, FinOps e Projeto Final Integrado</h1>
+          <p class="deck-meta">Aula 08 • 11/06/2026</p>
+          <p class="deck-year">2026</p>
+          <p class="deck-subtitle">Fechamento da disciplina com governanca refinada, custos analiticos e revisao do pipeline integrado.</p>
+        </div>
       </div>
-      <img class="slide-logo-mini" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" alt="Mackenzie" />
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/reveal.js/dist/reveal.js"></script>
-    <script>
-      Reveal.initialize({ hash: true, controls: true, progress: true, center: true });
-    </script>
-  </body>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 2 — AGENDA                                             -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Agenda</span>
+          <h2 class="deck-title">O que vai acontecer nesta aula</h2>
+        </div>
+        <div class="deck-grid">
+          <article class="deck-card">
+            <h3>Bloco 1</h3>
+            <ul>
+              <li>Lake Formation e governanca escalavel.</li>
+              <li>Controle fino de acesso a dados.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Bloco 2</h3>
+            <ul>
+              <li>FinOps para analytics.</li>
+              <li>Otimizacao de consultas e custos.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Bloco 3</h3>
+            <ul>
+              <li>Resumo Lambda versus Kappa.</li>
+              <li>Troubleshooting do pipeline final.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Entrega esperada</h3>
+            <ul>
+              <li>Visao consolidada da arquitetura final.</li>
+              <li>Checklist de seguranca, custo e operacao.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 3 — PLACEHOLDER                                        -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Placeholder</span>
+          <h2 class="deck-title">Slide inicial para evolucao do conteudo</h2>
+          <p class="deck-summary">Estrutura pronta para consolidar o fechamento da disciplina com visao integrada de seguranca, custo e operacao.</p>
+        </div>
+        <div class="deck-placeholder">
+          <div class="deck-panel">
+            <strong>Conteudo a desenvolver</strong>
+            <ul>
+              <li>Politicas com Lake Formation.</li>
+              <li>Acoes praticas de FinOps.</li>
+              <li>Fluxo completo do pipeline final.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Proximos incrementos</strong>
+            <ul>
+              <li>Adicionar arquitetura consolidada.</li>
+              <li>Inserir checklist de troubleshooting.</li>
+              <li>Detalhar a revisao final da disciplina.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <img class="slide-logo-mini" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" alt="Mackenzie" />
+
+  <div class="slide-footer">
+    <div class="footer-links">
+      <a href="../../../index.html" class="back-home">Indice</a>
+      <a href="../material/material_aula_08_seguranca_de_dados_finops_e_projeto_final_integrado.html" class="material-link">Material</a>
+    </div>
+    <div class="nav-wrapper">
+      <div class="nav-buttons"><button id="prev-btn" onclick="previousSlide()">&#8592; Anterior</button></div>
+      <div class="slide-counter"><span id="current-slide">1</span> / <span id="total-slides">1</span></div>
+      <div class="nav-buttons"><button id="next-btn" onclick="nextSlide()">Proximo &#8594;</button></div>
+    </div>
+    <button class="fullscreen-btn" onclick="toggleFullScreen()" title="Tela cheia">&#9974;</button>
+  </div>
+
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    document.getElementById('total-slides').textContent = totalSlides;
+    function showSlide(i) { slides.forEach(s => s.classList.remove('active')); slides[i].classList.add('active'); currentSlide = i; document.getElementById('current-slide').textContent = i + 1; document.getElementById('prev-btn').disabled = i === 0; document.getElementById('next-btn').disabled = i === totalSlides - 1; }
+    function nextSlide() { if (currentSlide < totalSlides - 1) showSlide(currentSlide + 1); }
+    function previousSlide() { if (currentSlide > 0) showSlide(currentSlide - 1); }
+    function toggleFullScreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+    document.addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); } else if (e.key === 'ArrowLeft') { e.preventDefault(); previousSlide(); } else if (e.key.toLowerCase() === 'f') toggleFullScreen(); });
+    showSlide(0);
+  </script>
+</body>
 </html>

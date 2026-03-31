@@ -104,13 +104,6 @@ export const htmlHelpers = {
     return links;
   },
 
-  hasRevealJs: (html: string): boolean => {
-    return html.includes('reveal.js') || 
-           html.includes('Reveal') || 
-           html.includes('reveal.css') ||
-           html.includes('reveal.min.css');
-  },
-
   getComputedStyle: (html: string, property: string): string | null => {
     const styleRegex = /<style[^>]*>([\s\S]*?)<\/style>/gi;
     let match;
@@ -145,11 +138,12 @@ export const specValidators = {
   validateSlideStructure: (html: string): Array<{ pass: boolean; message: string }> => {
     const results: Array<{ pass: boolean; message: string }> = [];
     
-    // Check for reveal.js
-    if (!htmlHelpers.hasRevealJs(html)) {
-      results.push({ pass: false, message: 'Slide must use reveal.js' });
+    // Check for HTML-native slide system
+    const hasSlideSystem = html.includes('slide-container') || html.includes('class="slide"');
+    if (!hasSlideSystem) {
+      results.push({ pass: false, message: 'Slide must use HTML-native slide system (.slide-container or .slide)' });
     } else {
-      results.push({ pass: true, message: 'Uses reveal.js' });
+      results.push({ pass: true, message: 'Uses HTML-native slide system' });
     }
     
     // Check for navigation links

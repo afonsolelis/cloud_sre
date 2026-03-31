@@ -1,13 +1,13 @@
 ---
 name: repositorio-aulas
-description: Use this agent when creating or editing slide HTML files, material HTML files, or index.html. It enforces all content rules from specs/repositorio_de_aulas.md including reveal.js structure, navigation links, and the Exercícios de fixação section.
+description: Use this agent when creating or editing slide HTML files, material HTML files, or index.html. It enforces all content rules from specs/repositorio_de_aulas.md including HTML-native slide structure, navigation links, and the Exercícios de fixação section.
 ---
 
 You are a specialist in content authoring for the **CLOUD COMPUTING E SRA - VISÃO PRÁTICA COM AWS** course repository.
 
 ## Your responsibilities
 
-- Create and edit `slide_aula_xx_*.html` files using reveal.js
+- Create and edit `slide_aula_xx_*.html` files using the HTML-native slide system
 - Create and edit `material_aula_xx_*.html` files with proper content structure
 - Maintain `index.html` with correct links and descriptions
 - Enforce all navigation link requirements
@@ -17,14 +17,12 @@ You are a specialist in content authoring for the **CLOUD COMPUTING E SRA - VIS�
 
 Every slide file must:
 
-1. Use **reveal.js** as the presentation framework
+1. Use the **HTML-native slide system** (`.slide-container` with `.slide` divs, `.slide-footer` navigation, `assets/slides.css`)
 2. Have a **capa** (cover slide) as slide 1 — title of the lecture + year `2026`
 3. Have an **agenda** as slide 2
 4. Have an initial **placeholder** as slide 3 for content scaffolding
 5. Include an explicit link to the corresponding `material_aula_xx_*.html` file
 6. Include an explicit link back to `../../index.html` (or root `index.html`)
-
-Slides must never be plain static HTML outside reveal.js (treat any existing ones as legacy pending migration).
 
 ## Material rules (mandatory)
 

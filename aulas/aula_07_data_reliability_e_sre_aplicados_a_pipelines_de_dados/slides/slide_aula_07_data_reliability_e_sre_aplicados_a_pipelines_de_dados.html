@@ -1,121 +1,132 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Slide Aula 07</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js/dist/reset.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js/dist/reveal.css" />
-    <link rel="stylesheet" href="../../../assets/reveal_custom.css" />
-    <style data-design-tokens>:root{--bg:#fff;--color:#000000}body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}a:hover{opacity:.8}a:focus{outline:2px solid #000000}</style>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aula 07 — Data Reliability e SRE Aplicados a Pipelines de Dados</title>
+  <link href="../../../assets/slides.css" rel="stylesheet">
+  <style data-design-tokens>:root{--bg:#fff;--color:#000000}body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}a:hover{opacity:.8}a:focus{outline:2px solid #000000}</style>
 </head>
-  <body>
-    <div class="reveal">
-      <div class="slides">
-        <section>
-          <div class="deck-shell">
-            <div>
-              <img class="deck-logo-full" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_e4vyyw.png" alt="Universidade Presbiteriana Mackenzie" />
-              <span class="deck-kicker">Cloud Computing e SRA</span>
-              <h1 class="deck-title">Data Reliability e SRE Aplicados a Pipelines de Dados</h1>
-              <p class="deck-meta">Aula 07 • 28/05/2026</p>
-              <p class="deck-year">2026</p>
-              <p class="deck-subtitle">Confiabilidade operacional para pipelines de dados com observabilidade, SLOs e orquestração resiliente.</p>
-            </div>
-            <div class="deck-footer">
-              <span>Slide de capa</span>
-              <div class="deck-links">
-                <a class="deck-link" href="../material/material_aula_07_data_reliability_e_sre_aplicados_a_pipelines_de_dados.html">Material</a>
-                <a class="deck-link" href="../../../index.html">Índice</a>
-              </div>
-            </div>
-          </div>
-        </section>
-        <section>
-          <div class="deck-shell">
-            <div>
-              <span class="deck-kicker">Agenda</span>
-              <h2 class="deck-title">O que vai acontecer nesta aula</h2>
-            </div>
-            <div class="deck-grid">
-              <article class="deck-card">
-                <h3>Bloco 1</h3>
-                <ul>
-                  <li>Métricas, logs e sinais de saúde.</li>
-                  <li>SLOs para entrega de dados.</li>
-                </ul>
-              </article>
-              <article class="deck-card">
-                <h3>Bloco 2</h3>
-                <ul>
-                  <li>CloudWatch para observabilidade.</li>
-                  <li>Alertas e detecção de falhas.</li>
-                </ul>
-              </article>
-              <article class="deck-card">
-                <h3>Bloco 3</h3>
-                <ul>
-                  <li>MWAA versus Step Functions.</li>
-                  <li>Retries e coordenação resiliente.</li>
-                </ul>
-              </article>
-              <article class="deck-card">
-                <h3>Entrega esperada</h3>
-                <ul>
-                  <li>Primeiro desenho de operação confiável.</li>
-                  <li>Pipeline com estratégia básica de recuperação.</li>
-                </ul>
-              </article>
-            </div>
-            <div class="deck-footer">
-              <span>Slide 2 de abertura</span>
-              <div class="deck-links">
-                <a class="deck-link" href="../material/material_aula_07_data_reliability_e_sre_aplicados_a_pipelines_de_dados.html">Material</a>
-                <a class="deck-link" href="../../../index.html">Índice</a>
-              </div>
-            </div>
-          </div>
-        </section>
-        <section>
-          <div class="deck-shell">
-            <div>
-              <span class="deck-kicker">Placeholder</span>
-              <h2 class="deck-title">Slide inicial para evolução do conteúdo</h2>
-              <p class="deck-summary">A base está pronta para inserir métricas, fluxos de orquestração e políticas de resposta a incidentes.</p>
-            </div>
-            <div class="deck-placeholder">
-              <div class="deck-panel">
-                <strong>Conteúdo a desenvolver</strong>
-                <ul>
-                  <li>Exemplo de SLO para pipeline crítico.</li>
-                  <li>Fluxo de retry e notificação.</li>
-                  <li>Comparativo prático entre orquestradores.</li>
-                </ul>
-              </div>
-              <div class="deck-panel">
-                <strong>Próximos incrementos</strong>
-                <ul>
-                  <li>Adicionar tabela de observabilidade.</li>
-                  <li>Inserir fluxo Step Functions.</li>
-                  <li>Detalhar o laboratório da aula.</li>
-                </ul>
-              </div>
-            </div>
-            <div class="deck-footer">
-              <span>Slide 3 mínimo exigido pela spec</span>
-              <div class="deck-links">
-                <a class="deck-link" href="../material/material_aula_07_data_reliability_e_sre_aplicados_a_pipelines_de_dados.html">Material</a>
-                <a class="deck-link" href="../../../index.html">Índice</a>
-              </div>
-            </div>
-          </div>
-        </section>
+<body>
+  <div class="slide-container">
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 1 — CAPA                                               -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <img class="deck-logo-full" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_e4vyyw.png" alt="Universidade Presbiteriana Mackenzie" />
+          <span class="deck-kicker">Cloud Computing e SRA</span>
+          <h1 class="deck-title">Data Reliability e SRE Aplicados a Pipelines de Dados</h1>
+          <p class="deck-meta">Aula 07 • 28/05/2026</p>
+          <p class="deck-year">2026</p>
+          <p class="deck-subtitle">Confiabilidade operacional para pipelines de dados com observabilidade, SLOs e orquestracao resiliente.</p>
+        </div>
       </div>
-      <img class="slide-logo-mini" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" alt="Mackenzie" />
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/reveal.js/dist/reveal.js"></script>
-    <script>
-      Reveal.initialize({ hash: true, controls: true, progress: true, center: true });
-    </script>
-  </body>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 2 — AGENDA                                             -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Agenda</span>
+          <h2 class="deck-title">O que vai acontecer nesta aula</h2>
+        </div>
+        <div class="deck-grid">
+          <article class="deck-card">
+            <h3>Bloco 1</h3>
+            <ul>
+              <li>Metricas, logs e sinais de saude.</li>
+              <li>SLOs para entrega de dados.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Bloco 2</h3>
+            <ul>
+              <li>CloudWatch para observabilidade.</li>
+              <li>Alertas e deteccao de falhas.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Bloco 3</h3>
+            <ul>
+              <li>MWAA versus Step Functions.</li>
+              <li>Retries e coordenacao resiliente.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Entrega esperada</h3>
+            <ul>
+              <li>Primeiro desenho de operacao confiavel.</li>
+              <li>Pipeline com estrategia basica de recuperacao.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 3 — PLACEHOLDER                                        -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Placeholder</span>
+          <h2 class="deck-title">Slide inicial para evolucao do conteudo</h2>
+          <p class="deck-summary">A base esta pronta para inserir metricas, fluxos de orquestracao e politicas de resposta a incidentes.</p>
+        </div>
+        <div class="deck-placeholder">
+          <div class="deck-panel">
+            <strong>Conteudo a desenvolver</strong>
+            <ul>
+              <li>Exemplo de SLO para pipeline critico.</li>
+              <li>Fluxo de retry e notificacao.</li>
+              <li>Comparativo pratico entre orquestradores.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Proximos incrementos</strong>
+            <ul>
+              <li>Adicionar tabela de observabilidade.</li>
+              <li>Inserir fluxo Step Functions.</li>
+              <li>Detalhar o laboratorio da aula.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <img class="slide-logo-mini" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" alt="Mackenzie" />
+
+  <div class="slide-footer">
+    <div class="footer-links">
+      <a href="../../../index.html" class="back-home">Indice</a>
+      <a href="../material/material_aula_07_data_reliability_e_sre_aplicados_a_pipelines_de_dados.html" class="material-link">Material</a>
+    </div>
+    <div class="nav-wrapper">
+      <div class="nav-buttons"><button id="prev-btn" onclick="previousSlide()">&#8592; Anterior</button></div>
+      <div class="slide-counter"><span id="current-slide">1</span> / <span id="total-slides">1</span></div>
+      <div class="nav-buttons"><button id="next-btn" onclick="nextSlide()">Proximo &#8594;</button></div>
+    </div>
+    <button class="fullscreen-btn" onclick="toggleFullScreen()" title="Tela cheia">&#9974;</button>
+  </div>
+
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    document.getElementById('total-slides').textContent = totalSlides;
+    function showSlide(i) { slides.forEach(s => s.classList.remove('active')); slides[i].classList.add('active'); currentSlide = i; document.getElementById('current-slide').textContent = i + 1; document.getElementById('prev-btn').disabled = i === 0; document.getElementById('next-btn').disabled = i === totalSlides - 1; }
+    function nextSlide() { if (currentSlide < totalSlides - 1) showSlide(currentSlide + 1); }
+    function previousSlide() { if (currentSlide > 0) showSlide(currentSlide - 1); }
+    function toggleFullScreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+    document.addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); } else if (e.key === 'ArrowLeft') { e.preventDefault(); previousSlide(); } else if (e.key.toLowerCase() === 'f') toggleFullScreen(); });
+    showSlide(0);
+  </script>
+</body>
 </html>

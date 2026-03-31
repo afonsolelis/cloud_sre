@@ -253,38 +253,33 @@ test.describe('Repositório de Aulas Spec', () => {
     });
   });
 
-  test.describe('Slides - Regras Obrigatórias (reveal.js)', () => {
+  test.describe('Slides - Regras Obrigatórias', () => {
     
-    test('slides devem usar reveal.js', async ({ aulasDir }) => {
+    test('slides devem usar sistema de slides HTML nativo', async ({ aulasDir }) => {
       const slideFiles = fsHelpers.getAllFiles(aulasDir).filter(f => f.includes('/slides/'));
-      
+
       for (const slideFile of slideFiles) {
         const content = fsHelpers.readFileSync(slideFile);
-        const hasRevealJs = 
-          content.includes('reveal.js') ||
-          content.includes('reveal.css') ||
-          content.includes('reveal.min.css') ||
-          content.includes('Reveal.initialize') ||
-          content.includes('Reveal.setup') ||
-          content.includes('class="reveal"') ||
-          content.includes('data-background');
-        
-        expect(hasRevealJs).toBeTruthy();
+        const hasNativeSlides =
+          content.includes('class="slide-container"') ||
+          content.includes('class="slide"') ||
+          content.includes('showSlide') ||
+          content.includes('nextSlide');
+
+        expect(hasNativeSlides).toBeTruthy();
       }
     });
 
     test('slides devem começar com capa', async ({ aulasDir }) => {
       const slideFiles = fsHelpers.getAllFiles(aulasDir).filter(f => f.includes('/slides/'));
-      
+
       for (const slideFile of slideFiles) {
         const content = fsHelpers.readFileSync(slideFile);
-        // Check for slide/section structure indicating a cover
-        const hasCover = 
+        // Check for slide structure indicating a cover
+        const hasCover =
           content.includes('class="slide"') ||
-          content.includes('data-state="cover"') ||
-          content.includes('<section') ||
           content.includes('<h1');
-        
+
         expect(hasCover).toBeTruthy();
       }
     });
@@ -336,30 +331,30 @@ test.describe('Repositório de Aulas Spec', () => {
 
     test('slides devem ter foco único por tela', async ({ aulasDir }) => {
       const slideFiles = fsHelpers.getAllFiles(aulasDir).filter(f => f.includes('/slides/'));
-      
+
       for (const slideFile of slideFiles) {
         const content = fsHelpers.readFileSync(slideFile);
-        // Check for reasonable section count
-        const sectionCount = (content.match(/<section/g) || []).length;
-        expect(sectionCount).toBeGreaterThanOrEqual(3); // cover, agenda, content
+        // Check for reasonable slide count
+        const slideCount = (content.match(/class="slide"/g) || []).length;
+        expect(slideCount).toBeGreaterThanOrEqual(3); // cover, agenda, content
       }
     });
 
     test('slides devem evitar poluição visual', async ({ aulasDir }) => {
       const slideFiles = fsHelpers.getAllFiles(aulasDir).filter(f => f.includes('/slides/'));
-      
+
       for (const slideFile of slideFiles) {
         const content = fsHelpers.readFileSync(slideFile);
-        
-        // Count different complex elements per section
-        const sections = content.match(/<section[^>]*>[\s\S]*?<\/section>/gi) || [];
-        
-        for (const section of sections) {
-          const hasLists = section.includes('<ul') || section.includes('<ol');
-          const hasTables = section.includes('<table');
-          const hasCards = section.toLowerCase().includes('card');
-          
-          // Should not have all three at once in a single section
+
+        // Count different complex elements per slide
+        const slides = content.split('class="slide"');
+
+        for (const slide of slides) {
+          const hasLists = slide.includes('<ul') || slide.includes('<ol');
+          const hasTables = slide.includes('<table');
+          const hasCards = slide.toLowerCase().includes('card');
+
+          // Should not have all three at once in a single slide
           const complexityCount = [hasLists, hasTables, hasCards].filter(Boolean).length;
           expect(complexityCount).toBeLessThanOrEqual(2);
         }

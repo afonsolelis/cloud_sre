@@ -59,9 +59,12 @@ ccsre_pratica/
 
 ### Padrão dos Slides
 
-- Todos os slides devem usar `reveal.js`.
-- O HTML dos slides deve seguir a estrutura compatível com `reveal.js`.
-- Qualquer slide novo ou refatorado fora de `reveal.js` é considerado fora do padrão.
+- Todos os slides devem usar o sistema de slides HTML nativo, sem dependência de frameworks externos.
+- Cada slide é um `<div class="slide">` dentro de um `<div class="slide-container">`. Apenas o slide com a classe `.slide.active` é visível por vez.
+- Um `<div class="slide-footer">` fixo no rodapé fornece navegação: botões anterior/próximo, contador de slides, alternância de tela cheia e links de navegação (Home/Material).
+- A navegação por teclado é obrigatória: `ArrowRight`/`Space` = próximo, `ArrowLeft` = anterior, `F` = tela cheia.
+- O CSS compartilhado dos slides deve estar em `assets/slides.css`.
+- Qualquer slide novo ou refatorado fora do sistema HTML nativo é considerado fora do padrão.
 - Todo slide deve começar com uma capa.
 - A capa deve exibir o título da aula e o ano `2026`.
 - O segundo slide deve ser uma agenda da aula.
@@ -72,7 +75,7 @@ ccsre_pratica/
 - Cada slide deve comunicar uma ideia principal por vez.
 - Cada slide deve usar apenas os elementos necessários para essa ideia.
 - Deve-se evitar excesso simultâneo de cards, tabelas, listas e blocos visuais na mesma tela.
-- Não devem ser adicionados controles duplicados de navegação quando o `reveal.js` já atender a necessidade.
+- Não devem ser adicionados controles duplicados de navegação além do `.slide-footer` padrão.
 - Conteúdo extenso e explicações detalhadas devem ficar no material, não no slide.
 
 ### Padrão dos Materiais

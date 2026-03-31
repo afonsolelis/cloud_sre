@@ -55,7 +55,7 @@ Use the appropriate sub-agent when creating or reviewing slides, materials, or v
 
 ## Slide Rules (summary)
 
-- Must use **reveal.js**
+- Must use the **HTML-native slide system** (`assets/slides.css`)
 - Slide 1: capa with lecture title + year 2026
 - Slide 2: agenda
 - Slide 3: initial placeholder

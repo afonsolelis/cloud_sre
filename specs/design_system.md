@@ -74,7 +74,7 @@ Definir um sistema visual único para manter `index.html`, slides e materiais co
 
 ### Slides
 
-- Devem usar `reveal.js`.
+- Devem usar o sistema de slides HTML nativo com `assets/slides.css`.
 - Devem manter a mesma linguagem visual entre todas as aulas.
 - Capa, agenda e placeholder inicial devem seguir o mesmo sistema visual.
 - Áreas de conteúdo dentro dos slides devem usar grids, cards e painéis consistentes.

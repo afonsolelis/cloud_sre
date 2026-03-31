@@ -1,0 +1,588 @@
+/* ==========================================================================
+   slides.css — HTML-native slide system for Mackenzie course decks
+   Replaces reveal_custom.css (no reveal.js dependency)
+   Design system: Mackenzie (white bg, black text, high contrast, square)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Design tokens
+   -------------------------------------------------------------------------- */
+
+:root {
+  --deck-bg: #ffffff;
+  --deck-surface: #f3f4f6;
+  --deck-panel: #ffffff;
+  --deck-border: #111111;
+  --deck-text: #111111;
+  --deck-muted: #555555;
+  --deck-accent: #111111;
+}
+
+/* --------------------------------------------------------------------------
+   2. Base reset & body
+   -------------------------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  background: linear-gradient(180deg, #ffffff 0%, #f7f7f7 100%);
+  color: var(--deck-text);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: var(--deck-accent);
+}
+
+a:focus {
+  outline: 2px solid var(--deck-accent);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   3. Slide container & navigation system
+   -------------------------------------------------------------------------- */
+
+.slide-container {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.slide {
+  width: 100%;
+  height: 100%;
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  flex-direction: column;
+  overflow-y: auto;
+  padding-bottom: 64px; /* space for fixed footer */
+}
+
+.slide.active {
+  display: flex;
+  animation: slideIn 0.35s ease-in-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   4. Fixed navigation footer
+   -------------------------------------------------------------------------- */
+
+.slide-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  background: var(--deck-bg);
+  border-top: 2px solid var(--deck-border);
+  z-index: 100;
+  flex-wrap: wrap;
+}
+
+.nav-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.nav-buttons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-buttons button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  height: 34px;
+  padding: 0 12px;
+  border: 2px solid var(--deck-border);
+  border-radius: 6px;
+  background: var(--deck-accent);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.82em;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.nav-buttons button:hover {
+  background: #333333;
+  box-shadow: 3px 3px 0 rgba(17, 17, 17, 0.12);
+}
+
+.nav-buttons button:active {
+  background: #000000;
+  box-shadow: none;
+}
+
+.nav-buttons button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.slide-counter {
+  font-size: 0.85em;
+  font-weight: 700;
+  color: var(--deck-text);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.fullscreen-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 2px solid var(--deck-border);
+  border-radius: 6px;
+  background: var(--deck-surface);
+  color: var(--deck-text);
+  font-size: 0.9em;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.fullscreen-btn:hover {
+  background: #e5e5e5;
+}
+
+.footer-links {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.back-home {
+  display: inline-block;
+  padding: 6px 14px;
+  border: 2px solid var(--deck-border);
+  border-radius: 6px;
+  background: var(--deck-surface);
+  color: var(--deck-text);
+  text-decoration: none;
+  font-size: 0.78em;
+  font-weight: 700;
+  transition: background 0.15s ease;
+}
+
+.back-home:hover {
+  background: #e0e0e0;
+}
+
+.material-link {
+  display: inline-block;
+  padding: 6px 14px;
+  border: 2px solid var(--deck-border);
+  border-radius: 6px;
+  background: #333333;
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.78em;
+  font-weight: 700;
+  transition: background 0.15s ease;
+}
+
+.material-link:hover {
+  background: #555555;
+}
+
+/* --------------------------------------------------------------------------
+   5. Internal slide layout — .deck-shell (main content wrapper)
+   -------------------------------------------------------------------------- */
+
+.deck-shell {
+  min-height: 640px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 28px 34px;
+  background: var(--deck-panel);
+  border: 2px solid var(--deck-border);
+  border-radius: 8px;
+  box-shadow: 18px 18px 0 rgba(17, 17, 17, 0.08);
+  margin: 18px;
+}
+
+/* --------------------------------------------------------------------------
+   6. Kicker (label / badge)
+   -------------------------------------------------------------------------- */
+
+.deck-kicker {
+  display: inline-block;
+  padding: 8px 12px;
+  border: 2px solid var(--deck-border);
+  border-radius: 6px;
+  font-size: 0.7em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: #fff;
+}
+
+/* --------------------------------------------------------------------------
+   7. Title, year, subtitle, meta, summary
+   -------------------------------------------------------------------------- */
+
+.deck-title {
+  margin: 14px 0 12px;
+  font-size: 1.9em;
+  line-height: 1.05;
+}
+
+.deck-year {
+  margin: 0;
+  font-size: 3.1em;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.deck-subtitle,
+.deck-meta,
+.deck-summary,
+.deck-note {
+  color: var(--deck-muted);
+}
+
+/* --------------------------------------------------------------------------
+   8. Grid & cards
+   -------------------------------------------------------------------------- */
+
+.deck-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.deck-card {
+  padding: 18px;
+  border: 2px solid var(--deck-border);
+  border-radius: 6px;
+  background: var(--deck-surface);
+}
+
+.deck-card h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 0.95em;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.deck-card ul,
+.deck-card ol {
+  margin: 0;
+  padding-left: 22px;
+}
+
+.deck-card li {
+  margin-bottom: 10px;
+}
+
+/* --------------------------------------------------------------------------
+   9. Table
+   -------------------------------------------------------------------------- */
+
+.deck-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.62em;
+}
+
+.deck-table th,
+.deck-table td {
+  padding: 12px 14px;
+  border: 2px solid var(--deck-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.deck-table th {
+  background: var(--deck-surface);
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   10. Columns (2-column layout)
+   -------------------------------------------------------------------------- */
+
+.deck-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+/* --------------------------------------------------------------------------
+   11. Callout (left-bordered highlight block)
+   -------------------------------------------------------------------------- */
+
+.deck-callout {
+  padding: 16px 18px;
+  border-left: 6px solid var(--deck-border);
+  background: var(--deck-surface);
+  font-size: 0.68em;
+}
+
+/* --------------------------------------------------------------------------
+   12. Panel (bordered box)
+   -------------------------------------------------------------------------- */
+
+.deck-panel {
+  padding: 18px;
+  border: 2px solid var(--deck-border);
+  border-radius: 6px;
+  background: #fff;
+}
+
+.deck-panel strong {
+  display: block;
+  margin-bottom: 10px;
+}
+
+/* --------------------------------------------------------------------------
+   13. Placeholder (asymmetric 2-column layout)
+   -------------------------------------------------------------------------- */
+
+.deck-placeholder {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 18px;
+}
+
+/* --------------------------------------------------------------------------
+   14. Logos
+   -------------------------------------------------------------------------- */
+
+.deck-logo-full {
+  display: block;
+  height: 54px;
+  width: auto;
+  margin-bottom: 10px;
+}
+
+.slide-logo-mini {
+  position: fixed;
+  bottom: 70px; /* raised above the navigation footer */
+  left: 14px;
+  height: 28px;
+  width: auto;
+  opacity: 0.6;
+  z-index: 99;
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   15. deck-footer — in-slide bottom info bar (inside .deck-shell)
+       NOT the navigation footer (.slide-footer)
+   -------------------------------------------------------------------------- */
+
+.deck-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.52em;
+  padding-top: 10px;
+  border-top: 2px solid var(--deck-border);
+}
+
+.deck-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.deck-link {
+  display: inline-block;
+  padding: 8px 12px;
+  border: 2px solid var(--deck-border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--deck-accent);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.deck-link:hover,
+.deck-link:focus {
+  background: #efefef;
+}
+
+/* --------------------------------------------------------------------------
+   16. Utility: keyboard hint
+   -------------------------------------------------------------------------- */
+
+.keyboard-hint {
+  position: fixed;
+  bottom: 62px;
+  right: 20px;
+  font-size: 0.65em;
+  color: var(--deck-muted);
+  opacity: 0.7;
+  pointer-events: none;
+  z-index: 101;
+}
+
+/* --------------------------------------------------------------------------
+   17. Print styles
+   -------------------------------------------------------------------------- */
+
+@media print {
+  .slide-footer,
+  .slide-logo-mini,
+  .keyboard-hint {
+    display: none !important;
+  }
+
+  .slide {
+    display: flex !important;
+    position: relative !important;
+    page-break-after: always;
+    height: auto !important;
+    overflow: visible !important;
+    padding-bottom: 0 !important;
+  }
+
+  .slide-container {
+    overflow: visible !important;
+    height: auto !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   18. Responsive — mobile / small screens
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .deck-grid,
+  .deck-placeholder,
+  .deck-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .deck-shell {
+    min-height: auto;
+    padding: 18px 16px;
+    margin: 10px;
+    box-shadow: 8px 8px 0 rgba(17, 17, 17, 0.06);
+  }
+
+  .deck-title {
+    font-size: 1.45em;
+  }
+
+  .deck-year {
+    font-size: 2.3em;
+  }
+
+  .deck-table {
+    font-size: 0.55em;
+  }
+
+  .deck-callout {
+    font-size: 0.62em;
+  }
+
+  /* Footer wraps gracefully */
+  .slide-footer {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 12px;
+  }
+
+  .nav-wrapper {
+    gap: 8px;
+  }
+
+  .nav-buttons button {
+    min-width: 32px;
+    height: 30px;
+    padding: 0 8px;
+    font-size: 0.75em;
+  }
+
+  .slide-counter {
+    font-size: 0.75em;
+  }
+
+  .footer-links {
+    gap: 6px;
+  }
+
+  .back-home,
+  .material-link {
+    padding: 5px 10px;
+    font-size: 0.7em;
+  }
+
+  .slide-logo-mini {
+    height: 22px;
+    bottom: 58px;
+  }
+
+  .slide {
+    padding-bottom: 56px;
+  }
+}
+
+@media (max-width: 480px) {
+  .deck-shell {
+    padding: 14px 12px;
+    margin: 6px;
+    gap: 16px;
+  }
+
+  .deck-title {
+    font-size: 1.2em;
+  }
+
+  .deck-year {
+    font-size: 1.8em;
+  }
+
+  .deck-kicker {
+    font-size: 0.6em;
+    padding: 6px 10px;
+  }
+
+  .slide-footer {
+    padding: 6px 8px;
+  }
+}

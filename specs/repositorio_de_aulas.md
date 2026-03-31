@@ -61,10 +61,13 @@ Organizar o conteúdo da disciplina em um repositório estático com uma página
 
 ## Regra obrigatória para slides
 
-- Todo slide de aula deve ser implementado com `reveal.js`.
-- O arquivo HTML do slide deve seguir a estrutura esperada pelo `reveal.js`.
-- Novas aulas, revisões e migrações de slides existentes devem adotar `reveal.js` como padrão canônico.
-- O uso de HTML estático fora do padrão `reveal.js` deve ser tratado apenas como legado temporário até migração.
+- Todo slide de aula deve ser implementado com o sistema de slides HTML nativo, sem dependência de frameworks externos.
+- Cada slide é um `<div class="slide">` dentro de um `<div class="slide-container">`. Apenas o slide com a classe `.slide.active` é visível por vez.
+- Um `<div class="slide-footer">` fixo no rodapé fornece navegação: botões anterior/próximo, contador de slides, alternância de tela cheia e links de navegação (Home/Material).
+- A navegação por teclado é obrigatória: `ArrowRight`/`Space` = próximo, `ArrowLeft` = anterior, `F` = tela cheia.
+- O CSS compartilhado dos slides deve estar em `assets/slides.css`.
+- O JavaScript de navegação dos slides deve estar embutido no próprio HTML ou em arquivo compartilhado, sem dependências externas.
+- Novas aulas, revisões e migrações de slides existentes devem adotar o sistema HTML nativo como padrão canônico.
 - Todo slide deve começar com uma capa.
 - A capa deve exibir o título da aula e o ano `2026`.
 - O segundo slide deve apresentar a agenda da aula.
@@ -76,7 +79,7 @@ Organizar o conteúdo da disciplina em um repositório estático com uma página
 - Cada slide deve conter somente os elementos necessários para comunicar esse foco com boa leitura.
 - Cada slide deve priorizar um título forte e no máximo um bloco principal de conteúdo por vez.
 - Quando houver listas, tabelas, cards ou painéis, a quantidade deve ser limitada para evitar poluição visual.
-- Não usar rodapés fixos extras, barras redundantes ou controles duplicados quando o `reveal.js` já oferecer a navegação necessária.
+- Não usar rodapés fixos extras, barras redundantes ou controles duplicados além do `.slide-footer` padrão.
 - Evitar excesso de texto no slide; detalhes longos devem ir para o material escrito.
 
 ## Regra obrigatória para materiais

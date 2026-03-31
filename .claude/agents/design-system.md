@@ -69,7 +69,8 @@ You are a specialist in the visual design system for the **CLOUD COMPUTING E SRA
 - Same visual identity as slides and materials
 - Lecture listing: consistent card pattern with title, date, and action links
 
-### Slides (reveal.js)
+### Slides
+- Must use `assets/slides.css` for shared slide styles
 - Must use the same visual language across all lectures
 - Cover, agenda, and placeholder slides follow the same design system
 - Content areas use consistent grids, cards, and panels

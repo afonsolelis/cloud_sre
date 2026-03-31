@@ -1,721 +1,599 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Aula 01 — Fundamentos de Cloud para Dados e Governanca de Acessos</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js/dist/reset.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js/dist/reveal.css" />
-    <link rel="stylesheet" href="../../../assets/reveal_custom.css" />
-    <style data-design-tokens>:root{--bg:#fff;--color:#000000}body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}a:hover{opacity:.8}a:focus{outline:2px solid #000000}</style>
-  </head>
-  <body>
-    <div class="reveal">
-      <div class="slides">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aula 01 — Fundamentos de Cloud para Dados e Governanca de Acessos</title>
+  <link href="../../../assets/slides.css" rel="stylesheet">
+  <style data-design-tokens>:root{--bg:#fff;--color:#000000}body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}a:hover{opacity:.8}a:focus{outline:2px solid #000000}</style>
+</head>
+<body>
+  <div class="slide-container">
 
-        <!-- ============================================================ -->
-        <!-- SLIDE 1 — CAPA                                               -->
-        <!-- ============================================================ -->
-        <section>
-          <div class="deck-shell">
-            <div>
-              <img class="deck-logo-full" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_e4vyyw.png" alt="Universidade Presbiteriana Mackenzie" />
-              <span class="deck-kicker">Cloud Computing e SRA — MBA Engenharia de Dados</span>
-              <h1 class="deck-title">Fundamentos de Cloud para Dados e Governanca de Acessos</h1>
-              <p class="deck-meta">Aula 01 &nbsp;&bull;&nbsp; 16/04/2026 &nbsp;&bull;&nbsp; 19h00 – 22h00</p>
-              <p class="deck-year">2026</p>
-              <p class="deck-subtitle">Base conceitual da disciplina: arquitetura de dados na nuvem e controle de acesso com AWS IAM.</p>
-            </div>
-            <div class="deck-footer">
-              <span>Slide 1 — Capa</span>
-              <div class="deck-links">
-                <a class="deck-link" href="../material/material_aula_01_fundamentos_de_cloud_para_dados_e_governanca_de_acessos.html">Material</a>
-                <a class="deck-link" href="../../../index.html">Indice</a>
-              </div>
-            </div>
+    <!-- ============================================================ -->
+    <!-- SLIDE 1 — CAPA                                               -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <img class="deck-logo-full" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_e4vyyw.png" alt="Universidade Presbiteriana Mackenzie" />
+          <span class="deck-kicker">Cloud Computing e SRA — MBA Engenharia de Dados</span>
+          <h1 class="deck-title">Fundamentos de Cloud para Dados e Governanca de Acessos</h1>
+          <p class="deck-meta">Aula 01 &nbsp;&bull;&nbsp; 16/04/2026 &nbsp;&bull;&nbsp; 19h00 – 22h00</p>
+          <p class="deck-year">2026</p>
+          <p class="deck-subtitle">Base conceitual da disciplina: arquitetura de dados na nuvem e controle de acesso com AWS IAM.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 2 — AGENDA                                             -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Agenda</span>
+          <h2 class="deck-title">O que vai acontecer nesta aula</h2>
+        </div>
+        <div class="deck-grid">
+          <article class="deck-card">
+            <h3>19h00 – 20h00 &middot; Teoria</h3>
+            <ul>
+              <li>Cloud Computing para Engenharia de Dados</li>
+              <li>Arquiteturas: Data Lake, DW, Data Mesh</li>
+              <li>AWS como plataforma de dados</li>
+              <li>Governanca de acessos com IAM</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>20h00 – 22h00 &middot; Pratica AWS Student</h3>
+            <ul>
+              <li>Setup da conta e exploracao do console</li>
+              <li>Criacao de grupos, usuarios e roles</li>
+              <li>Politica customizada em JSON</li>
+              <li>Buckets S3 por camada do Data Lake</li>
+              <li>Validacao com IAM Policy Simulator</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 3 — O QUE E CLOUD COMPUTING                           -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; 19h00 – 20h00</span>
+          <h2 class="deck-title">O que e Cloud Computing?</h2>
+          <p class="deck-summary">Entrega de recursos computacionais sob demanda pela internet, com pagamento por uso. Definicao NIST (SP 800-145).</p>
+        </div>
+        <div class="deck-callout">
+          <strong>5 Caracteristicas essenciais (NIST)</strong>
+          <ol style="margin:8px 0 0; padding-left:22px; font-size:0.95em;">
+            <li><strong>On-demand self-service</strong> — provisionar recursos sem intervencao humana.</li>
+            <li><strong>Broad network access</strong> — acesso via rede por qualquer dispositivo.</li>
+            <li><strong>Resource pooling</strong> — recursos compartilhados entre multiplos clientes.</li>
+            <li><strong>Rapid elasticity</strong> — escalar para cima ou para baixo conforme demanda.</li>
+            <li><strong>Measured service</strong> — uso monitorado e cobrado por consumo.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 4 — MODELOS DE SERVICO PARA DADOS                      -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Modelos de Servico</span>
+          <h2 class="deck-title">IaaS, PaaS e SaaS para Dados</h2>
+          <p class="deck-summary">Cada modelo define o nivel de responsabilidade entre voce e o provedor. Escolher o modelo certo impacta custo, agilidade e operacao.</p>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr>
+              <th>Modelo</th>
+              <th>Voce gerencia</th>
+              <th>AWS gerencia</th>
+              <th>Exemplos AWS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>IaaS</strong></td>
+              <td>SO, runtime, aplicacao, dados</td>
+              <td>Hardware, rede, virtualizacao</td>
+              <td>EC2, EBS, VPC</td>
+            </tr>
+            <tr>
+              <td><strong>PaaS</strong></td>
+              <td>Aplicacao e dados</td>
+              <td>SO, runtime, middleware</td>
+              <td>RDS, EMR, Elastic Beanstalk</td>
+            </tr>
+            <tr>
+              <td><strong>SaaS</strong></td>
+              <td>Configuracao e uso</td>
+              <td>Tudo o mais</td>
+              <td>Athena, QuickSight</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 5 — DATA LAKE                                          -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Arquiteturas de Dados</span>
+          <h2 class="deck-title">Data Lake</h2>
+          <p class="deck-summary">Repositorio centralizado para armazenar dados brutos em qualquer formato. Principio: schema-on-read.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>3 camadas classicas</strong>
+            <ul style="margin:0; padding-left:22px;">
+              <li><strong>Raw / Bronze</strong> — dados originais, sem transformacao.</li>
+              <li><strong>Trusted / Silver</strong> — dados limpos, validados, deduplicados.</li>
+              <li><strong>Refined / Gold</strong> — dados prontos para consumo analitico.</li>
+            </ul>
           </div>
-        </section>
-
-        <!-- ============================================================ -->
-        <!-- SLIDE 2 — AGENDA                                             -->
-        <!-- ============================================================ -->
-        <section>
-          <div class="deck-shell">
-            <div>
-              <span class="deck-kicker">Agenda</span>
-              <h2 class="deck-title">O que vai acontecer nesta aula</h2>
-            </div>
-            <div class="deck-grid">
-              <article class="deck-card">
-                <h3>19h00 – 20h00 &middot; Teoria</h3>
-                <ul>
-                  <li>Cloud Computing para Engenharia de Dados</li>
-                  <li>Arquiteturas: Data Lake, DW, Data Mesh</li>
-                  <li>AWS como plataforma de dados</li>
-                  <li>Governanca de acessos com IAM</li>
-                </ul>
-              </article>
-              <article class="deck-card">
-                <h3>20h00 – 22h00 &middot; Pratica AWS Student</h3>
-                <ul>
-                  <li>Setup da conta e exploracao do console</li>
-                  <li>Criacao de grupos, usuarios e roles</li>
-                  <li>Politica customizada em JSON</li>
-                  <li>Buckets S3 por camada do Data Lake</li>
-                  <li>Validacao com IAM Policy Simulator</li>
-                </ul>
-              </article>
-            </div>
-            <div class="deck-footer">
-              <span>Slide 2 — Agenda</span>
-              <div class="deck-links">
-                <a class="deck-link" href="../material/material_aula_01_fundamentos_de_cloud_para_dados_e_governanca_de_acessos.html">Material</a>
-                <a class="deck-link" href="../../../index.html">Indice</a>
-              </div>
-            </div>
+          <div class="deck-panel">
+            <strong>Stack AWS</strong>
+            <ul style="margin:0; padding-left:22px;">
+              <li><strong>S3</strong> — armazenamento das 3 camadas.</li>
+              <li><strong>Glue</strong> — catalogacao e ETL.</li>
+              <li><strong>Athena</strong> — consultas SQL diretamente no S3.</li>
+            </ul>
           </div>
-        </section>
+        </div>
+      </div>
+    </div>
 
-        <!-- ============================================================ -->
-        <!-- SLIDE 3 — O QUE E CLOUD COMPUTING                           -->
-        <!-- ============================================================ -->
-        <section>
-          <div class="deck-shell">
-            <div>
-              <span class="deck-kicker">Teoria &middot; 19h00 – 20h00</span>
-              <h2 class="deck-title">O que e Cloud Computing?</h2>
-              <p class="deck-summary">Entrega de recursos computacionais sob demanda pela internet, com pagamento por uso. Definicao NIST (SP 800-145).</p>
-            </div>
-            <div class="deck-callout">
-              <strong>5 Caracteristicas essenciais (NIST)</strong>
-              <ol style="margin:8px 0 0; padding-left:22px; font-size:0.95em;">
-                <li><strong>On-demand self-service</strong> — provisionar recursos sem intervencao humana.</li>
-                <li><strong>Broad network access</strong> — acesso via rede por qualquer dispositivo.</li>
-                <li><strong>Resource pooling</strong> — recursos compartilhados entre multiplos clientes.</li>
-                <li><strong>Rapid elasticity</strong> — escalar para cima ou para baixo conforme demanda.</li>
-                <li><strong>Measured service</strong> — uso monitorado e cobrado por consumo.</li>
-              </ol>
-            </div>
-            <div class="deck-footer">
-              <span>Slide 3 — Cloud Computing</span>
-              <div class="deck-links">
-                <a class="deck-link" href="../material/material_aula_01_fundamentos_de_cloud_para_dados_e_governanca_de_acessos.html">Material</a>
-                <a class="deck-link" href="../../../index.html">Indice</a>
-              </div>
-            </div>
+    <!-- ============================================================ -->
+    <!-- SLIDE 6 — DATA WAREHOUSE E DATA LAKEHOUSE                    -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Arquiteturas de Dados</span>
+          <h2 class="deck-title">Data Warehouse e Data Lakehouse</h2>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr>
+              <th>Aspecto</th>
+              <th>Data Warehouse</th>
+              <th>Data Lakehouse</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Schema</td>
+              <td>Schema-on-write</td>
+              <td>Schema-on-read + ACID</td>
+            </tr>
+            <tr>
+              <td>Armazenamento</td>
+              <td>Colunar proprietario</td>
+              <td>Aberto (Parquet/ORC em S3)</td>
+            </tr>
+            <tr>
+              <td>Performance</td>
+              <td>MPP, otimizado para BI</td>
+              <td>Combina DL + DW</td>
+            </tr>
+            <tr>
+              <td>Formatos abertos</td>
+              <td>Nao</td>
+              <td>Iceberg, Delta Lake, Hudi</td>
+            </tr>
+            <tr>
+              <td>AWS</td>
+              <td>Amazon Redshift</td>
+              <td>S3 + Glue + Athena/Spark</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 7 — DATA MESH                                          -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Arquiteturas de Dados</span>
+          <h2 class="deck-title">Data Mesh</h2>
+          <p class="deck-summary">Paradigma de descentralizacao proposto por Zhamak Dehghani. Quatro principios fundamentais.</p>
+        </div>
+        <div class="deck-grid">
+          <article class="deck-card">
+            <h3>1. Domain Ownership</h3>
+            <ul>
+              <li>Cada dominio de negocio e responsavel pelos seus dados.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>2. Data as a Product</h3>
+            <ul>
+              <li>Dados tratados com qualidade, SLA e documentacao como um produto.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>3. Self-Serve Platform</h3>
+            <ul>
+              <li>Infraestrutura compartilhada que reduz fricao para os dominios.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>4. Federated Governance</h3>
+            <ul>
+              <li>Padroes globais com autonomia local. AWS: Lake Formation, EventBridge.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 8 — AWS INFRAESTRUTURA GLOBAL                          -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; AWS</span>
+          <h2 class="deck-title">AWS Infraestrutura Global</h2>
+          <p class="deck-summary">Entender a infraestrutura fisica da AWS e essencial para decidir onde hospedar dados e servicos.</p>
+        </div>
+        <div class="deck-placeholder">
+          <div class="deck-panel">
+            <strong>Componentes</strong>
+            <ul style="margin:0; padding-left:22px;">
+              <li><strong>Regions</strong> — areas geograficas isoladas (ex.: us-east-1).</li>
+              <li><strong>Availability Zones</strong> — data centers independentes dentro de uma regiao.</li>
+              <li><strong>Edge Locations</strong> — pontos de presenca para CDN e DNS.</li>
+            </ul>
           </div>
-        </section>
-
-        <!-- ============================================================ -->
-        <!-- SLIDE 4 — MODELOS DE SERVICO PARA DADOS                      -->
-        <!-- ============================================================ -->
-        <section>
-          <div class="deck-shell">
-            <div>
-              <span class="deck-kicker">Teoria &middot; Modelos de Servico</span>
-              <h2 class="deck-title">IaaS, PaaS e SaaS para Dados</h2>
-              <p class="deck-summary">Cada modelo define o nivel de responsabilidade entre voce e o provedor. Escolher o modelo certo impacta custo, agilidade e operacao.</p>
-            </div>
-            <table class="deck-table">
-              <thead>
-                <tr>
-                  <th>Modelo</th>
-                  <th>Voce gerencia</th>
-                  <th>AWS gerencia</th>
-                  <th>Exemplos AWS</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><strong>IaaS</strong></td>
-                  <td>SO, runtime, aplicacao, dados</td>
-                  <td>Hardware, rede, virtualizacao</td>
-                  <td>EC2, EBS, VPC</td>
-                </tr>
-                <tr>
-                  <td><strong>PaaS</strong></td>
-                  <td>Aplicacao e dados</td>
-                  <td>SO, runtime, middleware</td>
-                  <td>RDS, EMR, Elastic Beanstalk</td>
-                </tr>
-                <tr>
-                  <td><strong>SaaS</strong></td>
-                  <td>Configuracao e uso</td>
-                  <td>Tudo o mais</td>
-                  <td>Athena, QuickSight</td>
-                </tr>
-              </tbody>
-            </table>
-            <div class="deck-footer">
-              <span>Slide 4 — Modelos de Servico</span>
-              <div class="deck-links">
-                <a class="deck-link" href="../material/material_aula_01_fundamentos_de_cloud_para_dados_e_governanca_de_acessos.html">Material</a>
-                <a class="deck-link" href="../../../index.html">Indice</a>
-              </div>
-            </div>
+          <div class="deck-panel">
+            <strong>Servicos da disciplina</strong>
+            <ul style="margin:0; padding-left:22px; font-size:0.9em;">
+              <li>S3, Athena, Glue</li>
+              <li>Kinesis, Lambda</li>
+              <li>RDS, DynamoDB, Redshift</li>
+              <li>IAM, Lake Formation</li>
+              <li>CloudWatch, Step Functions</li>
+            </ul>
+            <p style="margin:10px 0 0; font-size:0.85em;"><strong>Regiao recomendada:</strong> us-east-1</p>
           </div>
-        </section>
+        </div>
+      </div>
+    </div>
 
-        <!-- ============================================================ -->
-        <!-- SLIDE 5 — DATA LAKE                                          -->
-        <!-- ============================================================ -->
-        <section>
-          <div class="deck-shell">
-            <div>
-              <span class="deck-kicker">Teoria &middot; Arquiteturas de Dados</span>
-              <h2 class="deck-title">Data Lake</h2>
-              <p class="deck-summary">Repositorio centralizado para armazenar dados brutos em qualquer formato. Principio: schema-on-read.</p>
-            </div>
-            <div class="deck-columns">
-              <div class="deck-panel">
-                <strong>3 camadas classicas</strong>
-                <ul style="margin:0; padding-left:22px;">
-                  <li><strong>Raw / Bronze</strong> — dados originais, sem transformacao.</li>
-                  <li><strong>Trusted / Silver</strong> — dados limpos, validados, deduplicados.</li>
-                  <li><strong>Refined / Gold</strong> — dados prontos para consumo analitico.</li>
-                </ul>
-              </div>
-              <div class="deck-panel">
-                <strong>Stack AWS</strong>
-                <ul style="margin:0; padding-left:22px;">
-                  <li><strong>S3</strong> — armazenamento das 3 camadas.</li>
-                  <li><strong>Glue</strong> — catalogacao e ETL.</li>
-                  <li><strong>Athena</strong> — consultas SQL diretamente no S3.</li>
-                </ul>
-              </div>
-            </div>
-            <div class="deck-footer">
-              <span>Slide 5 — Data Lake</span>
-              <div class="deck-links">
-                <a class="deck-link" href="../material/material_aula_01_fundamentos_de_cloud_para_dados_e_governanca_de_acessos.html">Material</a>
-                <a class="deck-link" href="../../../index.html">Indice</a>
-              </div>
-            </div>
+    <!-- ============================================================ -->
+    <!-- SLIDE 9 — MODELO DE RESPONSABILIDADE COMPARTILHADA           -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Seguranca</span>
+          <h2 class="deck-title">Modelo de Responsabilidade Compartilhada</h2>
+          <p class="deck-summary">A AWS protege a infraestrutura DA nuvem. Voce protege o que coloca NA nuvem.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>AWS e responsavel por (OF the cloud)</strong>
+            <ul style="margin:0; padding-left:22px;">
+              <li>Hardware fisico e data centers</li>
+              <li>Rede global e hypervisors</li>
+              <li>Patches do sistema operacional gerenciado</li>
+              <li>Disponibilidade da infraestrutura</li>
+            </ul>
           </div>
-        </section>
-
-        <!-- ============================================================ -->
-        <!-- SLIDE 6 — DATA WAREHOUSE E DATA LAKEHOUSE                    -->
-        <!-- ============================================================ -->
-        <section>
-          <div class="deck-shell">
-            <div>
-              <span class="deck-kicker">Teoria &middot; Arquiteturas de Dados</span>
-              <h2 class="deck-title">Data Warehouse e Data Lakehouse</h2>
-            </div>
-            <table class="deck-table">
-              <thead>
-                <tr>
-                  <th>Aspecto</th>
-                  <th>Data Warehouse</th>
-                  <th>Data Lakehouse</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Schema</td>
-                  <td>Schema-on-write</td>
-                  <td>Schema-on-read + ACID</td>
-                </tr>
-                <tr>
-                  <td>Armazenamento</td>
-                  <td>Colunar proprietario</td>
-                  <td>Aberto (Parquet/ORC em S3)</td>
-                </tr>
-                <tr>
-                  <td>Performance</td>
-                  <td>MPP, otimizado para BI</td>
-                  <td>Combina DL + DW</td>
-                </tr>
-                <tr>
-                  <td>Formatos abertos</td>
-                  <td>Nao</td>
-                  <td>Iceberg, Delta Lake, Hudi</td>
-                </tr>
-                <tr>
-                  <td>AWS</td>
-                  <td>Amazon Redshift</td>
-                  <td>S3 + Glue + Athena/Spark</td>
-                </tr>
-              </tbody>
-            </table>
-            <div class="deck-footer">
-              <span>Slide 6 — DW e Lakehouse</span>
-              <div class="deck-links">
-                <a class="deck-link" href="../material/material_aula_01_fundamentos_de_cloud_para_dados_e_governanca_de_acessos.html">Material</a>
-                <a class="deck-link" href="../../../index.html">Indice</a>
-              </div>
-            </div>
+          <div class="deck-panel">
+            <strong>Voce e responsavel por (IN the cloud)</strong>
+            <ul style="margin:0; padding-left:22px;">
+              <li>Configuracao de IAM e permissoes</li>
+              <li>Criptografia de dados (em transito e em repouso)</li>
+              <li>Configuracao de security groups e ACLs</li>
+              <li>Protecao e classificacao dos seus dados</li>
+            </ul>
           </div>
-        </section>
+        </div>
+      </div>
+    </div>
 
-        <!-- ============================================================ -->
-        <!-- SLIDE 7 — DATA MESH                                          -->
-        <!-- ============================================================ -->
-        <section>
-          <div class="deck-shell">
-            <div>
-              <span class="deck-kicker">Teoria &middot; Arquiteturas de Dados</span>
-              <h2 class="deck-title">Data Mesh</h2>
-              <p class="deck-summary">Paradigma de descentralizacao proposto por Zhamak Dehghani. Quatro principios fundamentais.</p>
-            </div>
-            <div class="deck-grid">
-              <article class="deck-card">
-                <h3>1. Domain Ownership</h3>
-                <ul>
-                  <li>Cada dominio de negocio e responsavel pelos seus dados.</li>
-                </ul>
-              </article>
-              <article class="deck-card">
-                <h3>2. Data as a Product</h3>
-                <ul>
-                  <li>Dados tratados com qualidade, SLA e documentacao como um produto.</li>
-                </ul>
-              </article>
-              <article class="deck-card">
-                <h3>3. Self-Serve Platform</h3>
-                <ul>
-                  <li>Infraestrutura compartilhada que reduz fricao para os dominios.</li>
-                </ul>
-              </article>
-              <article class="deck-card">
-                <h3>4. Federated Governance</h3>
-                <ul>
-                  <li>Padroes globais com autonomia local. AWS: Lake Formation, EventBridge.</li>
-                </ul>
-              </article>
-            </div>
-            <div class="deck-footer">
-              <span>Slide 7 — Data Mesh</span>
-              <div class="deck-links">
-                <a class="deck-link" href="../material/material_aula_01_fundamentos_de_cloud_para_dados_e_governanca_de_acessos.html">Material</a>
-                <a class="deck-link" href="../../../index.html">Indice</a>
-              </div>
-            </div>
+    <!-- ============================================================ -->
+    <!-- SLIDE 10 — POR QUE GOVERNANCA DE ACESSOS                     -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Governanca</span>
+          <h2 class="deck-title">Por que Governanca de Acessos e critica?</h2>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Riscos reais</strong>
+            <ul style="margin:0; padding-left:22px;">
+              <li>Buckets S3 publicos por configuracao errada</li>
+              <li>Credenciais expostas em repositorios Git</li>
+              <li>Crypto mining em contas comprometidas</li>
+              <li>Usuarios com permissao de administrador sem necessidade</li>
+            </ul>
           </div>
-        </section>
-
-        <!-- ============================================================ -->
-        <!-- SLIDE 8 — AWS INFRAESTRUTURA GLOBAL                          -->
-        <!-- ============================================================ -->
-        <section>
-          <div class="deck-shell">
-            <div>
-              <span class="deck-kicker">Teoria &middot; AWS</span>
-              <h2 class="deck-title">AWS Infraestrutura Global</h2>
-              <p class="deck-summary">Entender a infraestrutura fisica da AWS e essencial para decidir onde hospedar dados e servicos.</p>
-            </div>
-            <div class="deck-placeholder">
-              <div class="deck-panel">
-                <strong>Componentes</strong>
-                <ul style="margin:0; padding-left:22px;">
-                  <li><strong>Regions</strong> — areas geograficas isoladas (ex.: us-east-1).</li>
-                  <li><strong>Availability Zones</strong> — data centers independentes dentro de uma regiao.</li>
-                  <li><strong>Edge Locations</strong> — pontos de presenca para CDN e DNS.</li>
-                </ul>
-              </div>
-              <div class="deck-panel">
-                <strong>Servicos da disciplina</strong>
-                <ul style="margin:0; padding-left:22px; font-size:0.9em;">
-                  <li>S3, Athena, Glue</li>
-                  <li>Kinesis, Lambda</li>
-                  <li>RDS, DynamoDB, Redshift</li>
-                  <li>IAM, Lake Formation</li>
-                  <li>CloudWatch, Step Functions</li>
-                </ul>
-                <p style="margin:10px 0 0; font-size:0.85em;"><strong>Regiao recomendada:</strong> us-east-1</p>
-              </div>
-            </div>
-            <div class="deck-footer">
-              <span>Slide 8 — Infraestrutura AWS</span>
-              <div class="deck-links">
-                <a class="deck-link" href="../material/material_aula_01_fundamentos_de_cloud_para_dados_e_governanca_de_acessos.html">Material</a>
-                <a class="deck-link" href="../../../index.html">Indice</a>
-              </div>
-            </div>
+          <div class="deck-panel">
+            <strong>Consequencias</strong>
+            <ul style="margin:0; padding-left:22px;">
+              <li>Vazamento de dados sensiveis de clientes</li>
+              <li>Violacao de LGPD e GDPR</li>
+              <li>Custos inesperados de milhares de dolares</li>
+              <li>Perda de confianca e danos reputacionais</li>
+            </ul>
           </div>
-        </section>
+        </div>
+        <div class="deck-callout">
+          <strong>Principio fundamental:</strong> Menor privilegio — conceda apenas o acesso estritamente necessario para a funcao. Revise e revogue regularmente.
+        </div>
+      </div>
+    </div>
 
-        <!-- ============================================================ -->
-        <!-- SLIDE 9 — MODELO DE RESPONSABILIDADE COMPARTILHADA           -->
-        <!-- ============================================================ -->
-        <section>
-          <div class="deck-shell">
-            <div>
-              <span class="deck-kicker">Teoria &middot; Seguranca</span>
-              <h2 class="deck-title">Modelo de Responsabilidade Compartilhada</h2>
-              <p class="deck-summary">A AWS protege a infraestrutura DA nuvem. Voce protege o que coloca NA nuvem.</p>
-            </div>
-            <div class="deck-columns">
-              <div class="deck-panel">
-                <strong>AWS e responsavel por (OF the cloud)</strong>
-                <ul style="margin:0; padding-left:22px;">
-                  <li>Hardware fisico e data centers</li>
-                  <li>Rede global e hypervisors</li>
-                  <li>Patches do sistema operacional gerenciado</li>
-                  <li>Disponibilidade da infraestrutura</li>
-                </ul>
-              </div>
-              <div class="deck-panel">
-                <strong>Voce e responsavel por (IN the cloud)</strong>
-                <ul style="margin:0; padding-left:22px;">
-                  <li>Configuracao de IAM e permissoes</li>
-                  <li>Criptografia de dados (em transito e em repouso)</li>
-                  <li>Configuracao de security groups e ACLs</li>
-                  <li>Protecao e classificacao dos seus dados</li>
-                </ul>
-              </div>
-            </div>
-            <div class="deck-footer">
-              <span>Slide 9 — Responsabilidade Compartilhada</span>
-              <div class="deck-links">
-                <a class="deck-link" href="../material/material_aula_01_fundamentos_de_cloud_para_dados_e_governanca_de_acessos.html">Material</a>
-                <a class="deck-link" href="../../../index.html">Indice</a>
-              </div>
-            </div>
+    <!-- ============================================================ -->
+    <!-- SLIDE 11 — AWS IAM CONCEITOS                                  -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; AWS IAM</span>
+          <h2 class="deck-title">IAM: Identidades e Entidades</h2>
+          <p class="deck-summary">Identity and Access Management — controla quem pode chamar quais APIs da AWS e em quais condicoes.</p>
+        </div>
+        <div class="deck-grid">
+          <article class="deck-card">
+            <h3>Users (Usuarios)</h3>
+            <ul>
+              <li>Credenciais de longo prazo (senha, access key).</li>
+              <li>Representam pessoas ou sistemas.</li>
+              <li>Nunca use a conta root no dia a dia.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Groups (Grupos)</h3>
+            <ul>
+              <li>Colecao de usuarios com permissoes compartilhadas.</li>
+              <li>Simplifica gestao de equipes.</li>
+              <li>Ex.: DataEngineers, DataAnalysts.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Roles (Papeis)</h3>
+            <ul>
+              <li>Credenciais temporarias, rotacionadas automaticamente.</li>
+              <li>Usadas por servicos AWS (Glue, Lambda).</li>
+              <li>Preferencia sobre access keys.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Policies (Politicas)</h3>
+            <ul>
+              <li>Documento JSON que define permissoes.</li>
+              <li>Attached a users, groups ou roles.</li>
+              <li>Gerenciadas (AWS) ou customizadas.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 12 — ANATOMIA DE UMA POLITICA IAM                       -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; IAM Policies</span>
+          <h2 class="deck-title">Anatomia de uma Politica IAM</h2>
+          <p class="deck-summary">Toda decisao de acesso e avaliada contra documentos JSON. Entender a estrutura e obrigatorio.</p>
+        </div>
+        <div class="deck-placeholder">
+          <div class="deck-panel">
+            <strong>Estrutura do Statement</strong>
+            <ul style="margin:0; padding-left:22px;">
+              <li><strong>Effect</strong> — Allow ou Deny.</li>
+              <li><strong>Action</strong> — operacoes permitidas (ex.: s3:GetObject).</li>
+              <li><strong>Resource</strong> — ARN do recurso alvo.</li>
+              <li><strong>Condition</strong> — restricoes adicionais (IP, MFA, tags).</li>
+            </ul>
           </div>
-        </section>
-
-        <!-- ============================================================ -->
-        <!-- SLIDE 10 — POR QUE GOVERNANCA DE ACESSOS                     -->
-        <!-- ============================================================ -->
-        <section>
-          <div class="deck-shell">
-            <div>
-              <span class="deck-kicker">Teoria &middot; Governanca</span>
-              <h2 class="deck-title">Por que Governanca de Acessos e critica?</h2>
-            </div>
-            <div class="deck-columns">
-              <div class="deck-panel">
-                <strong>Riscos reais</strong>
-                <ul style="margin:0; padding-left:22px;">
-                  <li>Buckets S3 publicos por configuracao errada</li>
-                  <li>Credenciais expostas em repositorios Git</li>
-                  <li>Crypto mining em contas comprometidas</li>
-                  <li>Usuarios com permissao de administrador sem necessidade</li>
-                </ul>
-              </div>
-              <div class="deck-panel">
-                <strong>Consequencias</strong>
-                <ul style="margin:0; padding-left:22px;">
-                  <li>Vazamento de dados sensiveis de clientes</li>
-                  <li>Violacao de LGPD e GDPR</li>
-                  <li>Custos inesperados de milhares de dolares</li>
-                  <li>Perda de confianca e danos reputacionais</li>
-                </ul>
-              </div>
-            </div>
-            <div class="deck-callout">
-              <strong>Principio fundamental:</strong> Menor privilegio — conceda apenas o acesso estritamente necessario para a funcao. Revise e revogue regularmente.
-            </div>
-            <div class="deck-footer">
-              <span>Slide 10 — Governanca de Acessos</span>
-              <div class="deck-links">
-                <a class="deck-link" href="../material/material_aula_01_fundamentos_de_cloud_para_dados_e_governanca_de_acessos.html">Material</a>
-                <a class="deck-link" href="../../../index.html">Indice</a>
-              </div>
-            </div>
+          <div class="deck-panel">
+            <strong>Regras de avaliacao</strong>
+            <ul style="margin:0; padding-left:22px;">
+              <li>Deny explicito sempre prevalece.</li>
+              <li>Sem Allow = negado por padrao (implicit deny).</li>
+              <li>Todas as politicas ativas sao avaliadas em conjunto.</li>
+              <li>Evite wildcards (*) em Action e Resource.</li>
+            </ul>
           </div>
-        </section>
+        </div>
+      </div>
+    </div>
 
-        <!-- ============================================================ -->
-        <!-- SLIDE 11 — AWS IAM CONCEITOS                                  -->
-        <!-- ============================================================ -->
-        <section>
-          <div class="deck-shell">
-            <div>
-              <span class="deck-kicker">Teoria &middot; AWS IAM</span>
-              <h2 class="deck-title">IAM: Identidades e Entidades</h2>
-              <p class="deck-summary">Identity and Access Management — controla quem pode chamar quais APIs da AWS e em quais condicoes.</p>
-            </div>
-            <div class="deck-grid">
-              <article class="deck-card">
-                <h3>Users (Usuarios)</h3>
-                <ul>
-                  <li>Credenciais de longo prazo (senha, access key).</li>
-                  <li>Representam pessoas ou sistemas.</li>
-                  <li>Nunca use a conta root no dia a dia.</li>
-                </ul>
-              </article>
-              <article class="deck-card">
-                <h3>Groups (Grupos)</h3>
-                <ul>
-                  <li>Colecao de usuarios com permissoes compartilhadas.</li>
-                  <li>Simplifica gestao de equipes.</li>
-                  <li>Ex.: DataEngineers, DataAnalysts.</li>
-                </ul>
-              </article>
-              <article class="deck-card">
-                <h3>Roles (Papeis)</h3>
-                <ul>
-                  <li>Credenciais temporarias, rotacionadas automaticamente.</li>
-                  <li>Usadas por servicos AWS (Glue, Lambda).</li>
-                  <li>Preferencia sobre access keys.</li>
-                </ul>
-              </article>
-              <article class="deck-card">
-                <h3>Policies (Politicas)</h3>
-                <ul>
-                  <li>Documento JSON que define permissoes.</li>
-                  <li>Attached a users, groups ou roles.</li>
-                  <li>Gerenciadas (AWS) ou customizadas.</li>
-                </ul>
-              </article>
-            </div>
-            <div class="deck-footer">
-              <span>Slide 11 — IAM Conceitos</span>
-              <div class="deck-links">
-                <a class="deck-link" href="../material/material_aula_01_fundamentos_de_cloud_para_dados_e_governanca_de_acessos.html">Material</a>
-                <a class="deck-link" href="../../../index.html">Indice</a>
-              </div>
-            </div>
-          </div>
-        </section>
+    <!-- ============================================================ -->
+    <!-- SLIDE 13 — LAB OVERVIEW                                       -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Pratica &middot; 20h00 – 22h00 &middot; AWS Student</span>
+          <h2 class="deck-title">Visao geral do laboratorio</h2>
+          <p class="deck-summary">Em 2 horas, vamos configurar uma conta AWS organizada com controles de acesso para engenharia de dados.</p>
+        </div>
+        <div class="deck-grid">
+          <article class="deck-card">
+            <h3>O que vamos construir</h3>
+            <ul>
+              <li>Grupos DataEngineers e DataAnalysts</li>
+              <li>Usuario IAM com console access</li>
+              <li>Roles para Glue e Lambda</li>
+              <li>Politica customizada em JSON</li>
+              <li>Buckets S3 por camada do Data Lake</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Pre-requisitos</h3>
+            <ul>
+              <li>Acesso ao AWS Student ativo</li>
+              <li>Navegador atualizado (Chrome/Firefox)</li>
+              <li>Regiao: us-east-1 (N. Virginia)</li>
+              <li>Material de apoio aberto em outra aba</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
 
-        <!-- ============================================================ -->
-        <!-- SLIDE 12 — ANATOMIA DE UMA POLITICA IAM                       -->
-        <!-- ============================================================ -->
-        <section>
-          <div class="deck-shell">
-            <div>
-              <span class="deck-kicker">Teoria &middot; IAM Policies</span>
-              <h2 class="deck-title">Anatomia de uma Politica IAM</h2>
-              <p class="deck-summary">Toda decisao de acesso e avaliada contra documentos JSON. Entender a estrutura e obrigatorio.</p>
-            </div>
-            <div class="deck-placeholder">
-              <div class="deck-panel">
-                <strong>Estrutura do Statement</strong>
-                <ul style="margin:0; padding-left:22px;">
-                  <li><strong>Effect</strong> — Allow ou Deny.</li>
-                  <li><strong>Action</strong> — operacoes permitidas (ex.: s3:GetObject).</li>
-                  <li><strong>Resource</strong> — ARN do recurso alvo.</li>
-                  <li><strong>Condition</strong> — restricoes adicionais (IP, MFA, tags).</li>
-                </ul>
-              </div>
-              <div class="deck-panel">
-                <strong>Regras de avaliacao</strong>
-                <ul style="margin:0; padding-left:22px;">
-                  <li>Deny explicito sempre prevalece.</li>
-                  <li>Sem Allow = negado por padrao (implicit deny).</li>
-                  <li>Todas as politicas ativas sao avaliadas em conjunto.</li>
-                  <li>Evite wildcards (*) em Action e Resource.</li>
-                </ul>
-              </div>
-            </div>
-            <div class="deck-footer">
-              <span>Slide 12 — Politicas IAM</span>
-              <div class="deck-links">
-                <a class="deck-link" href="../material/material_aula_01_fundamentos_de_cloud_para_dados_e_governanca_de_acessos.html">Material</a>
-                <a class="deck-link" href="../../../index.html">Indice</a>
-              </div>
-            </div>
-          </div>
-        </section>
+    <!-- ============================================================ -->
+    <!-- SLIDE 14 — LAB PASSO 1: ACESSO E EXPLORACAO                   -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Lab &middot; Passo 1</span>
+          <h2 class="deck-title">Acesso ao AWS Student e exploracao do console</h2>
+        </div>
+        <div class="deck-callout">
+          <strong>Objetivo:</strong> Entrar no ambiente AWS Student, confirmar a regiao us-east-1 e explorar o IAM Dashboard para entender o estado inicial da conta.
+        </div>
+        <div class="deck-panel">
+          <strong>Passos</strong>
+          <ol style="margin:0; padding-left:22px;">
+            <li>Acesse o portal AWS Student e inicie o laboratorio.</li>
+            <li>No console AWS, verifique no canto superior direito: a regiao deve ser <strong>N. Virginia (us-east-1)</strong>.</li>
+            <li>Navegue ate <strong>IAM &gt; Dashboard</strong>.</li>
+            <li>Observe: quantos usuarios, grupos e roles ja existem? Anote.</li>
+            <li>Localize o <strong>Account ID</strong> — voce vai precisar dele.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
 
-        <!-- ============================================================ -->
-        <!-- SLIDE 13 — LAB OVERVIEW                                       -->
-        <!-- ============================================================ -->
-        <section>
-          <div class="deck-shell">
-            <div>
-              <span class="deck-kicker">Pratica &middot; 20h00 – 22h00 &middot; AWS Student</span>
-              <h2 class="deck-title">Visao geral do laboratorio</h2>
-              <p class="deck-summary">Em 2 horas, vamos configurar uma conta AWS organizada com controles de acesso para engenharia de dados.</p>
-            </div>
-            <div class="deck-grid">
-              <article class="deck-card">
-                <h3>O que vamos construir</h3>
-                <ul>
-                  <li>Grupos DataEngineers e DataAnalysts</li>
-                  <li>Usuario IAM com console access</li>
-                  <li>Roles para Glue e Lambda</li>
-                  <li>Politica customizada em JSON</li>
-                  <li>Buckets S3 por camada do Data Lake</li>
-                </ul>
-              </article>
-              <article class="deck-card">
-                <h3>Pre-requisitos</h3>
-                <ul>
-                  <li>Acesso ao AWS Student ativo</li>
-                  <li>Navegador atualizado (Chrome/Firefox)</li>
-                  <li>Regiao: us-east-1 (N. Virginia)</li>
-                  <li>Material de apoio aberto em outra aba</li>
-                </ul>
-              </article>
-            </div>
-            <div class="deck-footer">
-              <span>Slide 13 — Lab Overview</span>
-              <div class="deck-links">
-                <a class="deck-link" href="../material/material_aula_01_fundamentos_de_cloud_para_dados_e_governanca_de_acessos.html">Material</a>
-                <a class="deck-link" href="../../../index.html">Indice</a>
-              </div>
-            </div>
-          </div>
-        </section>
+    <!-- ============================================================ -->
+    <!-- SLIDE 15 — LAB PASSO 2: GRUPOS IAM                            -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Lab &middot; Passo 2</span>
+          <h2 class="deck-title">Criacao de grupos IAM</h2>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr>
+              <th>Grupo</th>
+              <th>Politicas gerenciadas</th>
+              <th>Proposito</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>DataEngineers</strong></td>
+              <td>AmazonS3FullAccess, AWSGlueConsoleFullAccess, CloudWatchLogsFullAccess</td>
+              <td>Ingestao, ETL, monitoramento</td>
+            </tr>
+            <tr>
+              <td><strong>DataAnalysts</strong></td>
+              <td>AmazonAthenaFullAccess, AmazonS3ReadOnlyAccess</td>
+              <td>Consultas SQL, leitura de dados</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="deck-callout">
+          <strong>Caminho:</strong> IAM &gt; User groups &gt; Create group &gt; Selecione as politicas &gt; Create group.
+        </div>
+      </div>
+    </div>
 
-        <!-- ============================================================ -->
-        <!-- SLIDE 14 — LAB PASSO 1: ACESSO E EXPLORACAO                   -->
-        <!-- ============================================================ -->
-        <section>
-          <div class="deck-shell">
-            <div>
-              <span class="deck-kicker">Lab &middot; Passo 1</span>
-              <h2 class="deck-title">Acesso ao AWS Student e exploracao do console</h2>
-            </div>
-            <div class="deck-callout">
-              <strong>Objetivo:</strong> Entrar no ambiente AWS Student, confirmar a regiao us-east-1 e explorar o IAM Dashboard para entender o estado inicial da conta.
-            </div>
-            <div class="deck-panel">
-              <strong>Passos</strong>
-              <ol style="margin:0; padding-left:22px;">
-                <li>Acesse o portal AWS Student e inicie o laboratorio.</li>
-                <li>No console AWS, verifique no canto superior direito: a regiao deve ser <strong>N. Virginia (us-east-1)</strong>.</li>
-                <li>Navegue ate <strong>IAM &gt; Dashboard</strong>.</li>
-                <li>Observe: quantos usuarios, grupos e roles ja existem? Anote.</li>
-                <li>Localize o <strong>Account ID</strong> — voce vai precisar dele.</li>
-              </ol>
-            </div>
-            <div class="deck-footer">
-              <span>Slide 14 — Passo 1</span>
-              <div class="deck-links">
-                <a class="deck-link" href="../material/material_aula_01_fundamentos_de_cloud_para_dados_e_governanca_de_acessos.html">Material</a>
-                <a class="deck-link" href="../../../index.html">Indice</a>
-              </div>
-            </div>
-          </div>
-        </section>
+    <!-- ============================================================ -->
+    <!-- SLIDE 16 — LAB PASSO 3: USUARIO IAM                           -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Lab &middot; Passo 3</span>
+          <h2 class="deck-title">Criacao de usuario IAM</h2>
+        </div>
+        <div class="deck-panel">
+          <strong>Passos</strong>
+          <ol style="margin:0; padding-left:22px;">
+            <li>IAM &gt; Users &gt; <strong>Create user</strong>.</li>
+            <li>Nome: <strong>eng-dados-01</strong>.</li>
+            <li>Marque <strong>Provide user access to the AWS Management Console</strong>.</li>
+            <li>Defina uma senha temporaria (Custom password).</li>
+            <li>Na etapa de permissoes, selecione <strong>Add user to group</strong> &gt; <strong>DataEngineers</strong>.</li>
+            <li>Revise e crie o usuario.</li>
+            <li>Anote a <strong>Console sign-in URL</strong> — ela usa o Account ID.</li>
+          </ol>
+        </div>
+        <div class="deck-callout">
+          <strong>Teste:</strong> Abra uma janela anonima, acesse a sign-in URL e faca login com o usuario criado. Voce deve conseguir acessar S3 e Glue, mas nao IAM.
+        </div>
+      </div>
+    </div>
 
-        <!-- ============================================================ -->
-        <!-- SLIDE 15 — LAB PASSO 2: GRUPOS IAM                            -->
-        <!-- ============================================================ -->
-        <section>
-          <div class="deck-shell">
-            <div>
-              <span class="deck-kicker">Lab &middot; Passo 2</span>
-              <h2 class="deck-title">Criacao de grupos IAM</h2>
-            </div>
-            <table class="deck-table">
-              <thead>
-                <tr>
-                  <th>Grupo</th>
-                  <th>Politicas gerenciadas</th>
-                  <th>Proposito</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><strong>DataEngineers</strong></td>
-                  <td>AmazonS3FullAccess, AWSGlueConsoleFullAccess, CloudWatchLogsFullAccess</td>
-                  <td>Ingestao, ETL, monitoramento</td>
-                </tr>
-                <tr>
-                  <td><strong>DataAnalysts</strong></td>
-                  <td>AmazonAthenaFullAccess, AmazonS3ReadOnlyAccess</td>
-                  <td>Consultas SQL, leitura de dados</td>
-                </tr>
-              </tbody>
-            </table>
-            <div class="deck-callout">
-              <strong>Caminho:</strong> IAM &gt; User groups &gt; Create group &gt; Selecione as politicas &gt; Create group.
-            </div>
-            <div class="deck-footer">
-              <span>Slide 15 — Passo 2</span>
-              <div class="deck-links">
-                <a class="deck-link" href="../material/material_aula_01_fundamentos_de_cloud_para_dados_e_governanca_de_acessos.html">Material</a>
-                <a class="deck-link" href="../../../index.html">Indice</a>
-              </div>
-            </div>
-          </div>
-        </section>
+    <!-- ============================================================ -->
+    <!-- SLIDE 17 — LAB PASSO 4: ROLES PARA SERVICOS                   -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Lab &middot; Passo 4</span>
+          <h2 class="deck-title">Criacao de roles para servicos AWS</h2>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr>
+              <th>Role</th>
+              <th>Trusted Entity</th>
+              <th>Politicas</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>GlueJobRole</strong></td>
+              <td>AWS Service &gt; Glue</td>
+              <td>AmazonS3FullAccess, AWSGlueServiceRole, CloudWatchLogsFullAccess</td>
+            </tr>
+            <tr>
+              <td><strong>LambdaExecutionRole</strong></td>
+              <td>AWS Service &gt; Lambda</td>
+              <td>AmazonS3ReadOnlyAccess, AWSLambdaBasicExecutionRole</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="deck-callout">
+          <strong>Caminho:</strong> IAM &gt; Roles &gt; Create role &gt; Selecione o servico &gt; Attach policies &gt; Nomeie a role &gt; Create role.
+        </div>
+      </div>
+    </div>
 
-        <!-- ============================================================ -->
-        <!-- SLIDE 16 — LAB PASSO 3: USUARIO IAM                           -->
-        <!-- ============================================================ -->
-        <section>
-          <div class="deck-shell">
-            <div>
-              <span class="deck-kicker">Lab &middot; Passo 3</span>
-              <h2 class="deck-title">Criacao de usuario IAM</h2>
-            </div>
-            <div class="deck-panel">
-              <strong>Passos</strong>
-              <ol style="margin:0; padding-left:22px;">
-                <li>IAM &gt; Users &gt; <strong>Create user</strong>.</li>
-                <li>Nome: <strong>eng-dados-01</strong>.</li>
-                <li>Marque <strong>Provide user access to the AWS Management Console</strong>.</li>
-                <li>Defina uma senha temporaria (Custom password).</li>
-                <li>Na etapa de permissoes, selecione <strong>Add user to group</strong> &gt; <strong>DataEngineers</strong>.</li>
-                <li>Revise e crie o usuario.</li>
-                <li>Anote a <strong>Console sign-in URL</strong> — ela usa o Account ID.</li>
-              </ol>
-            </div>
-            <div class="deck-callout">
-              <strong>Teste:</strong> Abra uma janela anonima, acesse a sign-in URL e faca login com o usuario criado. Voce deve conseguir acessar S3 e Glue, mas nao IAM.
-            </div>
-            <div class="deck-footer">
-              <span>Slide 16 — Passo 3</span>
-              <div class="deck-links">
-                <a class="deck-link" href="../material/material_aula_01_fundamentos_de_cloud_para_dados_e_governanca_de_acessos.html">Material</a>
-                <a class="deck-link" href="../../../index.html">Indice</a>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ============================================================ -->
-        <!-- SLIDE 17 — LAB PASSO 4: ROLES PARA SERVICOS                   -->
-        <!-- ============================================================ -->
-        <section>
-          <div class="deck-shell">
-            <div>
-              <span class="deck-kicker">Lab &middot; Passo 4</span>
-              <h2 class="deck-title">Criacao de roles para servicos AWS</h2>
-            </div>
-            <table class="deck-table">
-              <thead>
-                <tr>
-                  <th>Role</th>
-                  <th>Trusted Entity</th>
-                  <th>Politicas</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><strong>GlueJobRole</strong></td>
-                  <td>AWS Service &gt; Glue</td>
-                  <td>AmazonS3FullAccess, AWSGlueServiceRole, CloudWatchLogsFullAccess</td>
-                </tr>
-                <tr>
-                  <td><strong>LambdaExecutionRole</strong></td>
-                  <td>AWS Service &gt; Lambda</td>
-                  <td>AmazonS3ReadOnlyAccess, AWSLambdaBasicExecutionRole</td>
-                </tr>
-              </tbody>
-            </table>
-            <div class="deck-callout">
-              <strong>Caminho:</strong> IAM &gt; Roles &gt; Create role &gt; Selecione o servico &gt; Attach policies &gt; Nomeie a role &gt; Create role.
-            </div>
-            <div class="deck-footer">
-              <span>Slide 17 — Passo 4</span>
-              <div class="deck-links">
-                <a class="deck-link" href="../material/material_aula_01_fundamentos_de_cloud_para_dados_e_governanca_de_acessos.html">Material</a>
-                <a class="deck-link" href="../../../index.html">Indice</a>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ============================================================ -->
-        <!-- SLIDE 18 — LAB PASSO 5: POLITICA CUSTOMIZADA EM JSON          -->
-        <!-- ============================================================ -->
-        <section>
-          <div class="deck-shell">
-            <div>
-              <span class="deck-kicker">Lab &middot; Passo 5</span>
-              <h2 class="deck-title">Politica customizada em JSON</h2>
-              <p class="deck-summary">Criar a politica <strong>DataLakeReadOnly</strong> e anexar ao grupo DataAnalysts.</p>
-            </div>
-            <div class="deck-panel" style="font-size:0.58em; font-family:monospace; white-space:pre; line-height:1.5; overflow-x:auto;">{
+    <!-- ============================================================ -->
+    <!-- SLIDE 18 — LAB PASSO 5: POLITICA CUSTOMIZADA EM JSON          -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Lab &middot; Passo 5</span>
+          <h2 class="deck-title">Politica customizada em JSON</h2>
+          <p class="deck-summary">Criar a politica <strong>DataLakeReadOnly</strong> e anexar ao grupo DataAnalysts.</p>
+        </div>
+        <div class="deck-panel" style="font-size:0.58em; font-family:monospace; white-space:pre; line-height:1.5; overflow-x:auto;">{
   "Version": "2012-10-17",
   "Statement": [
     {
@@ -733,165 +611,162 @@
     }
   ]
 }</div>
-            <div class="deck-callout">
-              <strong>Caminho:</strong> IAM &gt; Policies &gt; Create policy &gt; JSON tab &gt; Cole o JSON &gt; Nome: DataLakeReadOnly &gt; Create. Depois: User groups &gt; DataAnalysts &gt; Attach policy.
-            </div>
-            <div class="deck-footer">
-              <span>Slide 18 — Passo 5</span>
-              <div class="deck-links">
-                <a class="deck-link" href="../material/material_aula_01_fundamentos_de_cloud_para_dados_e_governanca_de_acessos.html">Material</a>
-                <a class="deck-link" href="../../../index.html">Indice</a>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ============================================================ -->
-        <!-- SLIDE 19 — LAB PASSO 6: POLICY SIMULATOR + S3 BUCKETS         -->
-        <!-- ============================================================ -->
-        <section>
-          <div class="deck-shell">
-            <div>
-              <span class="deck-kicker">Lab &middot; Passo 6</span>
-              <h2 class="deck-title">Validacao com Policy Simulator e criacao de buckets S3</h2>
-            </div>
-            <div class="deck-columns">
-              <div class="deck-panel">
-                <strong>Policy Simulator</strong>
-                <ol style="margin:0; padding-left:22px;">
-                  <li>Acesse IAM &gt; Policy Simulator.</li>
-                  <li>Selecione o usuario <strong>eng-dados-01</strong>.</li>
-                  <li>Teste: <strong>S3 &gt; PutObject</strong> &rarr; deve ser <span style="color:green;font-weight:700;">Allowed</span>.</li>
-                  <li>Teste: <strong>IAM &gt; CreateUser</strong> &rarr; deve ser <span style="color:red;font-weight:700;">Denied</span>.</li>
-                </ol>
-              </div>
-              <div class="deck-panel">
-                <strong>Buckets S3 por camada</strong>
-                <ol style="margin:0; padding-left:22px;">
-                  <li>S3 &gt; Create bucket.</li>
-                  <li><strong>data-lake-raw-{account-id}</strong></li>
-                  <li><strong>data-lake-trusted-{account-id}</strong></li>
-                  <li><strong>data-lake-refined-{account-id}</strong></li>
-                  <li>Regiao: us-east-1. Manter demais opcoes padrao.</li>
-                </ol>
-              </div>
-            </div>
-            <div class="deck-footer">
-              <span>Slide 19 — Passo 6</span>
-              <div class="deck-links">
-                <a class="deck-link" href="../material/material_aula_01_fundamentos_de_cloud_para_dados_e_governanca_de_acessos.html">Material</a>
-                <a class="deck-link" href="../../../index.html">Indice</a>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ============================================================ -->
-        <!-- SLIDE 20 — LAB PASSO 7 + DESAFIO                              -->
-        <!-- ============================================================ -->
-        <section>
-          <div class="deck-shell">
-            <div>
-              <span class="deck-kicker">Lab &middot; Passo 7 + Desafio</span>
-              <h2 class="deck-title">Verificacao final e desafio extra</h2>
-            </div>
-            <div class="deck-columns">
-              <div class="deck-panel">
-                <strong>Checklist de verificacao</strong>
-                <ul style="margin:0; padding-left:22px;">
-                  <li>Grupo DataEngineers criado com 3 politicas</li>
-                  <li>Grupo DataAnalysts criado com 2 politicas + custom</li>
-                  <li>Usuario eng-dados-01 no grupo DataEngineers</li>
-                  <li>Role GlueJobRole com trusted entity Glue</li>
-                  <li>Role LambdaExecutionRole com trusted entity Lambda</li>
-                  <li>Politica DataLakeReadOnly anexada a DataAnalysts</li>
-                  <li>3 buckets S3 criados (raw, trusted, refined)</li>
-                  <li>Policy Simulator validando permissoes</li>
-                </ul>
-              </div>
-              <div class="deck-panel">
-                <strong>Desafio (opcional)</strong>
-                <ul style="margin:0; padding-left:22px;">
-                  <li>Habilite MFA para o usuario eng-dados-01 (se suportado no AWS Student).</li>
-                  <li>Crie uma <strong>permission boundary</strong> que impeca qualquer usuario de criar outros usuarios IAM, e aplique-a ao grupo DataEngineers.</li>
-                  <li>Documente: qual e a diferenca entre uma boundary e uma policy normal?</li>
-                </ul>
-              </div>
-            </div>
-            <div class="deck-footer">
-              <span>Slide 20 — Passo 7 + Desafio</span>
-              <div class="deck-links">
-                <a class="deck-link" href="../material/material_aula_01_fundamentos_de_cloud_para_dados_e_governanca_de_acessos.html">Material</a>
-                <a class="deck-link" href="../../../index.html">Indice</a>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ============================================================ -->
-        <!-- SLIDE 21 — FECHAMENTO                                         -->
-        <!-- ============================================================ -->
-        <section>
-          <div class="deck-shell">
-            <div>
-              <span class="deck-kicker">Fechamento</span>
-              <h2 class="deck-title">Resumo e proximos passos</h2>
-            </div>
-            <div class="deck-grid">
-              <article class="deck-card">
-                <h3>O que vimos hoje</h3>
-                <ul>
-                  <li>Cloud Computing: 5 caracteristicas NIST, modelos IaaS/PaaS/SaaS.</li>
-                  <li>Arquiteturas: Data Lake, DW, Lakehouse, Data Mesh.</li>
-                  <li>AWS: infraestrutura global, responsabilidade compartilhada.</li>
-                  <li>IAM: users, groups, roles, policies, menor privilegio.</li>
-                </ul>
-              </article>
-              <article class="deck-card">
-                <h3>O que ficou pronto no lab</h3>
-                <ul>
-                  <li>Conta AWS Student organizada em us-east-1.</li>
-                  <li>Grupos DataEngineers e DataAnalysts.</li>
-                  <li>Roles GlueJobRole e LambdaExecutionRole.</li>
-                  <li>Politica customizada DataLakeReadOnly.</li>
-                  <li>3 buckets S3 (raw, trusted, refined).</li>
-                </ul>
-              </article>
-              <article class="deck-card">
-                <h3>Proxima aula — 23/04/2026</h3>
-                <ul>
-                  <li>Data Lake com S3 e Athena.</li>
-                  <li>Criacao de datasets nas 3 camadas.</li>
-                  <li>Consultas SQL serverless com Athena.</li>
-                  <li>Integracao com Glue Data Catalog.</li>
-                </ul>
-              </article>
-              <article class="deck-card">
-                <h3>Estudo complementar</h3>
-                <ul>
-                  <li>AWS Well-Architected — Security Pillar.</li>
-                  <li>Documentacao IAM: docs.aws.amazon.com/iam.</li>
-                  <li>Video: AWS re:Invent — IAM Best Practices.</li>
-                  <li>NIST SP 800-145 (definicao de Cloud).</li>
-                </ul>
-              </article>
-            </div>
-            <div class="deck-footer">
-              <span>Slide 21 — Fechamento</span>
-              <div class="deck-links">
-                <a class="deck-link" href="../material/material_aula_01_fundamentos_de_cloud_para_dados_e_governanca_de_acessos.html">Material</a>
-                <a class="deck-link" href="../../../index.html">Indice</a>
-              </div>
-            </div>
-          </div>
-        </section>
-
+        <div class="deck-callout">
+          <strong>Caminho:</strong> IAM &gt; Policies &gt; Create policy &gt; JSON tab &gt; Cole o JSON &gt; Nome: DataLakeReadOnly &gt; Create. Depois: User groups &gt; DataAnalysts &gt; Attach policy.
+        </div>
       </div>
-      <img class="slide-logo-mini" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" alt="Mackenzie" />
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/reveal.js/dist/reveal.js"></script>
-    <script>
-      Reveal.initialize({ hash: true, controls: true, progress: true, center: true, transition: "fade" });
-    </script>
-  </body>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 19 — LAB PASSO 6: POLICY SIMULATOR + S3 BUCKETS         -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Lab &middot; Passo 6</span>
+          <h2 class="deck-title">Validacao com Policy Simulator e criacao de buckets S3</h2>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Policy Simulator</strong>
+            <ol style="margin:0; padding-left:22px;">
+              <li>Acesse IAM &gt; Policy Simulator.</li>
+              <li>Selecione o usuario <strong>eng-dados-01</strong>.</li>
+              <li>Teste: <strong>S3 &gt; PutObject</strong> &rarr; deve ser <span style="color:green;font-weight:700;">Allowed</span>.</li>
+              <li>Teste: <strong>IAM &gt; CreateUser</strong> &rarr; deve ser <span style="color:red;font-weight:700;">Denied</span>.</li>
+            </ol>
+          </div>
+          <div class="deck-panel">
+            <strong>Buckets S3 por camada</strong>
+            <ol style="margin:0; padding-left:22px;">
+              <li>S3 &gt; Create bucket.</li>
+              <li><strong>data-lake-raw-{account-id}</strong></li>
+              <li><strong>data-lake-trusted-{account-id}</strong></li>
+              <li><strong>data-lake-refined-{account-id}</strong></li>
+              <li>Regiao: us-east-1. Manter demais opcoes padrao.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 20 — LAB PASSO 7 + DESAFIO                              -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Lab &middot; Passo 7 + Desafio</span>
+          <h2 class="deck-title">Verificacao final e desafio extra</h2>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Checklist de verificacao</strong>
+            <ul style="margin:0; padding-left:22px;">
+              <li>Grupo DataEngineers criado com 3 politicas</li>
+              <li>Grupo DataAnalysts criado com 2 politicas + custom</li>
+              <li>Usuario eng-dados-01 no grupo DataEngineers</li>
+              <li>Role GlueJobRole com trusted entity Glue</li>
+              <li>Role LambdaExecutionRole com trusted entity Lambda</li>
+              <li>Politica DataLakeReadOnly anexada a DataAnalysts</li>
+              <li>3 buckets S3 criados (raw, trusted, refined)</li>
+              <li>Policy Simulator validando permissoes</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Desafio (opcional)</strong>
+            <ul style="margin:0; padding-left:22px;">
+              <li>Habilite MFA para o usuario eng-dados-01 (se suportado no AWS Student).</li>
+              <li>Crie uma <strong>permission boundary</strong> que impeca qualquer usuario de criar outros usuarios IAM, e aplique-a ao grupo DataEngineers.</li>
+              <li>Documente: qual e a diferenca entre uma boundary e uma policy normal?</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 21 — FECHAMENTO                                         -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Fechamento</span>
+          <h2 class="deck-title">Resumo e proximos passos</h2>
+        </div>
+        <div class="deck-grid">
+          <article class="deck-card">
+            <h3>O que vimos hoje</h3>
+            <ul>
+              <li>Cloud Computing: 5 caracteristicas NIST, modelos IaaS/PaaS/SaaS.</li>
+              <li>Arquiteturas: Data Lake, DW, Lakehouse, Data Mesh.</li>
+              <li>AWS: infraestrutura global, responsabilidade compartilhada.</li>
+              <li>IAM: users, groups, roles, policies, menor privilegio.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>O que ficou pronto no lab</h3>
+            <ul>
+              <li>Conta AWS Student organizada em us-east-1.</li>
+              <li>Grupos DataEngineers e DataAnalysts.</li>
+              <li>Roles GlueJobRole e LambdaExecutionRole.</li>
+              <li>Politica customizada DataLakeReadOnly.</li>
+              <li>3 buckets S3 (raw, trusted, refined).</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Proxima aula — 23/04/2026</h3>
+            <ul>
+              <li>Data Lake com S3 e Athena.</li>
+              <li>Criacao de datasets nas 3 camadas.</li>
+              <li>Consultas SQL serverless com Athena.</li>
+              <li>Integracao com Glue Data Catalog.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Estudo complementar</h3>
+            <ul>
+              <li>AWS Well-Architected — Security Pillar.</li>
+              <li>Documentacao IAM: docs.aws.amazon.com/iam.</li>
+              <li>Video: AWS re:Invent — IAM Best Practices.</li>
+              <li>NIST SP 800-145 (definicao de Cloud).</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Mackenzie mini logo -->
+  <img class="slide-logo-mini" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" alt="Mackenzie" />
+
+  <!-- GLOBAL navigation footer -->
+  <div class="slide-footer">
+    <div class="footer-links">
+      <a href="../../../index.html" class="back-home">Indice</a>
+      <a href="../material/material_aula_01_fundamentos_de_cloud_para_dados_e_governanca_de_acessos.html" class="material-link">Material</a>
+    </div>
+    <div class="nav-wrapper">
+      <div class="nav-buttons"><button id="prev-btn" onclick="previousSlide()">&#8592; Anterior</button></div>
+      <div class="slide-counter"><span id="current-slide">1</span> / <span id="total-slides">1</span></div>
+      <div class="nav-buttons"><button id="next-btn" onclick="nextSlide()">Proximo &#8594;</button></div>
+    </div>
+    <button class="fullscreen-btn" onclick="toggleFullScreen()" title="Tela cheia">&#9974;</button>
+  </div>
+
+  <!-- Navigation script -->
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    document.getElementById('total-slides').textContent = totalSlides;
+    function showSlide(i) { slides.forEach(s => s.classList.remove('active')); slides[i].classList.add('active'); currentSlide = i; document.getElementById('current-slide').textContent = i + 1; document.getElementById('prev-btn').disabled = i === 0; document.getElementById('next-btn').disabled = i === totalSlides - 1; }
+    function nextSlide() { if (currentSlide < totalSlides - 1) showSlide(currentSlide + 1); }
+    function previousSlide() { if (currentSlide > 0) showSlide(currentSlide - 1); }
+    function toggleFullScreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+    document.addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); } else if (e.key === 'ArrowLeft') { e.preventDefault(); previousSlide(); } else if (e.key.toLowerCase() === 'f') toggleFullScreen(); });
+    showSlide(0);
+  </script>
+</body>
 </html>

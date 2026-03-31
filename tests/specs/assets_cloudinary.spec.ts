@@ -107,14 +107,14 @@ test.describe('Assets Cloudinary Spec', () => {
       for (const slideFile of slideFiles) {
         const content = fsHelpers.readFileSync(slideFile);
 
-        // Find position of first <section and of deck-logo-full
-        const firstSectionIndex = content.indexOf('<section');
-        const secondSectionIndex = content.indexOf('<section', firstSectionIndex + 1);
+        // Find position of first .slide div and of deck-logo-full
+        const firstSlideIndex = content.indexOf('class="slide"');
+        const secondSlideIndex = content.indexOf('class="slide"', firstSlideIndex + 1);
         const logoIndex = content.indexOf(LOGO_FULL_URL);
 
-        expect(logoIndex).toBeGreaterThan(firstSectionIndex);
-        if (secondSectionIndex > -1) {
-          expect(logoIndex).toBeLessThan(secondSectionIndex);
+        expect(logoIndex).toBeGreaterThan(firstSlideIndex);
+        if (secondSlideIndex > -1) {
+          expect(logoIndex).toBeLessThan(secondSlideIndex);
         }
       }
     });
@@ -157,24 +157,20 @@ test.describe('Assets Cloudinary Spec', () => {
       }
     });
 
-    test('logo mini deve estar dentro de .reveal mas fora de .slides', async ({ aulasDir }) => {
+    test('logo mini deve estar presente no arquivo de slides', async ({ aulasDir }) => {
       const slideFiles = fsHelpers.getAllFiles(aulasDir).filter(f => f.includes('/slides/'));
 
       for (const slideFile of slideFiles) {
         const content = fsHelpers.readFileSync(slideFile);
 
-        // The mini logo should appear after the closing </div> of .slides
-        // but before the closing </div> of .reveal
-        const slidesCloseIndex = content.lastIndexOf('</div>', content.indexOf('<script'));
-        const miniLogoIndex = content.indexOf(LOGO_MINI_URL);
-
-        expect(miniLogoIndex).toBeGreaterThan(-1);
+        // The mini logo URL must exist in the file
+        expect(content).toContain(LOGO_MINI_URL);
       }
     });
 
     test('logo mini nao deve interferir na navegacao (pointer-events: none)', async ({ projectRoot, aulasDir }) => {
       // pointer-events: none can be in the shared CSS or inline
-      const cssPath = path.join(projectRoot, 'assets', 'reveal_custom.css');
+      const cssPath = path.join(projectRoot, 'assets', 'slides.css');
       const cssContent = fsHelpers.isFile(cssPath) ? fsHelpers.readFileSync(cssPath) : '';
       const cssHasPointerEvents =
         cssContent.includes('pointer-events: none') ||
@@ -251,15 +247,15 @@ test.describe('Assets Cloudinary Spec', () => {
       expect(content).toContain('.logo-full');
     });
 
-    test('reveal_custom.css deve definir classe deck-logo-full', async ({ projectRoot }) => {
-      const cssPath = path.join(projectRoot, 'assets', 'reveal_custom.css');
+    test('slides.css deve definir classe deck-logo-full', async ({ projectRoot }) => {
+      const cssPath = path.join(projectRoot, 'assets', 'slides.css');
       const content = fsHelpers.readFileSync(cssPath);
 
       expect(content).toContain('.deck-logo-full');
     });
 
-    test('reveal_custom.css deve definir classe slide-logo-mini', async ({ projectRoot }) => {
-      const cssPath = path.join(projectRoot, 'assets', 'reveal_custom.css');
+    test('slides.css deve definir classe slide-logo-mini', async ({ projectRoot }) => {
+      const cssPath = path.join(projectRoot, 'assets', 'slides.css');
       const content = fsHelpers.readFileSync(cssPath);
 
       expect(content).toContain('.slide-logo-mini');

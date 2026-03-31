@@ -330,11 +330,11 @@ test.describe('Design System Spec', () => {
         return;
       }
       
-      // Check that all slides have similar structure (reveal.js)
+      // Check that all slides have similar structure (HTML-native slide system)
       for (const slideFile of slideFiles) {
         const content = fsHelpers.readFileSync(slideFile);
-        const hasRevealOrStyle = content.includes('reveal') || content.includes('<style');
-        expect(hasRevealOrStyle).toBeTruthy();
+        const hasSlideSystemOrStyle = content.includes('slide-container') || content.includes('<style');
+        expect(hasSlideSystemOrStyle).toBeTruthy();
       }
     });
 
@@ -430,18 +430,17 @@ test.describe('Design System Spec', () => {
 
   test.describe('Regras Específicas para Slides', () => {
     
-    test('slides devem usar reveal.js', async ({ aulasDir }) => {
+    test('slides devem usar sistema de slides HTML nativo', async ({ aulasDir }) => {
       const slideFiles = fsHelpers.getAllFiles(aulasDir).filter(f => f.includes('/slides/'));
-      
+
       for (const slideFile of slideFiles) {
         const content = fsHelpers.readFileSync(slideFile);
-        const hasRevealJs = 
-          content.includes('reveal.js') ||
-          content.includes('reveal.css') ||
-          content.includes('Reveal.initialize') ||
-          content.includes('class="reveal"');
-        
-        expect(hasRevealJs).toBeTruthy();
+        const hasNativeSlides =
+          content.includes('slide-container') ||
+          content.includes('slide-footer') ||
+          content.includes('showSlide');
+
+        expect(hasNativeSlides).toBeTruthy();
       }
     });
 
@@ -451,25 +450,33 @@ test.describe('Design System Spec', () => {
       for (const slideFile of slideFiles) {
         const content = fsHelpers.readFileSync(slideFile);
         // Check for single focus structure (not too many complex elements)
-        const sectionCount = (content.match(/<section/g) || []).length;
-        // Each section should have limited content
-        expect(sectionCount).toBeGreaterThanOrEqual(1);
+        const slideCount = (content.match(/class="slide"/g) || []).length;
+        // Each file should have multiple slides
+        expect(slideCount).toBeGreaterThanOrEqual(1);
       }
     });
 
     test('slides devem evitar poluição visual', async ({ aulasDir }) => {
       const slideFiles = fsHelpers.getAllFiles(aulasDir).filter(f => f.includes('/slides/'));
-      
+
       for (const slideFile of slideFiles) {
         const content = fsHelpers.readFileSync(slideFile);
-        // Count different element types - should not have too many
-        const hasLists = content.includes('<ul') || content.includes('<ol');
-        const hasTables = content.includes('<table');
-        const hasCards = content.includes('card') || content.includes('Card');
-        
-        // Should not have all three at once
-        const complexityCount = [hasLists, hasTables, hasCards].filter(Boolean).length;
-        expect(complexityCount).toBeLessThanOrEqual(2);
+        // Split by individual slides and check each one
+        const slideBlocks = content.split(/class="slide"/);
+
+        for (let i = 1; i < slideBlocks.length; i++) {
+          const block = slideBlocks[i];
+          const nextSlide = block.indexOf('class="slide"');
+          const section = nextSlide > -1 ? block.substring(0, nextSlide) : block;
+
+          const hasLists = section.includes('<ul') || section.includes('<ol');
+          const hasTables = section.includes('<table');
+          const hasCards = section.includes('deck-card');
+
+          // Should not have all three at once in a single slide
+          const complexityCount = [hasLists, hasTables, hasCards].filter(Boolean).length;
+          expect(complexityCount).toBeLessThanOrEqual(2);
+        }
       }
     });
 
