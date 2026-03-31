@@ -5,434 +5,1682 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Material Aula 01 — Fundamentos de Cloud para Dados e Governança de Acessos</title>
     <link rel="stylesheet" href="../../../assets/styles.css" />
-    <style data-design-tokens>:root{--bg:#fff;--color:#000000}body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}a:hover{opacity:.8}a:focus{outline:2px solid #000000}</style>
-</head>
+    <style data-design-tokens>
+      :root{--bg:#fff;--color:#000000}
+      body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}
+      a:hover{opacity:.8}
+      a:focus{outline:2px solid #000000}
+      table{width:100%;border-collapse:collapse;margin:18px 0;font-size:.97rem}
+      th,td{border:1px solid var(--border,#d7d7d7);padding:10px 14px;text-align:left}
+      th{background:var(--surface,#f6f6f6);font-weight:700}
+      pre{background:var(--surface,#f6f6f6);border:1px solid var(--border,#d7d7d7);border-radius:6px;padding:18px;overflow-x:auto;font-size:.92rem;line-height:1.5}
+      code{font-family:"Courier New",Courier,monospace}
+      .tip{background:#f0f7f0;border-left:4px solid #2a7a2a;padding:14px 18px;margin:16px 0;border-radius:4px}
+      .warning{background:#fef6e8;border-left:4px solid #c08800;padding:14px 18px;margin:16px 0;border-radius:4px}
+      .danger{background:#fef0f0;border-left:4px solid #b30000;padding:14px 18px;margin:16px 0;border-radius:4px}
+    </style>
+  </head>
   <body class="material">
     <main class="page">
 
+      <!-- ============================================================
+           HEADER
+      ============================================================= -->
       <section class="content-block">
-        <p class="meta">Aula 01 &nbsp;•&nbsp; 16/04/2026 &nbsp;•&nbsp; 19h00 – 22h00</p>
+        <p class="meta">Aula 01 &nbsp;&bull;&nbsp; 16/04/2026 &nbsp;&bull;&nbsp; 19h00 &ndash; 22h00</p>
         <h1>Fundamentos de Cloud para Dados e Governança de Acessos</h1>
         <p class="summary">
-          Este material aprofunda os conceitos apresentados nos slides da Aula 01.
-          Cobre Cloud Computing aplicada à engenharia de dados, os modelos arquiteturais
-          de Data Lake, Data Warehouse e Data Mesh, os fundamentos do AWS IAM e o
-          passo a passo completo do laboratório de configuração de conta e permissões.
+          Este material acompanha a primeira aula da disciplina <strong>Cloud Computing e SRA &mdash; Visão Prática com AWS</strong>
+          do MBA em Engenharia de Dados. Ele cobre, de forma aprofundada, todos os tópicos apresentados nos slides:
+          a definição de Cloud Computing segundo o NIST, os modelos de serviço (IaaS, PaaS, SaaS),
+          as principais arquiteturas de dados na nuvem (Data Lake, Data Warehouse, Data Lakehouse e Data Mesh),
+          a AWS como plataforma de dados, a governança de acessos com AWS IAM, o princípio do menor privilégio
+          e o mapeamento de perfis de acesso para um Data Lake corporativo.
+          A parte prática inclui um laboratório completo de 2 horas com instruções passo a passo para configuração
+          de grupos, usuários, roles, políticas customizadas e buckets S3 no ambiente AWS Student.
+          O material foi projetado para funcionar como referência de estudo autônoma &mdash; é possível
+          revisar todo o conteúdo da aula sem depender de anotações adicionais.
         </p>
       </section>
 
-      <!-- =========================================================
-           MÓDULO 1 — CLOUD COMPUTING PARA DADOS
-      ========================================================== -->
+      <!-- ============================================================
+           MÓDULO 1 — CLOUD COMPUTING PARA ENGENHARIA DE DADOS
+      ============================================================= -->
       <section class="content-block">
-        <h2>Módulo 1 — Cloud Computing para Dados</h2>
+        <h2>Módulo 1 &mdash; Cloud Computing para Engenharia de Dados</h2>
 
-        <h3>O que é Cloud Computing?</h3>
-        <p>
-          Cloud Computing é o modelo de entrega de recursos de TI — servidores, armazenamento,
-          bancos de dados, redes, software e inteligência — pela internet, com cobrança baseada
-          no consumo real. Em vez de comprar e manter infraestrutura própria, você aluga
-          capacidade de um provedor e paga apenas pelo que usa.
-        </p>
-        <p>
-          Para a engenharia de dados, esse modelo resolve dois problemas históricos: o custo fixo
-          de manter servidores ociosos em períodos de baixa demanda e a impossibilidade de crescer
-          rapidamente quando o volume de dados aumenta de forma inesperada.
-        </p>
+        <!-- O QUE É CLOUD COMPUTING -->
+        <h3>O que é Cloud Computing</h3>
 
-        <h3>Modelos de serviço</h3>
+        <h4>Definição NIST</h4>
         <p>
-          <strong>IaaS (Infrastructure as a Service):</strong> o provedor entrega computação,
-          armazenamento e rede virtualizados. Você é responsável pelo sistema operacional,
-          middleware e aplicação. Exemplos AWS: EC2 (servidores virtuais), EBS (discos),
-          VPC (rede privada). Usado quando você precisa de controle granular sobre a pilha.
+          O National Institute of Standards and Technology (NIST), na publicação SP 800-145, define Cloud Computing como
+          um modelo que permite acesso de rede ubíquo, conveniente e sob demanda a um pool compartilhado de recursos
+          computacionais configuráveis (por exemplo: redes, servidores, armazenamento, aplicações e serviços) que podem
+          ser rapidamente provisionados e liberados com mínimo esforço de gerenciamento ou interação com o provedor de serviço.
         </p>
         <p>
-          <strong>PaaS (Platform as a Service):</strong> o provedor gerencia o hardware e o
-          runtime. Você entrega a aplicação e os dados. Exemplos AWS: RDS (banco relacional
-          gerenciado), Elastic Beanstalk. Usado quando você quer focar no código sem operar
-          sistema operacional.
+          Essa definição estabelece cinco características essenciais que diferenciam a cloud de qualquer outra forma de
+          hospedagem ou virtualização:
         </p>
-        <p>
-          <strong>SaaS (Software as a Service):</strong> o provedor entrega a funcionalidade
-          completa. Você consome via interface ou API. Exemplos AWS: QuickSight (BI), Athena
-          (query serverless), Rekognition (visão computacional). Usado quando você quer
-          resultado imediato sem escrever ou manter código de infraestrutura.
-        </p>
-
-        <h3>Por que Cloud é fundamental para dados em escala</h3>
-        <p>
-          Pipelines de dados modernos têm cargas imprevisíveis: uma campanha de marketing pode
-          multiplicar o volume de eventos por 10x em minutos. Na infraestrutura on-premises,
-          você dimensiona para o pico e mantém capacidade ociosa o restante do tempo.
-          Na nuvem, você escala para o pico e retorna ao estado base automaticamente,
-          pagando apenas pelo tempo utilizado.
-        </p>
-        <p>
-          Além da elasticidade, a cloud elimina o overhead operacional de instalar, atualizar
-          e monitorar serviços complexos como bancos de dados distribuídos, clusters Spark
-          e sistemas de mensageria. Isso libera a equipe de engenharia para focar no que
-          gera valor: transformar dados em produto.
-        </p>
-      </section>
-
-      <!-- =========================================================
-           MÓDULO 1 — ARQUITETURAS DE DADOS
-      ========================================================== -->
-      <section class="content-block">
-        <h2>Modelos Arquiteturais: Data Lake, Data Warehouse e Data Mesh</h2>
-
-        <h3>Data Lake</h3>
-        <p>
-          Um Data Lake é um repositório centralizado que armazena dados em seu formato
-          original — estruturados, semiestruturados e não estruturados — sem transformação
-          prévia. O conceito central é <em>schema on read</em>: o esquema é aplicado no
-          momento da leitura, não no momento da gravação, o que confere máxima flexibilidade
-          para exploração e experimentação.
-        </p>
-        <p>
-          Na AWS, o componente principal de um Data Lake é o Amazon S3, que oferece
-          durabilidade de 99,999999999% (11 noves) e custo de armazenamento muito baixo.
-          Sobre o S3, serviços como AWS Glue (catálogo e ETL) e Amazon Athena (consultas SQL
-          serverless) formam a base analítica do Lake.
-        </p>
-        <p>
-          A organização canônica do Data Lake usa três camadas:
-        </p>
-        <ul>
-          <li><strong>Raw / Bronze:</strong> dados exatamente como chegaram da fonte, sem
-          nenhuma transformação. Servem como fonte da verdade e permitem reprocessamento
-          completo em caso de erro em estágios posteriores.</li>
-          <li><strong>Trusted / Silver:</strong> dados limpos, validados e padronizados.
-          Erros de tipo, valores nulos e duplicatas foram tratados. Prontos para consumo
-          por times técnicos.</li>
-          <li><strong>Refined / Gold:</strong> dados agregados e modelados para consumo
-          direto por BI, dashboards e modelos de machine learning. Geralmente organizados
-          por domínio de negócio.</li>
-        </ul>
-
-        <h3>Data Warehouse</h3>
-        <p>
-          Um Data Warehouse é otimizado para consultas analíticas de alta performance sobre
-          dados estruturados e transformados. O modelo de dados é definido na gravação
-          (<em>schema on write</em>), o que permite ao banco de dados otimizar o layout
-          físico dos dados para velocidade de leitura.
-        </p>
-        <p>
-          Na AWS, o Amazon Redshift é o serviço de Data Warehouse gerenciado. Usa
-          processamento massivamente paralelo (MPP), armazenamento colunar e compressão
-          para entregar consultas rápidas mesmo em tabelas com bilhões de linhas.
-          O Redshift Spectrum permite estender queries para dados diretamente no S3,
-          integrando Data Warehouse e Data Lake.
-        </p>
-        <p>
-          O Data Warehouse é a escolha certa quando você precisa de latência baixa em
-          consultas complexas, relatórios regulares e dashboards de BI com SLA de
-          performance definido.
-        </p>
-
-        <h3>Data Mesh</h3>
-        <p>
-          Data Mesh é uma abordagem arquitetural e organizacional que trata dados como
-          produto e distribui a responsabilidade pelos dados para os domínios de negócio
-          que os originam. Em vez de um time central de dados ser o guardião de todos
-          os dados da organização, cada domínio (ex.: time de vendas, time de logística)
-          publica seus próprios produtos de dados com contratos de interface bem definidos.
-        </p>
-        <p>
-          O Data Mesh resolve o gargalo de centralização que aparece em organizações grandes,
-          onde um único time de plataforma de dados não consegue atender todos os domínios
-          de negócio com a velocidade necessária. A governança é federada: cada domínio
-          tem autonomia, mas segue padrões centrais de qualidade, segurança e
-          interoperabilidade.
-        </p>
-        <p>
-          Na AWS, o Data Mesh é tipicamente implementado com Lake Formation (controle de
-          acesso fine-grained), Event Bridge (integração entre domínios) e Glue Data Catalog
-          (catálogo federado).
-        </p>
-      </section>
-
-      <!-- =========================================================
-           MÓDULO 1 — AWS COMO PLATAFORMA
-      ========================================================== -->
-      <section class="content-block">
-        <h2>AWS como Plataforma de Dados</h2>
-
-        <h3>Infraestrutura global</h3>
-        <p>
-          A AWS opera em <strong>Regiões</strong> distribuídas pelo mundo, cada uma composta
-          por múltiplas <strong>Zonas de Disponibilidade (AZs)</strong>. Cada AZ é um ou
-          mais data centers com energia, rede e resfriamento independentes, fisicamente
-          separados por distância suficiente para resistir a falhas localizadas (enchentes,
-          incêndios), mas próximos o suficiente para comunicação de baixa latência.
-        </p>
-        <p>
-          Para a disciplina, usaremos a região <strong>us-east-1 (N. Virginia)</strong>,
-          que tem cobertura mais ampla de serviços e geralmente custo menor.
-          É importante fixar a região antes de criar qualquer recurso: recursos criados
-          em regiões diferentes não são visíveis entre si por padrão.
-        </p>
-
-        <h3>Modelo de responsabilidade compartilhada</h3>
-        <p>
-          A AWS é responsável pela segurança <em>da</em> nuvem: hardware físico, rede
-          global, hypervisors, data centers. Você é responsável pela segurança <em>na</em>
-          nuvem: quem acessa seus dados, como eles são criptografados, quais portas estão
-          abertas, quais permissões IAM estão configuradas.
-        </p>
-        <p>
-          Compreender esse modelo é essencial: uma falha de segurança causada por
-          configuração incorreta de IAM ou por um bucket S3 público é
-          <strong>sua responsabilidade</strong>, não da AWS.
-        </p>
-
-        <h3>Mapa de serviços da disciplina</h3>
-        <p>
-          Ao longo das 8 aulas, trabalharemos com o seguinte conjunto de serviços:
-        </p>
-        <ul>
-          <li><strong>Armazenamento:</strong> S3 (objeto), EBS (bloco), EFS (arquivo).</li>
-          <li><strong>Banco de dados:</strong> RDS (relacional), DynamoDB (NoSQL), Redshift (DW).</li>
-          <li><strong>Processamento:</strong> AWS Glue (ETL serverless), EMR (Spark gerenciado).</li>
-          <li><strong>Streaming:</strong> Kinesis Data Streams, Kinesis Data Firehose.</li>
-          <li><strong>Orquestração:</strong> Step Functions, MWAA (Airflow gerenciado).</li>
-          <li><strong>Governança:</strong> IAM, Lake Formation, CloudTrail.</li>
-          <li><strong>Observabilidade:</strong> CloudWatch Logs, CloudWatch Metrics, CloudWatch Alarms.</li>
-          <li><strong>Consulta:</strong> Amazon Athena.</li>
-        </ul>
-      </section>
-
-      <!-- =========================================================
-           MÓDULO 2 — GOVERNANÇA DE ACESSOS
-      ========================================================== -->
-      <section class="content-block">
-        <h2>Módulo 2 — Governança de Acessos com AWS IAM</h2>
-
-        <h3>Por que o controle de acesso é crítico</h3>
-        <p>
-          Dados são ativo estratégico. Sem controle de acesso adequado, dados sensíveis
-          de clientes ficam expostos, pipelines podem ser modificados por usuários não
-          autorizados e logs de auditoria não existem para rastrear o que aconteceu.
-        </p>
-        <p>
-          Os erros de configuração IAM são, consistentemente, uma das principais causas
-          de incidentes de segurança em cloud. Os mais comuns são: uso da conta root para
-          operações do dia a dia, chaves de acesso (access keys) armazenadas em código-fonte
-          ou variáveis de ambiente não protegidas, políticas com wildcard (<code>*</code>)
-          em recursos e ações, e buckets S3 configurados como públicos por engano.
-        </p>
-
-        <h3>AWS IAM: conceitos fundamentais</h3>
-        <p>
-          O AWS Identity and Access Management (IAM) é o serviço que controla quem pode
-          chamar quais APIs da AWS e em quais condições. Cada chamada de API na AWS passa
-          pelo IAM, que avalia as políticas associadas à identidade que faz a chamada e
-          decide se concede ou nega o acesso.
-        </p>
-
-        <h4>Usuários (IAM Users)</h4>
-        <p>
-          Representam uma pessoa ou sistema com credenciais de longo prazo (senha para
-          console ou access key/secret key para API). Devem ser usados para acesso humano
-          ao console AWS. <strong>A conta root nunca deve ser usada para operações do dia
-          a dia</strong> — ela tem acesso irrestrito a tudo e suas ações não podem ser
-          limitadas por políticas IAM.
-        </p>
-
-        <h4>Grupos (IAM Groups)</h4>
-        <p>
-          São coleções de usuários. Em vez de atribuir políticas individualmente a cada
-          usuário, você atribui políticas ao grupo e adiciona usuários ao grupo.
-          Quando o perfil de um usuário muda, basta movê-lo para outro grupo —
-          as permissões mudam automaticamente.
-        </p>
-        <p>
-          Exemplo de estrutura de grupos para uma equipe de dados:
-        </p>
-        <ul>
-          <li><strong>DataEngineers:</strong> acesso de leitura/escrita em S3, Glue, Kinesis, CloudWatch.</li>
-          <li><strong>DataScientists:</strong> leitura em S3 Silver/Gold, Athena, SageMaker.</li>
-          <li><strong>DataAnalysts:</strong> somente leitura em Athena e Redshift.</li>
-          <li><strong>DataAdmins:</strong> acesso total ao IAM e ao gerenciamento da plataforma.</li>
-        </ul>
-
-        <h4>Roles (IAM Roles)</h4>
-        <p>
-          Uma Role é uma identidade que pode ser assumida temporariamente por um usuário,
-          um serviço AWS, ou uma conta externa. Ao contrário de usuários, roles não têm
-          credenciais de longo prazo — as credenciais são geradas temporariamente no momento
-          em que a role é assumida e expiram automaticamente.
-        </p>
-        <p>
-          Roles são o mecanismo correto para conceder permissões a serviços AWS.
-          Por exemplo: um job do AWS Glue precisa ler de um bucket S3 e gravar logs no
-          CloudWatch. Em vez de criar um usuário e colocar as credenciais no código do job,
-          você cria uma <em>Glue Job Role</em> com as permissões necessárias e configura
-          o Glue para assumir essa role automaticamente.
-        </p>
-
-        <h4>Políticas (IAM Policies)</h4>
-        <p>
-          Políticas são documentos JSON que definem o que é permitido ou negado.
-          Uma política é composta por um ou mais <em>statements</em>, cada um com:
-        </p>
-        <ul>
-          <li><strong>Effect:</strong> <code>Allow</code> ou <code>Deny</code>.</li>
-          <li><strong>Action:</strong> lista de operações de API (ex.: <code>s3:GetObject</code>, <code>glue:StartJobRun</code>).</li>
-          <li><strong>Resource:</strong> ARN do recurso ao qual a ação se aplica.</li>
-          <li><strong>Condition:</strong> condições opcionais (ex.: somente se MFA estiver ativo, somente de determinado IP).</li>
-        </ul>
-        <p>
-          Regras de avaliação:
-        </p>
-        <ul>
-          <li>Deny explícito sempre prevalece sobre qualquer Allow.</li>
-          <li>Sem Allow = negado por padrão (<em>implicit deny</em>).</li>
-          <li>Todas as políticas associadas à identidade são avaliadas em conjunto.</li>
-        </ul>
-
-        <h3>Princípio do menor privilégio</h3>
-        <p>
-          O princípio do menor privilégio (<em>Least Privilege</em>) é a pedra angular
-          da segurança em cloud: conceda apenas as permissões estritamente necessárias
-          para que uma identidade realize sua função, e nada além disso.
-        </p>
-        <p>
-          Na prática, isso significa:
-        </p>
-        <ul>
-          <li>Nunca usar <code>"Action": "*"</code> ou <code>"Resource": "*"</code>
-          em políticas de produção sem justificativa explícita.</li>
-          <li>Começar com permissões mínimas e adicionar conforme necessário,
-          em vez de começar com permissão total e tentar restringir depois.</li>
-          <li>Revisar periodicamente permissões ativas e revogar as que não são mais usadas.
-          O AWS IAM Access Analyzer ajuda a identificar permissões excessivas.</li>
-          <li>Separar ambientes (dev, staging, prod) em contas AWS diferentes,
-          nunca em namespaces dentro da mesma conta.</li>
-        </ul>
-      </section>
-
-      <!-- =========================================================
-           MÓDULO 2 — MAPEAMENTO DE PERMISSÕES
-      ========================================================== -->
-      <section class="content-block">
-        <h2>Mapeando Permissões para o Data Lake</h2>
-
-        <p>
-          Antes de criar qualquer recurso de IAM, é importante mapear quais perfis
-          existem na equipe de dados e quais permissões cada um precisa.
-          Esse exercício previne retrabalho e garante que o modelo de segurança
-          seja coerente com o modelo de negócio.
-        </p>
-
-        <h3>Permissões por perfil</h3>
-
-        <h4>Engenheiro de Dados</h4>
-        <ul>
-          <li>S3: leitura e escrita em todas as camadas (Raw, Trusted, Refined).</li>
-          <li>Glue: criar crawlers, jobs, catálogos.</li>
-          <li>Kinesis: produzir e consumir streams e firehose.</li>
-          <li>Step Functions: criar e executar state machines.</li>
-          <li>CloudWatch: visualizar logs e métricas.</li>
-          <li>IAM: <strong>sem permissão</strong> (administração de acesso é separada).</li>
-        </ul>
-
-        <h4>Cientista de Dados</h4>
-        <ul>
-          <li>S3: somente leitura nas camadas Trusted e Refined.</li>
-          <li>Athena: executar queries e criar workgroups.</li>
-          <li>Glue Data Catalog: leitura do catálogo.</li>
-          <li>SageMaker: criar e executar notebooks e treinamentos.</li>
-        </ul>
-
-        <h4>Analista de BI</h4>
-        <ul>
-          <li>Athena: executar queries (somente leitura).</li>
-          <li>Redshift: conexão somente leitura em schemas de reporting.</li>
-          <li>QuickSight: acesso a dashboards publicados.</li>
-          <li>S3: somente leitura em Refined.</li>
-        </ul>
-
-        <h4>Roles para serviços AWS</h4>
-        <ul>
-          <li><strong>GlueJobRole:</strong> S3 (leitura/escrita), Glue (execução), CloudWatch (logs).</li>
-          <li><strong>LambdaRole:</strong> S3 (leitura), DynamoDB (leitura/escrita), CloudWatch (logs).</li>
-          <li><strong>StepFunctionsRole:</strong> invocar Lambda, iniciar Glue Jobs, publicar no CloudWatch.</li>
-          <li><strong>KinesisFirehoseRole:</strong> S3 (escrita), CloudWatch (logs).</li>
-        </ul>
-      </section>
-
-      <!-- =========================================================
-           MÓDULO 3 — LABORATÓRIO PASSO A PASSO
-      ========================================================== -->
-      <section class="content-block">
-        <h2>Módulo 3 — Laboratório: Configuração Segura da Conta AWS</h2>
-        <p>
-          A prática ocorre entre 21h00 e 22h00 utilizando o ambiente <strong>AWS Student</strong>.
-          Siga os passos abaixo na ordem indicada. Cada passo tem uma validação — não avance
-          sem confirmar que o passo anterior funcionou.
-        </p>
-
-        <h3>Passo 1 — Acessar o ambiente AWS Student</h3>
         <ol>
-          <li>Acesse o portal da sua instituição e obtenha o link de acesso ao AWS Academy ou AWS Student Lab.</li>
-          <li>Clique em "Start Lab" e aguarde o status ficar verde (pode levar 1-2 minutos).</li>
-          <li>Clique em "AWS" para abrir o console com as credenciais temporárias do lab.</li>
-          <li>No canto superior direito do console, confirme que a região selecionada é <strong>us-east-1 (N. Virginia)</strong>. Se não estiver, altere agora.</li>
-          <li><strong>Validação:</strong> o console deve aparecer com uma barra de serviços visível e a região correta no header.</li>
+          <li>
+            <strong>Self-service sob demanda (On-demand self-service):</strong> o consumidor pode provisionar recursos
+            computacionais &mdash; como servidores virtuais ou armazenamento &mdash; automaticamente, sem necessidade de
+            interação humana com o provedor. Na prática, isso significa que um engenheiro de dados pode criar um cluster
+            de processamento Spark via console ou API em minutos, sem abrir chamado de infraestrutura.
+          </li>
+          <li>
+            <strong>Acesso amplo à rede (Broad network access):</strong> os recursos estão disponíveis pela rede
+            (tipicamente a internet) e são acessados por mecanismos padronizados que promovem o uso por uma variedade
+            de plataformas (laptops, smartphones, tablets, estações de trabalho). Qualquer membro da equipe de dados
+            pode acessar o console AWS ou fazer chamadas de API de qualquer localização.
+          </li>
+          <li>
+            <strong>Pool de recursos compartilhados (Resource pooling):</strong> os recursos do provedor são agrupados
+            para atender múltiplos consumidores usando um modelo multi-tenant, com diferentes recursos físicos e virtuais
+            atribuídos e reatribuídos dinamicamente conforme a demanda. O consumidor não tem controle ou conhecimento
+            sobre a localização exata dos recursos, embora possa especificar a região geográfica. Isso permite economia
+            de escala que seria impossível em infraestrutura privada.
+          </li>
+          <li>
+            <strong>Elasticidade rápida (Rapid elasticity):</strong> os recursos podem ser provisionados e liberados
+            elasticamente, em alguns casos automaticamente, para escalar rapidamente tanto para cima quanto para baixo,
+            proporcionalmente à demanda. Para o consumidor, os recursos frequentemente parecem ilimitados. Um pipeline
+            de dados que processa 100 GB por dia pode, sem alteração de arquitetura, processar 10 TB em um dia de pico.
+          </li>
+          <li>
+            <strong>Serviço medido (Measured service):</strong> os sistemas de cloud controlam e otimizam automaticamente
+            o uso de recursos por meio de medição em um nível de abstração apropriado ao tipo de serviço (armazenamento,
+            processamento, largura de banda, contas de usuário ativas). O uso é monitorado, controlado e reportado,
+            proporcionando transparência tanto para o provedor quanto para o consumidor. O modelo "pay-per-use" é a
+            consequência direta dessa característica.
+          </li>
         </ol>
 
-        <h3>Passo 2 — Explorar o IAM Dashboard</h3>
+        <h4>Contexto histórico: de mainframes à nuvem</h4>
+        <p>
+          Para entender por que a cloud mudou fundamentalmente a engenharia de dados, é útil revisitar a evolução
+          da computação corporativa:
+        </p>
+        <ul>
+          <li>
+            <strong>Era dos mainframes (1960-1980):</strong> computação centralizada, com terminais "burros" acessando
+            uma máquina única e poderosa. O processamento de dados era batch, com filas de jobs agendados. O custo era
+            proibitivo e o acesso limitado a grandes corporações.
+          </li>
+          <li>
+            <strong>Era cliente-servidor (1980-2000):</strong> descentralização parcial. Servidores departamentais,
+            bancos de dados relacionais (Oracle, SQL Server), data warehouses on-premises. A engenharia de dados nasceu
+            aqui, com ETL, modelagem dimensional (Kimball, Inmon) e ferramentas de BI.
+          </li>
+          <li>
+            <strong>Era da virtualização (2000-2010):</strong> VMware e tecnologias similares permitiram rodar múltiplos
+            servidores virtuais em hardware físico compartilhado. Isso melhorou a utilização de recursos, mas o modelo
+            econômico ainda era CapEx: compre o hardware, instale, mantenha.
+          </li>
+          <li>
+            <strong>Era da cloud (2006-presente):</strong> em 2006, a Amazon lançou o EC2 e o S3, inaugurando a cloud
+            pública. O Google Cloud Platform (GCP) e o Microsoft Azure seguiram. O modelo econômico mudou de CapEx
+            para OpEx, e a elasticidade tornou viável processar volumes de dados antes inimagináveis para a maioria
+            das empresas.
+          </li>
+          <li>
+            <strong>Era da cloud nativa para dados (2015-presente):</strong> serviços gerenciados como Redshift, BigQuery,
+            Snowflake, Athena e Databricks eliminaram a necessidade de gerenciar infraestrutura para análise de dados.
+            O conceito de "serverless" &mdash; onde o consumidor não gerencia nenhum servidor &mdash; tornou-se o padrão
+            aspiracional para pipelines de dados.
+          </li>
+        </ul>
+
+        <h4>Por que a cloud mudou o jogo para engenharia de dados</h4>
+        <p>
+          Antes da cloud, construir uma plataforma de dados exigia investimento inicial significativo: servidores físicos,
+          storage arrays, licenças de software de banco de dados, switches de rede, espaço em data center, equipe de
+          operações 24x7. O ciclo de aquisição era de semanas a meses. Se a demanda crescesse além da capacidade
+          instalada, era necessário um novo ciclo de aquisição. Se a demanda caísse, o hardware ficava ocioso, mas
+          os custos continuavam.
+        </p>
+        <p>
+          A cloud resolveu esses problemas de forma estrutural:
+        </p>
+        <ul>
+          <li>
+            <strong>Eliminação do planejamento de capacidade estático:</strong> em vez de dimensionar para o pico
+            esperado (com margem de segurança), você provisiona para a demanda atual e escala automaticamente.
+          </li>
+          <li>
+            <strong>Experimentação de baixo custo:</strong> testar uma nova arquitetura de pipeline custa centavos
+            na cloud. On-premises, exigiria um projeto de infraestrutura.
+          </li>
+          <li>
+            <strong>Acesso a tecnologias de ponta:</strong> serviços como GPUs para treinamento de ML, bancos de
+            dados especializados (graph, time-series, document) e streaming em tempo real estão disponíveis com
+            alguns cliques, sem necessidade de expertise em hardware.
+          </li>
+          <li>
+            <strong>Globalização de dados:</strong> replicar dados entre regiões geográficas para compliance
+            (LGPD, GDPR) ou para performance é nativo na cloud.
+          </li>
+        </ul>
+
+        <h4>Modelo econômico: CapEx vs OpEx</h4>
+        <p>
+          A diferença entre CapEx (Capital Expenditure) e OpEx (Operational Expenditure) é central para entender
+          a economia da cloud:
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Aspecto</th>
+              <th>CapEx (On-premises)</th>
+              <th>OpEx (Cloud)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Investimento inicial</td>
+              <td>Alto (compra de hardware, licenças)</td>
+              <td>Zero ou muito baixo</td>
+            </tr>
+            <tr>
+              <td>Modelo de custo</td>
+              <td>Fixo, independente do uso</td>
+              <td>Variável, proporcional ao uso</td>
+            </tr>
+            <tr>
+              <td>Escalabilidade</td>
+              <td>Limitada pela capacidade instalada</td>
+              <td>Virtualmente ilimitada</td>
+            </tr>
+            <tr>
+              <td>Depreciação</td>
+              <td>3-5 anos de amortização contábil</td>
+              <td>Sem depreciação (despesa operacional)</td>
+            </tr>
+            <tr>
+              <td>Risco de sub-utilização</td>
+              <td>Alto (hardware ocioso)</td>
+              <td>Baixo (paga apenas pelo consumo)</td>
+            </tr>
+            <tr>
+              <td>Tempo para provisionar</td>
+              <td>Semanas a meses</td>
+              <td>Minutos a horas</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          Para workloads de dados, o modelo OpEx é especialmente vantajoso porque a demanda de processamento
+          é frequentemente variável: pipelines batch rodam à noite, cargas de treinamento de ML são esporádicas,
+          campanhas de marketing geram picos temporários de ingestão. Na cloud, você paga pelo pico apenas
+          enquanto ele dura; on-premises, você paga o tempo todo por capacidade que pode ficar ociosa 80% do dia.
+        </p>
+      </section>
+
+      <!-- MODELOS DE SERVIÇO -->
+      <section class="content-block">
+        <h3>Modelos de Serviço</h3>
+
+        <h4>IaaS &mdash; Infrastructure as a Service</h4>
+        <p>
+          No modelo IaaS, o provedor de cloud entrega a camada de infraestrutura virtualizada: computação (servidores
+          virtuais), armazenamento (discos) e rede (VPCs, load balancers). O consumidor é responsável por tudo que
+          roda acima dessa camada: sistema operacional, patches de segurança, middleware, runtime, aplicações e dados.
+        </p>
+        <p>
+          <strong>Serviços AWS representativos:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>Amazon EC2 (Elastic Compute Cloud):</strong> servidores virtuais com centenas de tipos de instância
+            diferentes, desde t3.micro (1 vCPU, 1 GB RAM) até instâncias com 448 vCPUs e 24 TB de RAM. Para dados,
+            as famílias de instância mais relevantes são: r6i/r7i (otimizadas para memória, ideais para Spark e bancos
+            in-memory), c6i/c7i (otimizadas para computação, ideais para transformações CPU-intensive) e p4d/p5
+            (com GPUs NVIDIA, para treinamento de modelos de ML).
+          </li>
+          <li>
+            <strong>Amazon EBS (Elastic Block Store):</strong> discos de alta performance anexados a instâncias EC2.
+            O tipo gp3 oferece até 16.000 IOPS a custo acessível; o tipo io2 oferece até 64.000 IOPS para workloads
+            que exigem latência sub-milissegundo (como bancos de dados autogerenciados).
+          </li>
+          <li>
+            <strong>Amazon VPC (Virtual Private Cloud):</strong> rede virtual isolada onde seus recursos rodam.
+            Permite controle total sobre sub-redes, tabelas de roteamento, gateways de internet e conexões VPN
+            com redes corporativas. Essencial para compliance e isolamento de ambientes.
+          </li>
+        </ul>
+        <p>
+          <strong>Quando usar IaaS para dados:</strong> quando você precisa de controle total sobre a pilha de software
+          &mdash; por exemplo, para rodar uma versão específica do Apache Spark que não é suportada pelo EMR,
+          para instalar drivers de GPU customizados para treinamento de modelos, ou para rodar bancos de dados
+          open-source (ClickHouse, TimescaleDB) que não têm equivalente gerenciado na AWS.
+        </p>
+
+        <h4>PaaS &mdash; Platform as a Service</h4>
+        <p>
+          No modelo PaaS, o provedor gerencia a infraestrutura e o runtime. O consumidor entrega a aplicação
+          (ou a configuração) e os dados, sem se preocupar com sistema operacional, patches ou escalabilidade
+          da infraestrutura subjacente.
+        </p>
+        <p>
+          <strong>Serviços AWS representativos:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>Amazon RDS (Relational Database Service):</strong> bancos de dados relacionais gerenciados.
+            Suporta PostgreSQL, MySQL, MariaDB, Oracle, SQL Server e Amazon Aurora. O RDS cuida de backups
+            automáticos, patching, failover, réplicas de leitura e monitoramento. O engenheiro de dados interage
+            apenas com o banco via SQL, sem gerenciar o servidor que o hospeda.
+          </li>
+          <li>
+            <strong>Amazon EMR (Elastic MapReduce):</strong> clusters Spark, Hive, Presto e Flink gerenciados.
+            Você define o tamanho do cluster, submete seus jobs e o EMR cuida do provisionamento, configuração
+            e desligamento das instâncias. Combina a flexibilidade do Spark com a conveniência de não gerenciar
+            o cluster manualmente.
+          </li>
+          <li>
+            <strong>AWS Elastic Beanstalk:</strong> plataforma para deploy de aplicações web. Menos usado
+            diretamente por engenheiros de dados, mas relevante quando o pipeline inclui APIs de ingestão
+            que precisam escalar automaticamente.
+          </li>
+        </ul>
+        <p>
+          <strong>Quando usar PaaS para dados:</strong> quando você quer a funcionalidade de tecnologias como
+          PostgreSQL ou Spark sem o overhead de instalar, configurar, atualizar e monitorar a infraestrutura.
+          É a escolha mais comum para a maioria das plataformas de dados empresariais.
+        </p>
+
+        <h4>SaaS &mdash; Software as a Service</h4>
+        <p>
+          No modelo SaaS, o provedor entrega a funcionalidade completa. O consumidor interage com uma interface
+          ou API para obter resultados, sem gerenciar nada da infraestrutura ou da aplicação subjacente.
+        </p>
+        <p>
+          <strong>Serviços AWS representativos:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>Amazon Athena:</strong> serviço de consultas SQL serverless sobre dados no S3. Não há
+            infraestrutura para provisionar: você escreve a query, o Athena a executa sobre os dados no S3 e
+            cobra por volume de dados escaneado (US$ 5 por TB). Ideal para consultas ad-hoc e exploração de
+            dados no Data Lake.
+          </li>
+          <li>
+            <strong>Amazon QuickSight:</strong> ferramenta de BI e visualização de dados serverless.
+            Conecta-se a fontes como Athena, Redshift, RDS e S3 para gerar dashboards interativos.
+            Possui engine in-memory (SPICE) para performance e suporta ML integrado para detecção de
+            anomalias e previsões.
+          </li>
+          <li>
+            <strong>Amazon Rekognition:</strong> serviço de visão computacional para análise de imagens e vídeos.
+            Relevante em pipelines de dados que incluem conteúdo multimídia &mdash; por exemplo, classificação
+            automática de imagens de produtos em e-commerce.
+          </li>
+        </ul>
+        <p>
+          <strong>Quando usar SaaS para dados:</strong> quando você quer resultado imediato, sem escrever código de
+          infraestrutura. O Athena é o exemplo mais emblemático: em vez de manter um cluster de banco de dados
+          para consultas, você simplesmente executa SQL diretamente sobre arquivos no S3.
+        </p>
+
+        <h4>Comparativo de responsabilidade entre modelos</h4>
+        <table>
+          <thead>
+            <tr>
+              <th>Camada</th>
+              <th>IaaS</th>
+              <th>PaaS</th>
+              <th>SaaS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Dados</td>
+              <td>Consumidor</td>
+              <td>Consumidor</td>
+              <td>Consumidor</td>
+            </tr>
+            <tr>
+              <td>Aplicação</td>
+              <td>Consumidor</td>
+              <td>Consumidor</td>
+              <td>Provedor</td>
+            </tr>
+            <tr>
+              <td>Runtime / Middleware</td>
+              <td>Consumidor</td>
+              <td>Provedor</td>
+              <td>Provedor</td>
+            </tr>
+            <tr>
+              <td>Sistema Operacional</td>
+              <td>Consumidor</td>
+              <td>Provedor</td>
+              <td>Provedor</td>
+            </tr>
+            <tr>
+              <td>Virtualização</td>
+              <td>Provedor</td>
+              <td>Provedor</td>
+              <td>Provedor</td>
+            </tr>
+            <tr>
+              <td>Hardware / Rede / DC</td>
+              <td>Provedor</td>
+              <td>Provedor</td>
+              <td>Provedor</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h4>Orientação para escolha do modelo em cenários de dados</h4>
+        <ul>
+          <li>
+            <strong>Precisa de versão específica de software ou hardware especializado?</strong> Use IaaS (EC2 com
+            configuração customizada).
+          </li>
+          <li>
+            <strong>Precisa de banco de dados relacional sem gerenciar patches e backups?</strong> Use PaaS (RDS).
+          </li>
+          <li>
+            <strong>Precisa processar dados com Spark mas sem gerenciar o cluster?</strong> Use PaaS (EMR) ou
+            SaaS (Glue, que é serverless).
+          </li>
+          <li>
+            <strong>Precisa fazer consultas SQL ad-hoc sobre dados no S3?</strong> Use SaaS (Athena).
+          </li>
+          <li>
+            <strong>Precisa de dashboards de BI sem infraestrutura?</strong> Use SaaS (QuickSight).
+          </li>
+        </ul>
+      </section>
+
+      <!-- ARQUITETURAS DE DADOS NA NUVEM -->
+      <section class="content-block">
+        <h3>Arquiteturas de Dados na Nuvem</h3>
+
+        <h4>Data Lake</h4>
+        <p>
+          Um Data Lake é um repositório centralizado que armazena dados em seu formato original &mdash;
+          estruturados, semiestruturados e não estruturados &mdash; sem transformação prévia no momento da gravação.
+          O conceito central é <em>schema-on-read</em>: o esquema dos dados é aplicado no momento da leitura
+          (quando alguém executa uma query ou um job de transformação), não no momento da gravação.
+          Isso confere máxima flexibilidade para exploração, experimentação e reprocessamento.
+        </p>
+        <p>
+          Na AWS, o componente central de um Data Lake é o <strong>Amazon S3</strong>, que oferece durabilidade de
+          99,999999999% (11 noves), disponibilidade de 99,99% e custo de armazenamento extremamente baixo
+          (a partir de US$ 0,023/GB/mês no tier Standard, e US$ 0,004/GB/mês no tier Glacier Instant Retrieval).
+          Sobre o S3, serviços como <strong>AWS Glue</strong> (catálogo de metadados e ETL serverless) e
+          <strong>Amazon Athena</strong> (consultas SQL serverless) formam a base analítica do Lake.
+        </p>
+        <p>
+          A organização canônica de um Data Lake utiliza três camadas, cada uma com propósito, formato de dados
+          e ciclo de vida específicos:
+        </p>
+
+        <p><strong>Camada Raw / Bronze</strong></p>
+        <ul>
+          <li>
+            <strong>Propósito:</strong> armazenar os dados exatamente como chegaram da fonte, sem nenhuma
+            transformação, limpeza ou deduplicação. Esta camada serve como a fonte da verdade (source of truth)
+            e permite reprocessamento completo em caso de erro em estágios posteriores.
+          </li>
+          <li>
+            <strong>Formatos típicos:</strong> JSON bruto de APIs, CSV exportado de bancos transacionais,
+            Avro de sistemas de streaming (Kafka, Kinesis), logs de texto plano, imagens, vídeos, PDFs.
+          </li>
+          <li>
+            <strong>Organização:</strong> particionamento por data de ingestão e fonte.
+            Exemplo: <code>s3://data-lake-raw/source=crm/year=2026/month=04/day=16/</code>
+          </li>
+          <li>
+            <strong>Ciclo de vida:</strong> dados brutos são mantidos por períodos longos (frequentemente anos)
+            para compliance e possibilidade de reprocessamento. Políticas de lifecycle do S3 podem migrar dados
+            antigos para tiers de menor custo (Infrequent Access, Glacier).
+          </li>
+          <li>
+            <strong>Acesso:</strong> restrito a engenheiros de dados e pipelines automatizados.
+            Analistas e cientistas de dados não devem acessar esta camada diretamente.
+          </li>
+        </ul>
+
+        <p><strong>Camada Trusted / Silver</strong></p>
+        <ul>
+          <li>
+            <strong>Propósito:</strong> dados limpos, validados, deduplicados e padronizados. Erros de tipo,
+            valores nulos inválidos e registros duplicados foram tratados. Os dados estão em formato otimizado
+            para consulta e são consumíveis por times técnicos (engenheiros de dados, cientistas de dados).
+          </li>
+          <li>
+            <strong>Formatos típicos:</strong> Apache Parquet (colunar, comprimido, com schema embutido) ou
+            Apache ORC. A conversão de JSON/CSV para Parquet é uma das primeiras transformações do pipeline.
+          </li>
+          <li>
+            <strong>Organização:</strong> particionamento por domínio de negócio e dimensões analíticas relevantes.
+            Exemplo: <code>s3://data-lake-trusted/domain=vendas/year=2026/month=04/</code>
+          </li>
+          <li>
+            <strong>Ciclo de vida:</strong> dados são mantidos enquanto tiverem valor analítico. Geralmente
+            reprocessados periodicamente conforme as regras de limpeza evoluem.
+          </li>
+          <li>
+            <strong>Acesso:</strong> engenheiros de dados (leitura e escrita), cientistas de dados (leitura),
+            pipelines automatizados (leitura e escrita).
+          </li>
+        </ul>
+
+        <p><strong>Camada Refined / Gold</strong></p>
+        <ul>
+          <li>
+            <strong>Propósito:</strong> dados agregados, modelados e prontos para consumo direto por ferramentas
+            de BI, dashboards executivos e modelos de machine learning. Frequentemente organizados por domínio de
+            negócio ou caso de uso específico (ex.: "métricas de vendas diárias", "features para modelo de churn").
+          </li>
+          <li>
+            <strong>Formatos típicos:</strong> Parquet com schema rígido e bem documentado. Em alguns casos,
+            os dados são também materializados em um Data Warehouse (Redshift) para performance máxima em
+            consultas recorrentes.
+          </li>
+          <li>
+            <strong>Organização:</strong> particionamento otimizado para os padrões de consulta mais frequentes.
+            Exemplo: <code>s3://data-lake-refined/kpi=vendas_diarias/year=2026/month=04/</code>
+          </li>
+          <li>
+            <strong>Ciclo de vida:</strong> dados são recalculados periodicamente. Versões anteriores podem ser
+            mantidas para auditoria.
+          </li>
+          <li>
+            <strong>Acesso:</strong> analistas de BI (leitura), cientistas de dados (leitura), ferramentas de BI
+            (QuickSight, Tableau), modelos de ML em produção. Engenheiros de dados controlam a escrita.
+          </li>
+        </ul>
+
+        <h4>Data Warehouse</h4>
+        <p>
+          Um Data Warehouse é um sistema otimizado para consultas analíticas de alta performance sobre dados
+          estruturados e transformados. O modelo de dados é definido na gravação (<em>schema-on-write</em>):
+          antes de inserir dados, é necessário criar tabelas com schemas rígidos. Isso permite ao banco de dados
+          otimizar o layout físico dos dados para velocidade de leitura.
+        </p>
+        <p>
+          Na AWS, o <strong>Amazon Redshift</strong> é o serviço de Data Warehouse gerenciado. Suas
+          características arquiteturais incluem:
+        </p>
+        <ul>
+          <li>
+            <strong>Processamento Massivamente Paralelo (MPP):</strong> as queries são divididas entre múltiplos
+            nós de computação que trabalham em paralelo. Cada nó processa uma fatia (slice) dos dados,
+            e o nó líder agrega os resultados.
+          </li>
+          <li>
+            <strong>Armazenamento colunar:</strong> em vez de armazenar dados linha por linha (como um banco OLTP),
+            o Redshift armazena cada coluna em blocos contíguos. Isso é ideal para queries analíticas que tipicamente
+            leem poucas colunas de tabelas com muitas colunas (ex.: <code>SELECT SUM(valor) FROM vendas WHERE ano = 2026</code>
+            lê apenas as colunas <code>valor</code> e <code>ano</code>, ignorando todas as outras).
+          </li>
+          <li>
+            <strong>Compressão automática:</strong> o Redshift analisa os dados e aplica o algoritmo de compressão
+            mais eficiente para cada coluna, reduzindo o armazenamento e melhorando a performance de I/O.
+          </li>
+          <li>
+            <strong>Redshift Spectrum:</strong> permite executar queries que combinam dados de tabelas internas do
+            Redshift com dados armazenados no S3, sem necessidade de carregá-los. Isso integra Data Warehouse
+            e Data Lake em uma única interface SQL.
+          </li>
+          <li>
+            <strong>Redshift Serverless:</strong> versão sem cluster para provisionar. O Redshift escala
+            automaticamente a capacidade de computação conforme a demanda das queries.
+          </li>
+        </ul>
+        <p>
+          O Data Warehouse é a escolha certa quando você precisa de latência consistentemente baixa em consultas
+          complexas (joins entre tabelas grandes, agregações com filtros), relatórios regulares com SLA de performance
+          definido e dashboards de BI que exigem resposta em segundos.
+        </p>
+
+        <h4>Data Lakehouse</h4>
+        <p>
+          O Data Lakehouse é uma arquitetura que combina as melhores características do Data Lake e do Data Warehouse
+          em uma única plataforma. A ideia central é: manter os dados no Data Lake (S3), mas adicionar uma camada
+          de gerenciamento que fornece funcionalidades tradicionalmente exclusivas de Data Warehouses &mdash;
+          transações ACID, schema enforcement, indexação, time travel e atualizações incrementais.
+        </p>
+        <p>
+          Essa camada de gerenciamento é implementada por <strong>formatos de tabela abertos (open table formats)</strong>:
+        </p>
+        <ul>
+          <li>
+            <strong>Apache Iceberg:</strong> desenvolvido pela Netflix e depois doado à Apache Foundation.
+            Suporta transações ACID, time travel, schema evolution e partition evolution. É o formato adotado
+            pelo AWS como padrão em serviços como Athena v3, EMR e Glue. A AWS oferece suporte nativo ao Iceberg
+            em múltiplos serviços, tornando-o a escolha mais natural no ecossistema AWS.
+          </li>
+          <li>
+            <strong>Delta Lake:</strong> desenvolvido pela Databricks. Suporta transações ACID, time travel,
+            schema enforcement e operações MERGE (upsert). Amplamente usado por clientes Databricks, mas também
+            compatível com Spark open-source e com o EMR.
+          </li>
+          <li>
+            <strong>Apache Hudi:</strong> desenvolvido pela Uber. Foco em ingestão incremental eficiente
+            (upserts em grande escala) e compactação de dados. Ideal para cenários de CDC (Change Data Capture)
+            onde registros são frequentemente atualizados.
+          </li>
+        </ul>
+        <p>
+          <strong>Implementação na AWS:</strong> dados armazenados no S3 em formato Parquet, com metadados
+          de tabela gerenciados pelo Apache Iceberg. O AWS Glue Data Catalog serve como metastore. O Athena e
+          o Redshift Spectrum consultam esses dados com suporte a transações e time travel. O resultado é uma
+          plataforma que tem a flexibilidade e o custo do Data Lake com a confiabilidade e a performance do
+          Data Warehouse.
+        </p>
+
+        <h4>Data Mesh</h4>
+        <p>
+          Data Mesh é uma abordagem arquitetural e organizacional proposta por Zhamak Dehghani (2019) que trata
+          dados como produto e distribui a responsabilidade pelos dados para os domínios de negócio que os originam.
+          É fundamentalmente diferente das arquiteturas anteriores porque não é apenas uma escolha técnica &mdash;
+          é uma mudança organizacional.
+        </p>
+        <p>
+          O Data Mesh se baseia em quatro princípios:
+        </p>
         <ol>
-          <li>No campo de busca do console, digite <kbd>IAM</kbd> e clique no serviço.</li>
-          <li>O IAM Dashboard exibe o resumo de segurança da conta. Observe:
+          <li>
+            <strong>Propriedade de domínio (Domain Ownership):</strong> cada domínio de negócio (vendas, logística,
+            financeiro, marketing) é responsável por seus próprios dados, incluindo qualidade, pipeline e
+            disponibilização. Não existe um time central de dados que é o guardião de todos os dados da organização.
+          </li>
+          <li>
+            <strong>Dados como produto (Data as a Product):</strong> cada domínio trata seus dados como um produto
+            com consumidores reais. Isso implica documentação, SLAs de qualidade, contratos de interface (schemas),
+            monitoramento de uso e evolução planejada.
+          </li>
+          <li>
+            <strong>Plataforma self-service (Self-Serve Data Platform):</strong> a organização fornece uma
+            plataforma de infraestrutura que permite aos domínios publicar e consumir produtos de dados sem
+            depender de um time centralizado para cada operação. A plataforma oferece templates, automação,
+            governança e observabilidade como serviço.
+          </li>
+          <li>
+            <strong>Governança federada computacional (Federated Computational Governance):</strong> a governança
+            é definida centralmente (padrões de qualidade, segurança, interoperabilidade), mas executada de forma
+            automática e descentralizada. Políticas são implementadas como código que é aplicado automaticamente
+            pela plataforma.
+          </li>
+        </ol>
+        <p>
+          <strong>Quando o Data Mesh faz sentido:</strong> em organizações grandes (tipicamente com mais de
+          50-100 engenheiros de dados) onde um time centralizado se torna gargalo. Organizações menores geralmente
+          não têm a complexidade organizacional que justifica a overhead de um Data Mesh.
+        </p>
+        <p>
+          <strong>Implementação na AWS:</strong> AWS Lake Formation para controle de acesso fine-grained por
+          domínio, Amazon EventBridge para integração assíncrona entre domínios, AWS Glue Data Catalog como
+          catálogo federado onde cada domínio registra seus produtos de dados, e AWS RAM (Resource Access Manager)
+          para compartilhamento de recursos entre contas AWS de diferentes domínios.
+        </p>
+
+        <h4>Framework de decisão: quando usar qual arquitetura</h4>
+        <table>
+          <thead>
+            <tr>
+              <th>Critério</th>
+              <th>Data Lake</th>
+              <th>Data Warehouse</th>
+              <th>Lakehouse</th>
+              <th>Data Mesh</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Variedade de dados</td>
+              <td>Alta (qualquer formato)</td>
+              <td>Baixa (estruturado)</td>
+              <td>Alta</td>
+              <td>Depende dos domínios</td>
+            </tr>
+            <tr>
+              <td>Performance de query</td>
+              <td>Moderada</td>
+              <td>Alta</td>
+              <td>Alta</td>
+              <td>Depende da implementação</td>
+            </tr>
+            <tr>
+              <td>Transações ACID</td>
+              <td>Não nativo</td>
+              <td>Sim</td>
+              <td>Sim (via table format)</td>
+              <td>Depende</td>
+            </tr>
+            <tr>
+              <td>Custo de armazenamento</td>
+              <td>Muito baixo (S3)</td>
+              <td>Alto (storage dedicado)</td>
+              <td>Baixo (S3)</td>
+              <td>Variável</td>
+            </tr>
+            <tr>
+              <td>Complexidade organizacional</td>
+              <td>Baixa</td>
+              <td>Baixa</td>
+              <td>Moderada</td>
+              <td>Alta</td>
+            </tr>
+            <tr>
+              <td>Caso de uso ideal</td>
+              <td>Exploração, ML, dados brutos</td>
+              <td>BI, relatórios, dashboards</td>
+              <td>Plataforma unificada</td>
+              <td>Grandes organizações descentralizadas</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- AWS COMO PLATAFORMA DE DADOS -->
+      <section class="content-block">
+        <h3>AWS como Plataforma de Dados</h3>
+
+        <h4>Infraestrutura global</h4>
+        <p>
+          A AWS opera a maior infraestrutura de cloud pública do mundo:
+        </p>
+        <ul>
+          <li>
+            <strong>Regiões (32+):</strong> conjuntos geográficos independentes, cada um com governança de dados
+            isolada. Dados criados em uma região não são automaticamente replicados para outras. Exemplos:
+            us-east-1 (N. Virginia), sa-east-1 (São Paulo), eu-west-1 (Irlanda).
+          </li>
+          <li>
+            <strong>Zonas de Disponibilidade / AZs (100+):</strong> dentro de cada região, existem múltiplas AZs
+            (tipicamente 3 a 6). Cada AZ é composta por um ou mais data centers com energia, resfriamento e
+            conectividade de rede independentes. As AZs são fisicamente separadas por distância suficiente
+            para resistir a desastres localizados (enchentes, incêndios), mas conectadas por fibra óptica de
+            baixa latência (tipicamente menos de 2ms entre AZs na mesma região).
+          </li>
+          <li>
+            <strong>Edge Locations (400+):</strong> pontos de presença para Amazon CloudFront (CDN) e AWS Global
+            Accelerator. Usados para entregar conteúdo com baixa latência a usuários finais.
+          </li>
+          <li>
+            <strong>Local Zones:</strong> extensões de regiões AWS colocadas próximas a centros populacionais
+            para workloads que exigem latência de um dígito de milissegundos (ex.: aplicações de streaming
+            de vídeo, gaming).
+          </li>
+        </ul>
+
+        <h4>Por que usaremos us-east-1 nesta disciplina</h4>
+        <p>
+          A região <strong>us-east-1 (N. Virginia)</strong> foi escolhida por três razões práticas:
+        </p>
+        <ol>
+          <li>
+            <strong>Cobertura máxima de serviços:</strong> us-east-1 é tipicamente a primeira região a receber
+            novos serviços e features da AWS. Todos os serviços que usaremos na disciplina estão disponíveis nela.
+          </li>
+          <li>
+            <strong>Custo ligeiramente menor:</strong> os preços de muitos serviços são mais baixos em us-east-1
+            comparados a outras regiões, incluindo sa-east-1 (São Paulo).
+          </li>
+          <li>
+            <strong>Compatibilidade com AWS Student:</strong> o ambiente de laboratório da AWS Academy opera
+            primariamente em us-east-1.
+          </li>
+        </ol>
+        <div class="warning">
+          <strong>Atenção:</strong> sempre confirme que a região no console está definida como us-east-1 antes de
+          criar qualquer recurso. Recursos criados em regiões diferentes não são visíveis entre si por padrão,
+          e criar recursos na região errada é uma das causas mais comuns de confusão em laboratórios.
+        </div>
+
+        <h4>Mapa completo de serviços AWS para dados</h4>
+        <p>
+          Ao longo das 8 aulas da disciplina, trabalharemos com os seguintes serviços, organizados por categoria:
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Categoria</th>
+              <th>Serviço</th>
+              <th>O que faz</th>
+              <th>Quando usaremos</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td rowspan="3">Armazenamento</td>
+              <td>Amazon S3</td>
+              <td>Armazenamento de objetos (Data Lake)</td>
+              <td>Aulas 01-08 (base de tudo)</td>
+            </tr>
+            <tr>
+              <td>Amazon EBS</td>
+              <td>Discos de bloco para EC2</td>
+              <td>Aula 03 (bancos autogerenciados)</td>
+            </tr>
+            <tr>
+              <td>Amazon EFS</td>
+              <td>Sistema de arquivos compartilhado</td>
+              <td>Aula 05 (compartilhamento entre Lambdas)</td>
+            </tr>
+            <tr>
+              <td rowspan="3">Banco de Dados</td>
+              <td>Amazon RDS</td>
+              <td>Banco relacional gerenciado</td>
+              <td>Aula 03 (fontes de dados)</td>
+            </tr>
+            <tr>
+              <td>Amazon DynamoDB</td>
+              <td>Banco NoSQL key-value/document</td>
+              <td>Aula 03 (fontes NoSQL)</td>
+            </tr>
+            <tr>
+              <td>Amazon Redshift</td>
+              <td>Data Warehouse MPP colunar</td>
+              <td>Aula 06 (DW de alta performance)</td>
+            </tr>
+            <tr>
+              <td rowspan="2">Processamento</td>
+              <td>AWS Glue</td>
+              <td>ETL serverless + catálogo de metadados</td>
+              <td>Aulas 05, 07 (ETL e catálogo)</td>
+            </tr>
+            <tr>
+              <td>Amazon EMR</td>
+              <td>Clusters Spark/Hive/Presto gerenciados</td>
+              <td>Aula 05 (processamento em escala)</td>
+            </tr>
+            <tr>
+              <td rowspan="2">Streaming</td>
+              <td>Kinesis Data Streams</td>
+              <td>Ingestão de dados em tempo real</td>
+              <td>Aula 04 (streaming)</td>
+            </tr>
+            <tr>
+              <td>Kinesis Data Firehose</td>
+              <td>Entrega de streaming para S3/Redshift</td>
+              <td>Aula 04 (streaming para lake)</td>
+            </tr>
+            <tr>
+              <td rowspan="2">Orquestração</td>
+              <td>AWS Step Functions</td>
+              <td>Orquestração de workflows serverless</td>
+              <td>Aula 05 (pipelines)</td>
+            </tr>
+            <tr>
+              <td>Amazon MWAA</td>
+              <td>Apache Airflow gerenciado</td>
+              <td>Aula 07 (orquestração complexa)</td>
+            </tr>
+            <tr>
+              <td rowspan="3">Governança</td>
+              <td>AWS IAM</td>
+              <td>Controle de identidade e acesso</td>
+              <td>Aulas 01-08 (base de segurança)</td>
+            </tr>
+            <tr>
+              <td>AWS Lake Formation</td>
+              <td>Controle de acesso fine-grained para Data Lake</td>
+              <td>Aula 08 (governança avançada)</td>
+            </tr>
+            <tr>
+              <td>AWS CloudTrail</td>
+              <td>Auditoria de chamadas de API</td>
+              <td>Aula 07 (observabilidade)</td>
+            </tr>
+            <tr>
+              <td rowspan="3">Observabilidade</td>
+              <td>CloudWatch Logs</td>
+              <td>Armazenamento e busca de logs</td>
+              <td>Aula 07 (monitoramento)</td>
+            </tr>
+            <tr>
+              <td>CloudWatch Metrics</td>
+              <td>Métricas de infraestrutura e aplicação</td>
+              <td>Aula 07 (alertas)</td>
+            </tr>
+            <tr>
+              <td>CloudWatch Alarms</td>
+              <td>Alertas baseados em métricas</td>
+              <td>Aula 07 (SRE)</td>
+            </tr>
+            <tr>
+              <td>Analytics</td>
+              <td>Amazon Athena</td>
+              <td>SQL serverless sobre S3</td>
+              <td>Aulas 02, 05, 06 (consultas)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h4>Modelo de Responsabilidade Compartilhada</h4>
+        <p>
+          O <strong>Shared Responsibility Model</strong> da AWS é o conceito de segurança mais importante para
+          qualquer profissional que trabalha com cloud. Ele define claramente o que é responsabilidade da AWS
+          e o que é responsabilidade do cliente:
+        </p>
+        <p>
+          <strong>A AWS é responsável pela segurança DA nuvem (security OF the cloud):</strong>
+        </p>
+        <ul>
+          <li>Hardware físico dos data centers (servidores, discos, switches)</li>
+          <li>Segurança física (acesso biométrico, vigilância, destruição de hardware)</li>
+          <li>Infraestrutura de rede global (backbone, Edge Locations)</li>
+          <li>Hypervisors e camada de virtualização</li>
+          <li>Disponibilidade das regiões e zonas de disponibilidade</li>
+        </ul>
+        <p>
+          <strong>O cliente é responsável pela segurança NA nuvem (security IN the cloud):</strong>
+        </p>
+        <ul>
+          <li>Configuração de IAM (quem pode acessar o quê)</li>
+          <li>Configuração de rede (Security Groups, NACLs, VPC)</li>
+          <li>Criptografia de dados em repouso e em trânsito</li>
+          <li>Configuração de buckets S3 (público vs privado)</li>
+          <li>Gerenciamento de credenciais e rotação de chaves</li>
+          <li>Patching de sistema operacional (em instâncias EC2)</li>
+          <li>Configuração de firewalls de aplicação (WAF)</li>
+        </ul>
+        <div class="danger">
+          <strong>Exemplo concreto para engenharia de dados:</strong> se um bucket S3 contendo dados sensíveis de
+          clientes for configurado com acesso público e os dados forem expostos, a responsabilidade é inteiramente
+          do cliente, não da AWS. A AWS fornece as ferramentas para bloquear acesso público (S3 Block Public Access,
+          bucket policies, ACLs), mas a configuração correta é responsabilidade de quem administra a conta.
+          Da mesma forma, se um job do AWS Glue usar uma role com permissões excessivas (por exemplo,
+          <code>AdministratorAccess</code>) e essa role for comprometida, a responsabilidade pela escalação
+          de privilégio é do cliente.
+        </div>
+      </section>
+
+      <!-- ============================================================
+           MÓDULO 2 — GOVERNANÇA DE ACESSOS COM AWS IAM
+      ============================================================= -->
+      <section class="content-block">
+        <h2>Módulo 2 &mdash; Governança de Acessos com AWS IAM</h2>
+
+        <h3>Por que Governança de Acessos é o Alicerce</h3>
+
+        <h4>Incidentes reais que demonstram a importância</h4>
+        <p>
+          A governança de acessos não é um tema abstrato ou meramente teórico. Falhas de configuração IAM e de
+          controle de acesso estão entre as causas mais frequentes e mais caras de incidentes de segurança em cloud.
+          Alguns exemplos ilustrativos:
+        </p>
+        <ul>
+          <li>
+            <strong>Incidente Capital One (2019):</strong> uma ex-funcionária de um provedor de cloud explorou uma
+            configuração incorreta de WAF (Web Application Firewall) combinada com uma role IAM com privilégios
+            excessivos para acessar dados de mais de 100 milhões de clientes armazenados no S3. O custo para
+            a empresa ultrapassou US$ 150 milhões entre multas, processos e remediação. A causa raiz não foi uma
+            vulnerabilidade zero-day &mdash; foi uma configuração de acesso inadequada.
+          </li>
+          <li>
+            <strong>Buckets S3 expostos publicamente:</strong> ao longo dos anos, diversas organizações tiveram
+            dados sensíveis expostos por buckets S3 configurados com acesso público. Dados de eleitores, registros
+            médicos, informações financeiras e credenciais de acesso foram encontrados por pesquisadores de segurança
+            em buckets abertos. Em todos os casos, a AWS fornecia as ferramentas para bloquear o acesso &mdash;
+            a responsabilidade pela configuração era do cliente.
+          </li>
+          <li>
+            <strong>Mineração de criptomoedas com credenciais roubadas:</strong> access keys de IAM vazadas em
+            repositórios Git públicos são rapidamente descobertas por bots automatizados que provisionam instâncias
+            EC2 de alto custo para mineração de criptomoedas. Empresas já reportaram faturas surpresa de dezenas
+            de milhares de dólares por uso não autorizado de instâncias EC2 com GPUs.
+          </li>
+        </ul>
+
+        <h4>Contexto regulatório</h4>
+        <p>
+          Além dos riscos operacionais e financeiros, falhas de governança de acesso geram consequências regulatórias:
+        </p>
+        <ul>
+          <li>
+            <strong>LGPD (Lei Geral de Proteção de Dados &mdash; Brasil):</strong> exige que dados pessoais sejam
+            protegidos por medidas técnicas e administrativas. A falta de controle de acesso adequado é uma
+            violação direta da lei, com multas de até 2% do faturamento (limitadas a R$ 50 milhões por infração).
+          </li>
+          <li>
+            <strong>GDPR (General Data Protection Regulation &mdash; UE):</strong> exige proteção de dados pessoais
+            de cidadãos europeus. Multas podem chegar a 4% do faturamento global ou 20 milhões de euros,
+            o que for maior.
+          </li>
+          <li>
+            <strong>SOC 2 (Service Organization Control):</strong> auditoria comum em empresas de tecnologia
+            que demonstra controles de segurança adequados. A ausência de controle de acesso granular
+            é um achado crítico que pode impedir a certificação.
+          </li>
+        </ul>
+
+        <h4>Custo total da governança inadequada</h4>
+        <p>
+          O custo de uma governança de acessos inadequada vai muito além de multas:
+        </p>
+        <ul>
+          <li><strong>Custos financeiros diretos:</strong> faturas inesperadas por uso não autorizado de recursos.</li>
+          <li><strong>Custos de remediação:</strong> investigação forense, rotação de credenciais, reconfiguração de ambientes.</li>
+          <li><strong>Perda de dados:</strong> dados deletados ou corrompidos por usuários com permissões excessivas.</li>
+          <li><strong>Danos reputacionais:</strong> perda de confiança de clientes e parceiros após um vazamento.</li>
+          <li><strong>Custos legais:</strong> processos judiciais, negociações regulatórias, auditorias extraordinárias.</li>
+        </ul>
+      </section>
+
+      <!-- AWS IAM EM PROFUNDIDADE -->
+      <section class="content-block">
+        <h3>AWS IAM em Profundidade</h3>
+        <p>
+          O AWS Identity and Access Management (IAM) é o serviço central de segurança da AWS. Cada chamada de API
+          feita na AWS &mdash; seja pelo console, pela CLI, por um SDK ou por um serviço AWS &mdash; passa pelo IAM,
+          que avalia as políticas associadas à identidade que faz a chamada e decide se concede ou nega o acesso.
+          Compreender o IAM em profundidade é pré-requisito para trabalhar com qualquer serviço AWS de forma segura.
+        </p>
+
+        <h4>IAM Users (Usuários)</h4>
+        <p>
+          Um IAM User representa uma pessoa ou sistema com credenciais de longo prazo na conta AWS. Cada usuário pode
+          ter dois tipos de credenciais:
+        </p>
+        <ul>
+          <li>
+            <strong>Senha do console (Console password):</strong> usada para acessar o AWS Management Console
+            (interface web). Pode ter política de complexidade, expiração e obrigatoriedade de troca no primeiro login.
+          </li>
+          <li>
+            <strong>Chaves de acesso (Access keys):</strong> par de Access Key ID + Secret Access Key, usado para
+            acessar a AWS via CLI (aws cli), SDKs (boto3, AWS SDK for Java) ou chamadas diretas de API REST.
+            As access keys são credenciais de longo prazo e devem ser tratadas com o mesmo cuidado que senhas.
+          </li>
+        </ul>
+        <p>
+          <strong>Boas práticas para IAM Users:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>Nunca use a conta root para operações do dia a dia.</strong> A conta root tem acesso irrestrito
+            a todos os recursos e serviços da conta AWS, e suas permissões não podem ser limitadas por políticas IAM.
+            O root deve ser usado apenas para operações que exigem exclusivamente credenciais root (como fechar a conta
+            ou alterar o plano de suporte).
+          </li>
+          <li>
+            <strong>Habilite MFA (Multi-Factor Authentication) para todos os usuários.</strong> O MFA adiciona um
+            segundo fator de autenticação (tipicamente um código de 6 dígitos gerado por um aplicativo como
+            Google Authenticator ou Authy) ao login no console.
+          </li>
+          <li>
+            <strong>Rotacione access keys periodicamente.</strong> A AWS recomenda rotação a cada 90 dias.
+            O IAM Credential Report permite identificar chaves que não foram rotacionadas.
+          </li>
+          <li>
+            <strong>Nunca compartilhe credenciais entre pessoas.</strong> Cada pessoa deve ter seu próprio usuário IAM.
+            Compartilhar credenciais impede auditoria individual e viola o princípio de accountability.
+          </li>
+          <li>
+            <strong>Nunca coloque access keys no código-fonte.</strong> Use variáveis de ambiente, AWS Secrets Manager,
+            ou (preferencialmente) roles IAM que eliminam a necessidade de credenciais estáticas.
+          </li>
+        </ul>
+
+        <h4>IAM Groups (Grupos)</h4>
+        <p>
+          Um IAM Group é uma coleção de IAM Users. Políticas são atribuídas ao grupo, e todos os usuários membros
+          herdam essas permissões automaticamente. Grupos simplificam drasticamente o gerenciamento de permissões
+          em equipes:
+        </p>
+        <ul>
+          <li>Quando um novo membro entra na equipe, basta adicioná-lo ao grupo correto.</li>
+          <li>Quando alguém muda de função, basta movê-lo para outro grupo.</li>
+          <li>Quando uma política precisa ser atualizada, a mudança é feita uma vez no grupo e se aplica a todos os membros.</li>
+        </ul>
+        <p>
+          <strong>Padrões de design de grupos para equipes de dados:</strong>
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Grupo</th>
+              <th>Perfil</th>
+              <th>Políticas típicas</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>DataEngineers</td>
+              <td>Engenheiros que constroem e mantêm pipelines</td>
+              <td>S3 Full, Glue Full, Kinesis Full, CloudWatch Logs, Step Functions</td>
+            </tr>
+            <tr>
+              <td>DataScientists</td>
+              <td>Cientistas que exploram dados e treinam modelos</td>
+              <td>S3 Read (Silver/Gold), Athena Full, SageMaker, Glue Catalog Read</td>
+            </tr>
+            <tr>
+              <td>DataAnalysts</td>
+              <td>Analistas que consultam dados e criam relatórios</td>
+              <td>Athena Full, S3 Read (Gold), Redshift Read, QuickSight</td>
+            </tr>
+            <tr>
+              <td>DataAdmins</td>
+              <td>Administradores da plataforma de dados</td>
+              <td>IAM Full, Lake Formation, CloudTrail, Billing Read</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          <strong>Convenções de nomenclatura:</strong> use PascalCase para grupos (DataEngineers, não data-engineers),
+          pois é o padrão adotado na documentação AWS e facilita a leitura em políticas e logs.
+        </p>
+
+        <h4>IAM Roles (Papéis)</h4>
+        <p>
+          Uma IAM Role é uma identidade que pode ser <strong>assumida temporariamente</strong> por um usuário IAM,
+          um serviço AWS, ou uma identidade de outra conta AWS. A diferença fundamental entre um Role e um User é
+          que o Role não possui credenciais de longo prazo. Quando uma entidade assume um Role, o AWS Security
+          Token Service (STS) gera credenciais temporárias que expiram automaticamente (por padrão, em 1 hora,
+          configurável até 12 horas).
+        </p>
+        <p>
+          Uma Role é composta por dois elementos:
+        </p>
+        <ul>
+          <li>
+            <strong>Trust Policy (Política de confiança):</strong> define <em>quem</em> pode assumir a role. Por exemplo:
+            "o serviço AWS Glue pode assumir esta role" ou "usuários da conta 123456789012 podem assumir esta role".
+          </li>
+          <li>
+            <strong>Permission Policy (Política de permissão):</strong> define <em>o que</em> a role pode fazer depois
+            de assumida. Por exemplo: "pode ler objetos no bucket S3 X e gravar logs no CloudWatch".
+          </li>
+        </ul>
+        <p>
+          <strong>Por que Roles são fundamentais para serviços AWS:</strong>
+        </p>
+        <p>
+          Quando um job do AWS Glue precisa ler dados de um bucket S3 e gravar resultados em outro bucket, ele precisa
+          de permissões para essas operações. A forma <strong>correta</strong> de conceder essas permissões é criar
+          uma Role com uma Trust Policy que permite ao serviço Glue assumi-la e Permission Policies que concedem
+          acesso S3. O Glue assume a role automaticamente no início da execução e as credenciais expiram quando o
+          job termina.
+        </p>
+        <p>
+          A forma <strong>incorreta</strong> (e perigosa) seria criar um IAM User com access keys e configurar essas
+          chaves dentro do código ou nas variáveis de ambiente do job. Isso é inseguro porque: as chaves são de longo
+          prazo e não expiram automaticamente; se vazarem, o atacante tem acesso permanente; não há como revogar
+          as chaves sem impactar todos os jobs que as usam; e o CloudTrail não diferencia ações feitas por jobs
+          diferentes usando a mesma chave.
+        </p>
+        <p>
+          <strong>Tipos de Roles mais usados em dados:</strong>
+        </p>
+        <ul>
+          <li><strong>Service Role:</strong> assumida por um serviço AWS (Glue, Lambda, EMR, Step Functions).</li>
+          <li><strong>Cross-Account Role:</strong> assumida por identidades de outra conta AWS. Usada em Data Mesh para compartilhar dados entre domínios.</li>
+          <li><strong>Service-Linked Role:</strong> role pré-configurada pela AWS para um serviço específico. Criada automaticamente quando você habilita o serviço.</li>
+        </ul>
+
+        <h4>IAM Policies (Políticas)</h4>
+        <p>
+          Uma IAM Policy é um documento JSON que define formalmente o que é permitido ou negado. Toda decisão de
+          acesso na AWS é baseada na avaliação de uma ou mais políticas. Compreender a anatomia de uma política é
+          essencial:
+        </p>
+        <pre><code>{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowReadFromDataLakeGold",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::data-lake-refined-*",
+        "arn:aws:s3:::data-lake-refined-*/*"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "us-east-1"
+        }
+      }
+    }
+  ]
+}</code></pre>
+        <p>
+          <strong>Anatomia de cada campo:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>Version:</strong> versão da linguagem de políticas IAM. Sempre use <code>"2012-10-17"</code>
+            (a versão mais recente). A versão anterior (<code>"2008-10-17"</code>) não suporta variáveis de política.
+          </li>
+          <li>
+            <strong>Statement:</strong> array de declarações. Cada declaração é uma regra de acesso independente.
+            Uma política pode ter múltiplos statements.
+          </li>
+          <li>
+            <strong>Sid (Statement ID):</strong> identificador opcional e legível para humanos. Não afeta a avaliação,
+            mas facilita a auditoria e a documentação.
+          </li>
+          <li>
+            <strong>Effect:</strong> <code>"Allow"</code> ou <code>"Deny"</code>. Define se a declaração concede
+            ou nega acesso.
+          </li>
+          <li>
+            <strong>Principal:</strong> quem é afetado pela política. Usado em resource-based policies (como bucket
+            policies do S3). Em identity-based policies (atachadas a Users, Groups ou Roles), o Principal é
+            implicitamente a identidade à qual a política está atachada.
+          </li>
+          <li>
+            <strong>Action:</strong> lista de operações de API que a declaração cobre. Formato:
+            <code>serviço:OperaçãoDeAPI</code>. Exemplos: <code>s3:GetObject</code>, <code>glue:StartJobRun</code>,
+            <code>athena:StartQueryExecution</code>. O wildcard <code>*</code> significa "todas as ações".
+          </li>
+          <li>
+            <strong>Resource:</strong> ARN (Amazon Resource Name) do recurso ao qual a ação se aplica. O formato ARN é
+            <code>arn:aws:serviço:região:conta:recurso</code>. O wildcard <code>*</code> significa "todos os recursos".
+          </li>
+          <li>
+            <strong>Condition:</strong> condições opcionais que devem ser verdadeiras para a declaração se aplicar.
+            Exemplos: permitir acesso apenas de um determinado IP, apenas se o MFA estiver ativo, apenas em uma
+            determinada região, apenas em horário comercial.
+          </li>
+        </ul>
+
+        <p><strong>Tipos de políticas:</strong></p>
+        <ul>
+          <li>
+            <strong>Identity-based policies (políticas baseadas em identidade):</strong> atachadas a Users, Groups
+            ou Roles. Definem o que a identidade pode fazer.
+          </li>
+          <li>
+            <strong>Resource-based policies (políticas baseadas em recurso):</strong> atachadas diretamente a recursos
+            AWS (como bucket policies do S3 ou key policies do KMS). Definem quem pode acessar o recurso.
+          </li>
+          <li>
+            <strong>Permissions Boundaries (limites de permissão):</strong> definem o limite máximo de permissões que
+            uma identity-based policy pode conceder. Funcionam como um "teto": mesmo que a policy conceda
+            <code>AdministratorAccess</code>, se o permissions boundary permitir apenas <code>S3</code> e <code>Athena</code>,
+            apenas essas permissões serão efetivas.
+          </li>
+          <li>
+            <strong>SCPs (Service Control Policies):</strong> usadas no AWS Organizations para definir o limite máximo
+            de permissões para toda a organização ou para OUs (Organizational Units) específicas.
+          </li>
+          <li>
+            <strong>Session policies:</strong> políticas passadas no momento de assumir uma role, limitando ainda mais
+            as permissões da sessão.
+          </li>
+        </ul>
+
+        <h4>Lógica de avaliação de políticas</h4>
+        <p>
+          A avaliação de políticas IAM segue uma lógica precisa que todo profissional de dados deve dominar:
+        </p>
+        <ol>
+          <li><strong>Deny explícito?</strong> Se qualquer política aplicável contém um <code>"Effect": "Deny"</code>
+            que se aplica à ação e ao recurso, o acesso é <strong>negado</strong>. Um Deny explícito sempre prevalece
+            sobre qualquer Allow. Não há como "sobrescrever" um Deny.</li>
+          <li><strong>Allow explícito?</strong> Se alguma política aplicável contém um <code>"Effect": "Allow"</code>
+            que se aplica à ação e ao recurso (e todas as condições são satisfeitas), o acesso é <strong>concedido</strong>.</li>
+          <li><strong>Nem Deny nem Allow?</strong> Se nenhuma política se pronuncia sobre a ação e o recurso,
+            o acesso é <strong>negado por padrão</strong> (implicit deny).</li>
+        </ol>
+        <p>
+          <strong>Resumo:</strong> Deny explícito > Allow explícito > Deny implícito (padrão).
+        </p>
+        <div class="tip">
+          <strong>Dica prática:</strong> na dúvida, lembre-se de que na AWS tudo é negado por padrão. Você precisa
+          explicitamente conceder acesso. E se alguém explicitamente negar, essa negação prevalece sobre tudo.
+        </div>
+      </section>
+
+      <!-- PRINCÍPIO DO MENOR PRIVILÉGIO -->
+      <section class="content-block">
+        <h3>Princípio do Menor Privilégio</h3>
+        <p>
+          O Princípio do Menor Privilégio (<em>Principle of Least Privilege</em>) é a pedra angular da segurança em cloud:
+          <strong>conceda a cada identidade apenas as permissões estritamente necessárias para que ela realize sua
+          função, e nada além disso</strong>. Se um job do Glue precisa ler de um bucket S3 específico e gravar logs
+          no CloudWatch, a role desse job deve ter permissão apenas para essas duas operações, nesses recursos específicos.
+        </p>
+
+        <h4>Estratégias de implementação</h4>
+        <ul>
+          <li>
+            <strong>Comece com zero permissões:</strong> crie a identidade (user ou role) sem nenhuma política.
+            Adicione permissões incrementalmente conforme a necessidade for documentada e validada.
+          </li>
+          <li>
+            <strong>Use AWS managed policies como ponto de partida, depois refine:</strong> políticas gerenciadas
+            pela AWS (como <code>AmazonS3ReadOnlyAccess</code>) são um bom começo para prototipação e aprendizado,
+            mas em produção devem ser substituídas por políticas customizadas com escopo mais restrito
+            (por exemplo, leitura apenas em buckets específicos, não em todos).
+          </li>
+          <li>
+            <strong>Especifique recursos explicitamente:</strong> em vez de <code>"Resource": "*"</code>
+            (todos os recursos), use ARNs específicos: <code>"Resource": "arn:aws:s3:::meu-data-lake-gold/*"</code>.
+          </li>
+          <li>
+            <strong>Especifique ações explicitamente:</strong> em vez de <code>"Action": "s3:*"</code>
+            (todas as ações S3), liste apenas as necessárias: <code>"Action": ["s3:GetObject", "s3:ListBucket"]</code>.
+          </li>
+          <li>
+            <strong>Use condições:</strong> restrinja acesso por região (<code>aws:RequestedRegion</code>),
+            IP (<code>aws:SourceIp</code>), MFA (<code>aws:MultiFactorAuthPresent</code>), ou horário.
+          </li>
+        </ul>
+
+        <h4>IAM Access Analyzer</h4>
+        <p>
+          O AWS IAM Access Analyzer é uma ferramenta que ajuda a identificar permissões excessivas. Ele analisa
+          políticas atachadas a identidades e identifica ações e recursos que a identidade tem permissão para
+          acessar mas que nunca foram efetivamente utilizados (com base nos logs do CloudTrail). Isso permite
+          refinar políticas removendo permissões que foram concedidas mas nunca usadas.
+        </p>
+        <p>
+          O Access Analyzer também identifica recursos compartilhados externamente (como buckets S3 acessíveis
+          por outras contas) e gera políticas de menor privilégio automaticamente com base no uso observado.
+        </p>
+
+        <h4>Permission Boundaries como guardrails</h4>
+        <p>
+          Em ambientes onde múltiplas equipes criam suas próprias roles e políticas (como em um Data Mesh),
+          Permission Boundaries são essenciais como guardrails. Eles definem o limite máximo de permissões
+          que qualquer role criada por uma equipe pode ter, mesmo que a equipe atache uma política com
+          <code>AdministratorAccess</code>.
+        </p>
+        <p>
+          Exemplo: um permission boundary que permite apenas acesso a S3, Glue, Athena e CloudWatch garante
+          que nenhuma role criada pela equipe de dados possa, acidentalmente ou deliberadamente, acessar
+          serviços fora do escopo do time (como IAM, EC2 ou Lambda).
+        </p>
+
+        <h4>Anti-padrões comuns (o que NÃO fazer)</h4>
+        <ul>
+          <li>
+            <strong>Wildcards em tudo:</strong> <code>"Action": "*", "Resource": "*"</code> é equivalente a
+            <code>AdministratorAccess</code>. Nunca use em roles de serviço ou em políticas de equipe.
+          </li>
+          <li>
+            <strong>Admin para todos:</strong> atribuir <code>AdministratorAccess</code> a todos os membros
+            da equipe "para facilitar" é o caminho mais curto para um incidente de segurança.
+          </li>
+          <li>
+            <strong>Credenciais compartilhadas:</strong> usar a mesma access key para múltiplas pessoas ou
+            serviços impede auditoria individual e aumenta o raio de impacto se a chave vazar.
+          </li>
+          <li>
+            <strong>Credenciais no código:</strong> access keys hardcoded em scripts Python, notebooks Jupyter
+            ou repositórios Git são um dos vetores de ataque mais explorados.
+          </li>
+          <li>
+            <strong>Não revisar permissões:</strong> permissões concedidas temporariamente ("só para testar")
+            que nunca são revogadas acumulam-se ao longo do tempo, criando um ambiente cada vez mais permissivo.
+          </li>
+        </ul>
+      </section>
+
+      <!-- MAPEANDO PERFIS DE ACESSO PARA O DATA LAKE -->
+      <section class="content-block">
+        <h3>Mapeando Perfis de Acesso para o Data Lake</h3>
+        <p>
+          Antes de criar qualquer recurso de IAM, é essencial mapear quais perfis existem na equipe de dados
+          e quais permissões cada um precisa. Esse exercício previne retrabalho, evita concessão excessiva de
+          permissões e garante que o modelo de segurança seja coerente com o modelo organizacional.
+        </p>
+
+        <h4>Data Engineer (Engenheiro de Dados)</h4>
+        <p>
+          O engenheiro de dados constrói, opera e mantém os pipelines de ingestão, transformação e disponibilização
+          de dados. Suas permissões devem refletir a necessidade de acesso completo às ferramentas de pipeline,
+          mas sem acesso à administração da plataforma (IAM, billing, redes).
+        </p>
+        <ul>
+          <li><strong>S3:</strong> leitura e escrita em todas as camadas (Raw, Trusted, Refined). Precisa ingerir dados no Raw, transformar e gravar no Trusted, e materializar no Refined.</li>
+          <li><strong>AWS Glue:</strong> criar e executar crawlers (para descoberta de schema), criar e executar jobs ETL, gerenciar o catálogo de metadados.</li>
+          <li><strong>Kinesis:</strong> criar e gerenciar streams e firehoses para ingestão em tempo real.</li>
+          <li><strong>Step Functions:</strong> criar e executar state machines para orquestração de pipelines.</li>
+          <li><strong>CloudWatch:</strong> visualizar logs de execução de jobs, criar métricas customizadas e alarmes.</li>
+          <li><strong>Lambda:</strong> criar e executar funções serverless usadas como componentes de pipelines.</li>
+          <li><strong>EMR:</strong> criar e gerenciar clusters Spark para processamento em larga escala.</li>
+          <li><strong>IAM:</strong> <strong>sem permissão</strong>. A administração de acessos é responsabilidade do DataAdmin.</li>
+        </ul>
+
+        <h4>Data Scientist (Cientista de Dados)</h4>
+        <p>
+          O cientista de dados explora dados, treina modelos de machine learning e gera insights. Precisa de acesso
+          de leitura a dados limpos e prontos, e de ferramentas de experimentação, mas não deve modificar os
+          pipelines de produção.
+        </p>
+        <ul>
+          <li><strong>S3:</strong> somente leitura nas camadas Trusted (Silver) e Refined (Gold). Não deve acessar a camada Raw (dados brutos não confiáveis) nem gravar em nenhuma camada.</li>
+          <li><strong>Athena:</strong> executar queries SQL para exploração de dados.</li>
+          <li><strong>Glue Data Catalog:</strong> leitura do catálogo para descobrir datasets disponíveis.</li>
+          <li><strong>SageMaker:</strong> criar e executar notebooks, training jobs e endpoints de inferência.</li>
+          <li><strong>ECR (Elastic Container Registry):</strong> leitura para acessar imagens Docker de modelos.</li>
+        </ul>
+
+        <h4>BI Analyst (Analista de BI)</h4>
+        <p>
+          O analista de BI consome dados prontos para gerar relatórios, dashboards e análises de negócio.
+          Suas permissões devem ser as mais restritivas: apenas leitura em dados refinados.
+        </p>
+        <ul>
+          <li><strong>Athena:</strong> executar queries SQL (somente leitura, sem DDL).</li>
+          <li><strong>Redshift:</strong> conexão somente leitura em schemas de reporting.</li>
+          <li><strong>QuickSight:</strong> acesso a dashboards publicados e criação de análises.</li>
+          <li><strong>S3:</strong> somente leitura na camada Refined (Gold). Sem acesso a Raw ou Trusted.</li>
+        </ul>
+
+        <h4>Data Admin (Administrador de Dados)</h4>
+        <p>
+          O administrador gerencia a plataforma de dados: controle de acessos, governance, monitoramento e custos.
+        </p>
+        <ul>
+          <li><strong>IAM:</strong> gerenciamento completo de users, groups, roles e policies.</li>
+          <li><strong>Lake Formation:</strong> configuração de acesso fine-grained ao Data Lake.</li>
+          <li><strong>CloudTrail:</strong> auditoria de todas as chamadas de API na conta.</li>
+          <li><strong>CloudWatch:</strong> visualização de logs, métricas e alarmes de todos os serviços.</li>
+          <li><strong>AWS Config:</strong> monitoramento de conformidade de recursos.</li>
+          <li><strong>Billing:</strong> leitura de custos e uso para FinOps.</li>
+        </ul>
+
+        <h4>Service Roles (Roles para Serviços AWS)</h4>
+        <table>
+          <thead>
+            <tr>
+              <th>Role</th>
+              <th>Trusted Entity</th>
+              <th>Políticas necessárias</th>
+              <th>Uso</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>GlueJobRole</td>
+              <td>glue.amazonaws.com</td>
+              <td>S3 (leitura/escrita nos buckets do lake), AWSGlueServiceRole, CloudWatch Logs</td>
+              <td>Assumida por crawlers e jobs ETL do Glue</td>
+            </tr>
+            <tr>
+              <td>LambdaExecutionRole</td>
+              <td>lambda.amazonaws.com</td>
+              <td>S3 (leitura), DynamoDB (leitura), CloudWatch Logs</td>
+              <td>Assumida por funções Lambda de ingestão e transformação leve</td>
+            </tr>
+            <tr>
+              <td>StepFunctionsRole</td>
+              <td>states.amazonaws.com</td>
+              <td>Lambda (invocar), Glue (iniciar jobs), CloudWatch (logs e métricas)</td>
+              <td>Assumida por state machines que orquestram pipelines</td>
+            </tr>
+            <tr>
+              <td>KinesisFirehoseRole</td>
+              <td>firehose.amazonaws.com</td>
+              <td>S3 (escrita no bucket Raw), CloudWatch Logs</td>
+              <td>Assumida pelo Firehose para entregar dados de streaming ao S3</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h4>Matriz de permissões consolidada</h4>
+        <table>
+          <thead>
+            <tr>
+              <th>Serviço / Recurso</th>
+              <th>Data Engineer</th>
+              <th>Data Scientist</th>
+              <th>BI Analyst</th>
+              <th>Data Admin</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>S3 Raw (Bronze)</td>
+              <td>Leitura + Escrita</td>
+              <td>Sem acesso</td>
+              <td>Sem acesso</td>
+              <td>Leitura</td>
+            </tr>
+            <tr>
+              <td>S3 Trusted (Silver)</td>
+              <td>Leitura + Escrita</td>
+              <td>Leitura</td>
+              <td>Sem acesso</td>
+              <td>Leitura</td>
+            </tr>
+            <tr>
+              <td>S3 Refined (Gold)</td>
+              <td>Leitura + Escrita</td>
+              <td>Leitura</td>
+              <td>Leitura</td>
+              <td>Leitura</td>
+            </tr>
+            <tr>
+              <td>AWS Glue (Jobs/Crawlers)</td>
+              <td>Completo</td>
+              <td>Sem acesso</td>
+              <td>Sem acesso</td>
+              <td>Leitura</td>
+            </tr>
+            <tr>
+              <td>Glue Data Catalog</td>
+              <td>Completo</td>
+              <td>Leitura</td>
+              <td>Leitura</td>
+              <td>Completo</td>
+            </tr>
+            <tr>
+              <td>Amazon Athena</td>
+              <td>Completo</td>
+              <td>Completo</td>
+              <td>Leitura (queries)</td>
+              <td>Leitura</td>
+            </tr>
+            <tr>
+              <td>Amazon Redshift</td>
+              <td>Leitura + Escrita</td>
+              <td>Leitura</td>
+              <td>Leitura</td>
+              <td>Administração</td>
+            </tr>
+            <tr>
+              <td>Kinesis</td>
+              <td>Completo</td>
+              <td>Sem acesso</td>
+              <td>Sem acesso</td>
+              <td>Leitura</td>
+            </tr>
+            <tr>
+              <td>IAM</td>
+              <td>Sem acesso</td>
+              <td>Sem acesso</td>
+              <td>Sem acesso</td>
+              <td>Completo</td>
+            </tr>
+            <tr>
+              <td>CloudWatch</td>
+              <td>Leitura + Escrita</td>
+              <td>Leitura</td>
+              <td>Sem acesso</td>
+              <td>Completo</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ============================================================
+           MÓDULO 3 — LABORATÓRIO PRÁTICO
+      ============================================================= -->
+      <section class="content-block">
+        <h2>Módulo 3 &mdash; Laboratório Prático</h2>
+        <p>
+          A parte prática desta aula ocorre das <strong>20h00 às 22h00</strong> (2 horas) utilizando o ambiente
+          <strong>AWS Student</strong>. Cada passo a seguir contém instruções detalhadas e um critério de validação.
+          <strong>Não avance para o próximo passo sem confirmar que o passo anterior funcionou corretamente.</strong>
+          Se encontrar problemas, releia as instruções e verifique cada detalhe antes de pedir ajuda.
+        </p>
+        <div class="warning">
+          <strong>Atenção:</strong> o ambiente AWS Student tem limitações. Nem todos os serviços e operações estão
+          disponíveis. Se alguma operação for bloqueada, anote a mensagem de erro e siga para o próximo passo.
+          O aprendizado conceitual é tão importante quanto a execução técnica.
+        </div>
+
+        <!-- PASSO 1 -->
+        <h3>Passo 1 &mdash; Acessar o AWS Student (15 min)</h3>
+        <ol>
+          <li>
+            Acesse o portal da sua instituição (Mackenzie) e localize o link para o <strong>AWS Academy</strong>
+            ou <strong>AWS Student Lab</strong>.
+          </li>
+          <li>
+            Faça login com suas credenciais institucionais.
+          </li>
+          <li>
+            Localize o laboratório da disciplina e clique em <strong>"Start Lab"</strong>. Aguarde até que o
+            indicador de status mude de vermelho para <strong>verde</strong> (isso pode levar 1-2 minutos).
+          </li>
+          <li>
+            Quando o status estiver verde, clique no link <strong>"AWS"</strong> (geralmente no canto superior
+            esquerdo do painel do lab) para abrir o AWS Management Console em uma nova aba.
+          </li>
+          <li>
+            No console AWS, verifique no <strong>canto superior direito</strong> que a região selecionada é
+            <strong>us-east-1 (N. Virginia)</strong>. Se estiver em outra região, clique no nome da região e
+            selecione "US East (N. Virginia) us-east-1".
+          </li>
+          <li>
+            Na barra de busca no topo do console, digite <kbd>IAM</kbd> e clique em <strong>IAM</strong>
+            (o serviço de Identity and Access Management).
+          </li>
+          <li>
+            No IAM Dashboard, observe:
             <ul>
-              <li>Status do MFA na conta root (no lab gerenciado pela AWS Academy, isso já está configurado).</li>
-              <li>Número de usuários, grupos, roles e políticas existentes.</li>
+              <li>O número de usuários, grupos, roles e políticas existentes na conta do lab.</li>
+              <li>O status de segurança (Security recommendations).</li>
+              <li>O Account ID exibido no topo da página.</li>
             </ul>
           </li>
-          <li>No menu lateral, clique em <strong>Users</strong>. Anote os usuários pré-existentes, se houver.</li>
-          <li><strong>Validação:</strong> você consegue navegar pelo IAM sem erros de permissão.</li>
+          <li>
+            No menu lateral esquerdo, clique em <strong>Users</strong>. Anote quais usuários já existem
+            (o lab pode ter usuários pré-criados). Clique em <strong>Roles</strong> e observe quantas roles
+            já existem (o lab cria roles de serviço automaticamente). Clique em <strong>Policies</strong>
+            e observe a lista de políticas gerenciadas pela AWS.
+          </li>
         </ol>
+        <div class="tip">
+          <strong>Validação do Passo 1:</strong> você deve estar no console AWS com região us-east-1, dentro do
+          serviço IAM, conseguindo navegar pelo Dashboard, Users, Roles e Policies sem erros de permissão.
+        </div>
 
-        <h3>Passo 3 — Criar grupo DataEngineers</h3>
+        <!-- PASSO 2 -->
+        <h3>Passo 2 &mdash; Criar Grupos IAM (20 min)</h3>
+        <p>
+          Vamos criar dois grupos que representam perfis diferentes de acesso em uma equipe de dados.
+        </p>
+
+        <p><strong>Grupo 1: DataEngineers</strong></p>
         <ol>
           <li>No menu lateral do IAM, clique em <strong>User groups</strong>.</li>
           <li>Clique em <strong>Create group</strong>.</li>
-          <li>No campo "User group name", insira: <code>DataEngineers</code>.</li>
-          <li>Na seção "Attach permissions policies", busque e selecione:
+          <li>No campo "User group name", insira: <code>DataEngineers</code></li>
+          <li>
+            Na seção "Attach permissions policies", use o campo de busca para encontrar e selecionar
+            as seguintes políticas (marque o checkbox de cada uma):
             <ul>
-              <li><code>AmazonS3FullAccess</code></li>
-              <li><code>AWSGlueConsoleFullAccess</code></li>
-              <li><code>CloudWatchLogsFullAccess</code></li>
+              <li><code>AmazonS3FullAccess</code> &mdash; acesso completo ao S3 (leitura, escrita, gerenciamento de buckets)</li>
+              <li><code>AWSGlueConsoleFullAccess</code> &mdash; acesso completo ao Glue via console (crawlers, jobs, catálogo)</li>
+              <li><code>CloudWatchLogsFullAccess</code> &mdash; acesso completo a logs do CloudWatch (ler, escrever, criar log groups)</li>
+            </ul>
+          </li>
+          <li>Revise as seleções e clique em <strong>Create group</strong>.</li>
+        </ol>
+        <p>
+          <strong>Por que estas políticas?</strong> O engenheiro de dados precisa de acesso completo ao S3 para
+          gerenciar as camadas do Data Lake, ao Glue para criar e executar pipelines ETL, e ao CloudWatch Logs
+          para monitorar a execução dos jobs. Em um ambiente de produção, refinaríamos estas políticas para escopo
+          mais restrito (buckets específicos, log groups específicos), mas para o lab, as managed policies da AWS
+          são adequadas para aprendizado.
+        </p>
+
+        <p><strong>Grupo 2: DataAnalysts</strong></p>
+        <ol>
+          <li>Ainda em <strong>User groups</strong>, clique novamente em <strong>Create group</strong>.</li>
+          <li>No campo "User group name", insira: <code>DataAnalysts</code></li>
+          <li>
+            Busque e selecione as seguintes políticas:
+            <ul>
+              <li><code>AmazonAthenaFullAccess</code> &mdash; acesso completo ao Athena (executar queries, gerenciar workgroups)</li>
+              <li><code>AmazonS3ReadOnlyAccess</code> &mdash; somente leitura no S3 (listar buckets, ler objetos, sem escrita)</li>
             </ul>
           </li>
           <li>Clique em <strong>Create group</strong>.</li>
-          <li><strong>Validação:</strong> o grupo DataEngineers aparece na lista com 3 políticas associadas.</li>
         </ol>
+        <p>
+          <strong>Por que estas políticas?</strong> O analista de BI precisa consultar dados via Athena e ler
+          objetos no S3, mas nunca deve poder modificar dados no Data Lake. A política <code>AmazonS3ReadOnlyAccess</code>
+          garante que o analista pode ler de qualquer bucket, mas não pode escrever nem deletar.
+        </p>
+        <div class="tip">
+          <strong>Validação do Passo 2:</strong> na tela de User groups, você deve ver os dois grupos
+          (DataEngineers com 3 políticas e DataAnalysts com 2 políticas). Clique em cada grupo para confirmar
+          que as políticas estão listadas na aba "Permissions".
+        </div>
 
-        <h3>Passo 4 — Criar usuário IAM</h3>
+        <!-- PASSO 3 -->
+        <h3>Passo 3 &mdash; Criar Usuários IAM (15 min)</h3>
+
+        <p><strong>Usuário 1: engenheiro-dados-lab</strong></p>
         <ol>
           <li>No menu lateral, clique em <strong>Users</strong> e depois em <strong>Create user</strong>.</li>
-          <li>Nome do usuário: <code>engenheiro-dados-lab</code>.</li>
+          <li>No campo "User name", insira: <code>engenheiro-dados-lab</code></li>
           <li>Marque a opção <strong>"Provide user access to the AWS Management Console"</strong>.</li>
-          <li>Selecione <strong>"I want to create an IAM user"</strong>.</li>
-          <li>Escolha uma senha e marque a opção de troca obrigatória no primeiro login.</li>
+          <li>Selecione <strong>"I want to create an IAM user"</strong> (não use Identity Center neste lab).</li>
+          <li>Em "Console password", selecione <strong>"Custom password"</strong> e insira uma senha
+            que você vai lembrar (ex.: <code>LabSenha2026!</code>). Marque a opção
+            <strong>"User must create a new password at next sign-in"</strong>.</li>
           <li>Clique em <strong>Next</strong>.</li>
-          <li>Em "Set permissions", selecione <strong>"Add user to group"</strong> e marque o grupo <code>DataEngineers</code>.</li>
+          <li>Em "Set permissions", selecione <strong>"Add user to group"</strong>.</li>
+          <li>Marque o grupo <strong>DataEngineers</strong>.</li>
           <li>Clique em <strong>Next</strong> e depois em <strong>Create user</strong>.</li>
-          <li>Na tela de confirmação, anote o link de login e a senha temporária.</li>
-          <li><strong>Validação:</strong> o usuário aparece na lista com status "Active".</li>
+          <li>
+            Na tela de confirmação, <strong>anote</strong>:
+            <ul>
+              <li>O Console sign-in URL (algo como <code>https://123456789012.signin.aws.amazon.com/console</code>).</li>
+              <li>O nome do usuário e a senha temporária.</li>
+            </ul>
+          </li>
+          <li>Clique em <strong>Return to users list</strong>.</li>
         </ol>
 
-        <h3>Passo 5 — Criar a Role GlueJobRole</h3>
+        <p><strong>Usuário 2: analista-bi-lab</strong></p>
+        <ol>
+          <li>Clique novamente em <strong>Create user</strong>.</li>
+          <li>Nome: <code>analista-bi-lab</code></li>
+          <li>Habilite acesso ao console com senha customizada, da mesma forma que o usuário anterior.</li>
+          <li>Em "Set permissions", adicione ao grupo <strong>DataAnalysts</strong>.</li>
+          <li>Finalize a criação e anote as credenciais.</li>
+        </ol>
+        <div class="tip">
+          <strong>Validação do Passo 3:</strong> na lista de Users, ambos os usuários devem aparecer com status
+          "Enabled". Clique em <code>engenheiro-dados-lab</code> e verifique: na aba "Groups", o grupo
+          DataEngineers deve estar listado. Clique em <code>analista-bi-lab</code> e verifique que pertence
+          ao grupo DataAnalysts.
+        </div>
+
+        <!-- PASSO 4 -->
+        <h3>Passo 4 &mdash; Criar Roles para Serviços (20 min)</h3>
+
+        <p><strong>Role 1: GlueJobRole</strong></p>
         <ol>
           <li>No menu lateral do IAM, clique em <strong>Roles</strong> e depois em <strong>Create role</strong>.</li>
           <li>Em "Trusted entity type", selecione <strong>"AWS service"</strong>.</li>
-          <li>Em "Use case", escolha <strong>"Glue"</strong> na lista de serviços.</li>
+          <li>Em "Use case", na lista de serviços, selecione <strong>"Glue"</strong>.</li>
           <li>Clique em <strong>Next</strong>.</li>
-          <li>Busque e selecione as seguintes políticas:
+          <li>
+            Na tela "Add permissions", busque e selecione as seguintes políticas:
             <ul>
               <li><code>AmazonS3FullAccess</code></li>
               <li><code>AWSGlueServiceRole</code></li>
@@ -440,64 +1688,418 @@
             </ul>
           </li>
           <li>Clique em <strong>Next</strong>.</li>
-          <li>No campo "Role name", insira: <code>GlueJobRole</code>.</li>
-          <li>Revise o resumo e clique em <strong>Create role</strong>.</li>
-          <li><strong>Validação:</strong> a role GlueJobRole aparece na lista. Clique nela e confirme que as 3 políticas estão listadas na aba "Permissions".</li>
+          <li>No campo "Role name", insira: <code>GlueJobRole</code></li>
+          <li>Em "Description", insira: <code>Role para jobs ETL do AWS Glue - acesso a S3, Glue e CloudWatch Logs</code></li>
+          <li>Revise o resumo (Trusted entities deve mostrar "glue.amazonaws.com") e clique em <strong>Create role</strong>.</li>
+        </ol>
+        <p>
+          <strong>O que acabamos de fazer?</strong> Criamos uma role que o serviço AWS Glue pode assumir.
+          A Trust Policy (criada automaticamente ao selecionar "Glue" como trusted entity) contém:
+        </p>
+        <pre><code>{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "glue.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}</code></pre>
+        <p>
+          Isso significa: "o serviço AWS Glue tem permissão para chamar <code>sts:AssumeRole</code> nesta role".
+          Quando um job do Glue é executado e configurado com esta role, o Glue chama o STS, recebe credenciais
+          temporárias com as permissões da role (S3, Glue, CloudWatch) e usa essas credenciais durante a execução.
+        </p>
+
+        <p><strong>Role 2: LambdaExecutionRole</strong></p>
+        <ol>
+          <li>Clique novamente em <strong>Create role</strong>.</li>
+          <li>Trusted entity type: <strong>"AWS service"</strong>.</li>
+          <li>Use case: selecione <strong>"Lambda"</strong>.</li>
+          <li>Clique em <strong>Next</strong>.</li>
+          <li>
+            Busque e selecione:
+            <ul>
+              <li><code>AmazonS3ReadOnlyAccess</code></li>
+              <li><code>AmazonDynamoDBReadOnlyAccess</code></li>
+              <li><code>CloudWatchLogsFullAccess</code></li>
+            </ul>
+          </li>
+          <li>Clique em <strong>Next</strong>.</li>
+          <li>Role name: <code>LambdaExecutionRole</code></li>
+          <li>Description: <code>Role para funcoes Lambda - leitura em S3 e DynamoDB, escrita em CloudWatch Logs</code></li>
+          <li>Clique em <strong>Create role</strong>.</li>
+        </ol>
+        <p>
+          <strong>Diferença de escopo:</strong> note que a GlueJobRole tem <code>AmazonS3FullAccess</code>
+          (leitura e escrita, porque o Glue precisa gravar resultados de transformação), enquanto a
+          LambdaExecutionRole tem apenas <code>AmazonS3ReadOnlyAccess</code> (porque, neste cenário, a Lambda
+          apenas lê dados para processamento leve, sem gravar no S3).
+        </p>
+        <div class="tip">
+          <strong>Validação do Passo 4:</strong> na lista de Roles, ambas as roles devem ser visíveis. Clique
+          em <strong>GlueJobRole</strong>: na aba "Trust relationships", confirme que o serviço confiável é
+          <code>glue.amazonaws.com</code>; na aba "Permissions", confirme 3 políticas. Repita para
+          <strong>LambdaExecutionRole</strong>: serviço confiável <code>lambda.amazonaws.com</code>, 3 políticas.
+        </div>
+
+        <!-- PASSO 5 -->
+        <h3>Passo 5 &mdash; Escrever Política IAM Customizada (20 min)</h3>
+        <p>
+          Até agora, usamos apenas políticas gerenciadas pela AWS (managed policies). Agora vamos criar uma
+          política customizada que implementa o princípio do menor privilégio para o cenário de um analista
+          que deve ler dados refinados do Data Lake mas nunca pode modificá-los.
+        </p>
+        <ol>
+          <li>No menu lateral do IAM, clique em <strong>Policies</strong> e depois em <strong>Create policy</strong>.</li>
+          <li>Alterne para a aba <strong>"JSON"</strong> (não use o editor visual neste exercício &mdash; é fundamental
+            saber escrever políticas JSON diretamente).</li>
+          <li>
+            Apague o conteúdo padrão e cole a seguinte política:
+          </li>
+        </ol>
+        <pre><code>{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowReadGoldLayer",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Resource": "arn:aws:s3:::data-lake-refined-*/*"
+    },
+    {
+      "Sid": "AllowListGoldBuckets",
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListBucket"
+      ],
+      "Resource": "arn:aws:s3:::data-lake-refined-*"
+    },
+    {
+      "Sid": "AllowAthenaQueries",
+      "Effect": "Allow",
+      "Action": [
+        "athena:StartQueryExecution",
+        "athena:GetQueryResults",
+        "athena:GetQueryExecution"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "DenyWriteAndDelete",
+      "Effect": "Deny",
+      "Action": [
+        "s3:PutObject",
+        "s3:DeleteObject"
+      ],
+      "Resource": "*"
+    }
+  ]
+}</code></pre>
+        <ol start="4">
+          <li>Clique em <strong>Next</strong>.</li>
+          <li>No campo "Policy name", insira: <code>DataLakeGoldReadOnly</code></li>
+          <li>No campo "Description", insira: <code>Permite leitura na camada Gold do Data Lake e queries no Athena. Nega explicitamente escrita e exclusao no S3.</code></li>
+          <li>Clique em <strong>Create policy</strong>.</li>
+        </ol>
+        <p>
+          <strong>Análise da política criada:</strong>
+        </p>
+        <ul>
+          <li>
+            <strong>Statement 1 (AllowReadGoldLayer):</strong> permite <code>s3:GetObject</code> apenas em objetos
+            dentro de buckets cujo nome começa com <code>data-lake-refined-</code>. O wildcard <code>*</code> no final
+            do ARN significa "qualquer objeto dentro desses buckets".
+          </li>
+          <li>
+            <strong>Statement 2 (AllowListGoldBuckets):</strong> permite <code>s3:ListBucket</code> para listar o
+            conteúdo dos buckets Gold. Sem esta permissão, o analista poderia ler objetos individuais (se soubesse o caminho),
+            mas não poderia listar quais objetos existem.
+          </li>
+          <li>
+            <strong>Statement 3 (AllowAthenaQueries):</strong> permite executar queries no Athena, verificar o status
+            de execução e recuperar os resultados. O <code>"Resource": "*"</code> aqui é aceitável porque o acesso aos
+            dados subjacentes é controlado pelas permissões S3.
+          </li>
+          <li>
+            <strong>Statement 4 (DenyWriteAndDelete):</strong> nega explicitamente <code>s3:PutObject</code> e
+            <code>s3:DeleteObject</code> em qualquer recurso. Este Deny explícito garante que, mesmo se outra política
+            conceder permissão de escrita (por exemplo, uma managed policy atachada ao grupo), a escrita será negada.
+            Lembre-se: Deny explícito sempre prevalece.
+          </li>
+        </ul>
+
+        <p><strong>Atachar a política ao grupo DataAnalysts:</strong></p>
+        <ol>
+          <li>Vá para <strong>User groups</strong> e clique no grupo <strong>DataAnalysts</strong>.</li>
+          <li>Clique na aba <strong>Permissions</strong>.</li>
+          <li>Clique em <strong>Add permissions</strong> &gt; <strong>Attach policies</strong>.</li>
+          <li>Busque por <code>DataLakeGoldReadOnly</code> e selecione-a.</li>
+          <li>Clique em <strong>Attach policies</strong>.</li>
+        </ol>
+        <div class="tip">
+          <strong>Validação do Passo 5:</strong> na lista de Policies, a política <code>DataLakeGoldReadOnly</code>
+          deve ser visível (tipo "Customer managed"). No grupo DataAnalysts, a aba Permissions deve agora listar
+          3 políticas: <code>AmazonAthenaFullAccess</code>, <code>AmazonS3ReadOnlyAccess</code> e
+          <code>DataLakeGoldReadOnly</code>.
+        </div>
+
+        <!-- PASSO 6 -->
+        <h3>Passo 6 &mdash; Validar com Policy Simulator (15 min)</h3>
+        <p>
+          O IAM Policy Simulator é uma ferramenta que permite testar as permissões efetivas de um usuário, grupo
+          ou role sem executar ações reais na conta. Vamos usá-lo para validar que nosso modelo de permissões
+          está correto.
+        </p>
+        <ol>
+          <li>
+            Abra o Policy Simulator. Você pode acessá-lo de duas formas:
+            <ul>
+              <li>No menu lateral do IAM, procure o link <strong>"Policy Simulator"</strong> no final da página.</li>
+              <li>Ou acesse diretamente: <code>https://policysim.aws.amazon.com/</code></li>
+            </ul>
+          </li>
         </ol>
 
-        <h3>Passo 6 — Verificar as permissões com o Policy Simulator</h3>
+        <p><strong>Teste 1: engenheiro-dados-lab</strong></p>
         <ol>
-          <li>No menu lateral do IAM, role até o final e clique em <strong>"Policy Simulator"</strong>.</li>
-          <li>Em "Users, Groups, and Roles", selecione o usuário <code>engenheiro-dados-lab</code>.</li>
-          <li>Em "Select service", escolha <strong>S3</strong>.</li>
-          <li>Em "Select actions", escolha <code>GetObject</code> e <code>PutObject</code>.</li>
-          <li>Clique em <strong>Run Simulation</strong>.</li>
-          <li><strong>Validação:</strong> ambas as ações devem retornar "Allowed".</li>
-          <li>Repita o teste escolhendo a ação <code>CreateUser</code> do serviço IAM. O resultado esperado é <strong>"Denied"</strong> — confirmando que o princípio do menor privilégio está sendo respeitado.</li>
+          <li>No painel esquerdo "Users, Groups, and Roles", expanda <strong>Users</strong> e selecione
+            <code>engenheiro-dados-lab</code>.</li>
+          <li>No painel direito, em "Policy Simulator", selecione o serviço <strong>Amazon S3</strong>.</li>
+          <li>Em "Select actions", selecione <code>GetObject</code>.</li>
+          <li>Clique em <strong>Run Simulation</strong>. Resultado esperado: <strong>allowed</strong>.</li>
+          <li>Limpe a seleção e selecione <code>PutObject</code>.</li>
+          <li>Run Simulation. Resultado esperado: <strong>allowed</strong> (engenheiro tem S3FullAccess).</li>
+          <li>Agora mude o serviço para <strong>IAM</strong> e selecione <code>CreateUser</code>.</li>
+          <li>Run Simulation. Resultado esperado: <strong>denied</strong> (engenheiro não tem permissão IAM).</li>
+        </ol>
+
+        <p><strong>Teste 2: analista-bi-lab</strong></p>
+        <ol>
+          <li>No painel esquerdo, selecione <code>analista-bi-lab</code>.</li>
+          <li>Serviço: <strong>Amazon S3</strong>. Ação: <code>GetObject</code>.</li>
+          <li>Run Simulation. Resultado esperado: <strong>allowed</strong> (analista tem S3ReadOnlyAccess).</li>
+          <li>Ação: <code>PutObject</code>.</li>
+          <li>Run Simulation. Resultado esperado: <strong>denied</strong> (a política DataLakeGoldReadOnly
+            tem Deny explícito para PutObject, e a S3ReadOnlyAccess não concede escrita).</li>
+          <li>Serviço: <strong>Amazon Athena</strong>. Ação: <code>StartQueryExecution</code>.</li>
+          <li>Run Simulation. Resultado esperado: <strong>allowed</strong>.</li>
+          <li>Serviço: <strong>IAM</strong>. Ação: <code>CreateUser</code>.</li>
+          <li>Run Simulation. Resultado esperado: <strong>denied</strong>.</li>
+        </ol>
+
+        <p><strong>O que estes resultados confirmam:</strong></p>
+        <ul>
+          <li>O engenheiro pode ler e escrever no S3 (necessário para pipelines), mas não pode criar usuários IAM (separação de responsabilidades).</li>
+          <li>O analista pode ler dados e executar queries no Athena (necessário para análise), mas não pode modificar dados no S3 (proteção da camada Gold).</li>
+          <li>Nenhum dos dois pode administrar IAM (responsabilidade exclusiva do DataAdmin).</li>
+          <li>O princípio do menor privilégio está sendo respeitado: cada perfil tem exatamente as permissões necessárias para sua função.</li>
+        </ul>
+        <div class="tip">
+          <strong>Validação do Passo 6:</strong> todos os 8 testes devem retornar os resultados esperados
+          (allowed ou denied conforme listado acima). Anote os resultados para referência futura.
+        </div>
+
+        <!-- PASSO 7 -->
+        <h3>Passo 7 &mdash; Criar Estrutura de Buckets S3 (15 min)</h3>
+        <p>
+          Agora vamos criar a estrutura física do Data Lake com três buckets S3, cada um representando uma
+          camada da arquitetura.
+        </p>
+        <ol>
+          <li>
+            Na barra de busca do console, digite <kbd>S3</kbd> e clique no serviço <strong>Amazon S3</strong>.
+          </li>
+          <li>Clique em <strong>Create bucket</strong>.</li>
+          <li>
+            Configure o primeiro bucket:
+            <ul>
+              <li><strong>Bucket name:</strong> <code>data-lake-raw-SUAS-INICIAIS</code> (substitua SUAS-INICIAIS
+                pelas suas iniciais em minúsculo, ex.: <code>data-lake-raw-jps</code>). Nomes de bucket são globalmente
+                únicos na AWS &mdash; se o nome já estiver em uso, adicione números.</li>
+              <li><strong>AWS Region:</strong> confirme que está <code>US East (N. Virginia) us-east-1</code>.</li>
+              <li><strong>Object Ownership:</strong> mantenha "ACLs disabled" (recomendado).</li>
+              <li><strong>Block Public Access:</strong> mantenha <strong>todas as 4 opções marcadas</strong>
+                (Block all public access). Confirme marcando "I acknowledge that the current settings might
+                result in this bucket and the objects within becoming not public."</li>
+              <li><strong>Bucket Versioning:</strong> selecione <strong>Enable</strong>.</li>
+              <li>Mantenha as demais opções com valores padrão.</li>
+            </ul>
+          </li>
+          <li>Clique em <strong>Create bucket</strong>.</li>
+          <li>
+            Repita o processo para criar mais dois buckets:
+            <ul>
+              <li><code>data-lake-trusted-SUAS-INICIAIS</code> (mesmas configurações)</li>
+              <li><code>data-lake-refined-SUAS-INICIAIS</code> (mesmas configurações)</li>
+            </ul>
+          </li>
+          <li>
+            <strong>Upload de arquivo de teste:</strong> clique no bucket <code>data-lake-raw-SUAS-INICIAIS</code>,
+            depois em <strong>Upload</strong>, depois em <strong>Add files</strong>. Selecione qualquer arquivo
+            pequeno do seu computador (um arquivo .txt ou .csv simples). Clique em <strong>Upload</strong>.
+          </li>
+          <li>
+            Após o upload, clique no nome do arquivo. Verifique que os detalhes incluem:
+            <ul>
+              <li>O tamanho do arquivo.</li>
+              <li>A data de upload.</li>
+              <li>A storage class (Standard).</li>
+              <li>Se o versioning está habilitado (aba "Versions" deve mostrar a versão do objeto).</li>
+            </ul>
+          </li>
+        </ol>
+        <p>
+          <strong>Por que estas configurações?</strong>
+        </p>
+        <ul>
+          <li><strong>Block Public Access:</strong> garante que nenhum objeto nestes buckets pode ser acessado publicamente, mesmo que alguém configure uma ACL ou bucket policy incorretamente.</li>
+          <li><strong>Versioning:</strong> mantém um histórico de todas as versões de cada objeto. Se um arquivo for acidentalmente sobrescrito ou deletado, a versão anterior pode ser recuperada. Essencial para dados Raw (fonte da verdade).</li>
+        </ul>
+        <div class="tip">
+          <strong>Validação do Passo 7:</strong> na lista de buckets S3, você deve ver 3 novos buckets
+          (raw, trusted, refined), todos com "Block Public Access" como "On" e "Versioning" como "Enabled".
+          O bucket raw deve conter o arquivo de teste que você fez upload.
+        </div>
+
+        <!-- PASSO 8 -->
+        <h3>Passo 8 &mdash; Desafio Extra (para quem finalizar antes)</h3>
+        <p>
+          Se você completou todos os passos anteriores e ainda tem tempo, tente os desafios abaixo.
+          Eles exploram conceitos avançados que serão aprofundados em aulas futuras.
+        </p>
+
+        <h4>Desafio A: Criar um Permission Boundary</h4>
+        <ol>
+          <li>Crie uma nova política customizada chamada <code>DataTeamBoundary</code> que permite apenas
+            ações nos serviços S3, Glue, Athena, CloudWatch e Lambda (negando tudo o mais).</li>
+          <li>Vá até o usuário <code>engenheiro-dados-lab</code>, aba "Permissions boundary".</li>
+          <li>Atache a política <code>DataTeamBoundary</code> como permissions boundary.</li>
+          <li>Observe: mesmo que o usuário tenha <code>AmazonS3FullAccess</code>, o permissions boundary
+            limita suas ações ao escopo definido. Teste no Policy Simulator.</li>
+        </ol>
+
+        <h4>Desafio B: Habilitar MFA no Usuário IAM</h4>
+        <ol>
+          <li>Vá até o usuário <code>engenheiro-dados-lab</code>, aba "Security credentials".</li>
+          <li>Na seção "Multi-factor authentication (MFA)", clique em <strong>Assign MFA device</strong>.</li>
+          <li>Selecione "Authenticator app" e siga as instruções para configurar com Google Authenticator ou Authy.</li>
+          <li>Nota: no ambiente AWS Student, esta operação pode não estar disponível. Se for bloqueada,
+            documente a mensagem de erro e avance.</li>
+        </ol>
+
+        <h4>Desafio C: Criar Resource-Based Policy no Bucket Raw</h4>
+        <ol>
+          <li>Vá ao S3, clique no bucket <code>data-lake-raw-SUAS-INICIAIS</code>.</li>
+          <li>Clique na aba <strong>Permissions</strong> e depois em <strong>Bucket policy</strong> &gt; <strong>Edit</strong>.</li>
+          <li>Escreva uma bucket policy que permita apenas a role <code>GlueJobRole</code> a fazer
+            <code>s3:PutObject</code> neste bucket. Isso garante que apenas jobs do Glue podem gravar no bucket Raw.</li>
+          <li>Salve e teste.</li>
+        </ol>
+
+        <h4>Desafio D: IAM Access Analyzer</h4>
+        <ol>
+          <li>No IAM, navegue até <strong>Access Analyzer</strong> no menu lateral.</li>
+          <li>Crie um novo analyzer para a conta.</li>
+          <li>Analise os findings (se houver): recursos compartilhados externamente, permissões excessivas.</li>
+          <li>Documente as recomendações que o Access Analyzer oferece.</li>
         </ol>
       </section>
 
-      <!-- =========================================================
+      <!-- ============================================================
            EXERCÍCIOS DE FIXAÇÃO
-      ========================================================== -->
+      ============================================================= -->
       <section class="content-block">
         <h2>Exercícios de fixação</h2>
+        <p>
+          Responda os exercícios abaixo por escrito. Eles cobrem os tópicos centrais desta aula e servem como
+          preparação para discussões em aulas futuras. Cada resposta deve ter, no mínimo, um parágrafo completo.
+        </p>
+
         <ol>
           <li>
-            <strong>Comparativo de arquiteturas:</strong> descreva um cenário de negócio real
-            (ex.: e-commerce, banco, plataforma de streaming) e justifique se a melhor
-            escolha inicial seria um Data Lake, um Data Warehouse ou uma combinação dos dois.
-            Explique o raciocínio considerando volume, variedade e velocidade dos dados.
+            <strong>Comparativo de arquiteturas:</strong> considere uma empresa de e-commerce que processa
+            50 milhões de eventos de clickstream por dia, armazena imagens de produtos, recebe dados de parceiros
+            em formatos variados (CSV, JSON, XML) e precisa gerar relatórios diários de vendas com latência
+            máxima de 10 segundos para executivos. Justifique detalhadamente qual arquitetura de dados você
+            escolheria (Data Lake, Data Warehouse, Lakehouse ou uma combinação) e por quê. Considere volume,
+            variedade, velocidade e requisitos de performance na sua resposta.
           </li>
           <li>
-            <strong>Design de política IAM:</strong> escreva (em português estruturado, não
-            necessariamente em JSON) uma política IAM para um cientista de dados que precisa:
-            ler arquivos Parquet de um bucket S3 específico chamado <code>meu-data-lake-gold</code>,
-            executar queries no Athena, mas não tem permissão para escrever no S3 nem para
-            acessar DynamoDB. Liste Effect, Action e Resource para cada permissão necessária.
+            <strong>Design de política IAM:</strong> escreva uma política IAM completa (em JSON) para um
+            cientista de dados que precisa: (a) ler arquivos Parquet de um bucket S3 chamado
+            <code>analytics-gold-prod</code>; (b) executar queries no Athena usando o workgroup
+            <code>data-science-wg</code>; (c) criar notebooks no SageMaker; mas (d) não pode escrever no S3,
+            (e) não pode acessar DynamoDB e (f) não pode administrar IAM. Inclua Deny explícitos onde apropriado
+            e justifique cada statement.
           </li>
           <li>
-            <strong>Diagnóstico de segurança:</strong> uma empresa tem a seguinte configuração:
-            todos os engenheiros de dados usam a mesma access key compartilhada, o bucket S3
-            com dados de produção está configurado como público para facilitar o acesso,
-            e não há nenhuma role configurada para os jobs do Glue. Liste pelo menos cinco
-            riscos concretos dessa configuração e proponha uma solução para cada um.
+            <strong>Diagnóstico de segurança:</strong> uma startup tem a seguinte configuração AWS: (a) todos os
+            10 engenheiros de dados compartilham a mesma access key; (b) o bucket S3 com dados de produção está
+            público para facilitar o acesso de um parceiro externo; (c) não há roles configuradas para serviços
+            (os jobs do Glue usam access keys hardcoded); (d) a conta root é usada diariamente sem MFA;
+            (e) não há CloudTrail habilitado. Liste pelo menos 6 riscos concretos dessa configuração e proponha
+            uma solução específica para cada um, citando o serviço ou funcionalidade AWS que resolve o problema.
           </li>
           <li>
-            <strong>Diferença entre usuário e role:</strong> explique com suas palavras por que
-            é uma má prática criar um usuário IAM e colocar suas credenciais dentro de um
-            job do AWS Glue, e por que usar uma role resolve esse problema do ponto de vista
-            de segurança e operação.
+            <strong>Usuário vs Role:</strong> um colega de equipe propõe criar um IAM User chamado
+            <code>glue-service-user</code> com access keys e configurar essas keys nas variáveis de ambiente
+            de todos os jobs do Glue. Explique detalhadamente por que essa abordagem é insegura e quais
+            problemas operacionais ela pode causar. Em seguida, descreva a solução correta usando IAM Roles,
+            explicando como funciona o mecanismo de assume role e credenciais temporárias.
           </li>
           <li>
-            <strong>Modelo de responsabilidade:</strong> um bucket S3 de uma empresa foi
-            acessado indevidamente e dados de clientes foram expostos. A empresa afirma que
-            a AWS deveria ter impedido o acesso. Com base no modelo de responsabilidade
-            compartilhada, quem é responsável por esse incidente e por quê?
+            <strong>Modelo de responsabilidade compartilhada:</strong> uma empresa armazenou dados sensíveis
+            de saúde de pacientes em um bucket S3. Um pesquisador de segurança encontrou esses dados acessíveis
+            publicamente pela internet e publicou um artigo sobre o vazamento. A empresa entrou em contato com
+            a AWS alegando que a AWS deveria ter impedido o acesso. Com base no Shared Responsibility Model,
+            analise: (a) quem é responsável por este incidente, (b) quais ferramentas AWS poderiam ter prevenido
+            o problema, e (c) quais ações regulatórias (LGPD, GDPR) podem ser aplicadas.
+          </li>
+          <li>
+            <strong>Avaliação de políticas:</strong> um usuário IAM pertence a dois grupos. O Grupo A tem uma
+            política que permite <code>s3:*</code> em <code>arn:aws:s3:::bucket-vendas/*</code>. O Grupo B tem
+            uma política que nega <code>s3:DeleteObject</code> em <code>arn:aws:s3:::*</code>. Além disso, o
+            usuário tem uma identity-based policy que permite <code>s3:PutObject</code> em
+            <code>arn:aws:s3:::bucket-marketing/*</code>. Determine, com justificativa, se as seguintes ações
+            serão permitidas ou negadas:
+            <ul>
+              <li><code>s3:GetObject</code> em <code>bucket-vendas</code></li>
+              <li><code>s3:DeleteObject</code> em <code>bucket-vendas</code></li>
+              <li><code>s3:PutObject</code> em <code>bucket-marketing</code></li>
+              <li><code>s3:DeleteObject</code> em <code>bucket-marketing</code></li>
+              <li><code>s3:GetObject</code> em <code>bucket-financeiro</code></li>
+            </ul>
+          </li>
+          <li>
+            <strong>Design de estrutura de grupos:</strong> uma empresa de médio porte tem a seguinte equipe de dados:
+            5 engenheiros de dados, 3 cientistas de dados, 4 analistas de BI, 2 engenheiros de ML,
+            1 arquiteto de dados, 2 administradores de plataforma, 3 engenheiros de software que produzem
+            dados (backend) e 10 usuários de negócio que consomem dashboards. Projete a estrutura completa
+            de IAM Groups para essa organização, especificando: nome de cada grupo, quais perfis pertencem
+            a cada grupo, e quais políticas (managed e/ou customizadas) cada grupo deve ter.
+            Justifique suas decisões.
+          </li>
+          <li>
+            <strong>Análise de custos CapEx vs OpEx:</strong> uma empresa precisa construir uma plataforma de
+            dados que processa 500 GB/dia em horário comercial (8h) e 50 GB/dia nos finais de semana.
+            O pico mensal de processamento acontece na primeira semana do mês (fechamento financeiro), quando
+            o volume chega a 2 TB/dia por 5 dias. Compare os custos aproximados e as implicações operacionais
+            de: (a) montar essa plataforma on-premises com servidores próprios e (b) usar serviços AWS
+            (S3, Glue, Athena). Considere utilização média de hardware, custos de equipe de operações,
+            tempo de provisionamento e capacidade de lidar com picos.
           </li>
         </ol>
       </section>
 
+      <!-- ============================================================
+           FOOTER
+      ============================================================= -->
       <footer class="actions">
         <a class="button" href="../slides/slide_aula_01_fundamentos_de_cloud_para_dados_e_governanca_de_acessos.html">Voltar ao slide</a>
         <a class="button" href="../../../index.html">Voltar ao índice</a>
