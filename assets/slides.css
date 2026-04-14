@@ -36,7 +36,8 @@ html, body {
   background: linear-gradient(180deg, #ffffff 0%, #f7f7f7 100%);
   color: var(--deck-text);
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  line-height: 1.5;
+  font-size: 20px;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -247,10 +248,10 @@ a:focus {
 
 .deck-kicker {
   display: inline-block;
-  padding: 8px 12px;
+  padding: 8px 14px;
   border: 2px solid var(--deck-border);
   border-radius: 6px;
-  font-size: 0.7em;
+  font-size: 0.8em;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -262,14 +263,16 @@ a:focus {
    -------------------------------------------------------------------------- */
 
 .deck-title {
-  margin: 14px 0 12px;
-  font-size: 1.9em;
-  line-height: 1.05;
+  margin: 14px 0 14px;
+  font-size: 2.1em;
+  line-height: 1.08;
+  font-weight: 800;
+  letter-spacing: -0.01em;
 }
 
 .deck-year {
   margin: 0;
-  font-size: 3.1em;
+  font-size: 3.2em;
   font-weight: 800;
   letter-spacing: -0.04em;
 }
@@ -279,6 +282,12 @@ a:focus {
 .deck-summary,
 .deck-note {
   color: var(--deck-muted);
+  font-size: 1.02em;
+  line-height: 1.5;
+}
+
+.deck-summary {
+  font-size: 1.08em;
 }
 
 /* --------------------------------------------------------------------------
@@ -300,8 +309,8 @@ a:focus {
 
 .deck-card h3 {
   margin-top: 0;
-  margin-bottom: 12px;
-  font-size: 0.95em;
+  margin-bottom: 14px;
+  font-size: 1.1em;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -310,10 +319,12 @@ a:focus {
 .deck-card ol {
   margin: 0;
   padding-left: 22px;
+  font-size: 1em;
 }
 
 .deck-card li {
   margin-bottom: 10px;
+  line-height: 1.5;
 }
 
 /* --------------------------------------------------------------------------
@@ -323,12 +334,13 @@ a:focus {
 .deck-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.62em;
+  font-size: 0.9em;
+  line-height: 1.45;
 }
 
 .deck-table th,
 .deck-table td {
-  padding: 12px 14px;
+  padding: 14px 16px;
   border: 2px solid var(--deck-border);
   text-align: left;
   vertical-align: top;
@@ -354,10 +366,11 @@ a:focus {
    -------------------------------------------------------------------------- */
 
 .deck-callout {
-  padding: 16px 18px;
+  padding: 18px 20px;
   border-left: 6px solid var(--deck-border);
   background: var(--deck-surface);
-  font-size: 0.68em;
+  font-size: 1em;
+  line-height: 1.5;
 }
 
 /* --------------------------------------------------------------------------
@@ -365,15 +378,28 @@ a:focus {
    -------------------------------------------------------------------------- */
 
 .deck-panel {
-  padding: 18px;
+  padding: 20px;
   border: 2px solid var(--deck-border);
   border-radius: 6px;
   background: #fff;
+  font-size: 1em;
+  line-height: 1.5;
 }
 
 .deck-panel strong {
   display: block;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+  font-size: 1.08em;
+}
+
+.deck-panel ul,
+.deck-panel ol {
+  margin: 0;
+  padding-left: 22px;
+}
+
+.deck-panel li {
+  margin-bottom: 8px;
 }
 
 /* --------------------------------------------------------------------------
@@ -418,8 +444,8 @@ a:focus {
   justify-content: space-between;
   align-items: center;
   gap: 16px;
-  font-size: 0.52em;
-  padding-top: 10px;
+  font-size: 0.72em;
+  padding-top: 12px;
   border-top: 2px solid var(--deck-border);
 }
 
@@ -491,6 +517,10 @@ a:focus {
    -------------------------------------------------------------------------- */
 
 @media (max-width: 900px) {
+  html, body {
+    font-size: 17px;
+  }
+
   .deck-grid,
   .deck-placeholder,
   .deck-columns {
@@ -505,19 +535,19 @@ a:focus {
   }
 
   .deck-title {
-    font-size: 1.45em;
+    font-size: 1.7em;
   }
 
   .deck-year {
-    font-size: 2.3em;
+    font-size: 2.6em;
   }
 
   .deck-table {
-    font-size: 0.55em;
+    font-size: 0.82em;
   }
 
   .deck-callout {
-    font-size: 0.62em;
+    font-size: 0.92em;
   }
 
   /* Footer wraps gracefully */
@@ -563,6 +593,10 @@ a:focus {
 }
 
 @media (max-width: 480px) {
+  html, body {
+    font-size: 15px;
+  }
+
   .deck-shell {
     padding: 14px 12px;
     margin: 6px;
@@ -570,15 +604,15 @@ a:focus {
   }
 
   .deck-title {
-    font-size: 1.2em;
+    font-size: 1.4em;
   }
 
   .deck-year {
-    font-size: 1.8em;
+    font-size: 2em;
   }
 
   .deck-kicker {
-    font-size: 0.6em;
+    font-size: 0.7em;
     padding: 6px 10px;
   }
 

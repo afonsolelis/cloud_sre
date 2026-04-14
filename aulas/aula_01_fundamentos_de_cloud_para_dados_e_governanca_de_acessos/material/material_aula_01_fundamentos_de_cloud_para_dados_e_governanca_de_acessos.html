@@ -36,8 +36,11 @@
           as principais arquiteturas de dados na nuvem (Data Lake, Data Warehouse, Data Lakehouse e Data Mesh),
           a AWS como plataforma de dados, a governança de acessos com AWS IAM, o princípio do menor privilégio
           e o mapeamento de perfis de acesso para um Data Lake corporativo.
-          A parte prática inclui um laboratório completo de 2 horas com instruções passo a passo para configuração
-          de grupos, usuários, roles, políticas customizadas e buckets S3 no ambiente AWS Student.
+          A aula 01 é a primeira do curso, com foco em apresentação dos conceitos: as duas primeiras horas
+          (19h00 &ndash; 21h00) são dedicadas à teoria, e a última hora (21h00 &ndash; 22h00) ao laboratório
+          prático de configuração do ambiente AWS Student que será utilizado em todas as aulas seguintes.
+          O material inclui também uma seção de aprofundamento pós-aula com roles, políticas customizadas,
+          Policy Simulator e desafios extras para estudo autônomo.
           O material foi projetado para funcionar como referência de estudo autônoma &mdash; é possível
           revisar todo o conteúdo da aula sem depender de anotações adicionais.
         </p>
@@ -1517,11 +1520,16 @@
       <section class="content-block">
         <h2>Módulo 3 &mdash; Laboratório Prático</h2>
         <p>
-          A parte prática desta aula ocorre das <strong>20h00 às 22h00</strong> (2 horas) utilizando o ambiente
-          <strong>AWS Student</strong>. Cada passo a seguir contém instruções detalhadas e um critério de validação.
-          <strong>Não avance para o próximo passo sem confirmar que o passo anterior funcionou corretamente.</strong>
-          Se encontrar problemas, releia as instruções e verifique cada detalhe antes de pedir ajuda.
+          A parte prática desta aula ocorre das <strong>21h00 às 22h00</strong> (1 hora) utilizando o ambiente
+          <strong>AWS Student</strong>. O objetivo é deixar o seu ambiente pronto para as próximas aulas:
+          você sairá daqui com um grupo IAM, um usuário IAM pessoal e os buckets S3 das três camadas do Data Lake.
         </p>
+        <div class="tip">
+          <strong>Roteiro em aula (21h00 &ndash; 22h00):</strong> apenas os <strong>Passos 1, 2, 3 e 7</strong>
+          são executados ao vivo. Os <strong>Passos 4, 5, 6 e 8</strong> constituem a seção de
+          <em>aprofundamento pós-aula</em> &mdash; leitura obrigatória para estudo autônomo antes da próxima aula,
+          mas não precisam ser executados durante o encontro.
+        </div>
         <div class="warning">
           <strong>Atenção:</strong> o ambiente AWS Student tem limitações. Nem todos os serviços e operações estão
           disponíveis. Se alguma operação for bloqueada, anote a mensagem de erro e siga para o próximo passo.
@@ -1671,7 +1679,15 @@
         </div>
 
         <!-- PASSO 4 -->
-        <h3>Passo 4 &mdash; Criar Roles para Serviços (20 min)</h3>
+        <hr />
+        <h3 style="margin-top:32px;">Aprofundamento pós-aula (estudo autônomo)</h3>
+        <p>
+          Os passos a seguir <strong>não são executados ao vivo na aula 01</strong>. Eles complementam os
+          conceitos apresentados na teoria e devem ser lidos com calma para a próxima aula. Execute-os
+          quando puder &mdash; o ambiente AWS Student permite refazer o laboratório.
+        </p>
+
+        <h3>Passo 4 &mdash; Criar Roles para Serviços (20 min) &middot; <em>aprofundamento</em></h3>
 
         <p><strong>Role 1: GlueJobRole</strong></p>
         <ol>
@@ -1747,7 +1763,7 @@
         </div>
 
         <!-- PASSO 5 -->
-        <h3>Passo 5 &mdash; Escrever Política IAM Customizada (20 min)</h3>
+        <h3>Passo 5 &mdash; Escrever Política IAM Customizada (20 min) &middot; <em>aprofundamento</em></h3>
         <p>
           Até agora, usamos apenas políticas gerenciadas pela AWS (managed policies). Agora vamos criar uma
           política customizada que implementa o princípio do menor privilégio para o cenário de um analista
@@ -1850,7 +1866,7 @@
         </div>
 
         <!-- PASSO 6 -->
-        <h3>Passo 6 &mdash; Validar com Policy Simulator (15 min)</h3>
+        <h3>Passo 6 &mdash; Validar com Policy Simulator (15 min) &middot; <em>aprofundamento</em></h3>
         <p>
           O IAM Policy Simulator é uma ferramenta que permite testar as permissões efetivas de um usuário, grupo
           ou role sem executar ações reais na conta. Vamos usá-lo para validar que nosso modelo de permissões
@@ -1906,7 +1922,14 @@
         </div>
 
         <!-- PASSO 7 -->
-        <h3>Passo 7 &mdash; Criar Estrutura de Buckets S3 (15 min)</h3>
+        <hr />
+        <h3 style="margin-top:32px;">Voltando ao roteiro ao vivo</h3>
+        <p>
+          O Passo 7 abaixo <strong>é executado em aula</strong>, imediatamente após o Passo 3. É o fechamento
+          do setup do ambiente e deixa os 3 buckets S3 do Data Lake prontos para as próximas aulas.
+        </p>
+
+        <h3>Passo 7 &mdash; Criar Estrutura de Buckets S3 (15 min) &middot; <em>em aula</em></h3>
         <p>
           Agora vamos criar a estrutura física do Data Lake com três buckets S3, cada um representando uma
           camada da arquitetura.
@@ -1968,7 +1991,8 @@
         </div>
 
         <!-- PASSO 8 -->
-        <h3>Passo 8 &mdash; Desafio Extra (para quem finalizar antes)</h3>
+        <hr />
+        <h3 style="margin-top:32px;">Passo 8 &mdash; Desafios extras &middot; <em>aprofundamento</em></h3>
         <p>
           Se você completou todos os passos anteriores e ainda tem tempo, tente os desafios abaixo.
           Eles exploram conceitos avançados que serão aprofundados em aulas futuras.

@@ -37,22 +37,22 @@
         </div>
         <div class="deck-grid">
           <article class="deck-card">
-            <h3>19h00 – 20h00 &middot; Teoria</h3>
+            <h3>19h00 – 21h00 &middot; Teoria</h3>
             <ul>
+              <li>Boas-vindas e apresentacao da disciplina</li>
               <li>Cloud Computing para Engenharia de Dados</li>
-              <li>Arquiteturas: Data Lake, DW, Data Mesh</li>
+              <li>Arquiteturas: Data Lake, DW, Lakehouse, Data Mesh</li>
               <li>AWS como plataforma de dados</li>
               <li>Governanca de acessos com IAM</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>20h00 – 22h00 &middot; Pratica AWS Student</h3>
+            <h3>21h00 – 22h00 &middot; Setup AWS Student</h3>
             <ul>
-              <li>Setup da conta e exploracao do console</li>
-              <li>Criacao de grupos, usuarios e roles</li>
-              <li>Politica customizada em JSON</li>
-              <li>Buckets S3 por camada do Data Lake</li>
-              <li>Validacao com IAM Policy Simulator</li>
+              <li>Acesso ao AWS Student e regiao us-east-1</li>
+              <li>Criacao de grupo e usuario IAM</li>
+              <li>Buckets S3 do Data Lake (raw, trusted, refined)</li>
+              <li>Checklist do ambiente pronto para as proximas aulas</li>
             </ul>
           </article>
         </div>
@@ -65,13 +65,13 @@
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Teoria &middot; 19h00 – 20h00</span>
+          <span class="deck-kicker">Teoria &middot; 19h00 – 21h00</span>
           <h2 class="deck-title">O que e Cloud Computing?</h2>
           <p class="deck-summary">Entrega de recursos computacionais sob demanda pela internet, com pagamento por uso. Definicao NIST (SP 800-145).</p>
         </div>
         <div class="deck-callout">
           <strong>5 Caracteristicas essenciais (NIST)</strong>
-          <ol style="margin:8px 0 0; padding-left:22px; font-size:0.95em;">
+          <ol style="margin:12px 0 0; padding-left:22px;">
             <li><strong>On-demand self-service</strong> — provisionar recursos sem intervencao humana.</li>
             <li><strong>Broad network access</strong> — acesso via rede por qualquer dispositivo.</li>
             <li><strong>Resource pooling</strong> — recursos compartilhados entre multiplos clientes.</li>
@@ -264,14 +264,14 @@
           </div>
           <div class="deck-panel">
             <strong>Servicos da disciplina</strong>
-            <ul style="margin:0; padding-left:22px; font-size:0.9em;">
+            <ul style="margin:0; padding-left:22px;">
               <li>S3, Athena, Glue</li>
               <li>Kinesis, Lambda</li>
               <li>RDS, DynamoDB, Redshift</li>
               <li>IAM, Lake Formation</li>
               <li>CloudWatch, Step Functions</li>
             </ul>
-            <p style="margin:10px 0 0; font-size:0.85em;"><strong>Regiao recomendada:</strong> us-east-1</p>
+            <p style="margin:14px 0 0;"><strong>Regiao recomendada:</strong> us-east-1</p>
           </div>
         </div>
       </div>
@@ -431,28 +431,27 @@
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Pratica &middot; 20h00 – 22h00 &middot; AWS Student</span>
-          <h2 class="deck-title">Visao geral do laboratorio</h2>
-          <p class="deck-summary">Em 2 horas, vamos configurar uma conta AWS organizada com controles de acesso para engenharia de dados.</p>
+          <span class="deck-kicker">Pratica &middot; 21h00 – 22h00 &middot; AWS Student</span>
+          <h2 class="deck-title">Setup do ambiente AWS Student</h2>
+          <p class="deck-summary">Em 1 hora vamos deixar sua conta AWS Student pronta para todas as proximas aulas: identidade, grupo e buckets do Data Lake.</p>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
-            <h3>O que vamos construir</h3>
+            <h3>O que vamos configurar</h3>
             <ul>
-              <li>Grupos DataEngineers e DataAnalysts</li>
-              <li>Usuario IAM com console access</li>
-              <li>Roles para Glue e Lambda</li>
-              <li>Politica customizada em JSON</li>
-              <li>Buckets S3 por camada do Data Lake</li>
+              <li>Acesso ao AWS Student + regiao us-east-1</li>
+              <li>Grupo IAM <strong>DataEngineers</strong></li>
+              <li>Usuario IAM pessoal no grupo</li>
+              <li>3 buckets S3 (raw, trusted, refined)</li>
             </ul>
           </article>
           <article class="deck-card">
             <h3>Pre-requisitos</h3>
             <ul>
               <li>Acesso ao AWS Student ativo</li>
-              <li>Navegador atualizado (Chrome/Firefox)</li>
-              <li>Regiao: us-east-1 (N. Virginia)</li>
-              <li>Material de apoio aberto em outra aba</li>
+              <li>Chrome ou Firefox atualizado</li>
+              <li>Material da aula aberto em outra aba</li>
+              <li>Bloco de notas para anotar Account ID e URL de login</li>
             </ul>
           </article>
         </div>
@@ -460,226 +459,118 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 14 — LAB PASSO 1: ACESSO E EXPLORACAO                   -->
+    <!-- SLIDE 14 — LAB PASSO 1: ACESSO AO CONSOLE                     -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Lab &middot; Passo 1</span>
-          <h2 class="deck-title">Acesso ao AWS Student e exploracao do console</h2>
-        </div>
-        <div class="deck-callout">
-          <strong>Objetivo:</strong> Entrar no ambiente AWS Student, confirmar a regiao us-east-1 e explorar o IAM Dashboard para entender o estado inicial da conta.
+          <h2 class="deck-title">Acesso ao AWS Student e regiao</h2>
+          <p class="deck-summary">Entrar no console, confirmar a regiao e localizar o Account ID.</p>
         </div>
         <div class="deck-panel">
-          <strong>Passos</strong>
-          <ol style="margin:0; padding-left:22px;">
-            <li>Acesse o portal AWS Student e inicie o laboratorio.</li>
-            <li>No console AWS, verifique no canto superior direito: a regiao deve ser <strong>N. Virginia (us-east-1)</strong>.</li>
-            <li>Navegue ate <strong>IAM &gt; Dashboard</strong>.</li>
-            <li>Observe: quantos usuarios, grupos e roles ja existem? Anote.</li>
-            <li>Localize o <strong>Account ID</strong> — voce vai precisar dele.</li>
+          <strong>Passo a passo</strong>
+          <ol>
+            <li>Acesse o portal <strong>AWS Academy / Student</strong> e inicie o laboratorio.</li>
+            <li>Clique em <strong>AWS Details &gt; AWS Console &gt; Open Console</strong>.</li>
+            <li>No canto superior direito, confirme a regiao: <strong>N. Virginia (us-east-1)</strong>.</li>
+            <li>Navegue ate <strong>IAM &gt; Dashboard</strong> e localize o <strong>Account ID</strong>.</li>
+            <li>Anote o Account ID — sera usado nos proximos passos.</li>
           </ol>
         </div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 15 — LAB PASSO 2: GRUPOS IAM                            -->
+    <!-- SLIDE 15 — LAB PASSO 2: GRUPO + USUARIO IAM                   -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Lab &middot; Passo 2</span>
-          <h2 class="deck-title">Criacao de grupos IAM</h2>
+          <h2 class="deck-title">Grupo DataEngineers e usuario IAM</h2>
+          <p class="deck-summary">Criar o grupo com as politicas base e um usuario pessoal dentro dele.</p>
         </div>
-        <table class="deck-table">
-          <thead>
-            <tr>
-              <th>Grupo</th>
-              <th>Politicas gerenciadas</th>
-              <th>Proposito</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>DataEngineers</strong></td>
-              <td>AmazonS3FullAccess, AWSGlueConsoleFullAccess, CloudWatchLogsFullAccess</td>
-              <td>Ingestao, ETL, monitoramento</td>
-            </tr>
-            <tr>
-              <td><strong>DataAnalysts</strong></td>
-              <td>AmazonAthenaFullAccess, AmazonS3ReadOnlyAccess</td>
-              <td>Consultas SQL, leitura de dados</td>
-            </tr>
-          </tbody>
-        </table>
-        <div class="deck-callout">
-          <strong>Caminho:</strong> IAM &gt; User groups &gt; Create group &gt; Selecione as politicas &gt; Create group.
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Criar o grupo</strong>
+            <ol>
+              <li>IAM &gt; User groups &gt; <strong>Create group</strong>.</li>
+              <li>Nome: <strong>DataEngineers</strong>.</li>
+              <li>Anexe: <strong>AmazonS3FullAccess</strong> e <strong>CloudWatchLogsFullAccess</strong>.</li>
+              <li>Create group.</li>
+            </ol>
+          </div>
+          <div class="deck-panel">
+            <strong>Criar o usuario</strong>
+            <ol>
+              <li>IAM &gt; Users &gt; <strong>Create user</strong>.</li>
+              <li>Nome: <strong>eng-dados-01</strong>.</li>
+              <li>Marque <strong>Provide user access to the AWS Management Console</strong> e defina senha.</li>
+              <li>Adicione ao grupo <strong>DataEngineers</strong>.</li>
+              <li>Anote a <strong>Console sign-in URL</strong>.</li>
+            </ol>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 16 — LAB PASSO 3: USUARIO IAM                           -->
+    <!-- SLIDE 16 — LAB PASSO 3: BUCKETS S3                            -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Lab &middot; Passo 3</span>
-          <h2 class="deck-title">Criacao de usuario IAM</h2>
+          <h2 class="deck-title">Buckets S3 do Data Lake</h2>
+          <p class="deck-summary">Criar 3 buckets, um por camada. Substitua <code>{account-id}</code> pelo ID anotado no Passo 1.</p>
         </div>
         <div class="deck-panel">
-          <strong>Passos</strong>
-          <ol style="margin:0; padding-left:22px;">
-            <li>IAM &gt; Users &gt; <strong>Create user</strong>.</li>
-            <li>Nome: <strong>eng-dados-01</strong>.</li>
-            <li>Marque <strong>Provide user access to the AWS Management Console</strong>.</li>
-            <li>Defina uma senha temporaria (Custom password).</li>
-            <li>Na etapa de permissoes, selecione <strong>Add user to group</strong> &gt; <strong>DataEngineers</strong>.</li>
-            <li>Revise e crie o usuario.</li>
-            <li>Anote a <strong>Console sign-in URL</strong> — ela usa o Account ID.</li>
+          <strong>Passo a passo</strong>
+          <ol>
+            <li>Abra o servico <strong>S3 &gt; Create bucket</strong>.</li>
+            <li>Crie os 3 buckets abaixo, na regiao <strong>us-east-1</strong>:</li>
           </ol>
-        </div>
-        <div class="deck-callout">
-          <strong>Teste:</strong> Abra uma janela anonima, acesse a sign-in URL e faca login com o usuario criado. Voce deve conseguir acessar S3 e Glue, mas nao IAM.
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 17 — LAB PASSO 4: ROLES PARA SERVICOS                   -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Lab &middot; Passo 4</span>
-          <h2 class="deck-title">Criacao de roles para servicos AWS</h2>
-        </div>
-        <table class="deck-table">
-          <thead>
-            <tr>
-              <th>Role</th>
-              <th>Trusted Entity</th>
-              <th>Politicas</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>GlueJobRole</strong></td>
-              <td>AWS Service &gt; Glue</td>
-              <td>AmazonS3FullAccess, AWSGlueServiceRole, CloudWatchLogsFullAccess</td>
-            </tr>
-            <tr>
-              <td><strong>LambdaExecutionRole</strong></td>
-              <td>AWS Service &gt; Lambda</td>
-              <td>AmazonS3ReadOnlyAccess, AWSLambdaBasicExecutionRole</td>
-            </tr>
-          </tbody>
-        </table>
-        <div class="deck-callout">
-          <strong>Caminho:</strong> IAM &gt; Roles &gt; Create role &gt; Selecione o servico &gt; Attach policies &gt; Nomeie a role &gt; Create role.
+          <ul style="margin:12px 0 0; padding-left:44px;">
+            <li><strong>data-lake-raw-{account-id}</strong> — dados brutos</li>
+            <li><strong>data-lake-trusted-{account-id}</strong> — dados validados</li>
+            <li><strong>data-lake-refined-{account-id}</strong> — dados prontos para analise</li>
+          </ul>
+          <p style="margin:14px 0 0;">Mantenha <strong>Block Public Access</strong> habilitado (padrao). Nao altere as demais opcoes.</p>
         </div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 18 — LAB PASSO 5: POLITICA CUSTOMIZADA EM JSON          -->
+    <!-- SLIDE 17 — CHECKLIST FINAL                                    -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Lab &middot; Passo 5</span>
-          <h2 class="deck-title">Politica customizada em JSON</h2>
-          <p class="deck-summary">Criar a politica <strong>DataLakeReadOnly</strong> e anexar ao grupo DataAnalysts.</p>
-        </div>
-        <div class="deck-panel" style="font-size:0.58em; font-family:monospace; white-space:pre; line-height:1.5; overflow-x:auto;">{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": ["s3:GetObject", "s3:ListBucket"],
-      "Resource": [
-        "arn:aws:s3:::data-lake-refined-*",
-        "arn:aws:s3:::data-lake-refined-*/*"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": "athena:StartQueryExecution",
-      "Resource": "*"
-    }
-  ]
-}</div>
-        <div class="deck-callout">
-          <strong>Caminho:</strong> IAM &gt; Policies &gt; Create policy &gt; JSON tab &gt; Cole o JSON &gt; Nome: DataLakeReadOnly &gt; Create. Depois: User groups &gt; DataAnalysts &gt; Attach policy.
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 19 — LAB PASSO 6: POLICY SIMULATOR + S3 BUCKETS         -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Lab &middot; Passo 6</span>
-          <h2 class="deck-title">Validacao com Policy Simulator e criacao de buckets S3</h2>
+          <span class="deck-kicker">Lab &middot; Checklist final</span>
+          <h2 class="deck-title">Ambiente pronto para as proximas aulas</h2>
         </div>
         <div class="deck-columns">
           <div class="deck-panel">
-            <strong>Policy Simulator</strong>
-            <ol style="margin:0; padding-left:22px;">
-              <li>Acesse IAM &gt; Policy Simulator.</li>
-              <li>Selecione o usuario <strong>eng-dados-01</strong>.</li>
-              <li>Teste: <strong>S3 &gt; PutObject</strong> &rarr; deve ser <span style="color:green;font-weight:700;">Allowed</span>.</li>
-              <li>Teste: <strong>IAM &gt; CreateUser</strong> &rarr; deve ser <span style="color:red;font-weight:700;">Denied</span>.</li>
-            </ol>
-          </div>
-          <div class="deck-panel">
-            <strong>Buckets S3 por camada</strong>
-            <ol style="margin:0; padding-left:22px;">
-              <li>S3 &gt; Create bucket.</li>
-              <li><strong>data-lake-raw-{account-id}</strong></li>
-              <li><strong>data-lake-trusted-{account-id}</strong></li>
-              <li><strong>data-lake-refined-{account-id}</strong></li>
-              <li>Regiao: us-east-1. Manter demais opcoes padrao.</li>
-            </ol>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 20 — LAB PASSO 7 + DESAFIO                              -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Lab &middot; Passo 7 + Desafio</span>
-          <h2 class="deck-title">Verificacao final e desafio extra</h2>
-        </div>
-        <div class="deck-columns">
-          <div class="deck-panel">
-            <strong>Checklist de verificacao</strong>
-            <ul style="margin:0; padding-left:22px;">
-              <li>Grupo DataEngineers criado com 3 politicas</li>
-              <li>Grupo DataAnalysts criado com 2 politicas + custom</li>
-              <li>Usuario eng-dados-01 no grupo DataEngineers</li>
-              <li>Role GlueJobRole com trusted entity Glue</li>
-              <li>Role LambdaExecutionRole com trusted entity Lambda</li>
-              <li>Politica DataLakeReadOnly anexada a DataAnalysts</li>
-              <li>3 buckets S3 criados (raw, trusted, refined)</li>
-              <li>Policy Simulator validando permissoes</li>
+            <strong>Verificacao</strong>
+            <ul>
+              <li>Conta AWS Student ativa e regiao us-east-1 confirmada</li>
+              <li>Account ID anotado</li>
+              <li>Grupo <strong>DataEngineers</strong> criado com as 2 politicas</li>
+              <li>Usuario <strong>eng-dados-01</strong> criado e no grupo</li>
+              <li>Console sign-in URL salva</li>
+              <li>Buckets <strong>raw</strong>, <strong>trusted</strong> e <strong>refined</strong> criados</li>
             </ul>
           </div>
           <div class="deck-panel">
-            <strong>Desafio (opcional)</strong>
-            <ul style="margin:0; padding-left:22px;">
-              <li>Habilite MFA para o usuario eng-dados-01 (se suportado no AWS Student).</li>
-              <li>Crie uma <strong>permission boundary</strong> que impeca qualquer usuario de criar outros usuarios IAM, e aplique-a ao grupo DataEngineers.</li>
-              <li>Documente: qual e a diferenca entre uma boundary e uma policy normal?</li>
-            </ul>
+            <strong>Teste rapido</strong>
+            <ol>
+              <li>Abra uma janela anonima.</li>
+              <li>Acesse a Console sign-in URL.</li>
+              <li>Faca login com <strong>eng-dados-01</strong>.</li>
+              <li>Abra S3 — voce deve ver os 3 buckets.</li>
+              <li>Tente abrir IAM — acesso negado (esperado).</li>
+            </ol>
           </div>
         </div>
       </div>
@@ -707,11 +598,11 @@
           <article class="deck-card">
             <h3>O que ficou pronto no lab</h3>
             <ul>
-              <li>Conta AWS Student organizada em us-east-1.</li>
-              <li>Grupos DataEngineers e DataAnalysts.</li>
-              <li>Roles GlueJobRole e LambdaExecutionRole.</li>
-              <li>Politica customizada DataLakeReadOnly.</li>
+              <li>Conta AWS Student em us-east-1 confirmada.</li>
+              <li>Grupo <strong>DataEngineers</strong> com politicas base.</li>
+              <li>Usuario IAM <strong>eng-dados-01</strong> no grupo.</li>
               <li>3 buckets S3 (raw, trusted, refined).</li>
+              <li>Console sign-in URL testada.</li>
             </ul>
           </article>
           <article class="deck-card">
