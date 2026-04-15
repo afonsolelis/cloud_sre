@@ -33,18 +33,170 @@
         <p class="summary">
           Este material acompanha a primeira aula da disciplina <strong>Cloud Computing e SRA &mdash; Visão Prática com AWS</strong>
           do MBA em Engenharia de Dados. Ele cobre, de forma aprofundada, todos os tópicos apresentados nos slides:
-          a definição de Cloud Computing segundo o NIST, os modelos de serviço (IaaS, PaaS, SaaS),
-          as principais arquiteturas de dados na nuvem (Data Lake, Data Warehouse, Data Lakehouse e Data Mesh),
-          a AWS como plataforma de dados, a governança de acessos com AWS IAM, o princípio do menor privilégio
-          e o mapeamento de perfis de acesso para um Data Lake corporativo.
-          A aula 01 é a primeira do curso, com foco em apresentação dos conceitos: as duas primeiras horas
+          o mapa da disciplina e sua narrativa em torno do dataset Olist; a dinâmica do avião como metáfora de pipeline;
+          a definição de Cloud Computing segundo o NIST; os modelos de serviço (IaaS, PaaS, SaaS);
+          as principais arquiteturas de dados na nuvem (Data Lake, Data Warehouse, Data Lakehouse e Data Mesh);
+          a AWS como plataforma de dados; a governança de acessos com AWS IAM; o princípio do menor privilégio;
+          o mapeamento de perfis de acesso para um Data Lake corporativo; e o papel da <strong>LabRole</strong> no ambiente
+          AWS Academy Learner Lab, que será usado em todas as práticas do semestre.
+          A aula 01 tem dinâmica excepcional dentro do curso: as duas primeiras horas
           (19h00 &ndash; 21h00) são dedicadas à teoria, e a última hora (21h00 &ndash; 22h00) ao laboratório
-          prático de configuração do ambiente AWS Student que será utilizado em todas as aulas seguintes.
+          prático de configuração do ambiente AWS Student.
           O material inclui também uma seção de aprofundamento pós-aula com roles, políticas customizadas,
           Policy Simulator e desafios extras para estudo autônomo.
-          O material foi projetado para funcionar como referência de estudo autônoma &mdash; é possível
+          Ele foi projetado para funcionar como referência de estudo autônoma &mdash; é possível
           revisar todo o conteúdo da aula sem depender de anotações adicionais.
         </p>
+      </section>
+
+      <!-- ============================================================
+           MAPA DA DISCIPLINA
+      ============================================================= -->
+      <section class="content-block">
+        <h2>Mapa da disciplina &mdash; as 8 aulas</h2>
+        <p>
+          Antes de mergulhar nos conceitos da Aula 01, é importante enxergar a disciplina inteira. Cada aula
+          constrói uma camada nova sobre a anterior, e o objetivo final é um pipeline de dados AWS completo,
+          observável, seguro e financeiramente sustentável. A lógica é simples: começamos pela fundação
+          (identidade, storage), depois conectamos fontes, depois processamos, depois analisamos e, por fim,
+          colocamos governança, reliability e FinOps como camadas transversais.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Data</th>
+              <th>Tema</th>
+              <th>Entregável acumulado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>01</td><td>16/04/2026</td><td>Fundamentos de Cloud para dados e governança de acessos</td><td>Conta AWS Student ativa, 3 buckets S3 prontos</td></tr>
+            <tr><td>02</td><td>23/04/2026</td><td>Fundação do Data Lake: S3 e Athena</td><td>Olist no Raw, catalogado, consultável em SQL</td></tr>
+            <tr><td>03</td><td>30/04/2026</td><td>Fontes de dados: bancos relacionais e NoSQL</td><td>RDS e DynamoDB conectados ao pipeline</td></tr>
+            <tr><td>04</td><td>07/05/2026</td><td>Ingestão e processamento near real-time (streaming)</td><td>Kinesis entregando eventos ao Raw</td></tr>
+            <tr><td>05</td><td>14/05/2026</td><td>Integração, ETL serverless e catálogo de dados</td><td>Glue jobs promovendo Raw &rarr; Trusted &rarr; Refined</td></tr>
+            <tr><td>06</td><td>21/05/2026</td><td>Data Warehousing com Redshift</td><td>Camada de BI com modelagem dimensional</td></tr>
+            <tr><td>07</td><td>28/05/2026</td><td>Data Reliability e SRE aplicados a pipelines</td><td>Observabilidade, SLOs e alertas</td></tr>
+            <tr><td>08</td><td>11/06/2026</td><td>Segurança, FinOps e projeto final</td><td>Pipeline completo Olist com custos otimizados</td></tr>
+          </tbody>
+        </table>
+        <p>
+          Observe que cada aula pressupõe que a anterior foi cumprida. Por isso, o laboratório da Aula 01
+          precisa terminar com os buckets criados: sem eles, a Aula 02 não acontece.
+        </p>
+      </section>
+
+      <!-- ============================================================
+           NARRATIVA OLIST
+      ============================================================= -->
+      <section class="content-block">
+        <h2>Olist &mdash; o dataset que atravessa o semestre</h2>
+        <p>
+          Para dar realismo e continuidade às práticas, escolhemos um único dataset público como fio condutor de
+          toda a disciplina: o <strong>Olist Brazilian E-commerce Public Dataset</strong>, disponibilizado pela Olist
+          no Kaggle. Ele contém cerca de 100 mil pedidos reais feitos entre 2016 e 2018 no marketplace Olist,
+          com informações de pedidos, itens, clientes, vendedores, produtos, pagamentos, reviews e geolocalização.
+          Todas as tabelas vêm em CSV, o que nos permite simular um cenário de ingestão bastante próximo do que
+          acontece em empresas reais.
+        </p>
+        <p>
+          A evolução do Olist pelas camadas do Data Lake vai espelhar a evolução da disciplina:
+        </p>
+        <ul>
+          <li><strong>Aula 02:</strong> os CSVs brutos entram no bucket <code>olist-raw</code>, organizados por tabela e por data de ingestão. O Glue Data Catalog descobre o schema e o Athena permite as primeiras consultas.</li>
+          <li><strong>Aulas 03-04:</strong> simulamos fontes complementares (RDS PostgreSQL e DynamoDB com catálogo de produtos; Kinesis com eventos de clickstream sintéticos). Essas fontes também pousam no Raw.</li>
+          <li><strong>Aula 05:</strong> jobs Glue convertem CSV para Parquet, aplicam limpeza e deduplicação, e materializam o Olist no bucket <code>olist-trusted</code>.</li>
+          <li><strong>Aula 06:</strong> tabelas dimensionais e fatos alimentam o Redshift, e agregados analíticos vão para o <code>olist-refined</code>.</li>
+          <li><strong>Aula 07:</strong> monitoramos o pipeline Olist com CloudWatch e Step Functions, aplicando SLOs sobre o frescor dos dados.</li>
+          <li><strong>Aula 08:</strong> revisamos custos, governança e entregamos o pipeline Olist como projeto final.</li>
+        </ul>
+        <p>
+          <strong>Nesta Aula 01 não carregamos o Olist ainda.</strong> Estamos construindo a estrutura vazia que o
+          receberá: três buckets S3 com nomes prefixados <code>olist-</code> para tornar evidente, durante todo o
+          semestre, qual dataset estamos trabalhando. A primeira linha de dado Olist só entra na Aula 02.
+        </p>
+      </section>
+
+      <!-- ============================================================
+           DINAMICA DO AVIAO
+      ============================================================= -->
+      <section class="content-block">
+        <h2>Abertura &mdash; Dinâmica do avião</h2>
+        <p>
+          A aula começa com uma dinâmica curta (cerca de 20 minutos, incluindo reflexão guiada) cujo objetivo é
+          fazer o grupo experimentar, na prática, o que significa operar um sistema distribuído com canais de
+          comunicação restritos. Trata-se de uma adaptação didática, onde cada participante recebe uma folha com
+          alguns símbolos e um papel específico (A, B1, B2, C, D, E, F, G, H ou I). O grupo deve descobrir qual
+          símbolo aparece em todas as folhas, mas com regras estritas de comunicação.
+        </p>
+
+        <h3>Regras da dinâmica</h3>
+        <ol>
+          <li>Cada pessoa recebe uma folha com quatro ou cinco símbolos e não pode mostrá-la a ninguém.</li>
+          <li>A única forma de comunicação permitida é por <strong>bilhetes manuscritos</strong> &mdash; nada de falar, gesticular ou mostrar o papel.</li>
+          <li>O participante <strong>A</strong> (o cliente final) só pode trocar bilhetes com <strong>B1</strong> e <strong>B2</strong>.</li>
+          <li>Os participantes <strong>C, D, E, F, G, H e I</strong> (as fontes) só podem trocar bilhetes com <strong>B1</strong> e <strong>B2</strong>.</li>
+          <li><strong>B1</strong> e <strong>B2</strong> coordenam o fluxo: trocam bilhetes entre si, com A e com as fontes.</li>
+          <li>O grupo vence quando A declara, com confiança, o símbolo comum a todas as folhas.</li>
+          <li>Tempo máximo: 10 minutos para a execução; 10 minutos para a reflexão.</li>
+        </ol>
+
+        <h3>Mapeando a dinâmica em um pipeline de dados</h3>
+        <p>
+          Terminada a execução, o debrief conecta cada elemento da dinâmica a um componente real de engenharia
+          de dados. Essa analogia vai voltar várias vezes ao longo do semestre.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Papel na dinâmica</th>
+              <th>Equivalente em dados</th>
+              <th>Exemplo concreto no curso</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>C, D, E, F, G, H, I</td>
+              <td>Produtores / fontes</td>
+              <td>CSVs do Olist, RDS, DynamoDB, Kinesis streams</td>
+            </tr>
+            <tr>
+              <td>B1 e B2</td>
+              <td>Brokers / plataforma de integração</td>
+              <td>S3, Glue Catalog, EventBridge, Kinesis Firehose</td>
+            </tr>
+            <tr>
+              <td>A</td>
+              <td>Consumidor / caso de uso final</td>
+              <td>Dashboards, modelos de ML, APIs de negócio</td>
+            </tr>
+            <tr>
+              <td>Bilhetes manuscritos</td>
+              <td>Contratos de interface (schemas, ARNs, contratos de evento)</td>
+              <td>Schemas Parquet, ARN de buckets, eventos JSON</td>
+            </tr>
+            <tr>
+              <td>Proibição de falar direto</td>
+              <td>Desacoplamento produtor-consumidor</td>
+              <td>Consumidores nunca acessam fontes cruas; passam pelo Data Lake</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Lições que a dinâmica deixa</h3>
+        <ul>
+          <li><strong>Sem um broker forte, o consumidor fica órfão.</strong> Se B1 e B2 falham, A não consegue fechar a resposta. É por isso que investimos tanto em S3, Glue e Kinesis como camadas confiáveis.</li>
+          <li><strong>Produtores não conhecem o todo.</strong> Cada fonte conhece um pedaço da verdade. A integração é do pipeline, não das fontes.</li>
+          <li><strong>Contratos precisam ser explícitos.</strong> Bilhetes ambíguos geram respostas erradas &mdash; assim como schemas mal definidos geram dados corrompidos no Lake.</li>
+          <li><strong>Latência existe e é real.</strong> Enquanto os bilhetes circulam, A espera. O mesmo vale para pipelines: frescor de dado é função da arquitetura.</li>
+          <li><strong>Governança emerge rápido.</strong> Quem pode escrever? Quem só pode ler? Quem valida? Essas perguntas aparecem naturalmente e são o assunto do IAM.</li>
+        </ul>
+        <div class="tip">
+          <strong>Registro para estudo:</strong> anote, logo após a dinâmica, quais foram as maiores dificuldades
+          vividas pelo seu grupo. Elas reaparecerão em forma de bug, latência ou incidente em algum momento do
+          semestre &mdash; e entender a raiz humana do problema ajuda a projetar a solução técnica.
+        </div>
       </section>
 
       <!-- ============================================================
@@ -1140,8 +1292,8 @@
         "s3:ListBucket"
       ],
       "Resource": [
-        "arn:aws:s3:::data-lake-refined-*",
-        "arn:aws:s3:::data-lake-refined-*/*"
+        "arn:aws:s3:::olist-refined-*",
+        "arn:aws:s3:::olist-refined-*/*"
       ],
       "Condition": {
         "StringEquals": {
@@ -1516,20 +1668,67 @@
       </section>
 
       <!-- ============================================================
-           MÓDULO 3 — LABORATÓRIO PRÁTICO
+           MÓDULO 3 — O LABROLE DO AWS LEARNER LAB
       ============================================================= -->
       <section class="content-block">
-        <h2>Módulo 3 &mdash; Laboratório Prático</h2>
+        <h2>Módulo 3 &mdash; O LabRole do AWS Academy Learner Lab</h2>
+        <p>
+          O ambiente que usamos nas práticas é o <strong>AWS Academy Learner Lab</strong>. Ele é uma conta AWS real,
+          com limites de tempo, créditos de consumo e um conjunto fixo de serviços habilitados. Para evitar que cada
+          aluno gaste tempo criando roles de serviço nas primeiras aulas, a AWS Academy pré-configura uma role chamada
+          <strong>LabRole</strong>, que praticamente todos os serviços usados no curso assumem automaticamente
+          (Glue, Lambda, Athena, Kinesis Firehose, SageMaker, Step Functions).
+        </p>
+
+        <h3>O que a LabRole permite</h3>
+        <ul>
+          <li>Acessos amplos a S3 (leitura, escrita, gerenciamento de buckets).</li>
+          <li>Execução e gerenciamento de jobs Glue, funções Lambda e streams Kinesis.</li>
+          <li>Queries Athena e gerenciamento de workgroups.</li>
+          <li>Logs em CloudWatch Logs e métricas.</li>
+          <li>Trust policy configurada para múltiplos serviços (<code>glue.amazonaws.com</code>, <code>lambda.amazonaws.com</code>, <code>firehose.amazonaws.com</code> etc.).</li>
+        </ul>
+
+        <h3>O que a LabRole não permite (e por quê)</h3>
+        <ul>
+          <li><strong>Criar usuários IAM persistentes:</strong> o ambiente é reciclado a cada sessão do lab, então não faz sentido criar usuários permanentes.</li>
+          <li><strong>Alterar billing e organização:</strong> você não controla a conta raiz nem a conta do AWS Organizations da universidade.</li>
+          <li><strong>Provisionar recursos de alto custo:</strong> instâncias com GPUs, clusters muito grandes e storage de tiers premium estão bloqueados.</li>
+          <li><strong>Modificar a própria LabRole:</strong> a trust policy e as políticas atachadas vêm prontas; você não consegue adicionar nem remover permissões.</li>
+        </ul>
+        <div class="warning">
+          <strong>Implicação didática importante:</strong> em uma conta AWS real corporativa, não usaríamos uma role
+          única com permissões amplas. Criaríamos uma role dedicada por serviço, com políticas de menor privilégio.
+          Aqui, porém, o objetivo é aprender os conceitos de dados; o LabRole elimina o atrito inicial de IAM para
+          que você foque no que importa nesta primeira hora de prática. Em aulas posteriores, revisitamos o tema.
+        </div>
+
+        <h3>Como a LabRole aparece no dia a dia do lab</h3>
+        <p>
+          Quando você criar um job do Glue na Aula 05, por exemplo, o console perguntará qual role o job deve
+          assumir. A resposta padrão será <code>LabRole</code>. O mesmo vale para funções Lambda, crawlers do Glue
+          e entregas do Kinesis Firehose. Saber disso evita confusão quando o console pedir uma "IAM role" e a
+          lista não estiver vazia.
+        </p>
+      </section>
+
+      <!-- ============================================================
+           MÓDULO 4 — LABORATÓRIO PRÁTICO
+      ============================================================= -->
+      <section class="content-block">
+        <h2>Módulo 4 &mdash; Laboratório Prático</h2>
         <p>
           A parte prática desta aula ocorre das <strong>21h00 às 22h00</strong> (1 hora) utilizando o ambiente
-          <strong>AWS Student</strong>. O objetivo é deixar o seu ambiente pronto para as próximas aulas:
-          você sairá daqui com um grupo IAM, um usuário IAM pessoal e os buckets S3 das três camadas do Data Lake.
+          <strong>AWS Academy Learner Lab</strong>. O objetivo é deixar o seu ambiente pronto para as próximas aulas:
+          você sairá daqui com o lab iniciado, o console aberto em us-east-1, a LabRole compreendida e os três buckets
+          S3 do Data Lake criados (<code>olist-raw</code>, <code>olist-trusted</code>, <code>olist-refined</code>).
         </p>
         <div class="tip">
-          <strong>Roteiro em aula (21h00 &ndash; 22h00):</strong> apenas os <strong>Passos 1, 2, 3 e 7</strong>
-          são executados ao vivo. Os <strong>Passos 4, 5, 6 e 8</strong> constituem a seção de
+          <strong>Roteiro em aula (21h00 &ndash; 22h00):</strong> os <strong>Passos 1, 2, 3 e 4</strong> são
+          executados ao vivo. Os <strong>Passos 5, 6, 7 e 8</strong> constituem a seção de
           <em>aprofundamento pós-aula</em> &mdash; leitura obrigatória para estudo autônomo antes da próxima aula,
-          mas não precisam ser executados durante o encontro.
+          mas não precisam ser executados durante o encontro. Eles demonstram como seria o setup em uma conta AWS real,
+          fora das limitações do Learner Lab, para fins didáticos.
         </div>
         <div class="warning">
           <strong>Atenção:</strong> o ambiente AWS Student tem limitações. Nem todos os serviços e operações estão
@@ -1538,7 +1737,7 @@
         </div>
 
         <!-- PASSO 1 -->
-        <h3>Passo 1 &mdash; Acessar o AWS Student (15 min)</h3>
+        <h3>Passo 1 &mdash; Acessar o AWS Student (15 min) &middot; <em>em aula</em></h3>
         <ol>
           <li>
             Acesse o portal da sua instituição (Mackenzie) e localize o link para o <strong>AWS Academy</strong>
@@ -1585,9 +1784,106 @@
         </div>
 
         <!-- PASSO 2 -->
-        <h3>Passo 2 &mdash; Criar Grupos IAM (20 min)</h3>
+        <h3>Passo 2 &mdash; Reconhecer o IAM e a LabRole (10 min) &middot; <em>em aula</em></h3>
         <p>
-          Vamos criar dois grupos que representam perfis diferentes de acesso em uma equipe de dados.
+          Antes de criar qualquer recurso novo, vamos entender o que o Learner Lab já nos oferece. Esse passo é
+          principalmente exploratório e gera os artefatos que usaremos durante todo o semestre.
+        </p>
+        <ol>
+          <li>No menu lateral do IAM, clique em <strong>Users</strong> e observe os usuários pré-criados pelo lab (o lab pode trazer um usuário chamado <code>vocareum</code> ou similar).</li>
+          <li>Clique em <strong>Roles</strong>. Localize a role chamada <code>LabRole</code>. Ela é o coração do ambiente.</li>
+          <li>Abra a LabRole e vá na aba <strong>Permissions</strong>. Observe as políticas atachadas: verá <code>AmazonS3FullAccess</code>, <code>AWSGlueConsoleFullAccess</code>, <code>CloudWatchLogsFullAccess</code> e outras, dependendo da versão do lab.</li>
+          <li>Ainda na LabRole, abra a aba <strong>Trust relationships</strong>. Observe que ela aceita ser assumida por múltiplos serviços AWS (<code>glue.amazonaws.com</code>, <code>lambda.amazonaws.com</code>, <code>firehose.amazonaws.com</code> etc.).</li>
+          <li>No menu lateral, clique em <strong>Policies</strong>. Use o filtro para ver as diferenças entre "AWS managed" e "Customer managed". No Learner Lab, a maioria é AWS managed.</li>
+          <li>Anote para si: "no lab, todo serviço gerenciado vai assumir a LabRole automaticamente".</li>
+        </ol>
+        <div class="tip">
+          <strong>Validação do Passo 2:</strong> você deve ter identificado a LabRole, entendido suas políticas e
+          seus trusted entities. Se a LabRole não existir no seu ambiente, avise o professor antes de prosseguir.
+        </div>
+
+        <!-- ============================================================
+             PASSO 3 — BUCKETS S3 DO DATA LAKE (EM AULA)
+        ============================================================= -->
+        <h3>Passo 3 &mdash; Criar a estrutura de buckets S3 do Data Lake (25 min) &middot; <em>em aula</em></h3>
+        <p>
+          Agora criamos a estrutura física do Data Lake com três buckets S3, um por camada. Os nomes usam o prefixo
+          <code>olist-</code> porque o dataset Olist ocupará essa estrutura a partir da Aula 02.
+        </p>
+        <ol>
+          <li>
+            Na barra de busca do console, digite <kbd>S3</kbd> e clique no serviço <strong>Amazon S3</strong>.
+          </li>
+          <li>Clique em <strong>Create bucket</strong>.</li>
+          <li>
+            Configure o primeiro bucket:
+            <ul>
+              <li><strong>Bucket name:</strong> <code>olist-raw-&lt;iniciais&gt;</code> (substitua <code>&lt;iniciais&gt;</code> pelas suas iniciais em minúsculo, por exemplo <code>olist-raw-jps</code>). Nomes de bucket são globalmente únicos &mdash; se estiver em uso, acrescente números.</li>
+              <li><strong>AWS Region:</strong> confirme que está <code>US East (N. Virginia) us-east-1</code>.</li>
+              <li><strong>Object Ownership:</strong> mantenha "ACLs disabled" (recomendado).</li>
+              <li><strong>Block Public Access:</strong> mantenha <strong>todas as 4 opções marcadas</strong> (Block all public access). Confirme marcando "I acknowledge...".</li>
+              <li><strong>Bucket Versioning:</strong> selecione <strong>Enable</strong>.</li>
+              <li>Mantenha as demais opções com valores padrão.</li>
+            </ul>
+          </li>
+          <li>Clique em <strong>Create bucket</strong>.</li>
+          <li>
+            Repita o processo para criar mais dois buckets com exatamente as mesmas configurações:
+            <ul>
+              <li><code>olist-trusted-&lt;iniciais&gt;</code></li>
+              <li><code>olist-refined-&lt;iniciais&gt;</code></li>
+            </ul>
+          </li>
+        </ol>
+        <p>
+          <strong>Por que estas configurações?</strong>
+        </p>
+        <ul>
+          <li><strong>Block Public Access:</strong> garante que nenhum objeto nestes buckets pode ser acessado publicamente, mesmo que alguém configure uma ACL ou bucket policy incorretamente. É a principal defesa contra vazamentos.</li>
+          <li><strong>Versioning:</strong> mantém um histórico de todas as versões de cada objeto. Se um arquivo for acidentalmente sobrescrito ou deletado, a versão anterior pode ser recuperada. Essencial para a camada Raw, que é a fonte da verdade.</li>
+          <li><strong>Prefixo <code>olist-</code>:</strong> torna imediato, em qualquer operação, qual dataset estamos manipulando. Em uma conta compartilhada, isso é boa prática de organização.</li>
+        </ul>
+
+        <!-- ============================================================
+             PASSO 4 — SMOKE TEST DE UPLOAD
+        ============================================================= -->
+        <h3>Passo 4 &mdash; Smoke test: upload e leitura (10 min) &middot; <em>em aula</em></h3>
+        <p>
+          Validamos que o bucket Raw realmente aceita escrita e que você consegue reler o que gravou. Este é o
+          teste mais simples possível e evita surpresas na Aula 02.
+        </p>
+        <ol>
+          <li>Clique no bucket <code>olist-raw-&lt;iniciais&gt;</code>.</li>
+          <li>Clique em <strong>Upload &gt; Add files</strong>.</li>
+          <li>Selecione qualquer arquivo pequeno do seu computador (um <code>.txt</code> ou <code>.csv</code> simples).</li>
+          <li>Clique em <strong>Upload</strong> e aguarde o status "Succeeded".</li>
+          <li>Volte para o bucket, clique no arquivo recém-carregado e observe tamanho, data, storage class (Standard) e versão.</li>
+          <li>Na aba <strong>Versions</strong> do objeto, confirme que o versioning registrou a primeira versão.</li>
+          <li>Clique em <strong>Download</strong> e confirme que você consegue recuperar o arquivo.</li>
+        </ol>
+        <div class="tip">
+          <strong>Validação do Passo 4:</strong> você deve ter três buckets listados em S3 (<code>olist-raw-*</code>,
+          <code>olist-trusted-*</code>, <code>olist-refined-*</code>), todos com Block Public Access ativo e
+          Versioning habilitado, e ter pelo menos um arquivo de teste gravado e relido no Raw.
+        </div>
+
+        <!-- ============================================================
+             APROFUNDAMENTO POS-AULA - INTRODUCAO
+        ============================================================= -->
+        <hr />
+        <h3 style="margin-top:32px;">Aprofundamento pós-aula (estudo autônomo)</h3>
+        <p>
+          Os passos 5 a 8 <strong>não são executados ao vivo na aula 01</strong>. Eles simulam como seria o setup em
+          uma conta AWS corporativa, fora das limitações do Learner Lab &mdash; criando grupos, usuários, roles
+          dedicadas e políticas customizadas com menor privilégio. Leia-os com calma durante a semana. No Learner Lab,
+          a maioria dessas operações pode ser bloqueada; o objetivo principal é que você entenda como se faz na prática
+          real.
+        </p>
+
+        <!-- PASSO 5 -->
+        <h3>Passo 5 &mdash; Criar grupos IAM (20 min) &middot; <em>aprofundamento</em></h3>
+        <p>
+          Vamos projetar dois grupos que representam perfis diferentes de acesso em uma equipe de dados.
         </p>
 
         <p><strong>Grupo 1: DataEngineers</strong></p>
@@ -1633,13 +1929,14 @@
           garante que o analista pode ler de qualquer bucket, mas não pode escrever nem deletar.
         </p>
         <div class="tip">
-          <strong>Validação do Passo 2:</strong> na tela de User groups, você deve ver os dois grupos
+          <strong>Validação do Passo 5:</strong> na tela de User groups, você deve ver os dois grupos
           (DataEngineers com 3 políticas e DataAnalysts com 2 políticas). Clique em cada grupo para confirmar
-          que as políticas estão listadas na aba "Permissions".
+          que as políticas estão listadas na aba "Permissions". No Learner Lab essa operação pode falhar &mdash;
+          nesse caso, apenas registre o design do grupo no seu caderno.
         </div>
 
-        <!-- PASSO 3 -->
-        <h3>Passo 3 &mdash; Criar Usuários IAM (15 min)</h3>
+        <!-- PASSO 6 -->
+        <h3>Passo 6 &mdash; Criar usuários IAM (15 min) &middot; <em>aprofundamento</em></h3>
 
         <p><strong>Usuário 1: engenheiro-dados-lab</strong></p>
         <ol>
@@ -1673,22 +1970,14 @@
           <li>Finalize a criação e anote as credenciais.</li>
         </ol>
         <div class="tip">
-          <strong>Validação do Passo 3:</strong> na lista de Users, ambos os usuários devem aparecer com status
+          <strong>Validação do Passo 6:</strong> na lista de Users, ambos os usuários devem aparecer com status
           "Enabled". Clique em <code>engenheiro-dados-lab</code> e verifique: na aba "Groups", o grupo
           DataEngineers deve estar listado. Clique em <code>analista-bi-lab</code> e verifique que pertence
-          ao grupo DataAnalysts.
+          ao grupo DataAnalysts. Caso o Learner Lab bloqueie a criação de usuários, apenas registre o design.
         </div>
 
-        <!-- PASSO 4 -->
-        <hr />
-        <h3 style="margin-top:32px;">Aprofundamento pós-aula (estudo autônomo)</h3>
-        <p>
-          Os passos a seguir <strong>não são executados ao vivo na aula 01</strong>. Eles complementam os
-          conceitos apresentados na teoria e devem ser lidos com calma para a próxima aula. Execute-os
-          quando puder &mdash; o ambiente AWS Student permite refazer o laboratório.
-        </p>
-
-        <h3>Passo 4 &mdash; Criar Roles para Serviços (20 min) &middot; <em>aprofundamento</em></h3>
+        <!-- PASSO 7 -->
+        <h3>Passo 7 &mdash; Criar roles para serviços (20 min) &middot; <em>aprofundamento</em></h3>
 
         <p><strong>Role 1: GlueJobRole</strong></p>
         <ol>
@@ -1757,14 +2046,16 @@
           apenas lê dados para processamento leve, sem gravar no S3).
         </p>
         <div class="tip">
-          <strong>Validação do Passo 4:</strong> na lista de Roles, ambas as roles devem ser visíveis. Clique
+          <strong>Validação do Passo 7:</strong> na lista de Roles, ambas as roles devem ser visíveis. Clique
           em <strong>GlueJobRole</strong>: na aba "Trust relationships", confirme que o serviço confiável é
           <code>glue.amazonaws.com</code>; na aba "Permissions", confirme 3 políticas. Repita para
           <strong>LambdaExecutionRole</strong>: serviço confiável <code>lambda.amazonaws.com</code>, 3 políticas.
+          No Learner Lab a criação de roles customizadas pode estar bloqueada; nesse caso, compare mentalmente com a
+          <code>LabRole</code> já existente.
         </div>
 
-        <!-- PASSO 5 -->
-        <h3>Passo 5 &mdash; Escrever Política IAM Customizada (20 min) &middot; <em>aprofundamento</em></h3>
+        <!-- PASSO 8 -->
+        <h3>Passo 8 &mdash; Escrever política IAM customizada (20 min) &middot; <em>aprofundamento</em></h3>
         <p>
           Até agora, usamos apenas políticas gerenciadas pela AWS (managed policies). Agora vamos criar uma
           política customizada que implementa o princípio do menor privilégio para o cenário de um analista
@@ -1787,7 +2078,7 @@
       "Action": [
         "s3:GetObject"
       ],
-      "Resource": "arn:aws:s3:::data-lake-refined-*/*"
+      "Resource": "arn:aws:s3:::olist-refined-*/*"
     },
     {
       "Sid": "AllowListGoldBuckets",
@@ -1795,7 +2086,7 @@
       "Action": [
         "s3:ListBucket"
       ],
-      "Resource": "arn:aws:s3:::data-lake-refined-*"
+      "Resource": "arn:aws:s3:::olist-refined-*"
     },
     {
       "Sid": "AllowAthenaQueries",
@@ -1830,7 +2121,7 @@
         <ul>
           <li>
             <strong>Statement 1 (AllowReadGoldLayer):</strong> permite <code>s3:GetObject</code> apenas em objetos
-            dentro de buckets cujo nome começa com <code>data-lake-refined-</code>. O wildcard <code>*</code> no final
+            dentro de buckets cujo nome começa com <code>olist-refined-</code>. O wildcard <code>*</code> no final
             do ARN significa "qualquer objeto dentro desses buckets".
           </li>
           <li>
@@ -1860,14 +2151,14 @@
           <li>Clique em <strong>Attach policies</strong>.</li>
         </ol>
         <div class="tip">
-          <strong>Validação do Passo 5:</strong> na lista de Policies, a política <code>DataLakeGoldReadOnly</code>
+          <strong>Validação do Passo 8:</strong> na lista de Policies, a política <code>DataLakeGoldReadOnly</code>
           deve ser visível (tipo "Customer managed"). No grupo DataAnalysts, a aba Permissions deve agora listar
           3 políticas: <code>AmazonAthenaFullAccess</code>, <code>AmazonS3ReadOnlyAccess</code> e
           <code>DataLakeGoldReadOnly</code>.
         </div>
 
-        <!-- PASSO 6 -->
-        <h3>Passo 6 &mdash; Validar com Policy Simulator (15 min) &middot; <em>aprofundamento</em></h3>
+        <!-- PASSO 9 -->
+        <h3>Passo 9 &mdash; Validar com Policy Simulator (15 min) &middot; <em>aprofundamento</em></h3>
         <p>
           O IAM Policy Simulator é uma ferramenta que permite testar as permissões efetivas de um usuário, grupo
           ou role sem executar ações reais na conta. Vamos usá-lo para validar que nosso modelo de permissões
@@ -1918,82 +2209,15 @@
           <li>O princípio do menor privilégio está sendo respeitado: cada perfil tem exatamente as permissões necessárias para sua função.</li>
         </ul>
         <div class="tip">
-          <strong>Validação do Passo 6:</strong> todos os 8 testes devem retornar os resultados esperados
-          (allowed ou denied conforme listado acima). Anote os resultados para referência futura.
+          <strong>Validação do Passo 9:</strong> todos os 8 testes devem retornar os resultados esperados
+          (allowed ou denied conforme listado acima). Anote os resultados para referência futura. Se o Policy
+          Simulator não estiver disponível no Learner Lab, faça o exercício mental de prever o resultado de cada
+          combinação usuário × ação &mdash; o objetivo é treinar o raciocínio.
         </div>
 
-        <!-- PASSO 7 -->
+        <!-- PASSO 10 -->
         <hr />
-        <h3 style="margin-top:32px;">Voltando ao roteiro ao vivo</h3>
-        <p>
-          O Passo 7 abaixo <strong>é executado em aula</strong>, imediatamente após o Passo 3. É o fechamento
-          do setup do ambiente e deixa os 3 buckets S3 do Data Lake prontos para as próximas aulas.
-        </p>
-
-        <h3>Passo 7 &mdash; Criar Estrutura de Buckets S3 (15 min) &middot; <em>em aula</em></h3>
-        <p>
-          Agora vamos criar a estrutura física do Data Lake com três buckets S3, cada um representando uma
-          camada da arquitetura.
-        </p>
-        <ol>
-          <li>
-            Na barra de busca do console, digite <kbd>S3</kbd> e clique no serviço <strong>Amazon S3</strong>.
-          </li>
-          <li>Clique em <strong>Create bucket</strong>.</li>
-          <li>
-            Configure o primeiro bucket:
-            <ul>
-              <li><strong>Bucket name:</strong> <code>data-lake-raw-SUAS-INICIAIS</code> (substitua SUAS-INICIAIS
-                pelas suas iniciais em minúsculo, ex.: <code>data-lake-raw-jps</code>). Nomes de bucket são globalmente
-                únicos na AWS &mdash; se o nome já estiver em uso, adicione números.</li>
-              <li><strong>AWS Region:</strong> confirme que está <code>US East (N. Virginia) us-east-1</code>.</li>
-              <li><strong>Object Ownership:</strong> mantenha "ACLs disabled" (recomendado).</li>
-              <li><strong>Block Public Access:</strong> mantenha <strong>todas as 4 opções marcadas</strong>
-                (Block all public access). Confirme marcando "I acknowledge that the current settings might
-                result in this bucket and the objects within becoming not public."</li>
-              <li><strong>Bucket Versioning:</strong> selecione <strong>Enable</strong>.</li>
-              <li>Mantenha as demais opções com valores padrão.</li>
-            </ul>
-          </li>
-          <li>Clique em <strong>Create bucket</strong>.</li>
-          <li>
-            Repita o processo para criar mais dois buckets:
-            <ul>
-              <li><code>data-lake-trusted-SUAS-INICIAIS</code> (mesmas configurações)</li>
-              <li><code>data-lake-refined-SUAS-INICIAIS</code> (mesmas configurações)</li>
-            </ul>
-          </li>
-          <li>
-            <strong>Upload de arquivo de teste:</strong> clique no bucket <code>data-lake-raw-SUAS-INICIAIS</code>,
-            depois em <strong>Upload</strong>, depois em <strong>Add files</strong>. Selecione qualquer arquivo
-            pequeno do seu computador (um arquivo .txt ou .csv simples). Clique em <strong>Upload</strong>.
-          </li>
-          <li>
-            Após o upload, clique no nome do arquivo. Verifique que os detalhes incluem:
-            <ul>
-              <li>O tamanho do arquivo.</li>
-              <li>A data de upload.</li>
-              <li>A storage class (Standard).</li>
-              <li>Se o versioning está habilitado (aba "Versions" deve mostrar a versão do objeto).</li>
-            </ul>
-          </li>
-        </ol>
-        <p>
-          <strong>Por que estas configurações?</strong>
-        </p>
-        <ul>
-          <li><strong>Block Public Access:</strong> garante que nenhum objeto nestes buckets pode ser acessado publicamente, mesmo que alguém configure uma ACL ou bucket policy incorretamente.</li>
-          <li><strong>Versioning:</strong> mantém um histórico de todas as versões de cada objeto. Se um arquivo for acidentalmente sobrescrito ou deletado, a versão anterior pode ser recuperada. Essencial para dados Raw (fonte da verdade).</li>
-        </ul>
-        <div class="tip">
-          <strong>Validação do Passo 7:</strong> na lista de buckets S3, você deve ver 3 novos buckets
-          (raw, trusted, refined), todos com "Block Public Access" como "On" e "Versioning" como "Enabled".
-          O bucket raw deve conter o arquivo de teste que você fez upload.
-        </div>
-
-        <!-- PASSO 8 -->
-        <hr />
-        <h3 style="margin-top:32px;">Passo 8 &mdash; Desafios extras &middot; <em>aprofundamento</em></h3>
+        <h3 style="margin-top:32px;">Passo 10 &mdash; Desafios extras &middot; <em>aprofundamento</em></h3>
         <p>
           Se você completou todos os passos anteriores e ainda tem tempo, tente os desafios abaixo.
           Eles exploram conceitos avançados que serão aprofundados em aulas futuras.
@@ -2020,7 +2244,7 @@
 
         <h4>Desafio C: Criar Resource-Based Policy no Bucket Raw</h4>
         <ol>
-          <li>Vá ao S3, clique no bucket <code>data-lake-raw-SUAS-INICIAIS</code>.</li>
+          <li>Vá ao S3, clique no bucket <code>olist-raw-&lt;iniciais&gt;</code>.</li>
           <li>Clique na aba <strong>Permissions</strong> e depois em <strong>Bucket policy</strong> &gt; <strong>Edit</strong>.</li>
           <li>Escreva uma bucket policy que permita apenas a role <code>GlueJobRole</code> a fazer
             <code>s3:PutObject</code> neste bucket. Isso garante que apenas jobs do Glue podem gravar no bucket Raw.</li>

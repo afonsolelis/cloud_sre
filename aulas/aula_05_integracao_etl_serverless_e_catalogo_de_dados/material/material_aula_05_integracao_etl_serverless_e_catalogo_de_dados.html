@@ -4,317 +4,940 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/png" href="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" />
-    <title>Material Aula 05 — Integração, ETL Serverless e Catálogo de Dados</title>
+    <title>Material Aula 05 &mdash; Integra&ccedil;&atilde;o, ETL Serverless e Cat&aacute;logo de Dados</title>
     <link rel="stylesheet" href="../../../assets/styles.css" />
-    <style data-design-tokens>:root{--bg:#fff;--color:#000000}body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}a:hover{opacity:.8}a:focus{outline:2px solid #000000}</style>
+    <style data-design-tokens>
+      :root{--bg:#fff;--color:#000000}
+      body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}
+      a:hover{opacity:.8}
+      a:focus{outline:2px solid #000000}
+      table{width:100%;border-collapse:collapse;margin:18px 0;font-size:.97rem}
+      th,td{border:1px solid var(--border,#d7d7d7);padding:10px 14px;text-align:left;vertical-align:top}
+      th{background:var(--surface,#f6f6f6);font-weight:700}
+      pre{background:var(--surface,#f6f6f6);border:1px solid var(--border,#d7d7d7);border-radius:6px;padding:18px;overflow-x:auto;font-size:.92rem;line-height:1.5}
+      code{font-family:"Courier New",Courier,monospace}
+      .tip{background:#f0f7f0;border-left:4px solid #2a7a2a;padding:14px 18px;margin:16px 0;border-radius:4px}
+      .warning{background:#fef6e8;border-left:4px solid #c08800;padding:14px 18px;margin:16px 0;border-radius:4px}
+      .danger{background:#fef0f0;border-left:4px solid #b30000;padding:14px 18px;margin:16px 0;border-radius:4px}
+      .button{display:inline-block;padding:10px 18px;border:1px solid #111;border-radius:6px;text-decoration:none;color:#111;background:#fff;font-weight:700;margin-right:10px}
+      .button:hover{background:#eee}
+    </style>
   </head>
   <body class="material">
     <main class="page">
 
+      <!-- ============================================================
+           HEADER
+      ============================================================= -->
       <section class="content-block">
-        <p class="meta">Aula 05 &nbsp;•&nbsp; 14/05/2026 &nbsp;•&nbsp; 19h00 – 22h00</p>
-        <h1>Integração, ETL Serverless e Catálogo de Dados</h1>
+        <p class="meta">Aula 05 &nbsp;&bull;&nbsp; 14/05/2026 &nbsp;&bull;&nbsp; 19h00 &ndash; 22h00</p>
+        <h1>Integra&ccedil;&atilde;o, ETL Serverless e Cat&aacute;logo de Dados</h1>
         <p class="summary">
-          Este material aprofunda os conceitos apresentados nos slides da Aula 05.
-          Cobre o AWS Glue Data Catalog como repositório central de metadados,
-          o uso de Crawlers para descoberta automática de schemas, a criação de
-          Glue Jobs com PySpark para transformações ETL serverless, e as boas práticas
-          de pipeline de Raw para Trusted com conversão para Parquet.
+          Este material acompanha a quinta aula da disciplina <strong>Cloud Computing e SRA &mdash; Vis&atilde;o Pr&aacute;tica com AWS</strong>
+          do MBA em Engenharia de Dados. A aula &eacute; o cora&ccedil;&atilde;o operacional do pipeline Olist: aqui, os dados brutos
+          que ingerimos nas aulas anteriores (bancos relacionais, NoSQL e streams) s&atilde;o transformados em dados confi&aacute;veis,
+          modelados em star schema e disponibilizados para consumo anal&iacute;tico.
+          O conte&uacute;do cobre os conceitos de ETL vs ELT, o modelo serverless de processamento de dados e a cobran&ccedil;a por
+          DPU-segundo, a arquitetura do AWS Glue (Data Catalog, Crawler, Job, Studio, Workflow), os fundamentos de Apache Spark
+          e PySpark, qualidade de dados em pipelines, modelagem dimensional (Kimball) e uma men&ccedil;&atilde;o aos formatos abertos
+          de tabela (Iceberg, Delta Lake, Hudi). As duas &uacute;ltimas horas s&atilde;o dedicadas a um laborat&oacute;rio completo:
+          construir dois Glue Jobs PySpark que movem o dataset Olist de <em>raw</em> para <em>silver</em> e de <em>silver</em> para
+          <em>gold</em>, culminando com queries anal&iacute;ticas no Athena sobre o star schema.
         </p>
       </section>
 
-      <!-- =========================================================
-           MÓDULO 1 — GLUE DATA CATALOG
-      ========================================================== -->
+      <!-- ============================================================
+           MODULO 1 — CONTEXTO
+      ============================================================= -->
       <section class="content-block">
-        <h2>Módulo 1 — AWS Glue Data Catalog: O Metastore Central</h2>
+        <h2>M&oacute;dulo 1 &mdash; Contexto: do dado cru ao dado &uacute;til</h2>
 
-        <h3>O que é um catálogo de dados e por que é essencial</h3>
+        <h3>Onde estamos no pipeline Olist</h3>
         <p>
-          Em um Data Lake maduro, dezenas de fontes diferentes geram centenas de tabelas
-          armazenadas em múltiplos formatos e prefixos no S3. Sem um catálogo central,
-          cada equipe precisa conhecer manualmente onde os dados estão, qual é o schema
-          de cada arquivo, quais colunas existem e o que cada uma significa. Esse
-          conhecimento fica disperso em planilhas, wikis e na cabeça das pessoas,
-          gerando silos de informação e retrabalho constante.
+          O projeto condutor desta disciplina &eacute; o dataset p&uacute;blico da Olist, contendo pedidos, produtos, clientes,
+          avalia&ccedil;&otilde;es e pagamentos de um marketplace brasileiro. At&eacute; agora constru&iacute;mos as funda&ccedil;&otilde;es:
+          definimos a conta AWS e o IAM (Aula 01), estabelecemos o Data Lake com S3 e Athena (Aula 02), conectamos fontes
+          relacionais e NoSQL (Aula 03) e aprendemos padr&otilde;es de ingest&atilde;o near real-time com Kinesis (Aula 04).
+          Hoje, na Aula 05, chegamos ao est&aacute;gio em que os dados brutos j&aacute; est&atilde;o no bucket <code>raw</code>
+          e precisam ser lapidados: limpos, tipados, deduplicados, enriquecidos com joins e, por fim, reorganizados em
+          modelo dimensional para an&aacute;lises de BI. Essa transforma&ccedil;&atilde;o &eacute; o que faz a diferen&ccedil;a entre um
+          Data Lake que &eacute; um "data swamp" e um Data Lake que &eacute; um ativo corporativo.
+        </p>
+
+        <h3>Por que n&atilde;o consultar o raw diretamente?</h3>
+        <p>
+          CSV &eacute; um formato textual, l&iacute;nea por l&iacute;nea, sem compress&atilde;o colunar nem estat&iacute;sticas. Consultar CSV
+          no Athena funciona para explora&ccedil;&atilde;o pontual, mas fica invi&aacute;vel para queries repetidas: cada SELECT
+          relerá o arquivo inteiro. Al&eacute;m disso, o raw cont&eacute;m duplicatas, campos mal tipados (n&uacute;meros e datas vindo
+          como texto), linhas inv&aacute;lidas e nomes de colunas inconsistentes. A camada silver existe para resolver essa
+          d&iacute;vida t&eacute;cnica: parquet colunar comprimido, schema explicitado, deduplica&ccedil;&atilde;o feita. A camada gold
+          ent&atilde;o reorganiza a silver em um modelo pensado para consumo (fato e dimens&otilde;es), eliminando joins caros nas
+          queries finais.
+        </p>
+      </section>
+
+      <!-- ============================================================
+           MODULO 2 — ETL vs ELT
+      ============================================================= -->
+      <section class="content-block">
+        <h2>M&oacute;dulo 2 &mdash; ETL vs ELT</h2>
+
+        <h3>Os dois paradigmas</h3>
+        <p>
+          <strong>ETL (Extract, Transform, Load)</strong> &eacute; o padr&atilde;o cl&aacute;ssico herdado da era do Data Warehouse
+          on-premise. A ideia central &eacute; transformar o dado <em>antes</em> de escrev&ecirc;-lo no destino. Isso
+          economizava espa&ccedil;o de armazenamento (caro no on-prem) e protegia o DW de cargas mal formadas. Tipicamente,
+          um servidor ETL dedicado (Informatica, DataStage, SSIS) ficava entre a origem e o DW, executando regras em um
+          engine pr&oacute;prio, e apenas o resultado final entrava no destino.
         </p>
         <p>
-          O AWS Glue Data Catalog resolve esse problema sendo o repositório central de
-          metadados do ecossistema analítico AWS. Ele armazena:
+          <strong>ELT (Extract, Load, Transform)</strong> inverte a ordem: primeiro carrega o dado bruto no Data Lake ou
+          Data Warehouse em nuvem, depois transforma l&aacute; dentro usando a pr&oacute;pria capacidade de processamento
+          distribu&iacute;do. Esse padr&atilde;o s&oacute; se tornou vi&aacute;vel com storage barato (S3) e compute el&aacute;stico
+          (Glue, Redshift, Snowflake). A vantagem fundamental: o dado cru fica preservado, permitindo reprocessamento
+          com novas regras sem precisar reingerir.
         </p>
+
+        <h3>Comparativo</h3>
+        <table>
+          <thead>
+            <tr><th>Aspecto</th><th>ETL</th><th>ELT</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Ordem</td><td>Extract &rarr; Transform &rarr; Load</td><td>Extract &rarr; Load &rarr; Transform</td></tr>
+            <tr><td>Engine de transforma&ccedil;&atilde;o</td><td>Servidor ETL dedicado</td><td>Engine do destino (DW/Lake)</td></tr>
+            <tr><td>Ambiente t&iacute;pico</td><td>DW on-premise</td><td>Cloud data lake / lakehouse</td></tr>
+            <tr><td>Volumes</td><td>M&eacute;dios (GB)</td><td>Grandes a massivos (TB+)</td></tr>
+            <tr><td>Dado cru preservado</td><td>N&atilde;o (s&oacute; o transformado)</td><td>Sim (raw layer)</td></tr>
+            <tr><td>Reprocessamento</td><td>Requer reingest&atilde;o</td><td>Apenas reroda a transforma&ccedil;&atilde;o</td></tr>
+            <tr><td>Ferramentas cl&aacute;ssicas</td><td>Informatica, SSIS, DataStage, Pentaho</td><td>Glue, dbt, Spark, Redshift, Snowflake</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Quando ainda faz sentido usar ETL cl&aacute;ssico</h3>
         <ul>
-          <li><strong>Databases:</strong> agrupamentos lógicos de tabelas (equivalente a schemas no SQL).</li>
-          <li><strong>Tables:</strong> definições de schema, formato, localização no S3 e particionamento.</li>
-          <li><strong>Partitions:</strong> metadados de cada partição individual de uma tabela.</li>
-          <li><strong>Connections:</strong> configurações de conexão JDBC para bancos externos (RDS, Redshift).</li>
+          <li>Dados sens&iacute;veis que precisam ser mascarados <strong>antes</strong> de pousar em qualquer lugar (LGPD, GDPR).</li>
+          <li>Destino pequeno ou caro por compute (um DW de pequeno porte fica caro para processar TB brutos).</li>
+          <li>Regras de neg&oacute;cio r&iacute;gidas que exigem valida&ccedil;&atilde;o antes do load (ex.: boletas financeiras).</li>
+          <li>Compliance exige auditoria rigorosa na zona de staging intermedi&aacute;ria.</li>
         </ul>
+
+        <h3>Quando ELT &eacute; o caminho natural</h3>
+        <ul>
+          <li>Storage &eacute; barato (S3 custa centavos por GB-m&ecirc;s) e compute &eacute; el&aacute;stico.</li>
+          <li>Dados brutos precisam ficar dispon&iacute;veis para reprocessar (mudan&ccedil;a de regra de neg&oacute;cio, corre&ccedil;&atilde;o de bug).</li>
+          <li>Cientistas de dados e analistas querem acesso ao dado cru para explora&ccedil;&atilde;o.</li>
+          <li>Volumes s&atilde;o grandes e variam ao longo do tempo &mdash; voc&ecirc; n&atilde;o quer dimensionar um cluster ETL fixo.</li>
+        </ul>
+
+        <div class="tip">
+          <strong>Na pr&aacute;tica:</strong> nosso pipeline Olist segue o padr&atilde;o ELT com toque de ETL. O dado cru
+          vai para o S3 raw sem transforma&ccedil;&atilde;o (ELT puro). Mas o Glue Job que gera a silver aplica transforma&ccedil;&otilde;es
+          razoavelmente pesadas (dedup, casting, filtros), e pode-se argumentar que isso &eacute; um ETL dentro do Lake.
+          O importante &eacute; que a camada raw permanece intacta e reproduz&iacute;vel.
+        </div>
+      </section>
+
+      <!-- ============================================================
+           MODULO 3 — SERVERLESS
+      ============================================================= -->
+      <section class="content-block">
+        <h2>M&oacute;dulo 3 &mdash; Serverless para dados</h2>
+
+        <h3>O que serverless realmente significa</h3>
         <p>
-          O Glue Catalog é compatível com o Apache Hive Metastore, o que significa que todos
-          os serviços AWS que entendem Hive — Athena, Redshift Spectrum, EMR, Glue Jobs —
-          compartilham as mesmas definições de tabela sem duplicação. Alterar o schema
-          no Catalog reflete imediatamente em todos os serviços.
+          "Serverless" n&atilde;o quer dizer "sem servidor". Existem servidores rodando seu c&oacute;digo, claro. O termo significa
+          que <strong>voc&ecirc; n&atilde;o os gerencia</strong>. N&atilde;o provisiona capacidade, n&atilde;o escolhe tamanho de VM, n&atilde;o
+          instala runtime, n&atilde;o cuida de patches de sistema operacional. A AWS aloca tudo sob demanda quando sua fun&ccedil;&atilde;o
+          ou job dispara, executa, e libera os recursos ao final. Voc&ecirc; paga exclusivamente pelo tempo de execu&ccedil;&atilde;o
+          real, granulado no segundo ou no milissegundo.
         </p>
 
-        <h3>Glue Crawlers: descoberta automática de schema</h3>
+        <h3>As quatro caracter&iacute;sticas centrais</h3>
+        <ol>
+          <li>
+            <strong>Stateless:</strong> cada execu&ccedil;&atilde;o come&ccedil;a do zero. N&atilde;o h&aacute; estado persistente entre invoca&ccedil;&otilde;es.
+            Se voc&ecirc; precisa lembrar algo entre runs, use armazenamento externo (S3, DynamoDB, Glue Catalog).
+          </li>
+          <li>
+            <strong>Ef&ecirc;mero:</strong> os recursos (contêineres, JVMs, executors) existem apenas durante a execu&ccedil;&atilde;o.
+            Ap&oacute;s o fim do job, s&atilde;o destru&iacute;dos. Voc&ecirc; n&atilde;o pode fazer SSH, n&atilde;o pode instalar daemons que fiquem
+            rodando.
+          </li>
+          <li>
+            <strong>Event-driven:</strong> o trabalho &eacute; disparado por eventos &mdash; uma mensagem chegando, um objeto
+            novo no S3, uma chamada de API, um cron schedule. Voc&ecirc; define o gatilho, n&atilde;o precisa ter um daemon
+            fazendo polling.
+          </li>
+          <li>
+            <strong>Pay-per-use:</strong> cobran&ccedil;a por segundo (ou milissegundo) de execu&ccedil;&atilde;o. Quando n&atilde;o h&aacute;
+            trabalho, n&atilde;o h&aacute; custo. Isso inverte completamente a economia do data processing: um pipeline que roda
+            1h por dia custa 1/24 do custo de um cluster fixo 24x7.
+          </li>
+        </ol>
+
+        <h3>Modelo de cobran&ccedil;a do Glue: DPU-segundo</h3>
         <p>
-          Um Crawler é um agente do Glue que escaneia uma fonte de dados (S3, banco JDBC,
-          DynamoDB) e automaticamente infere o schema, cria ou atualiza tabelas no Catalog,
-          e detecta novas partições. Sem Crawlers, você precisaria escrever e executar
-          manualmente os DDLs de criação de tabela sempre que novos dados chegassem
-          ou o schema mudasse.
+          O AWS Glue cobra em <strong>DPUs</strong> (Data Processing Units). Uma DPU &eacute; uma unidade de processamento
+          virtual equivalente a <strong>4 vCPUs e 16 GB de mem&oacute;ria</strong>. Voc&ecirc; escolhe quantas DPUs seu job utiliza
+          (m&iacute;nimo 2 para jobs Spark) e o Glue cobra pela hora de DPU utilizada, faturada no segundo (com m&iacute;nimo de
+          1 minuto por execu&ccedil;&atilde;o, dependendo do tipo).
         </p>
         <p>
-          O Crawler usa classificadores para detectar o formato dos arquivos
-          (CSV, JSON, Parquet, ORC, Avro) e inferir tipos de colunas. Para CSV,
-          ele usa heurísticas para detectar o delimitador e amostras de valores
-          para inferir tipos. Para Parquet, ele lê o schema embutido nos metadados
-          do arquivo.
+          Exemplo pr&aacute;tico: um job Spark que roda por 10 minutos com 2 DPUs consome 2 DPUs &times; (10/60) h = 0,333 DPU-hora.
+          Ao pre&ccedil;o atual de cerca de US$ 0,44 por DPU-hora, isso d&aacute; aproximadamente US$ 0,15. Esse modelo &eacute; eficiente
+          para cargas intermitentes, mas pode virar uma armadilha para jobs que ficam presos em lan&ccedil;ar e n&atilde;o processar
+          nada (cold start de Spark demora v&aacute;rios minutos). Da&iacute; a import&acirc;ncia de <strong>parar jobs travados</strong>
+          e monitorar execu&ccedil;&otilde;es.
+        </p>
+
+        <div class="warning">
+          <strong>Cuidado no Learner Lab:</strong> o budget do AWS Student &eacute; limitado (US$ 100 por semestre).
+          Um job Glue deixado rodando acidentalmente por uma hora com 10 DPUs j&aacute; consome v&aacute;rios d&oacute;lares.
+          Sempre verifique a aba <em>Runs</em> do Glue antes de fechar a sess&atilde;o.
+        </div>
+      </section>
+
+      <!-- ============================================================
+           MODULO 4 — AWS GLUE
+      ============================================================= -->
+      <section class="content-block">
+        <h2>M&oacute;dulo 4 &mdash; AWS Glue: arquitetura e componentes</h2>
+
+        <h3>Vis&atilde;o geral</h3>
+        <p>
+          O AWS Glue &eacute; a plataforma serverless de integra&ccedil;&atilde;o de dados da AWS. Ele re&uacute;ne em um &uacute;nico servi&ccedil;o
+          quatro capacidades que, em stacks tradicionais, exigiriam ferramentas separadas: (1) um metastore central
+          (Data Catalog), (2) descoberta autom&aacute;tica de schema (Crawler), (3) execu&ccedil;&atilde;o de ETL distribu&iacute;do
+          (Job Spark) e (4) orquestra&ccedil;&atilde;o de pipelines (Workflow). Por cima disso tudo, oferece uma interface visual
+          (Studio) para quem prefere desenhar em vez de codar.
+        </p>
+
+        <h3>Glue Data Catalog</h3>
+        <p>
+          O Data Catalog &eacute; o cora&ccedil;&atilde;o do Glue. Ele &eacute; um metastore compat&iacute;vel com Apache Hive, o que significa
+          que qualquer ferramenta do ecossistema Hadoop (Spark, Presto, Hive, Trino) consegue consumi-lo. Quando voc&ecirc;
+          cria uma tabela no Catalog, est&aacute; dizendo "existe um conjunto de arquivos em tal caminho S3, com tal schema,
+          em tal formato". A partir desse ponto, Athena, Redshift Spectrum, EMR e os pr&oacute;prios Jobs do Glue podem
+          consultar aquela "tabela" como se fosse uma tabela relacional.
         </p>
         <p>
-          Boas práticas para Crawlers:
+          O Catalog organiza metadados em:
         </p>
         <ul>
-          <li>Configure um crawler separado por camada (Raw, Trusted, Refined) e por domínio.</li>
-          <li>Agende crawlers para rodar após os jobs que populam cada camada.</li>
-          <li>Use o modo <strong>Crawl new sub-folders only</strong> para incrementalizar
-          a descoberta de partições sem re-escanear dados já catalogados.</li>
-          <li>Defina um database de destino diferente para cada ambiente (dev, staging, prod).</li>
+          <li><strong>Databases</strong> &mdash; agrupamentos l&oacute;gicos. No nosso projeto: <code>olist_raw</code>, <code>olist_trusted</code>, <code>olist_refined</code>.</li>
+          <li><strong>Tables</strong> &mdash; schema (colunas e tipos) + localiza&ccedil;&atilde;o S3 + formato (CSV, Parquet, JSON).</li>
+          <li><strong>Partitions</strong> &mdash; subdivis&otilde;es f&iacute;sicas da tabela (ex.: <code>year_month=2018-05</code> em um subdirect&oacute;rio).</li>
+          <li><strong>Connections</strong> &mdash; conex&otilde;es credencializadas a fontes externas (RDS, Redshift, Kafka).</li>
+          <li><strong>Classifiers</strong> &mdash; regras para reconhecer formatos customizados (ex.: CSV com delimitador pipe).</li>
+        </ul>
+
+        <h3>Glue Crawler</h3>
+        <p>
+          O Crawler &eacute; um processo que varre um caminho no S3, amostra arquivos, deduz o formato, infere tipos de colunas
+          e cria (ou atualiza) tabelas no Catalog. &Eacute; a ferramenta mais r&aacute;pida para voc&ecirc; dizer "pegue isso que est&aacute;
+          no S3 e fa&ccedil;a ser consult&aacute;vel". Ele tamb&eacute;m detecta parti&ccedil;&otilde;es estilo Hive (diret&oacute;rios com
+          <code>chave=valor</code>) e atualiza o Catalog quando novas parti&ccedil;&otilde;es aparecem.
+        </p>
+        <p>
+          Cuidados: a infer&ecirc;ncia de tipos nem sempre acerta &mdash; datas frequentemente s&atilde;o reconhecidas como string,
+          n&uacute;meros decimais viram double. Para produ&ccedil;&atilde;o s&eacute;ria, o padr&atilde;o maduro &eacute; definir as tabelas via c&oacute;digo
+          (CREATE EXTERNAL TABLE no Athena ou SDK do Glue), deixando o Crawler apenas para ambientes explorat&oacute;rios
+          ou descoberta inicial.
+        </p>
+
+        <h3>Glue Job</h3>
+        <p>
+          O Job &eacute; a unidade de trabalho execut&aacute;vel do Glue. Voc&ecirc; escolhe o tipo e escreve (ou gera visualmente) o
+          c&oacute;digo que transforma dados. Os tipos principais:
+        </p>
+        <table>
+          <thead>
+            <tr><th>Tipo</th><th>Quando usar</th><th>Recursos m&iacute;nimos</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Spark</strong></td><td>Volumes grandes, joins, agrega&ccedil;&otilde;es, particionamento</td><td>2 DPUs</td></tr>
+            <tr><td><strong>Spark Streaming</strong></td><td>Consumir Kinesis/Kafka em micro-batches</td><td>2 DPUs</td></tr>
+            <tr><td><strong>Python Shell</strong></td><td>Scripts pequenos, chamadas API, orquestra&ccedil;&atilde;o leve</td><td>0,0625 ou 1 DPU</td></tr>
+            <tr><td><strong>Ray</strong></td><td>Workloads Python distribu&iacute;dos (ML, simula&ccedil;&otilde;es)</td><td>2 workers</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Glue Studio</h3>
+        <p>
+          O Studio &eacute; a interface visual do Glue. Voc&ecirc; arrasta blocos que representam fontes, transforma&ccedil;&otilde;es
+          e destinos, conecta-os em um DAG e o Studio gera c&oacute;digo PySpark correspondente. &Eacute; &oacute;timo para prototipagem,
+          para democratizar o ETL para perfis menos t&eacute;cnicos e para gerar boilerplate. Por&eacute;m, transforma&ccedil;&otilde;es
+          mais avan&ccedil;adas (UDFs, janelamento, l&oacute;gicas condicionais complexas) ainda exigem edi&ccedil;&atilde;o do c&oacute;digo,
+          e o versionamento do fluxo visual em Git &eacute; limitado.
+        </p>
+
+        <h3>Glue Workflow</h3>
+        <p>
+          O Workflow orquestra m&uacute;ltiplos crawlers e jobs em um grafo direcionado, com triggers que podem ser:
+          <em>on-demand</em> (manual), <em>schedule</em> (cron) ou <em>event</em> (outro job terminou). Isso permite
+          encadear, por exemplo: "toda noite &agrave; 1h da manh&atilde;, roda o crawler raw, depois o job raw_to_silver,
+          depois o crawler silver, depois o job silver_to_gold, depois o crawler gold". Em pipelines maiores e mais
+          cr&iacute;ticos, o padr&atilde;o mais usado na AWS &eacute; Step Functions, que oferece mais recursos de controle de fluxo
+          (par&acirc;metros, erros, timeouts, paralelismo).
+        </p>
+      </section>
+
+      <!-- ============================================================
+           MODULO 5 — SPARK & PYSPARK
+      ============================================================= -->
+      <section class="content-block">
+        <h2>M&oacute;dulo 5 &mdash; Apache Spark e PySpark</h2>
+
+        <h3>Fundamentos de Spark</h3>
+        <p>
+          Apache Spark &eacute; um motor de processamento distribu&iacute;do em mem&oacute;ria. Ele particiona os dados em v&aacute;rios
+          n&oacute;s (executors), processa em paralelo e combina os resultados. Trabalha com tr&ecirc;s abstra&ccedil;&otilde;es principais:
+        </p>
+        <ul>
+          <li><strong>RDD (Resilient Distributed Dataset):</strong> cole&ccedil;&atilde;o imut&aacute;vel e distribu&iacute;da de objetos. API de baixo n&iacute;vel, raramente usada hoje diretamente.</li>
+          <li><strong>DataFrame:</strong> tabela distribu&iacute;da com schema, an&aacute;loga a uma tabela SQL ou a um DataFrame do pandas. &Eacute; a API mais usada em ETL.</li>
+          <li><strong>Dataset:</strong> DataFrame tipado (dispon&iacute;vel em Scala/Java). Em PySpark, s&oacute; existe DataFrame.</li>
+        </ul>
+
+        <h3>Arquitetura de execu&ccedil;&atilde;o</h3>
+        <p>
+          Quando voc&ecirc; submete um job Spark, existe um <strong>Driver</strong> (programa principal) que coordena e
+          v&aacute;rios <strong>Executors</strong> (n&oacute;s que fazem o trabalho). O driver transforma seu c&oacute;digo em um DAG de
+          tarefas, envia as tarefas aos executors, que processam parti&ccedil;&otilde;es de dados em paralelo, e retorna
+          resultados ao driver.
+        </p>
+
+        <h3>Lazy evaluation</h3>
+        <p>
+          A caracter&iacute;stica mais importante para entender Spark &eacute; <strong>avalia&ccedil;&atilde;o pregui&ccedil;osa</strong>:
+          transforma&ccedil;&otilde;es (<code>select</code>, <code>filter</code>, <code>groupBy</code>, <code>join</code>) n&atilde;o executam
+          nada &mdash; apenas constroem um plano l&oacute;gico. S&oacute; quando voc&ecirc; chama uma a&ccedil;&atilde;o (<code>count</code>,
+          <code>collect</code>, <code>show</code>, <code>write</code>) o Spark otimiza o plano (via Catalyst Optimizer) e
+          executa de fato. Isso permite o otimizador reorganizar filtros, eliminar colunas desnecess&aacute;rias e reduzir
+          shuffles antes de rodar qualquer coisa.
+        </p>
+
+        <h3>Transforma&ccedil;&otilde;es vs a&ccedil;&otilde;es &mdash; tabela de refer&ecirc;ncia</h3>
+        <table>
+          <thead>
+            <tr><th>Categoria</th><th>Transforma&ccedil;&otilde;es (lazy)</th><th>A&ccedil;&otilde;es (eager)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Sele&ccedil;&atilde;o</td><td><code>select</code>, <code>filter</code>, <code>where</code>, <code>drop</code></td><td><code>count</code>, <code>collect</code>, <code>take</code>, <code>show</code></td></tr>
+            <tr><td>Agrega&ccedil;&atilde;o</td><td><code>groupBy</code>, <code>agg</code>, <code>pivot</code></td><td><code>reduce</code>, <code>foreach</code></td></tr>
+            <tr><td>Combinar</td><td><code>join</code>, <code>union</code>, <code>intersect</code></td><td><code>first</code>, <code>head</code></td></tr>
+            <tr><td>Transformar</td><td><code>withColumn</code>, <code>withColumnRenamed</code>, <code>map</code></td><td><code>toPandas</code>, <code>toLocalIterator</code></td></tr>
+            <tr><td>I/O</td><td><code>read.parquet</code>, <code>read.csv</code></td><td><code>write.parquet</code>, <code>saveAsTable</code></td></tr>
+          </tbody>
+        </table>
+
+        <h3>PySpark em ETL &mdash; operadores essenciais</h3>
+<pre><code>from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, to_timestamp, date_format, trim, when
+
+spark = SparkSession.builder.getOrCreate()
+
+# Leitura
+df_csv    = spark.read.option("header", True).csv("s3://bucket/raw/orders/")
+df_parq   = spark.read.parquet("s3://bucket/silver/orders/")
+
+# Transforma&ccedil;&otilde;es b&aacute;sicas
+df2 = (df_csv
+  .withColumn("order_ts", to_timestamp(col("order_purchase_timestamp")))
+  .withColumn("customer_id", trim(col("customer_id")))
+  .filter(col("customer_id").isNotNull())
+  .dropDuplicates(["order_id"])
+  .select("order_id", "customer_id", "order_ts"))
+
+# Agrega&ccedil;&atilde;o
+agg = df2.groupBy("customer_id").count()
+
+# Join
+enriched = df2.join(agg, "customer_id")
+
+# Escrita particionada em Parquet
+(enriched
+  .withColumn("year_month", date_format(col("order_ts"), "yyyy-MM"))
+  .write
+  .mode("overwrite")
+  .partitionBy("year_month")
+  .parquet("s3://bucket/silver/orders_enriched/"))</code></pre>
+
+        <div class="tip">
+          <strong>Dica de performance:</strong> sempre prefira <code>filter</code> e <code>select</code> o mais cedo poss&iacute;vel
+          no pipeline. O Catalyst Optimizer faz pushdown, mas ajudar o otimizador sendo expl&iacute;cito raramente prejudica.
+        </div>
+      </section>
+
+      <!-- ============================================================
+           MODULO 6 — QUALIDADE
+      ============================================================= -->
+      <section class="content-block">
+        <h2>M&oacute;dulo 6 &mdash; Qualidade de dados no ETL</h2>
+
+        <h3>Por que qualidade &eacute; parte do ETL, n&atilde;o um extra</h3>
+        <p>
+          Dado sem qualidade &eacute; passivo: polui dashboards, gera decis&otilde;es erradas e corr&oacute;i confian&ccedil;a. A camada
+          silver existe justamente para garantir qualidade m&iacute;nima. Todo job que popula a silver deve aplicar, no m&iacute;nimo,
+          quatro tipos de garantias:
+        </p>
+        <ol>
+          <li>
+            <strong>Deduplica&ccedil;&atilde;o:</strong> identificar a chave natural de cada entidade (order_id, customer_id,
+            product_id) e remover duplicatas com <code>dropDuplicates([chave])</code>. Em cen&aacute;rios com CDC ou retentativas,
+            duplicatas s&atilde;o quase garantidas.
+          </li>
+          <li>
+            <strong>Casting de tipos:</strong> timestamps viram <code>TimestampType</code>, n&uacute;meros monet&aacute;rios viram
+            <code>DecimalType</code> (nunca double para dinheiro), inteiros viram <code>IntegerType</code> ou
+            <code>LongType</code>. Use <code>to_timestamp</code>, <code>cast</code>.
+          </li>
+          <li>
+            <strong>Tratamento de nulls:</strong> decida expl&iacute;citamente se filtra, preenche ou flaga. Use
+            <code>filter(col("x").isNotNull())</code>, <code>fillna</code> ou <code>when/otherwise</code>.
+          </li>
+          <li>
+            <strong>Schema enforcement:</strong> declare um <code>StructType</code> expl&iacute;cito na leitura e valide
+            ap&oacute;s. Isso evita que uma coluna nova ou faltando passe silenciosamente.
+          </li>
+        </ol>
+
+        <h3>Ferramentas AWS e open source</h3>
+        <ul>
+          <li>
+            <strong>Glue Data Quality:</strong> servi&ccedil;o nativo do Glue com linguagem declarativa DQDL. Voc&ecirc; escreve
+            regras como <code>RowCount &gt; 0</code>, <code>Completeness "customer_id" &gt; 0.99</code>,
+            <code>Uniqueness "order_id" = 1.0</code> e o Glue executa dentro do pipeline.
+          </li>
+          <li>
+            <strong>Deequ:</strong> biblioteca open source da AWS (Java/Scala) para valida&ccedil;&atilde;o sobre Spark. Integra-se
+            com Glue Jobs.
+          </li>
+          <li>
+            <strong>Great Expectations:</strong> biblioteca Python muito popular para definir expectations em formato
+            declarativo. Gera profiling e docs autom&aacute;ticas.
+          </li>
         </ul>
       </section>
 
-      <!-- =========================================================
-           MÓDULO 2 — GLUE JOBS ETL
-      ========================================================== -->
+      <!-- ============================================================
+           MODULO 7 — MODELAGEM STAR SCHEMA
+      ============================================================= -->
       <section class="content-block">
-        <h2>Módulo 2 — AWS Glue Jobs: ETL Serverless com PySpark</h2>
+        <h2>M&oacute;dulo 7 &mdash; Modelagem dimensional (Kimball)</h2>
 
-        <h3>O que é um Glue Job</h3>
+        <h3>O star schema</h3>
         <p>
-          Um Glue Job é um script ETL executado em um ambiente serverless gerenciado pela AWS.
-          Você escreve o código (Python com PySpark ou Scala com Spark), define o tipo
-          de worker e o número de DPUs (Data Processing Units), e o Glue provisiona
-          o cluster Spark, executa o job e desprovisiona os recursos automaticamente.
-          Você paga apenas pelo tempo de execução em DPU-segundos.
-        </p>
-        <p>
-          O Glue oferece três tipos de worker:
+          A modelagem dimensional, popularizada por Ralph Kimball nos anos 90, continua sendo a abordagem padr&atilde;o
+          para dados anal&iacute;ticos. O modelo <strong>star schema</strong> (esquema estrela) organiza os dados em duas
+          categorias de tabelas:
         </p>
         <ul>
-          <li><strong>Standard:</strong> 2 vCPUs, 8 GB de RAM. Uso geral.</li>
-          <li><strong>G.1X:</strong> 4 vCPUs, 16 GB de RAM. Recomendado para transformações
-          com uso intensivo de memória.</li>
-          <li><strong>G.2X:</strong> 8 vCPUs, 32 GB de RAM. Para workloads pesados com
-          shuffles frequentes e datasets muito grandes.</li>
+          <li>
+            <strong>Tabela fato:</strong> cont&eacute;m os eventos mensur&aacute;veis do neg&oacute;cio. Cada linha &eacute; uma ocorr&ecirc;ncia
+            (venda, pagamento, pedido). As colunas s&atilde;o medidas num&eacute;ricas (pre&ccedil;o, quantidade, valor) e chaves
+            estrangeiras para as dimens&otilde;es.
+          </li>
+          <li>
+            <strong>Tabelas dimens&atilde;o:</strong> cont&eacute;m contexto descritivo. Cada dimens&atilde;o responde uma pergunta:
+            <em>quem</em> (cliente), <em>o qu&ecirc;</em> (produto), <em>quando</em> (tempo), <em>onde</em> (local),
+            <em>como</em> (forma de pagamento). Dimens&otilde;es s&atilde;o denormalizadas (redund&acirc;ncia aceita em DW).
+          </li>
         </ul>
 
-        <h3>Estrutura de um Glue Job em PySpark</h3>
+        <h3>Aplicando ao dataset Olist</h3>
         <p>
-          Um Glue Job típico para converter dados da camada Raw (CSV) para Trusted (Parquet)
-          tem a seguinte estrutura:
+          Nosso star schema final na camada gold ser&aacute;:
         </p>
-        <pre><code>import sys
-from awsglue.transforms import *
+        <table>
+          <thead>
+            <tr><th>Tabela</th><th>Tipo</th><th>Gr&atilde;o / descri&ccedil;&atilde;o</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>fato_vendas</code></td><td>Fato</td><td>1 linha por item de pedido (order_id + product_id)</td></tr>
+            <tr><td><code>dim_cliente</code></td><td>Dimens&atilde;o</td><td>customer_id, cidade, estado, regi&atilde;o</td></tr>
+            <tr><td><code>dim_produto</code></td><td>Dimens&atilde;o</td><td>product_id, categoria, peso, dimens&otilde;es</td></tr>
+            <tr><td><code>dim_tempo</code></td><td>Dimens&atilde;o</td><td>timestamp, ano, m&ecirc;s, dia, dia da semana</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Por que star schema (e n&atilde;o s&oacute; joins on-the-fly)?</h3>
+        <ul>
+          <li>Queries anal&iacute;ticas viram r&aacute;pidas: poucos joins, todos por chave simples.</li>
+          <li>Modelo intuitivo para usu&aacute;rios de BI: "fato cercado por contexto".</li>
+          <li>Ferramentas de BI (QuickSight, Power BI, Tableau) s&atilde;o otimizadas para star schemas.</li>
+          <li>Denormaliza&ccedil;&atilde;o aceita nas dimens&otilde;es (ex.: estado e regi&atilde;o juntos) evita joins extras.</li>
+        </ul>
+      </section>
+
+      <!-- ============================================================
+           MODULO 8 — FORMATOS DE TABELA ABERTA
+      ============================================================= -->
+      <section class="content-block">
+        <h2>M&oacute;dulo 8 &mdash; Formatos de tabela aberta (men&ccedil;&atilde;o)</h2>
+        <p>
+          Parquet &eacute; um formato de <strong>arquivo</strong> colunar excelente, mas por si s&oacute; n&atilde;o resolve problemas
+          de uma "tabela" como entidade l&oacute;gica: n&atilde;o tem transa&ccedil;&otilde;es ACID, n&atilde;o suporta schema evolution sem dor,
+          n&atilde;o permite time travel nativo. &Eacute; a&iacute; que entram os <strong>formatos de tabela aberta</strong>, que usam
+          Parquet (ou ORC) por baixo e adicionam uma camada de metadados que traz as garantias de um DW para o Data Lake.
+        </p>
+        <table>
+          <thead>
+            <tr><th>Formato</th><th>Origem</th><th>Caracter&iacute;sticas</th><th>Suporte AWS</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Apache Iceberg</strong></td>
+              <td>Netflix, hoje ASF</td>
+              <td>ACID, schema evolution, partition evolution, time travel</td>
+              <td>Nativo (Glue, Athena, Redshift, EMR)</td>
+            </tr>
+            <tr>
+              <td><strong>Delta Lake</strong></td>
+              <td>Databricks</td>
+              <td>ACID, upserts, time travel, muito usado em Databricks</td>
+              <td>Leitura no Athena, EMR</td>
+            </tr>
+            <tr>
+              <td><strong>Apache Hudi</strong></td>
+              <td>Uber</td>
+              <td>Focado em upserts e CDC, copy-on-write e merge-on-read</td>
+              <td>EMR, Glue</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="tip">
+          <strong>Na AWS hoje:</strong> Iceberg &eacute; a aposta mais forte. Redshift, Athena, Glue e EMR t&ecirc;m suporte nativo
+          e bem integrado. Se voc&ecirc; for adotar um formato de tabela agora, comece por ele.
+        </div>
+      </section>
+
+      <!-- ============================================================
+           MODULO 9 — LAB 1: CRAWLER RAW
+      ============================================================= -->
+      <section class="content-block">
+        <h2>M&oacute;dulo 9 &mdash; Laborat&oacute;rio 1: catalogar a camada raw</h2>
+
+        <h3>Objetivo</h3>
+        <p>
+          Fazer o Glue Crawler descobrir o schema dos arquivos CSV do Olist em <code>s3://&lt;aluno&gt;-raw/olist/</code>
+          e popular o database <code>olist_raw</code> no Data Catalog.
+        </p>
+
+        <h3>Pr&eacute;-requisitos</h3>
+        <ul>
+          <li>AWS Student ativo, regi&atilde;o <strong>us-east-1</strong>.</li>
+          <li>Bucket <code>&lt;aluno&gt;-raw</code> com o dataset Olist descompactado em <code>olist/orders/</code>, <code>olist/order_items/</code>, <code>olist/customers/</code>, <code>olist/products/</code>.</li>
+          <li>Role de execu&ccedil;&atilde;o <strong>LabRole</strong> dispon&iacute;vel.</li>
+        </ul>
+
+        <h3>Passo a passo</h3>
+        <ol>
+          <li>Abra o Console AWS e navegue at&eacute; <strong>AWS Glue</strong>.</li>
+          <li>No menu lateral, clique em <em>Databases</em>.</li>
+          <li>Clique <em>Add database</em>. Nome: <code>olist_raw</code>. Deixe description em branco. Clique <em>Create database</em>.</li>
+          <li>Volte ao menu e clique em <em>Crawlers</em> &rarr; <em>Create crawler</em>.</li>
+          <li>Name: <code>olist_raw_crawler</code>. Clique <em>Next</em>.</li>
+          <li>Em Data source configuration, clique <em>Add a data source</em>. Source type: <strong>S3</strong>. S3 path: <code>s3://&lt;aluno&gt;-raw/olist/</code>. Subsequent crawler runs: <em>Crawl all sub-folders</em>. Adicione e clique <em>Next</em>.</li>
+          <li>IAM role: selecione <strong>LabRole</strong>. Clique <em>Next</em>.</li>
+          <li>Target database: <code>olist_raw</code>. Table name prefix: deixe em branco. Crawler schedule: <em>On demand</em>. Clique <em>Next</em>.</li>
+          <li>Revise e clique <em>Create crawler</em>.</li>
+          <li>Selecione o crawler na lista e clique <em>Run</em>. Aguarde at&eacute; o status mudar para <em>Ready</em> (cerca de 1&ndash;3 minutos).</li>
+          <li>V&aacute; a <em>Databases &rarr; olist_raw &rarr; Tables</em>. Voc&ecirc; deve ver tabelas como <code>orders</code>, <code>order_items</code>, <code>customers</code>, <code>products</code>.</li>
+        </ol>
+
+        <div class="warning">
+          <strong>Aten&ccedil;&atilde;o:</strong> se o Crawler n&atilde;o achar tabelas, verifique: (1) os CSVs t&ecirc;m extens&atilde;o
+          <code>.csv</code>; (2) a LabRole tem permiss&atilde;o de leitura no bucket; (3) o path termina com <code>/</code>.
+        </div>
+      </section>
+
+      <!-- ============================================================
+           MODULO 10 — LAB 2: raw_to_silver
+      ============================================================= -->
+      <section class="content-block">
+        <h2>M&oacute;dulo 10 &mdash; Laborat&oacute;rio 2: Glue Job <code>raw_to_silver</code></h2>
+
+        <h3>Objetivo</h3>
+        <p>
+          Criar um Glue Job PySpark que l&ecirc; a tabela <code>olist_raw.orders</code>, aplica dedup, casting e filtro de nulls,
+          particiona por <code>year_month</code> e grava em Parquet no bucket <code>&lt;aluno&gt;-trusted</code>.
+        </p>
+
+        <h3>Passo a passo &mdash; configura&ccedil;&atilde;o do Job</h3>
+        <ol>
+          <li>No console Glue, clique em <em>ETL jobs</em>.</li>
+          <li>Clique <em>Script editor</em> e escolha engine <strong>Spark</strong>.</li>
+          <li>Nome do job: <code>raw_to_silver</code>.</li>
+          <li>Job details &rarr; <em>IAM role</em>: <strong>LabRole</strong>.</li>
+          <li><em>Type</em>: Spark. <em>Glue version</em>: 4.0 ou superior. <em>Language</em>: Python 3.</li>
+          <li><em>Worker type</em>: G.1X. <em>Number of workers</em>: 2.</li>
+          <li><em>Job timeout</em>: 15 minutes.</li>
+          <li><em>Number of retries</em>: 0.</li>
+          <li>Em <em>Advanced properties &rarr; Job parameters</em>, adicione (opcional): <code>--enable-continuous-cloudwatch-log</code> = <code>true</code>.</li>
+        </ol>
+
+        <h3>Script PySpark completo</h3>
+<pre><code>import sys
+from awsglue.context import GlueContext
 from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
+from pyspark.sql.functions import col, to_timestamp, date_format, trim
+
+# ------------------------------------------------------------------
+# Inicializa&ccedil;&atilde;o do contexto Glue/Spark
+# ------------------------------------------------------------------
+sc    = SparkContext.getOrCreate()
+glue  = GlueContext(sc)
+spark = glue.spark_session
+
+# Substitua pelo seu prefixo de bucket
+ALUNO = "meu-aluno"
+
+src_path = f"s3://{ALUNO}-raw/olist/orders/"
+dst_path = f"s3://{ALUNO}-trusted/olist/orders/"
+
+# ------------------------------------------------------------------
+# Leitura da camada raw (CSV)
+# ------------------------------------------------------------------
+orders = (spark.read
+    .option("header", True)
+    .option("inferSchema", False)
+    .csv(src_path))
+
+print(f"Linhas lidas no raw: {orders.count()}")
+
+# ------------------------------------------------------------------
+# Transforma&ccedil;&otilde;es de qualidade
+#   1. Timestamp: casting da coluna de data
+#   2. Trim em colunas de texto-chave
+#   3. Filtro de nulls em customer_id (dado obrigat&oacute;rio)
+#   4. Deduplica&ccedil;&atilde;o por order_id (chave natural)
+#   5. Deriva year_month para particionamento
+# ------------------------------------------------------------------
+orders_silver = (orders
+    .withColumn("order_purchase_timestamp",
+                to_timestamp(col("order_purchase_timestamp")))
+    .withColumn("customer_id", trim(col("customer_id")))
+    .withColumn("order_id",    trim(col("order_id")))
+    .filter(col("customer_id").isNotNull())
+    .filter(col("order_id").isNotNull())
+    .dropDuplicates(["order_id"])
+    .withColumn("year_month",
+                date_format(col("order_purchase_timestamp"), "yyyy-MM")))
+
+print(f"Linhas ap&oacute;s qualidade: {orders_silver.count()}")
+
+# ------------------------------------------------------------------
+# Escrita em Parquet, particionada por year_month
+# ------------------------------------------------------------------
+(orders_silver.write
+    .mode("overwrite")
+    .partitionBy("year_month")
+    .parquet(dst_path))
+
+print(f"Parquet escrito em: {dst_path}")</code></pre>
+
+        <h3>Executando e acompanhando</h3>
+        <ol>
+          <li>Clique em <em>Save</em> e depois <em>Run</em>.</li>
+          <li>V&aacute; para a aba <em>Runs</em>. Status deve mudar para <strong>Running</strong>.</li>
+          <li>Clique no run em execu&ccedil;&atilde;o, depois em <em>Output logs</em> &mdash; abre CloudWatch Logs.</li>
+          <li>Acompanhe as mensagens: linha lidas, linhas ap&oacute;s qualidade, path de escrita.</li>
+          <li>Ao final (status <strong>Succeeded</strong>), verifique em <em>Runs</em>: <em>Execution time</em> e <em>DPU hours</em>.</li>
+          <li>Abra o S3 e confira <code>s3://&lt;aluno&gt;-trusted/olist/orders/</code>. Deve haver subdiret&oacute;rios no formato <code>year_month=2018-05/</code> com arquivos <code>part-00000-*.parquet</code>.</li>
+        </ol>
+
+        <div class="tip">
+          <strong>Para catalogar o silver:</strong> rode um crawler adicional apontando para <code>s3://&lt;aluno&gt;-trusted/olist/</code>
+          com database destino <code>olist_trusted</code>. Isso permite consultar a silver tamb&eacute;m via Athena.
+        </div>
+
+        <h3>Jobs para as outras tabelas</h3>
+        <p>
+          O mesmo padr&atilde;o vale para <code>order_items</code>, <code>customers</code> e <code>products</code>. Voc&ecirc; pode
+          clonar o script acima, ajustando os paths e as regras espec&iacute;ficas de cada tabela (por exemplo,
+          <code>customers</code> n&atilde;o tem timestamp, ent&atilde;o n&atilde;o particionamos).
+        </p>
+      </section>
+
+      <!-- ============================================================
+           MODULO 11 — LAB 3: silver_to_gold
+      ============================================================= -->
+      <section class="content-block">
+        <h2>M&oacute;dulo 11 &mdash; Laborat&oacute;rio 3: Glue Job <code>silver_to_gold</code></h2>
+
+        <h3>Objetivo</h3>
+        <p>
+          Ler a silver (orders, order_items, customers, products), fazer um join 4-way e produzir as tabelas do star schema
+          (<code>fato_vendas</code>, <code>dim_cliente</code>, <code>dim_produto</code>, <code>dim_tempo</code>) no bucket
+          <code>&lt;aluno&gt;-refined</code>.
+        </p>
+
+        <h3>Passo a passo &mdash; cria&ccedil;&atilde;o do Job</h3>
+        <ol>
+          <li>Glue &rarr; ETL jobs &rarr; <em>Script editor</em> &rarr; <em>Spark</em>.</li>
+          <li>Nome: <code>silver_to_gold</code>.</li>
+          <li>IAM role: <strong>LabRole</strong>. Glue version: 4.0+. Python 3.</li>
+          <li>Worker type: G.1X. Number of workers: 2. Timeout: 15 min. Retries: 0.</li>
+        </ol>
+
+        <h3>Script PySpark completo</h3>
+<pre><code>from pyspark.context import SparkContext
 from awsglue.context import GlueContext
-from awsglue.job import Job
-from pyspark.sql.functions import col, to_date, trim
-
-## @params: [JOB_NAME]
-args = getResolvedOptions(sys.argv, ['JOB_NAME'])
-
-sc = SparkContext()
-glueContext = GlueContext(sc)
-spark = glueContext.spark_session
-job = Job(glueContext)
-job.init(args['JOB_NAME'], args)
-
-# Ler da camada Raw via Glue Data Catalog
-raw_df = glueContext.create_dynamic_frame.from_catalog(
-    database="datalake_lab",
-    table_name="raw_pedidos"
-).toDF()
-
-# Transformações de qualidade
-trusted_df = (
-    raw_df
-    .withColumn("pedido_id", trim(col("pedido_id")))
-    .withColumn("data_pedido", to_date(col("data_pedido"), "yyyy-MM-dd"))
-    .withColumn("valor", col("valor").cast("decimal(10,2)"))
-    .dropDuplicates(["pedido_id"])
-    .filter(col("valor") > 0)
+from pyspark.sql.functions import (
+    col, year, month, dayofmonth, dayofweek, date_format
 )
 
-# Gravar na camada Trusted em Parquet com particionamento
-trusted_df.write \
-    .mode("overwrite") \
-    .partitionBy("status") \
-    .parquet("s3://seu-bucket/trusted/dominio=vendas/entidade=pedidos/")
+# ------------------------------------------------------------------
+# Inicializa&ccedil;&atilde;o
+# ------------------------------------------------------------------
+sc    = SparkContext.getOrCreate()
+glue  = GlueContext(sc)
+spark = glue.spark_session
 
-job.commit()
-</code></pre>
+ALUNO  = "meu-aluno"
+silver = f"s3://{ALUNO}-trusted/olist"
+gold   = f"s3://{ALUNO}-refined/olist/gold"
 
-        <h3>Glue Studio: interface visual para ETL</h3>
-        <p>
-          O Glue Studio oferece uma interface drag-and-drop para construir pipelines ETL
-          visualmente, sem escrever código. Você arrasta nós de Source (Glue Catalog,
-          S3, JDBC), Transform (Filter, Join, Map, Drop Fields, Change Schema) e Target
-          (S3, Glue Catalog, JDBC), conecta-os visualmente, e o Glue Studio gera o código
-          PySpark automaticamente. Para equipes que precisam de agilidade sem experiência
-          profunda em Spark, o Studio é um ponto de entrada poderoso.
-        </p>
+# ------------------------------------------------------------------
+# Leitura da silver (Parquet)
+# ------------------------------------------------------------------
+orders    = spark.read.parquet(f"{silver}/orders/")
+items     = spark.read.parquet(f"{silver}/order_items/")
+customers = spark.read.parquet(f"{silver}/customers/")
+products  = spark.read.parquet(f"{silver}/products/")
 
-        <h3>Bookmarks: processamento incremental</h3>
-        <p>
-          O Glue Job Bookmark é um mecanismo que registra quais dados já foram processados
-          em execuções anteriores. Ao reexecutar o job, o Glue lê apenas os novos dados
-          adicionados desde a última execução bem-sucedida, evitando reprocessar tudo.
-          É essencial para pipelines que rodam periodicamente sobre dados que crescem
-          continuamente.
-        </p>
+print(f"orders: {orders.count()}  items: {items.count()}  "
+      f"customers: {customers.count()}  products: {products.count()}")
+
+# ------------------------------------------------------------------
+# Join 4-way pelo item
+# ------------------------------------------------------------------
+base = (items
+    .join(orders,    "order_id")
+    .join(customers, "customer_id")
+    .join(products,  "product_id"))
+
+# ------------------------------------------------------------------
+# FATO: fato_vendas (gr&atilde;o = item de pedido)
+# ------------------------------------------------------------------
+fato = base.select(
+    col("order_id"),
+    col("order_item_id"),
+    col("customer_id").alias("customer_sk"),
+    col("product_id").alias("product_sk"),
+    col("order_purchase_timestamp").alias("time_sk"),
+    col("price").cast("decimal(10,2)").alias("price"),
+    col("freight_value").cast("decimal(10,2)").alias("freight"),
+    (col("price") + col("freight_value")).cast("decimal(10,2)").alias("total"))
+
+# ------------------------------------------------------------------
+# DIMENSOES
+# ------------------------------------------------------------------
+dim_cliente = (customers
+    .select("customer_id",
+            "customer_unique_id",
+            "customer_city",
+            "customer_state",
+            "customer_zip_code_prefix")
+    .distinct())
+
+dim_produto = (products
+    .select("product_id",
+            "product_category_name",
+            "product_weight_g",
+            "product_length_cm",
+            "product_height_cm",
+            "product_width_cm")
+    .distinct())
+
+dim_tempo = (orders
+    .select("order_purchase_timestamp")
+    .distinct()
+    .withColumn("year",         year(col("order_purchase_timestamp")))
+    .withColumn("month",        month(col("order_purchase_timestamp")))
+    .withColumn("day",          dayofmonth(col("order_purchase_timestamp")))
+    .withColumn("day_of_week",  dayofweek(col("order_purchase_timestamp")))
+    .withColumn("year_month",   date_format(col("order_purchase_timestamp"), "yyyy-MM")))
+
+# ------------------------------------------------------------------
+# Escrita no gold (Parquet)
+# ------------------------------------------------------------------
+(fato.write.mode("overwrite")
+    .partitionBy(date_format(col("time_sk"), "yyyy-MM").alias("year_month"))
+    .parquet(f"{gold}/fato_vendas/"))
+
+dim_cliente.write.mode("overwrite").parquet(f"{gold}/dim_cliente/")
+dim_produto.write.mode("overwrite").parquet(f"{gold}/dim_produto/")
+dim_tempo.write.mode("overwrite").parquet(f"{gold}/dim_tempo/")
+
+print("Star schema gravado com sucesso.")</code></pre>
+
+        <div class="warning">
+          <strong>Observa&ccedil;&atilde;o:</strong> no PySpark, voc&ecirc; n&atilde;o pode usar <code>col()</code> dentro de
+          <code>partitionBy</code>. O jeito correto &eacute; criar a coluna antes:
+          <code>fato2 = fato.withColumn("year_month", date_format(col("time_sk"), "yyyy-MM"))</code> e depois
+          <code>fato2.write.partitionBy("year_month")</code>. Ajuste o c&oacute;digo se o exemplo acima falhar.
+        </div>
+
+        <h3>Executando</h3>
+        <ol>
+          <li>Save &rarr; Run.</li>
+          <li>Acompanhe em Runs / CloudWatch Logs.</li>
+          <li>Quando terminar, confirme no S3: <code>gold/fato_vendas/</code>, <code>gold/dim_cliente/</code>, <code>gold/dim_produto/</code>, <code>gold/dim_tempo/</code>.</li>
+        </ol>
       </section>
 
-      <!-- =========================================================
-           MÓDULO 3 — LABORATÓRIO
-      ========================================================== -->
+      <!-- ============================================================
+           MODULO 12 — LAB 4: CRAWLER GOLD E ATHENA
+      ============================================================= -->
       <section class="content-block">
-        <h2>Módulo 3 — Laboratório: Catálogo com Crawler e ETL com Glue Job</h2>
+        <h2>M&oacute;dulo 12 &mdash; Laborat&oacute;rio 4: catalogar gold e consultar no Athena</h2>
+
+        <h3>Crawler do gold</h3>
+        <ol>
+          <li>Glue &rarr; Databases &rarr; <em>Add database</em> &rarr; <code>olist_refined</code>.</li>
+          <li>Crawlers &rarr; <em>Create crawler</em> &rarr; nome <code>olist_refined_crawler</code>.</li>
+          <li>Data source S3: <code>s3://&lt;aluno&gt;-refined/olist/gold/</code>.</li>
+          <li>IAM role: <strong>LabRole</strong>.</li>
+          <li>Target database: <code>olist_refined</code>. Schedule: on-demand.</li>
+          <li>Create e Run. Ao final, confirme em <em>olist_refined &rarr; Tables</em>: <code>fato_vendas</code>, <code>dim_cliente</code>, <code>dim_produto</code>, <code>dim_tempo</code>.</li>
+        </ol>
+
+        <h3>Queries anal&iacute;ticas no Athena</h3>
         <p>
-          A prática utiliza o ambiente <strong>AWS Student</strong>.
-          Usaremos os dados criados nas aulas anteriores.
+          Abra o <strong>Amazon Athena</strong>. Se for a primeira vez, configure o <em>Query result location</em>
+          apontando para um prefix em um de seus buckets (ex.: <code>s3://&lt;aluno&gt;-refined/athena-results/</code>).
+          Selecione o database <code>olist_refined</code>.
         </p>
 
-        <h3>Passo 1 — Criar um Glue Crawler para a camada Raw</h3>
-        <ol>
-          <li>No console AWS, acesse <strong>AWS Glue</strong> e clique em <strong>Crawlers</strong>.</li>
-          <li>Clique em <strong>Create crawler</strong>.</li>
-          <li>Nome: <code>crawler-raw-lab</code>. Clique em <strong>Next</strong>.</li>
-          <li>Em <strong>Data source</strong>, clique em <strong>Add a data source</strong>.</li>
-          <li>Tipo: <strong>S3</strong>. Path: <code>s3://seu-bucket/raw/</code>.
-          Clique em <strong>Add an S3 data source</strong>.</li>
-          <li>Clique em <strong>Next</strong>.</li>
-          <li>Em <strong>IAM role</strong>, selecione uma role com permissões de Glue e S3
-          (crie uma com <code>AWSGlueServiceRole</code> + <code>AmazonS3FullAccess</code> se necessário).</li>
-          <li>Clique em <strong>Next</strong>.</li>
-          <li>Em <strong>Output configuration</strong>, em <strong>Target database</strong>,
-          clique em <strong>Add database</strong>, insira <code>datalake_lab</code> e confirme.</li>
-          <li>Prefix para tabelas criadas: <code>raw_</code>.</li>
-          <li>Clique em <strong>Next</strong>, revise e clique em <strong>Create crawler</strong>.</li>
-          <li>Selecione o crawler e clique em <strong>Run</strong>. Aguarde o status <strong>Succeeded</strong>.</li>
-          <li><strong>Validação:</strong> acesse <strong>Databases</strong> no Glue e confira que
-          as tabelas foram criadas automaticamente com schemas inferidos.</li>
-        </ol>
+        <h4>Receita mensal por categoria de produto</h4>
+<pre><code>SELECT  p.product_category_name          AS categoria,
+        date_format(t.order_purchase_timestamp, '%Y-%m') AS mes,
+        ROUND(SUM(f.total), 2)           AS receita
+FROM    olist_refined.fato_vendas f
+JOIN    olist_refined.dim_produto p ON f.product_sk = p.product_id
+JOIN    olist_refined.dim_tempo   t ON f.time_sk    = t.order_purchase_timestamp
+GROUP BY 1, 2
+ORDER BY receita DESC
+LIMIT 20;</code></pre>
 
-        <h3>Passo 2 — Explorar o Glue Data Catalog</h3>
-        <ol>
-          <li>No menu do Glue, acesse <strong>Databases</strong> e clique em <code>datalake_lab</code>.</li>
-          <li>Clique em <strong>Tables</strong> e inspecione as tabelas criadas pelo crawler.</li>
-          <li>Clique em uma tabela e explore: schema detectado, localização no S3, formato,
-          e partições detectadas.</li>
-          <li>Acesse o Athena e execute <code>SHOW TABLES IN datalake_lab;</code>
-          para confirmar que as tabelas catalogadas estão disponíveis para query.</li>
-          <li><strong>Validação:</strong> as tabelas criadas pelo Crawler aparecem no Athena
-          sem necessidade de DDL manual.</li>
-        </ol>
+        <h4>Top 10 clientes por ticket total</h4>
+<pre><code>SELECT  f.customer_sk,
+        c.customer_state,
+        ROUND(SUM(f.total), 2) AS ticket_total
+FROM    olist_refined.fato_vendas f
+JOIN    olist_refined.dim_cliente c ON f.customer_sk = c.customer_id
+GROUP BY f.customer_sk, c.customer_state
+ORDER BY ticket_total DESC
+LIMIT 10;</code></pre>
 
-        <h3>Passo 3 — Criar um Glue Job ETL no Glue Studio</h3>
-        <ol>
-          <li>No menu do Glue, acesse <strong>ETL Jobs</strong> e clique em
-          <strong>Visual ETL</strong>.</li>
-          <li>Clique em <strong>Add nodes</strong> e adicione um nó <strong>AWS Glue Data Catalog</strong>
-          como fonte. Configure: Database = <code>datalake_lab</code>,
-          Table = a tabela <code>raw_pedidos</code> criada pelo crawler.</li>
-          <li>Adicione um nó <strong>Change Schema</strong> e configure os tipos de colunas:
-            <ul>
-              <li><code>valor</code>: altere de string para <code>double</code></li>
-              <li><code>data_pedido</code>: altere de string para <code>date</code></li>
-            </ul>
-          </li>
-          <li>Adicione um nó <strong>Filter</strong> e configure: <code>valor > 0</code>
-          para remover registros inválidos.</li>
-          <li>Adicione um nó <strong>Amazon S3</strong> como destino.
-          Configure: Format = <code>Parquet</code>,
-          Compression = <code>Snappy</code>,
-          Path = <code>s3://seu-bucket/trusted/dominio=vendas/entidade=pedidos/</code>.</li>
-          <li>No painel de <strong>Job details</strong>:
-            <ul>
-              <li>Nome: <code>etl-raw-to-trusted-pedidos</code></li>
-              <li>IAM Role: a mesma role com acesso a Glue e S3</li>
-              <li>Number of workers: <code>2</code> (mínimo para o lab)</li>
-              <li>Worker type: <code>G.1X</code></li>
-            </ul>
-          </li>
-          <li>Clique em <strong>Save</strong> e depois em <strong>Run</strong>.</li>
-          <li>Acompanhe o job na aba <strong>Runs</strong>. Aguarde o status <strong>Succeeded</strong>.</li>
-          <li><strong>Validação:</strong> acesse o S3 e confirme que arquivos Parquet foram criados
-          no prefixo <code>trusted/dominio=vendas/entidade=pedidos/</code>.</li>
-        </ol>
+        <h4>Receita por estado</h4>
+<pre><code>SELECT  c.customer_state           AS estado,
+        COUNT(DISTINCT f.order_id) AS pedidos,
+        ROUND(SUM(f.total), 2)     AS receita
+FROM    olist_refined.fato_vendas f
+JOIN    olist_refined.dim_cliente c ON f.customer_sk = c.customer_id
+GROUP BY c.customer_state
+ORDER BY receita DESC;</code></pre>
 
-        <h3>Passo 4 — Validar os dados Trusted no Athena</h3>
-        <ol>
-          <li>Execute um novo Crawler apontando para <code>s3://seu-bucket/trusted/</code>
-          para catalogar a camada Trusted, ou crie a tabela manualmente com DDL no Athena.</li>
-          <li>Execute uma query comparando Raw e Trusted para validar a transformação:</li>
-        </ol>
-        <pre><code>-- Raw: tipos originais
-SELECT pedido_id, data_pedido, valor FROM datalake_lab.raw_pedidos;
-
--- Trusted: tipos corrigidos e dados filtrados
-SELECT pedido_id, data_pedido, valor FROM datalake_lab.trusted_pedidos;
-</code></pre>
-        <ol start="3">
-          <li><strong>Validação:</strong> os tipos de dados na camada Trusted estão corretos
-          (DATE para data_pedido, DOUBLE para valor) e apenas registros com valor > 0 aparecem.</li>
-        </ol>
+        <h4>Ticket m&eacute;dio por m&ecirc;s</h4>
+<pre><code>SELECT  date_format(t.order_purchase_timestamp, '%Y-%m') AS mes,
+        COUNT(DISTINCT f.order_id) AS pedidos,
+        ROUND(AVG(f.total), 2)     AS ticket_medio
+FROM    olist_refined.fato_vendas f
+JOIN    olist_refined.dim_tempo   t ON f.time_sk = t.order_purchase_timestamp
+GROUP BY 1
+ORDER BY 1;</code></pre>
       </section>
 
-      <!-- =========================================================
-           EXERCÍCIOS DE FIXAÇÃO
-      ========================================================== -->
+      <!-- ============================================================
+           MODULO 13 — CLEANUP
+      ============================================================= -->
       <section class="content-block">
-        <h2>Exercícios de fixação</h2>
+        <h2>M&oacute;dulo 13 &mdash; Encerramento e boas pr&aacute;ticas de custo</h2>
+        <ul>
+          <li>V&aacute; em Glue &rarr; ETL jobs &rarr; Runs. Certifique-se de que n&atilde;o h&aacute; jobs em <em>Running</em>.</li>
+          <li>Se criou algum Workflow com trigger agendada, desabilite.</li>
+          <li>Mantenha os Parquet em <code>trusted</code> e <code>refined</code>: a Aula 06 (Redshift) ir&aacute; consumi-los.</li>
+          <li>Evite rodar o Crawler repetidas vezes: cada execu&ccedil;&atilde;o consome DPU.</li>
+          <li>Clique em <strong>End Lab</strong> ao final da sess&atilde;o AWS Student para congelar o ambiente.</li>
+        </ul>
+
+        <div class="danger">
+          <strong>Verifique sempre o budget</strong> do Learner Lab no topo da p&aacute;gina do laborat&oacute;rio. Se estiver acima
+          de 60% do limite antes do final da disciplina, revise se h&aacute; recursos rodando que voc&ecirc; esqueceu.
+        </div>
+      </section>
+
+      <!-- ============================================================
+           EXERCICIOS DE FIXACAO
+      ============================================================= -->
+      <section class="content-block">
+        <h2>Exerc&iacute;cios de fixa&ccedil;&atilde;o</h2>
         <ol>
           <li>
-            <strong>Catálogo versus DDL manual:</strong> explique o papel do AWS Glue Data Catalog
-            em uma plataforma analítica com 10 equipes diferentes consumindo dados de 50 tabelas
-            distintas. Quais problemas surgiriam se cada equipe mantivesse sua própria definição
-            de tabela local, e como o Catalog centralizado resolve cada um desses problemas?
+            <strong>ETL vs ELT &mdash; decis&atilde;o arquitetural:</strong> uma fintech brasileira precisa ingerir e tratar 500 GB
+            di&aacute;rios de eventos de transa&ccedil;&otilde;es de cart&otilde;es. O dado bruto cont&eacute;m PAN (n&uacute;mero de cart&atilde;o) que
+            deve ser mascarado antes de pousar em qualquer zona anal&iacute;tica (PCI-DSS). Os analistas precisam poder
+            reprocessar o hist&oacute;rico quando novas regras surgirem. Decida entre ETL cl&aacute;ssico, ELT puro ou h&iacute;brido,
+            justificando a escolha com base nos requisitos regulat&oacute;rios e operacionais.
           </li>
           <li>
-            <strong>Pipeline Raw para Trusted:</strong> desenhe (em texto, com bullet points)
-            o fluxo completo de um Glue Job que transforma dados de pedidos da camada Raw
-            (CSV com schema inconsistente) para a camada Trusted (Parquet particionado).
-            Especifique cada transformação necessária, o tipo de output, o particionamento
-            escolhido, e como o Job Bookmark seria configurado para processamento incremental.
+            <strong>C&aacute;lculo de custo Glue:</strong> seu Glue Job Spark rodou por 12 minutos com 5 DPUs. Considerando
+            pre&ccedil;o de US$ 0,44 por DPU-hora, calcule o custo da execu&ccedil;&atilde;o. Em seguida, proponha duas otimiza&ccedil;&otilde;es
+            concretas de c&oacute;digo PySpark que poderiam reduzir o tempo de execu&ccedil;&atilde;o em 40% sem alterar o n&uacute;mero de DPUs.
           </li>
           <li>
-            <strong>Classificação de qualidade de dados:</strong> um Glue Crawler detectou
-            uma tabela com as seguintes características: coluna <code>preco</code> inferida como STRING
-            (deveria ser DOUBLE), coluna <code>data_criacao</code> inferida como STRING
-            (deveria ser TIMESTAMP), e 15% dos registros com <code>pedido_id</code> nulo.
-            Escreva as transformações PySpark necessárias para corrigir cada problema
-            em um Glue Job.
+            <strong>Design do Data Catalog:</strong> projete a estrutura de databases e tabelas do Glue Data Catalog para
+            um pipeline medalh&atilde;o de uma empresa que processa dados de: (a) pedidos de e-commerce, (b) cliques no site,
+            (c) cat&aacute;logo de produtos do ERP, (d) avalia&ccedil;&otilde;es dos clientes. Defina nomes de databases, tabelas e
+            esquema de parti&ccedil;&otilde;es para cada camada (raw, trusted, refined). Justifique cada escolha.
           </li>
           <li>
-            <strong>Glue Studio versus código PySpark manual:</strong> compare as vantagens
-            e desvantagens do Glue Studio (interface visual) versus escrever o código PySpark
-            manualmente. Em quais cenários cada abordagem é mais adequada? Considere
-            manutenibilidade, controle, curva de aprendizado e capacidade de versionar o código.
+            <strong>PySpark &mdash; reescrita defensiva:</strong> dado o trecho abaixo, identifique ao menos quatro problemas
+            de qualidade ou performance e reescreva o c&oacute;digo corrigindo-os, explicando cada corre&ccedil;&atilde;o:
+            <pre><code>df = spark.read.csv("s3://bucket/raw/orders/")
+df.show()
+clean = df.filter("customer_id is not null")
+clean.toPandas().to_csv("/tmp/out.csv")</code></pre>
           </li>
           <li>
-            <strong>Estratégia de catálogo para múltiplos ambientes:</strong> uma empresa
-            tem três ambientes: dev, staging e prod. Os dados de cada ambiente estão
-            em buckets S3 separados. Descreva como você organizaria o Glue Data Catalog
-            (databases, tabelas, prefixos) para garantir que jobs do ambiente dev não
-            leiam dados de prod, e que seja fácil promover a definição de uma tabela
-            de staging para prod.
+            <strong>Modelagem dimensional:</strong> com base no dataset Olist, projete uma extens&atilde;o do star schema que
+            inclua uma dimens&atilde;o <code>dim_pagamento</code> (origem: <code>olist_order_payments_dataset.csv</code>) e uma
+            m&eacute;trica <code>review_score</code> (origem: <code>olist_order_reviews_dataset.csv</code>) na
+            <code>fato_vendas</code>. Especifique as transforma&ccedil;&otilde;es PySpark necess&aacute;rias, lidando com o fato de que
+            um pedido pode ter m&uacute;ltiplos pagamentos.
+          </li>
+          <li>
+            <strong>Qualidade com Glue Data Quality:</strong> escreva, em formato DQDL (Data Quality Definition Language),
+            ao menos cinco regras para a tabela <code>olist_trusted.orders</code> que garantam: (a) order_id &eacute; sempre &uacute;nico,
+            (b) customer_id nunca &eacute; nulo, (c) order_purchase_timestamp est&aacute; dentro de um range plaus&iacute;vel
+            (2016 a 2020), (d) o conjunto tem pelo menos 90 mil linhas, (e) cada order_id cont&eacute;m no m&iacute;nimo 1 item.
+          </li>
+          <li>
+            <strong>Formatos de tabela aberta:</strong> explique, com suas palavras, o que mudaria no nosso pipeline
+            raw &rarr; silver &rarr; gold se a camada silver usasse <strong>Apache Iceberg</strong> em vez de Parquet puro.
+            Cite ao menos tr&ecirc;s benef&iacute;cios concretos e um custo operacional adicional.
+          </li>
+          <li>
+            <strong>Orquestra&ccedil;&atilde;o:</strong> desenhe um Glue Workflow que orquestre o pipeline Olist completo desde o
+            crawler do raw at&eacute; a valida&ccedil;&atilde;o final no Athena. Liste cada n&oacute; (crawler ou job), o trigger de entrada,
+            a condi&ccedil;&atilde;o para avan&ccedil;ar ao pr&oacute;ximo n&oacute; e o que deve acontecer em caso de falha. Compare mentalmente
+            com uma implementa&ccedil;&atilde;o equivalente em AWS Step Functions &mdash; qual seria mais adequado para produ&ccedil;&atilde;o cr&iacute;tica
+            e por qu&ecirc;?
           </li>
         </ol>
       </section>
 
+      <!-- ============================================================
+           FOOTER
+      ============================================================= -->
       <footer class="actions">
         <a class="button" href="../slides/slide_aula_05_integracao_etl_serverless_e_catalogo_de_dados.html">Voltar ao slide</a>
-        <a class="button" href="../../../index.html">Voltar ao índice</a>
+        <a class="button" href="../../../index.html">Voltar ao &iacute;ndice</a>
       </footer>
 
     </main>

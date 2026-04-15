@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"import pptx; print\\(pptx.__version__\\)\")",
+      "Bash(pip install *)",
+      "Bash(python extract_materiais.py)",
+      "Bash(npx --yes playwright --version)",
+      "Bash(python -c \"import playwright; print\\('py playwright ok'\\)\")",
+      "Bash(wc *)",
+      "Bash(python -c ' *)",
+      "Bash(grep -c '<li>$\\\\|<li>' /c/Users/Afonso/repos/cloud_sre/aulas/aula_01_fundamentos_de_cloud_para_dados_e_governanca_de_acessos/material/material_aula_01_fundamentos_de_cloud_para_dados_e_governanca_de_acessos.html)",
+      "Bash(awk '/Exercícios de fixação/,0' /c/Users/Afonso/repos/cloud_sre/aulas/aula_01_fundamentos_de_cloud_para_dados_e_governanca_de_acessos/material/material_aula_01_fundamentos_de_cloud_para_dados_e_governanca_de_acessos.html)",
+      "Bash(python *)"
+    ]
+  }
+}

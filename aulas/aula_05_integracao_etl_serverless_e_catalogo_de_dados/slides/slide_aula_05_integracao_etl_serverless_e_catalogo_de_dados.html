@@ -4,31 +4,31 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" />
-  <title>Aula 05 — Integracao, ETL Serverless e Catalogo de Dados</title>
+  <title>Aula 05 &mdash; Integracao, ETL Serverless e Catalogo de Dados</title>
   <link href="../../../assets/slides.css" rel="stylesheet">
-  <style data-design-tokens>:root{--bg:#fff;--color:#000000}body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}a:hover{opacity:.8}a:focus{outline:2px solid #000000}</style>
+  <style data-design-tokens>:root{--bg:#fff;--color:#000000}body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}a:hover{opacity:.8}a:focus{outline:2px solid #000000} pre{background:#f3f4f6;border:2px solid #111;border-radius:6px;padding:14px;font-family:"Courier New",Courier,monospace;font-size:.78em;line-height:1.45;overflow:auto;margin:0}</style>
 </head>
 <body>
   <div class="slide-container">
 
     <!-- ============================================================ -->
-    <!-- SLIDE 1 — CAPA                                               -->
+    <!-- SLIDE 1 — CAPA                                                -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
           <img class="deck-logo-full" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_e4vyyw.png" alt="Universidade Presbiteriana Mackenzie" />
-          <span class="deck-kicker">Cloud Computing e SRA</span>
-          <h1 class="deck-title">Integracao, ETL Serverless e Catalogo de Dados</h1>
-          <p class="deck-meta">Aula 05 • 14/05/2026</p>
+          <span class="deck-kicker">Cloud Computing e SRA &mdash; MBA Engenharia de Dados</span>
+          <h1 class="deck-title">Integra&ccedil;&atilde;o, ETL Serverless e Cat&aacute;logo de Dados</h1>
+          <p class="deck-meta">Aula 05 &nbsp;&bull;&nbsp; 14/05/2026 &nbsp;&bull;&nbsp; 19h00 &ndash; 22h00</p>
           <p class="deck-year">2026</p>
-          <p class="deck-subtitle">Descoberta de esquemas, catalogo centralizado e pipelines de transformacao com servicos serverless.</p>
+          <p class="deck-subtitle">O cora&ccedil;&atilde;o do pipeline Olist: transformar raw em silver e silver em gold com AWS Glue, PySpark e Data Catalog.</p>
         </div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 2 — AGENDA                                             -->
+    <!-- SLIDE 2 — AGENDA                                              -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
@@ -38,31 +38,23 @@
         </div>
         <div class="deck-grid">
           <article class="deck-card">
-            <h3>Bloco 1</h3>
+            <h3>19h00 &ndash; 20h30 &middot; Teoria</h3>
             <ul>
-              <li>Glue Data Catalog e metastore.</li>
-              <li>Crawlers para descoberta automatica.</li>
+              <li>Recap e contexto: do streaming &agrave; transforma&ccedil;&atilde;o</li>
+              <li>ETL vs ELT</li>
+              <li>Serverless para dados e modelo DPU-segundo</li>
+              <li>AWS Glue: Catalog, Crawler, Job, Studio, Workflow</li>
+              <li>Conceitos de Spark e PySpark</li>
+              <li>Qualidade e modelagem star schema</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>Bloco 2</h3>
+            <h3>20h30 &ndash; 22h00 &middot; Pr&aacute;tica AWS Student</h3>
             <ul>
-              <li>Glue Jobs com PySpark e Ray.</li>
-              <li>Transformacoes serverless.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Bloco 3</h3>
-            <ul>
-              <li>Conversao para Parquet.</li>
-              <li>Uso da camada Trusted no lake.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Entrega esperada</h3>
-            <ul>
-              <li>Catalogo inicial registrado.</li>
-              <li>Pipeline simples de ETL desenhado e validado.</li>
+              <li>Crawler em s3://&lt;aluno&gt;-raw/olist/</li>
+              <li>Glue Job 1 &mdash; raw &rarr; silver (PySpark)</li>
+              <li>Glue Job 2 &mdash; silver &rarr; gold (star schema)</li>
+              <li>Crawler no gold e queries anal&iacute;ticas no Athena</li>
             </ul>
           </article>
         </div>
@@ -70,53 +62,801 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 3 — PLACEHOLDER                                        -->
+    <!-- SLIDE 3 — PLACEHOLDER / CONTEXTO                              -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Placeholder</span>
-          <h2 class="deck-title">Slide inicial para evolucao do conteudo</h2>
-          <p class="deck-summary">Template pronto para aprofundar fluxo de catalogo, transformacao e publicacao de dados refinados.</p>
+          <span class="deck-kicker">Recap &middot; Onde estamos</span>
+          <h2 class="deck-title">Do dado cru ao dado &uacute;til</h2>
+          <p class="deck-summary">Nas aulas anteriores, ingerimos dados de bancos relacionais, NoSQL e streams no Data Lake. Hoje, transformamos esse material bruto em dados confi&aacute;veis e prontos para an&aacute;lise.</p>
         </div>
         <div class="deck-placeholder">
           <div class="deck-panel">
-            <strong>Conteudo a desenvolver</strong>
+            <strong>Jornada do pipeline Olist</strong>
+            <ol>
+              <li><strong>Aula 02:</strong> S3 + Athena (Data Lake base).</li>
+              <li><strong>Aula 03:</strong> RDS e DynamoDB como fontes.</li>
+              <li><strong>Aula 04:</strong> Ingest&atilde;o near real-time com Kinesis.</li>
+              <li><strong>Aula 05 &mdash; hoje:</strong> Glue transforma e cataloga.</li>
+              <li><strong>Aula 06:</strong> Redshift para DW de alta performance.</li>
+            </ol>
+          </div>
+          <div class="deck-callout">
+            <strong>Foco da aula</strong>
+            <p style="margin:8px 0 0;">Transformar o dataset Olist em um star schema governado, documentado e consult&aacute;vel via SQL.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 4 — ETL vs ELT                                          -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Padr&otilde;es de integra&ccedil;&atilde;o</span>
+          <h2 class="deck-title">ETL vs ELT</h2>
+          <p class="deck-summary">A ordem das letras muda tudo: onde a transforma&ccedil;&atilde;o acontece redefine a arquitetura.</p>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr><th>Aspecto</th><th>ETL</th><th>ELT</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Ordem</td><td>Extract &rarr; Transform &rarr; Load</td><td>Extract &rarr; Load &rarr; Transform</td></tr>
+            <tr><td>Onde transforma</td><td>Fora do destino (engine ETL)</td><td>Dentro do destino (DW/Lake)</td></tr>
+            <tr><td>T&iacute;pico em</td><td>DW on-premise</td><td>Cloud data lake / lakehouse</td></tr>
+            <tr><td>Volumes</td><td>M&eacute;dios</td><td>Grandes / massivos</td></tr>
+            <tr><td>Ferramentas</td><td>Informatica, SSIS, DataStage</td><td>Glue, dbt, Spark, Redshift</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 5 — Quando ETL, quando ELT                              -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Decis&atilde;o</span>
+          <h2 class="deck-title">Quando usar cada padr&atilde;o?</h2>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Use ETL quando...</strong>
             <ul>
-              <li>Passo a passo do crawler.</li>
-              <li>Exemplo de job de ETL em Glue.</li>
-              <li>Estrategia de saida para Parquet.</li>
+              <li>Dados sens&iacute;veis precisam ser mascarados antes de pousar.</li>
+              <li>DW destino &eacute; pequeno ou caro por compute.</li>
+              <li>Regras de neg&oacute;cio complexas precisam validar antes do load.</li>
+              <li>Compliance exige auditoria na zona de staging.</li>
             </ul>
           </div>
           <div class="deck-panel">
-            <strong>Proximos incrementos</strong>
+            <strong>Use ELT quando...</strong>
             <ul>
-              <li>Adicionar diagrama do metastore.</li>
-              <li>Inserir checklist de validacao.</li>
-              <li>Detalhar o laboratorio da aula.</li>
+              <li>Storage &eacute; barato (S3) e compute &eacute; el&aacute;stico.</li>
+              <li>Dados brutos precisam ficar dispon&iacute;veis para reprocessar.</li>
+              <li>Cientistas de dados querem o dado cru.</li>
+              <li>Volumes s&atilde;o grandes e variam ao longo do dia.</li>
             </ul>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 6 — Serverless para dados                               -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Modelo operacional</span>
+          <h2 class="deck-title">Serverless para dados</h2>
+          <p class="deck-summary">Voc&ecirc; n&atilde;o gerencia o cluster. A AWS aloca recursos sob demanda, voc&ecirc; paga pelo tempo de execu&ccedil;&atilde;o.</p>
+        </div>
+        <div class="deck-grid">
+          <article class="deck-card">
+            <h3>4 caracter&iacute;sticas centrais</h3>
+            <ul>
+              <li><strong>Stateless</strong> &mdash; sem estado entre execu&ccedil;&otilde;es.</li>
+              <li><strong>Ef&ecirc;mero</strong> &mdash; recursos vivem s&oacute; durante o job.</li>
+              <li><strong>Event-driven</strong> &mdash; disparado por evento, cron, API.</li>
+              <li><strong>Pay-per-use</strong> &mdash; cobra&ccedil;a por segundo de execu&ccedil;&atilde;o.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Modelo de cobran&ccedil;a do Glue</h3>
+            <ul>
+              <li>Unidade: <strong>DPU</strong> (Data Processing Unit).</li>
+              <li>1 DPU = 4 vCPU + 16 GB RAM.</li>
+              <li>Cobra&ccedil;a por <strong>DPU-hora</strong>, faturada por segundo.</li>
+              <li>M&iacute;nimo 2 DPUs por job Spark.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 7 — AWS Glue visao geral                                 -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; AWS Glue</span>
+          <h2 class="deck-title">AWS Glue &mdash; vis&atilde;o arquitetural</h2>
+          <p class="deck-summary">Glue &eacute; a plataforma serverless de integra&ccedil;&atilde;o de dados da AWS. Re&uacute;ne catalogar, descobrir, transformar e orquestrar em um &uacute;nico servi&ccedil;o.</p>
+        </div>
+        <div class="deck-grid">
+          <article class="deck-card">
+            <h3>Componentes</h3>
+            <ul>
+              <li><strong>Data Catalog</strong> &mdash; metastore central.</li>
+              <li><strong>Crawler</strong> &mdash; descobre schema.</li>
+              <li><strong>Job</strong> &mdash; executa Spark ou Python.</li>
+              <li><strong>Studio</strong> &mdash; ETL visual.</li>
+              <li><strong>Workflow</strong> &mdash; orquestra&ccedil;&atilde;o.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Integra&ccedil;&otilde;es</h3>
+            <ul>
+              <li>L&ecirc; e escreve em S3, RDS, DynamoDB, Redshift.</li>
+              <li>Catalog consumido por Athena, EMR, Redshift Spectrum.</li>
+              <li>Disparado por EventBridge, Lambda, cron.</li>
+              <li>Logs em CloudWatch.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 8 — Glue Data Catalog                                    -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Metastore</span>
+          <h2 class="deck-title">Glue Data Catalog</h2>
+          <p class="deck-summary">Reposit&oacute;rio central de metadados, compat&iacute;vel com Apache Hive Metastore. Torna dados no S3 consult&aacute;veis como tabelas.</p>
+        </div>
+        <div class="deck-panel">
+          <strong>O que vive no Catalog</strong>
+          <ul>
+            <li><strong>Database</strong> &mdash; agrupamento l&oacute;gico (ex.: olist_raw, olist_trusted, olist_refined).</li>
+            <li><strong>Tables</strong> &mdash; schema + localiza&ccedil;&atilde;o S3 + formato.</li>
+            <li><strong>Partitions</strong> &mdash; subdivis&otilde;es f&iacute;sicas (ex.: year_month=2018-05).</li>
+            <li><strong>Connections</strong> &mdash; credenciais para fontes externas.</li>
+            <li><strong>Classifiers</strong> &mdash; regras para reconhecer formatos customizados.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 9 — Glue Crawler                                         -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Descoberta</span>
+          <h2 class="deck-title">Glue Crawler</h2>
+          <p class="deck-summary">Varre um caminho no S3, infere schema, detecta parti&ccedil;&otilde;es e popula o Catalog automaticamente.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>O que ele faz</strong>
+            <ul>
+              <li>Detecta formato (CSV, JSON, Parquet).</li>
+              <li>Infere tipos a partir de amostras.</li>
+              <li>Cria ou atualiza tabelas no Catalog.</li>
+              <li>Descobre parti&ccedil;&otilde;es estilo Hive.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Cuidados</strong>
+            <ul>
+              <li>Tipagem inferida nem sempre acerta (ex.: datas viram string).</li>
+              <li>Rodar crawler com excesso &eacute; caro (cobra por DPU).</li>
+              <li>Em produ&ccedil;&atilde;o, prefira criar tabelas via c&oacute;digo.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 10 — Glue Job                                            -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Execu&ccedil;&atilde;o</span>
+          <h2 class="deck-title">Glue Job</h2>
+          <p class="deck-summary">Unidade de execu&ccedil;&atilde;o do Glue. Roda em ambiente gerenciado Spark ou Python shell.</p>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr><th>Tipo</th><th>Quando usar</th><th>Recursos</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Spark</strong></td><td>Volumes grandes, joins, agrega&ccedil;&otilde;es</td><td>M&iacute;nimo 2 DPUs</td></tr>
+            <tr><td><strong>Spark Streaming</strong></td><td>Kinesis / Kafka em micro-batches</td><td>M&iacute;nimo 2 DPUs</td></tr>
+            <tr><td><strong>Python Shell</strong></td><td>Scripts pequenos, chamadas API</td><td>0,0625 ou 1 DPU</td></tr>
+            <tr><td><strong>Ray</strong></td><td>Workloads Python distribu&iacute;dos</td><td>M&iacute;nimo 2 workers</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 11 — Glue Studio                                         -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; ETL visual</span>
+          <h2 class="deck-title">Glue Studio</h2>
+          <p class="deck-summary">Interface visual para desenhar pipelines arrastando blocos. O Studio gera c&oacute;digo PySpark automaticamente.</p>
+        </div>
+        <div class="deck-callout">
+          <strong>Vantagens e limita&ccedil;&otilde;es</strong>
+          <ul style="margin:10px 0 0; padding-left:22px;">
+            <li>Acelera prototipagem e democratiza ETL.</li>
+            <li>Gera c&oacute;digo que voc&ecirc; pode editar depois.</li>
+            <li>Transforma&ccedil;&otilde;es avan&ccedil;adas ainda precisam de c&oacute;digo.</li>
+            <li>Versionamento do fluxo visual &eacute; limitado.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 12 — Glue Workflow                                       -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Orquestra&ccedil;&atilde;o</span>
+          <h2 class="deck-title">Glue Workflow</h2>
+          <p class="deck-summary">Encadeia crawlers e jobs em um DAG, com triggers condicionais e rerun em falhas.</p>
+        </div>
+        <div class="deck-panel">
+          <strong>Elementos</strong>
+          <ul>
+            <li><strong>Triggers</strong> &mdash; iniciam execu&ccedil;&atilde;o (schedule, on-demand, event).</li>
+            <li><strong>Jobs</strong> &mdash; unidades de trabalho encadeadas.</li>
+            <li><strong>Crawlers</strong> &mdash; podem rodar entre jobs.</li>
+            <li><strong>Condi&ccedil;&otilde;es</strong> &mdash; success, failure, timeout.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 13 — Spark conceitos                                     -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Spark</span>
+          <h2 class="deck-title">Conceitos de Apache Spark</h2>
+          <p class="deck-summary">Motor de processamento distribu&iacute;do em mem&oacute;ria que roda por baixo do Glue.</p>
+        </div>
+        <div class="deck-grid">
+          <article class="deck-card">
+            <h3>Abstra&ccedil;&otilde;es</h3>
+            <ul>
+              <li><strong>RDD</strong> &mdash; cole&ccedil;&atilde;o distribu&iacute;da imut&aacute;vel (low-level).</li>
+              <li><strong>DataFrame</strong> &mdash; tabela distribu&iacute;da com schema.</li>
+              <li><strong>Dataset</strong> &mdash; DataFrame tipado (Scala/Java).</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Execu&ccedil;&atilde;o</h3>
+            <ul>
+              <li><strong>Driver</strong> &mdash; programa principal.</li>
+              <li><strong>Executors</strong> &mdash; n&oacute;s que fazem o trabalho.</li>
+              <li><strong>Lazy evaluation</strong> &mdash; transforma&ccedil;&otilde;es s&oacute; rodam ao ver uma a&ccedil;&atilde;o.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 14 — Transformacoes vs Acoes                             -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Spark API</span>
+          <h2 class="deck-title">Transforma&ccedil;&otilde;es vs A&ccedil;&otilde;es</h2>
+          <p class="deck-summary">Transforma&ccedil;&otilde;es constroem o plano l&oacute;gico. A&ccedil;&otilde;es disparam execu&ccedil;&atilde;o.</p>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr><th>Transforma&ccedil;&otilde;es (lazy)</th><th>A&ccedil;&otilde;es (eager)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>select, filter, where</td><td>count, collect</td></tr>
+            <tr><td>map, flatMap</td><td>show, take</td></tr>
+            <tr><td>groupBy, agg</td><td>write.parquet, saveAsTable</td></tr>
+            <tr><td>join, union</td><td>foreach</td></tr>
+            <tr><td>withColumn, drop</td><td>toPandas</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 15 — PySpark basico                                      -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; PySpark</span>
+          <h2 class="deck-title">PySpark b&aacute;sico para ETL</h2>
+        </div>
+<pre><code>from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, to_timestamp
+
+spark = SparkSession.builder.getOrCreate()
+
+df = spark.read.option("header", True).csv("s3://bucket/raw/orders/")
+
+clean = (df
+  .withColumn("purchased_at", to_timestamp(col("order_purchase_timestamp")))
+  .filter(col("customer_id").isNotNull())
+  .dropDuplicates(["order_id"])
+  .select("order_id", "customer_id", "purchased_at"))
+
+clean.write.mode("overwrite").parquet("s3://bucket/silver/orders/")</code></pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 16 — Qualidade no ETL                                    -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Qualidade</span>
+          <h2 class="deck-title">Qualidade no ETL</h2>
+          <p class="deck-summary">Dado sem qualidade &eacute; passivo. Toda camada silver deve aplicar garantias m&iacute;nimas.</p>
+        </div>
+        <div class="deck-grid">
+          <article class="deck-card">
+            <h3>Checks essenciais</h3>
+            <ul>
+              <li><strong>Dedup</strong> &mdash; dropDuplicates por chave.</li>
+              <li><strong>Casting</strong> &mdash; tipos corretos (timestamp, decimal).</li>
+              <li><strong>Nulls</strong> &mdash; filtrar ou preencher.</li>
+              <li><strong>Schema enforcement</strong> &mdash; StructType expl&iacute;cito.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Ferramentas AWS</h3>
+            <ul>
+              <li><strong>Glue Data Quality</strong> &mdash; regras DQDL.</li>
+              <li><strong>Deequ</strong> &mdash; lib open source integr&aacute;vel.</li>
+              <li><strong>Great Expectations</strong> &mdash; expectations em Python.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 17 — Star schema                                          -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Modelagem</span>
+          <h2 class="deck-title">Star schema &mdash; fato e dimens&otilde;es</h2>
+          <p class="deck-summary">Modelagem dimensional cl&aacute;ssica (Kimball): uma tabela fato central cercada por dimens&otilde;es.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>No nosso Olist</strong>
+            <ul>
+              <li><strong>fato_vendas</strong> &mdash; 1 linha por item de pedido.</li>
+              <li><strong>dim_cliente</strong> &mdash; customer_id, estado, cidade.</li>
+              <li><strong>dim_produto</strong> &mdash; product_id, categoria, peso.</li>
+              <li><strong>dim_tempo</strong> &mdash; ano, m&ecirc;s, dia, dia da semana.</li>
+              <li><strong>dim_local</strong> &mdash; CEP, estado, regi&atilde;o.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Por que star schema?</strong>
+            <ul>
+              <li>Queries anal&iacute;ticas mais r&aacute;pidas (menos joins).</li>
+              <li>Modelo intuitivo para usu&aacute;rios de BI.</li>
+              <li>Denormaliza&ccedil;&atilde;o &eacute; aceit&aacute;vel em DW.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 18 — Formatos de tabela aberta                           -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Lakehouse</span>
+          <h2 class="deck-title">Formatos de tabela aberta</h2>
+          <p class="deck-summary">Parquet &eacute; &oacute;timo como arquivo, mas falta ACID. Formatos de tabela trazem transa&ccedil;&otilde;es, time travel e schema evolution para o Data Lake.</p>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr><th>Formato</th><th>Criador</th><th>Suporte AWS</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Apache Iceberg</strong></td><td>Netflix</td><td>Nativo (Glue, Athena, Redshift, EMR)</td></tr>
+            <tr><td><strong>Delta Lake</strong></td><td>Databricks</td><td>Leitura no Athena, EMR</td></tr>
+            <tr><td><strong>Apache Hudi</strong></td><td>Uber</td><td>EMR, Glue</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 19 — TRANSICAO PRATICA                                   -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Pr&aacute;tica &middot; 20h30 &ndash; 22h00</span>
+          <h2 class="deck-title">Hora de codar &mdash; AWS Student</h2>
+          <p class="deck-summary">Vamos construir dois Glue Jobs que movem dados de raw &rarr; silver &rarr; gold, e consultar o resultado no Athena.</p>
+        </div>
+        <div class="deck-panel">
+          <strong>Checklist antes de come&ccedil;ar</strong>
+          <ul>
+            <li>AWS Student logado, regi&atilde;o <strong>us-east-1</strong>.</li>
+            <li>Buckets <code>&lt;aluno&gt;-raw</code>, <code>&lt;aluno&gt;-trusted</code>, <code>&lt;aluno&gt;-refined</code>.</li>
+            <li>Dataset Olist j&aacute; carregado em <code>&lt;aluno&gt;-raw/olist/</code>.</li>
+            <li>Role de execu&ccedil;&atilde;o: <strong>LabRole</strong>.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 20 — LAB 1 Crawler raw                                   -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Lab 1 &middot; Crawler raw</span>
+          <h2 class="deck-title">Catalogar a camada raw</h2>
+        </div>
+        <div class="deck-panel">
+          <strong>Passo a passo</strong>
+          <ol>
+            <li>Console AWS &rarr; <strong>Glue</strong> &rarr; Databases &rarr; <em>Add database</em> &rarr; <code>olist_raw</code>.</li>
+            <li>Crawlers &rarr; <em>Create crawler</em> &rarr; nome <code>olist_raw_crawler</code>.</li>
+            <li>Data source: S3 &rarr; <code>s3://&lt;aluno&gt;-raw/olist/</code>.</li>
+            <li>IAM role: <strong>LabRole</strong>.</li>
+            <li>Target database: <code>olist_raw</code>.</li>
+            <li>Schedule: on-demand. Salvar e executar.</li>
+            <li>Ao finalizar, confira as tabelas criadas (orders, order_items, customers, products).</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 21 — LAB 2 Job raw_to_silver criacao                     -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Lab 2 &middot; raw &rarr; silver</span>
+          <h2 class="deck-title">Criar o Glue Job <code>raw_to_silver</code></h2>
+        </div>
+        <div class="deck-panel">
+          <strong>Configura&ccedil;&atilde;o</strong>
+          <ol>
+            <li>Glue &rarr; ETL jobs &rarr; <em>Script editor</em> &rarr; <em>Spark</em>.</li>
+            <li>Nome: <code>raw_to_silver</code>.</li>
+            <li>Language: <strong>Python 3</strong>.</li>
+            <li>IAM role: <strong>LabRole</strong>.</li>
+            <li>Worker type: <strong>G.1X</strong>; Workers: <strong>2</strong>.</li>
+            <li>Timeout: <strong>15 min</strong>.</li>
+            <li>Number of retries: <strong>0</strong>.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 22 — LAB 2 Script PySpark raw_to_silver                  -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Lab 2 &middot; C&oacute;digo</span>
+          <h2 class="deck-title">Script <code>raw_to_silver.py</code></h2>
+        </div>
+<pre><code>import sys
+from awsglue.context import GlueContext
+from pyspark.context import SparkContext
+from pyspark.sql.functions import col, to_timestamp, date_format, trim
+
+sc = SparkContext.getOrCreate()
+glue = GlueContext(sc)
+spark = glue.spark_session
+
+ALUNO = "&lt;aluno&gt;"
+src = f"s3://{ALUNO}-raw/olist/orders/"
+dst = f"s3://{ALUNO}-trusted/olist/orders/"
+
+orders = (spark.read.option("header", True).csv(src)
+  .withColumn("order_purchase_timestamp",
+              to_timestamp(col("order_purchase_timestamp")))
+  .withColumn("customer_id", trim(col("customer_id")))
+  .filter(col("customer_id").isNotNull())
+  .dropDuplicates(["order_id"])
+  .withColumn("year_month",
+              date_format(col("order_purchase_timestamp"), "yyyy-MM")))
+
+(orders.write.mode("overwrite")
+  .partitionBy("year_month")
+  .parquet(dst))</code></pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 23 — LAB 2 Run + CloudWatch                               -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Lab 2 &middot; Execu&ccedil;&atilde;o</span>
+          <h2 class="deck-title">Rodar e observar o job</h2>
+        </div>
+        <div class="deck-panel">
+          <strong>Acompanhamento</strong>
+          <ol>
+            <li>Clique em <em>Run</em>. Aguarde o status mudar para <strong>Running</strong>.</li>
+            <li>Aba <em>Runs</em>: veja <strong>Execution time</strong> e <strong>DPU hours</strong>.</li>
+            <li>Abra o link <strong>Output logs</strong> &rarr; CloudWatch Logs.</li>
+            <li>Observe as linhas do Spark: stages, tasks, shuffle.</li>
+            <li>Quando terminar, confira Parquet em <code>s3://&lt;aluno&gt;-trusted/olist/orders/year_month=.../</code>.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 24 — LAB 3 silver_to_gold ideia                           -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Lab 3 &middot; silver &rarr; gold</span>
+          <h2 class="deck-title">Modelar o star schema Olist</h2>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Fato</strong>
+            <ul>
+              <li><code>fato_vendas</code>: order_id, customer_sk, product_sk, time_sk, price, freight, total.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Dimens&otilde;es</strong>
+            <ul>
+              <li><code>dim_cliente</code></li>
+              <li><code>dim_produto</code></li>
+              <li><code>dim_tempo</code></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 25 — LAB 3 Script parte 1                                 -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Lab 3 &middot; C&oacute;digo (1/2)</span>
+          <h2 class="deck-title">Script <code>silver_to_gold.py</code> &mdash; joins</h2>
+        </div>
+<pre><code>from pyspark.context import SparkContext
+from awsglue.context import GlueContext
+from pyspark.sql.functions import col, year, month, dayofmonth
+
+sc = SparkContext.getOrCreate()
+glue = GlueContext(sc)
+spark = glue.spark_session
+
+ALUNO  = "&lt;aluno&gt;"
+silver = f"s3://{ALUNO}-trusted/olist"
+gold   = f"s3://{ALUNO}-refined/olist/gold"
+
+orders    = spark.read.parquet(f"{silver}/orders/")
+items     = spark.read.parquet(f"{silver}/order_items/")
+customers = spark.read.parquet(f"{silver}/customers/")
+products  = spark.read.parquet(f"{silver}/products/")
+
+base = (items
+  .join(orders,    "order_id")
+  .join(customers, "customer_id")
+  .join(products,  "product_id"))</code></pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 26 — LAB 3 Script parte 2                                 -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Lab 3 &middot; C&oacute;digo (2/2)</span>
+          <h2 class="deck-title">Script <code>silver_to_gold.py</code> &mdash; fato e dims</h2>
+        </div>
+<pre><code>fato = base.select(
+    col("order_id"),
+    col("customer_id").alias("customer_sk"),
+    col("product_id").alias("product_sk"),
+    col("order_purchase_timestamp").alias("time_sk"),
+    col("price"),
+    col("freight_value").alias("freight"),
+    (col("price") + col("freight_value")).alias("total"))
+
+dim_cliente = customers.select(
+    "customer_id","customer_city","customer_state").distinct()
+dim_produto = products.select(
+    "product_id","product_category_name").distinct()
+dim_tempo   = (orders.select("order_purchase_timestamp")
+    .withColumn("year",  year(col("order_purchase_timestamp")))
+    .withColumn("month", month(col("order_purchase_timestamp")))
+    .withColumn("day",   dayofmonth(col("order_purchase_timestamp")))
+    .distinct())
+
+fato.write.mode("overwrite").parquet(f"{gold}/fato_vendas/")
+dim_cliente.write.mode("overwrite").parquet(f"{gold}/dim_cliente/")
+dim_produto.write.mode("overwrite").parquet(f"{gold}/dim_produto/")
+dim_tempo.write.mode("overwrite").parquet(f"{gold}/dim_tempo/")</code></pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 27 — LAB 4 Crawler gold                                   -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Lab 4 &middot; Catalogar gold</span>
+          <h2 class="deck-title">Crawler no <code>olist_refined</code></h2>
+        </div>
+        <div class="deck-panel">
+          <strong>Passos</strong>
+          <ol>
+            <li>Glue &rarr; Databases &rarr; criar <code>olist_refined</code>.</li>
+            <li>Crawlers &rarr; criar <code>olist_refined_crawler</code>.</li>
+            <li>Fonte: <code>s3://&lt;aluno&gt;-refined/olist/gold/</code>.</li>
+            <li>Role: <strong>LabRole</strong>. Database destino: <code>olist_refined</code>.</li>
+            <li>Executar. Validar tabelas: <code>fato_vendas</code>, <code>dim_cliente</code>, <code>dim_produto</code>, <code>dim_tempo</code>.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 28 — LAB 5 Queries Athena                                 -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Lab 5 &middot; Valida&ccedil;&atilde;o no Athena</span>
+          <h2 class="deck-title">Queries anal&iacute;ticas</h2>
+        </div>
+<pre><code>-- Receita mensal por categoria
+SELECT  p.product_category_name AS categoria,
+        date_format(t.order_purchase_timestamp, '%Y-%m') AS mes,
+        ROUND(SUM(f.total), 2) AS receita
+FROM    olist_refined.fato_vendas f
+JOIN    olist_refined.dim_produto p ON f.product_sk = p.product_id
+JOIN    olist_refined.dim_tempo   t ON f.time_sk    = t.order_purchase_timestamp
+GROUP BY 1, 2
+ORDER BY receita DESC
+LIMIT 20;
+
+-- Top 10 clientes por ticket
+SELECT  customer_sk, ROUND(SUM(total), 2) AS ticket
+FROM    olist_refined.fato_vendas
+GROUP BY customer_sk
+ORDER BY ticket DESC
+LIMIT 10;</code></pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 29 — Cleanup                                              -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Lab &middot; Encerramento</span>
+          <h2 class="deck-title">Parar o que est&aacute; rodando</h2>
+          <p class="deck-summary">DPU-segundo &eacute; caro. Sempre encerre jobs e crawlers n&atilde;o utilizados para preservar o budget do Learner Lab.</p>
+        </div>
+        <div class="deck-panel">
+          <strong>Checklist</strong>
+          <ul>
+            <li>Verifique <em>Runs</em> e confirme que nenhum job est&aacute; em <strong>Running</strong>.</li>
+            <li>Desabilite triggers de workflow se criou algum.</li>
+            <li>Mantenha os Parquet nos buckets (ser&atilde;o usados na Aula 06).</li>
+            <li>Clique em <strong>End Lab</strong> ao final da sess&atilde;o.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 30 — Fechamento                                           -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Fechamento</span>
+          <h2 class="deck-title">Resumo e pr&oacute;xima aula</h2>
+        </div>
+        <div class="deck-grid">
+          <article class="deck-card">
+            <h3>O que ficou pronto</h3>
+            <ul>
+              <li>Dataset Olist catalogado em 3 databases.</li>
+              <li>Pipeline raw &rarr; silver &rarr; gold automatizado.</li>
+              <li>Star schema consult&aacute;vel no Athena.</li>
+              <li>Observabilidade via CloudWatch Logs.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Pr&oacute;xima aula &mdash; 21/05/2026</h3>
+            <ul>
+              <li>Data Warehousing de alta performance.</li>
+              <li>Amazon Redshift e Redshift Serverless.</li>
+              <li>Carga do gold no DW.</li>
+              <li>Query tuning e modelagem f&iacute;sica.</li>
+            </ul>
+          </article>
         </div>
       </div>
     </div>
 
   </div>
 
+  <!-- Mackenzie mini logo -->
   <img class="slide-logo-mini" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" alt="Mackenzie" />
 
+  <!-- GLOBAL navigation footer -->
   <div class="slide-footer">
     <div class="footer-links">
-      <a href="../../../index.html" class="back-home">Indice</a>
+      <a href="../../../index.html" class="back-home">&Iacute;ndice</a>
       <a href="../material/material_aula_05_integracao_etl_serverless_e_catalogo_de_dados.html" class="material-link">Material</a>
     </div>
     <div class="nav-wrapper">
       <div class="nav-buttons"><button id="prev-btn" onclick="previousSlide()">&#8592; Anterior</button></div>
       <div class="slide-counter"><span id="current-slide">1</span> / <span id="total-slides">1</span></div>
-      <div class="nav-buttons"><button id="next-btn" onclick="nextSlide()">Proximo &#8594;</button></div>
+      <div class="nav-buttons"><button id="next-btn" onclick="nextSlide()">Pr&oacute;ximo &#8594;</button></div>
     </div>
     <button class="fullscreen-btn" onclick="toggleFullScreen()" title="Tela cheia">&#9974;</button>
   </div>
 
+  <!-- Navigation script -->
   <script>
     let currentSlide = 0;
     const slides = document.querySelectorAll('.slide');

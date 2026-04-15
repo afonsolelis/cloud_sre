@@ -4,356 +4,899 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/png" href="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" />
-    <title>Material Aula 03 — Fontes de Dados: Bancos Relacionais e NoSQL</title>
+    <title>Material Aula 03 - Fontes de Dados: Bancos Relacionais e NoSQL</title>
     <link rel="stylesheet" href="../../../assets/styles.css" />
-    <style data-design-tokens>:root{--bg:#fff;--color:#000000}body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}a:hover{opacity:.8}a:focus{outline:2px solid #000000}</style>
+    <style data-design-tokens>
+      :root{--bg:#fff;--color:#000000}
+      body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}
+      a:hover{opacity:.8}
+      a:focus{outline:2px solid #000000}
+      table{width:100%;border-collapse:collapse;margin:18px 0;font-size:.97rem}
+      th,td{border:1px solid var(--border,#d7d7d7);padding:10px 14px;text-align:left;vertical-align:top}
+      th{background:var(--surface,#f6f6f6);font-weight:700}
+      pre{background:var(--surface,#f6f6f6);border:1px solid var(--border,#d7d7d7);border-radius:6px;padding:18px;overflow-x:auto;font-size:.92rem;line-height:1.5}
+      code{font-family:"Courier New",Courier,monospace}
+      .tip{background:#f0f7f0;border-left:4px solid #2a7a2a;padding:14px 18px;margin:16px 0;border-radius:4px}
+      .warning{background:#fef6e8;border-left:4px solid #c08800;padding:14px 18px;margin:16px 0;border-radius:4px}
+      .danger{background:#fef0f0;border-left:4px solid #b30000;padding:14px 18px;margin:16px 0;border-radius:4px}
+    </style>
   </head>
   <body class="material">
     <main class="page">
 
+      <!-- ============================================================
+           HEADER
+      ============================================================= -->
       <section class="content-block">
-        <p class="meta">Aula 03 &nbsp;•&nbsp; 30/04/2026 &nbsp;•&nbsp; 19h00 – 22h00</p>
+        <p class="meta">Aula 03 &nbsp;&bull;&nbsp; 30/04/2026 &nbsp;&bull;&nbsp; 19h00 &ndash; 22h00</p>
         <h1>Fontes de Dados: Bancos Relacionais e NoSQL</h1>
         <p class="summary">
-          Este material aprofunda os conceitos apresentados nos slides da Aula 03.
-          Cobre o ecossistema de bancos de dados transacionais na AWS — Amazon RDS
-          e Amazon DynamoDB —, as estratégias de extração de dados para o Data Lake,
-          o mecanismo de Change Data Capture (CDC) com AWS DMS, e a modelagem
-          Single-Table Design no DynamoDB para alto throughput.
+          Este material aprofunda todos os tópicos tratados nos slides da Aula 03.
+          O objetivo é apresentar, em profundidade, o ecossistema de fontes operacionais
+          que alimentam um pipeline de dados moderno: bancos relacionais (OLTP) e bancos
+          NoSQL, com foco em <strong>Amazon RDS PostgreSQL</strong> e <strong>Amazon DynamoDB</strong>.
+          O material explora a teoria (OLTP vs OLAP, modelagem, normalização, ACID, CAP,
+          famílias NoSQL, decisão SQL vs NoSQL) e em seguida guia o aluno passo a passo
+          pelo laboratório prático no AWS Learner Lab, onde subiremos um banco PostgreSQL,
+          popularemos com dados do dataset Olist, rodaremos consultas analíticas, criaremos
+          uma tabela DynamoDB de eventos de sessão e exportaremos um snapshot do RDS para o
+          bucket <code>raw</code> do data lake criado na Aula 01. A aula segue o contrato
+          obrigatório da disciplina: das 19h00 às 20h30 é teoria, e das 20h30 às 22h00 é
+          prática no AWS Student.
         </p>
       </section>
 
-      <!-- =========================================================
-           MÓDULO 1 — BANCOS RELACIONAIS
-      ========================================================== -->
+      <!-- ============================================================
+           MODULO 1 - CONTEXTO
+      ============================================================= -->
       <section class="content-block">
-        <h2>Módulo 1 — Bancos de Dados Relacionais: Amazon RDS</h2>
+        <h2>Módulo 1 &mdash; Fontes operacionais no pipeline de dados</h2>
 
-        <h3>OLTP versus OLAP: por que separar?</h3>
+        <h3>Recapitulando onde estamos</h3>
         <p>
-          Sistemas transacionais (OLTP — Online Transaction Processing) são otimizados
-          para operações de leitura e escrita de baixa latência em poucos registros por
-          vez: criar um pedido, atualizar o saldo de uma conta, registrar um login.
-          Esses bancos usam índices otimizados para busca por chave primária e normalização
-          para evitar redundância.
+          Nas duas primeiras aulas construímos a fundação do nosso data lake: na Aula 01
+          configuramos o AWS Student, o usuário IAM e os três buckets S3 (<code>raw</code>,
+          <code>trusted</code>, <code>refined</code>). Na Aula 02 colocamos dados Olist em
+          formato bruto no S3, criamos um banco no AWS Glue Data Catalog e aprendemos a
+          consultar esses dados com Amazon Athena. O lake, por enquanto, está sendo alimentado
+          manualmente: alguém baixou os CSVs do Kaggle e os fez upload para o S3.
         </p>
         <p>
-          Sistemas analíticos (OLAP — Online Analytical Processing) exigem o oposto:
-          leituras de grandes volumes de dados, agregações, junções entre tabelas de fato
-          e dimensão, e queries que varrem milhões de linhas. Executar queries analíticas
-          diretamente no banco de produção OLTP degrada a performance das aplicações
-          que dependem dele, pois as queries competem pelos mesmos recursos (CPU, I/O)
-          com as transações dos usuários.
-        </p>
-        <p>
-          A solução é extrair os dados do OLTP periodicamente (batch) ou em tempo quase
-          real (CDC) e carregá-los em um Data Lake ou Data Warehouse dedicado para análise.
+          Esta aula responde a uma pergunta fundamental: <em>na vida real, de onde vêm os
+          dados que são colocados no data lake?</em> A resposta, na maioria esmagadora dos
+          casos corporativos, são as <strong>fontes operacionais</strong> &mdash; os bancos
+          de dados usados pelos sistemas transacionais das empresas. São eles que guardam o
+          estado corrente do negócio: pedidos, clientes, produtos, pagamentos, inventário.
+          Uma engenharia de dados séria precisa entender profundamente essas fontes, porque
+          é delas que depende toda a confiabilidade downstream.
         </p>
 
-        <h3>Amazon RDS: banco relacional gerenciado</h3>
+        <h3>O fluxo típico de um pipeline moderno</h3>
         <p>
-          O Amazon Relational Database Service (RDS) é um serviço PaaS que gerencia
-          automaticamente patching do sistema operacional e do banco de dados, backups
-          automáticos com retenção configurável, failover automático entre Zonas de
-          Disponibilidade (Multi-AZ), e monitoramento de métricas via CloudWatch.
+          O fluxo que usaremos como referência durante toda a disciplina é:
         </p>
-        <p>
-          Motores suportados: MySQL, PostgreSQL, MariaDB, Oracle Database, SQL Server,
-          e Amazon Aurora (MySQL-compatível e PostgreSQL-compatível). Aurora é o motor
-          recomendado para novas aplicações na AWS — ele usa armazenamento distribuído
-          que separa computação de storage, permitindo escalabilidade de leitura com
-          até 15 Read Replicas e tolerância a falhas superior.
-        </p>
-        <p>
-          Do ponto de vista do engenheiro de dados, o RDS é uma fonte de dados transacionais
-          que precisa ser extraída com cuidado. As estratégias de extração são:
-        </p>
-        <ul>
-          <li>
-            <strong>Full extract (extração completa):</strong> copia a tabela inteira a cada
-            execução. Simples de implementar, mas impraticável para tabelas grandes
-            (centenas de GB). Causa carga significativa no banco de produção.
-          </li>
-          <li>
-            <strong>Incremental extract por timestamp:</strong> usa uma coluna de
-            <code>updated_at</code> para extrair apenas registros modificados desde
-            a última execução. Requer que todas as tabelas tenham essa coluna populada
-            corretamente — um requisito que nem sempre é atendido pelos sistemas legados.
-          </li>
-          <li>
-            <strong>Change Data Capture (CDC):</strong> captura mudanças no nível do
-            transaction log do banco de dados, sem precisar modificar as tabelas de origem.
-            A abordagem mais robusta e com menor impacto no banco de produção.
-          </li>
-        </ul>
+        <ol>
+          <li><strong>Fontes OLTP</strong> &mdash; RDS, DynamoDB, sistemas SaaS, ERPs, CRMs.</li>
+          <li><strong>Camada de ingestão</strong> &mdash; snapshot batch, ingestão incremental, CDC.</li>
+          <li><strong>Data Lake</strong> &mdash; S3 com camadas raw, trusted e refined.</li>
+          <li><strong>Catalogação e processamento</strong> &mdash; Glue Data Catalog, Glue ETL, EMR.</li>
+          <li><strong>OLAP / consumo</strong> &mdash; Athena, Redshift, QuickSight, ML.</li>
+        </ol>
+        <div class="warning">
+          <strong>Regra de ouro da engenharia de dados.</strong> Nunca rode consultas analíticas
+          pesadas diretamente no banco transacional de produção. Um <code>SELECT ... GROUP BY ...</code>
+          em uma tabela com 500 milhões de linhas pode derrubar o sistema de checkout.
+          A solução é replicar (batch ou CDC) para uma plataforma otimizada para análise &mdash;
+          no nosso caso, o data lake.
+        </div>
+      </section>
 
-        <h3>AWS Database Migration Service (DMS) e CDC</h3>
+      <!-- ============================================================
+           MODULO 2 - OLTP vs OLAP
+      ============================================================= -->
+      <section class="content-block">
+        <h2>Módulo 2 &mdash; OLTP vs OLAP</h2>
         <p>
-          O AWS DMS é o serviço gerenciado da AWS para migração e replicação contínua
-          de dados entre bancos. No contexto de Data Lake, ele é usado principalmente
-          para CDC: o DMS lê o binary log (MySQL/MariaDB) ou o WAL — Write-Ahead Log
-          (PostgreSQL) do banco de origem e entrega as mudanças (INSERT, UPDATE, DELETE)
-          em formato JSON para um destino como S3 ou Kinesis.
+          OLTP (<em>Online Transaction Processing</em>) e OLAP (<em>Online Analytical Processing</em>)
+          são os dois grandes paradigmas de cargas de banco de dados. O conceito é antigo
+          (Codd, 1993) mas continua extremamente atual. Entender a diferença entre eles é a
+          base para escolher a tecnologia certa e projetar pipelines que não se sabotem.
         </p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Aspecto</th>
+              <th>OLTP (transacional)</th>
+              <th>OLAP (analítico)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Objetivo</td><td>Registrar operações do negócio em tempo real</td><td>Responder perguntas sobre o histórico do negócio</td></tr>
+            <tr><td>Volume por operação</td><td>Poucas linhas por transação</td><td>Milhões de linhas por consulta</td></tr>
+            <tr><td>Operações dominantes</td><td>INSERT, UPDATE, DELETE e SELECT pontuais</td><td>SELECT com GROUP BY, JOIN, agregações</td></tr>
+            <tr><td>Modelagem</td><td>Normalizada, tipicamente 3FN</td><td>Desnormalizada: star schema, snowflake, tabelas wide</td></tr>
+            <tr><td>Latência alvo</td><td>Milissegundos</td><td>Segundos a minutos</td></tr>
+            <tr><td>Concorrência</td><td>Milhares de conexões simultâneas curtas</td><td>Dezenas de conexões longas</td></tr>
+            <tr><td>Armazenamento preferido</td><td>Row-based</td><td>Colunar (Parquet, ORC, Redshift)</td></tr>
+            <tr><td>Usuários</td><td>Aplicações, APIs, clientes finais</td><td>Analistas, cientistas de dados, BI, ML</td></tr>
+            <tr><td>AWS</td><td>RDS, Aurora, DynamoDB</td><td>Athena, Redshift, EMR</td></tr>
+          </tbody>
+        </table>
+
         <p>
-          Cada evento de mudança no CDC contém: o tipo da operação (I/U/D),
-          o timestamp da mudança, os valores antes e depois (para UPDATE),
-          e todos os campos do registro. Isso permite reconstruir o estado exato
-          do banco em qualquer ponto no tempo, simplesmente replaying os eventos
-          em ordem.
-        </p>
-        <p>
-          Para configurar CDC no DMS com PostgreSQL, é necessário habilitar logical
-          replication no RDS: <code>rds.logical_replication = 1</code> no parameter group.
-          O DMS então cria um replication slot no PostgreSQL para consumir o WAL.
+          É comum ouvir que "o DynamoDB é NoSQL, então é analítico". Falso: DynamoDB é
+          <strong>OLTP</strong> &mdash; é otimizado para operações de baixa latência em poucos
+          itens por vez. Analítica em DynamoDB (scans longos, agregações) é um anti-padrão
+          que destrói capacidade e custo. O caminho correto é exportar DynamoDB para S3 e
+          analisar lá.
         </p>
       </section>
 
-      <!-- =========================================================
-           MÓDULO 2 — DYNAMODB
-      ========================================================== -->
+      <!-- ============================================================
+           MODULO 3 - MODELAGEM RELACIONAL
+      ============================================================= -->
       <section class="content-block">
-        <h2>Módulo 2 — Amazon DynamoDB: NoSQL de Alto Throughput</h2>
-
-        <h3>Quando usar NoSQL em vez de SQL</h3>
+        <h2>Módulo 3 &mdash; Modelagem relacional</h2>
         <p>
-          Bancos relacionais escalam verticalmente (adicionar CPU e RAM ao servidor),
-          o que tem limites físicos e custos exponenciais. Para aplicações que precisam
-          servir milhões de requisições por segundo com latência de um dígito de milissegundos
-          — independentemente do volume total de dados —, o modelo relacional não é adequado.
-        </p>
-        <p>
-          O DynamoDB foi projetado para escala horizontal: os dados são particionados
-          automaticamente entre centenas ou milhares de servidores, e o throughput escala
-          linearmente adicionando capacidade sem downtime. A latência de leitura e escrita
-          é garantida em microssegundos para respostas em cache (DAX) e poucos milissegundos
-          para operações diretas na tabela.
+          O modelo relacional foi proposto por Edgar F. Codd em 1970 no paper seminal
+          "A Relational Model of Data for Large Shared Data Banks". A ideia central é
+          representar dados como <strong>relações</strong> (tabelas) com linhas (tuplas) e
+          colunas (atributos), e permitir operar sobre eles com uma álgebra formal (a álgebra
+          relacional) que, na prática, se traduz em SQL.
         </p>
 
-        <h3>Componentes fundamentais do DynamoDB</h3>
-        <p>
-          <strong>Partition Key (PK):</strong> é o atributo que determina em qual partição
-          física um item será armazenado. O DynamoDB aplica uma função hash sobre o valor
-          da PK para distribuir os itens entre partições. Uma boa PK tem alta cardinalidade
-          e distribuição uniforme — valores que se concentram em poucos valores (ex.:
-          <code>status = 'ativo'</code>) criam hot partitions que limitam o throughput.
-        </p>
-        <p>
-          <strong>Sort Key (SK):</strong> quando definida junto com a PK, forma uma
-          chave composta. Todos os itens com a mesma PK são armazenados juntos,
-          ordenados pela SK. Isso permite queries eficientes do tipo "busque todos os
-          pedidos do cliente X entre as datas Y e Z" usando operadores de range
-          (<code>BETWEEN</code>, <code>BEGINS_WITH</code>, <code>>&lt;</code>).
-        </p>
-        <p>
-          <strong>Global Secondary Index (GSI):</strong> é uma projeção da tabela com
-          uma PK e SK diferentes da tabela principal. Um GSI permite consultar a tabela
-          de uma perspectiva diferente sem duplicar o dado principal. Por exemplo,
-          se a tabela usa <code>userID</code> como PK, um GSI com
-          <code>emailAddress</code> como PK permite buscar usuários por email
-          em O(1). Cada GSI tem sua própria capacidade de throughput e cobra separadamente.
-        </p>
-        <p>
-          <strong>Capacidade (RCU/WCU):</strong> o DynamoDB opera em dois modos.
-          No modo <strong>On-Demand</strong>, você paga por requisição sem pré-provisionar
-          capacidade — ideal para cargas imprevisíveis. No modo <strong>Provisioned</strong>,
-          você define Read Capacity Units (RCU) e Write Capacity Units (WCU) antecipadamente
-          e paga por capacidade provisionada — ideal para cargas previsíveis com
-          possibilidade de usar Auto Scaling.
-        </p>
-
-        <h3>Single-Table Design</h3>
-        <p>
-          O Single-Table Design é a abordagem de modelagem recomendada para DynamoDB.
-          Em vez de criar uma tabela por entidade (como no modelo relacional), você
-          armazena múltiplos tipos de entidades em uma única tabela, usando valores
-          prefixados na PK e SK para distingui-los.
-        </p>
-        <p>
-          Por exemplo, em um sistema de e-commerce, a mesma tabela pode armazenar:
-        </p>
+        <h3>Entidade, atributo, tupla, relacionamento</h3>
         <ul>
-          <li>Usuários: <code>PK = USER#U001</code>, <code>SK = PROFILE</code></li>
-          <li>Pedidos do usuário: <code>PK = USER#U001</code>, <code>SK = ORDER#2026-04-01#P001</code></li>
-          <li>Itens do pedido: <code>PK = ORDER#P001</code>, <code>SK = ITEM#SKU-123</code></li>
+          <li><strong>Entidade:</strong> objeto do mundo real que queremos representar. No Olist,
+          entidades são <em>cliente</em>, <em>pedido</em>, <em>produto</em>. Cada entidade vira uma tabela.</li>
+          <li><strong>Atributo:</strong> propriedade de uma entidade. Para <em>pedido</em> temos
+          <em>id do pedido</em>, <em>data da compra</em>, <em>status</em>. Cada atributo vira uma coluna.</li>
+          <li><strong>Tupla / linha:</strong> uma ocorrência concreta da entidade, por exemplo
+          <em>o pedido 1234 feito pelo cliente A em 30/04/2026 e entregue em 05/05/2026</em>.</li>
+          <li><strong>Relacionamento:</strong> associação entre entidades. Pode ser 1:1
+          (um cliente tem um perfil), 1:N (um cliente faz muitos pedidos) ou N:N
+          (um pedido contém muitos produtos, um produto aparece em muitos pedidos). O modelo
+          relacional implementa relacionamentos com chaves estrangeiras; relações N:N exigem
+          uma tabela de associação (no Olist, <code>order_items</code>).</li>
         </ul>
+
+        <h3>Normalização &mdash; 1FN, 2FN, 3FN</h3>
         <p>
-          Esse design permite buscar "o perfil do usuário U001 e todos os seus pedidos"
-          com uma única operação <code>Query</code> (sem JOIN), já que todos os itens com
-          a mesma PK ficam na mesma partição. A regra é: modele com base nos padrões de
-          acesso (access patterns) da aplicação, não no schema lógico dos dados.
+          Normalizar significa reorganizar o schema para eliminar redundância e anomalias
+          de atualização. As três primeiras formas normais cobrem 95% dos casos práticos em
+          sistemas transacionais.
         </p>
 
-        <h3>Exportando DynamoDB para o Data Lake (S3)</h3>
+        <h4>Primeira Forma Normal (1FN)</h4>
         <p>
-          O DynamoDB oferece dois mecanismos nativos de integração com S3:
+          Uma tabela está em 1FN quando cada coluna contém apenas valores atômicos &mdash; isto é,
+          indivisíveis &mdash; e não há grupos repetitivos. Listas, arrays e "campos separados por
+          vírgula" violam 1FN.
         </p>
+        <p>Exemplo de violação:</p>
+<pre><code>pedido_id | itens
+1001      | camiseta, bone, meia
+1002      | tenis</code></pre>
+        <p>Corrigindo para 1FN:</p>
+<pre><code>pedido_id | produto
+1001      | camiseta
+1001      | bone
+1001      | meia
+1002      | tenis</code></pre>
+
+        <h4>Segunda Forma Normal (2FN)</h4>
+        <p>
+          Uma tabela está em 2FN quando está em 1FN e todo atributo não-chave depende da
+          chave primária <em>inteira</em>, não apenas de uma parte dela. A 2FN só é problema
+          quando a chave primária é composta.
+        </p>
+        <p>
+          Exemplo Olist: considere uma tabela <code>order_items (order_id, product_id, quantidade, nome_produto)</code>
+          com chave primária <code>(order_id, product_id)</code>. O atributo <code>quantidade</code>
+          depende da chave inteira &mdash; OK. Mas <code>nome_produto</code> depende apenas de
+          <code>product_id</code>. Isso viola 2FN. A correção é mover <code>nome_produto</code>
+          para a tabela <code>products</code>.
+        </p>
+
+        <h4>Terceira Forma Normal (3FN)</h4>
+        <p>
+          Uma tabela está em 3FN quando está em 2FN e nenhum atributo não-chave depende
+          transitivamente da chave primária &mdash; ou seja, nenhum atributo não-chave depende
+          de outro atributo não-chave.
+        </p>
+        <p>
+          Exemplo Olist: em <code>customers (customer_id, cep, cidade, uf)</code>, temos que
+          <code>cidade</code> e <code>uf</code> dependem de <code>cep</code>, que por sua vez
+          depende de <code>customer_id</code>. Isso é uma dependência transitiva. A correção
+          é criar uma tabela <code>geolocation (cep, cidade, uf)</code> e deixar apenas
+          <code>cep</code> em <code>customers</code>.
+        </p>
+
+        <div class="tip">
+          <strong>Quando não normalizar.</strong> Em OLAP (data warehouse, star schema) a
+          desnormalização é a norma, não a exceção: queremos reduzir JOINs e acelerar queries
+          analíticas. A regra prática é: <em>normalize em OLTP, desnormalize em OLAP</em>.
+          O processo de ETL da Aula 05 justamente traduz um schema normalizado em schema
+          dimensional.
+        </div>
+
+        <h3>Chaves: primária, estrangeira, natural e surrogate</h3>
         <ul>
-          <li>
-            <strong>DynamoDB Export to S3:</strong> exporta um snapshot completo
-            da tabela para S3 em formato JSON ou DynamoDB JSON. Funciona em segundo plano
-            sem impactar o throughput da tabela, usando o recurso Point-in-Time Recovery (PITR).
-            Ideal para carga inicial no Data Lake.
-          </li>
-          <li>
-            <strong>DynamoDB Streams + Lambda/Kinesis:</strong> captura cada mudança
-            (INSERT, UPDATE, DELETE) em tempo real e permite processá-las com Lambda
-            ou entregá-las via Kinesis Firehose para o S3. Implementa o padrão CDC
-            para DynamoDB.
-          </li>
+          <li><strong>Primary Key (PK):</strong> identifica univocamente cada linha.
+          Deve ser NOT NULL e UNIQUE. Toda tabela bem projetada tem uma PK.</li>
+          <li><strong>Foreign Key (FK):</strong> atributo (ou conjunto de atributos) que
+          aponta para a PK de outra tabela. Garante <em>integridade referencial</em>: não é
+          possível criar um <code>orders.customer_id</code> que não exista em
+          <code>customers.customer_id</code>.</li>
+          <li><strong>Chave natural:</strong> valor do próprio negócio usado como chave
+          &mdash; CPF, email, CEP, ISBN. Vantagem: significativa. Desvantagem: pode mudar
+          (pessoa troca de email), pode ser sensível (LGPD), e muda regras de unicidade.</li>
+          <li><strong>Surrogate key:</strong> chave artificial, gerada pelo sistema
+          (<code>SERIAL</code>, <code>UUID</code>). Vantagem: estável, sem semântica de
+          negócio, sempre única. Desvantagem: precisa de um JOIN extra para recuperar o
+          significado. Em sistemas modernos, o padrão é preferir surrogate keys.</li>
         </ul>
       </section>
 
-      <!-- =========================================================
-           MÓDULO 3 — LABORATÓRIO
-      ========================================================== -->
+      <!-- ============================================================
+           MODULO 4 - ACID
+      ============================================================= -->
       <section class="content-block">
-        <h2>Módulo 3 — Laboratório: DynamoDB para o Data Lake</h2>
+        <h2>Módulo 4 &mdash; ACID: o contrato das transações</h2>
         <p>
-          A prática ocorre entre 20h00 e 22h00 utilizando o ambiente <strong>AWS Student</strong>.
-          Siga cada passo na ordem indicada.
+          Uma transação é uma sequência de operações tratada como uma unidade lógica.
+          ACID é o acrônimo das quatro propriedades que um SGBD transacional deve garantir.
+        </p>
+        <ul>
+          <li><strong>A &mdash; Atomicidade.</strong> Todas as operações de uma transação
+          ou acontecem juntas, ou nenhuma acontece. Se uma etapa falha no meio, o banco faz
+          <em>rollback</em> de tudo que foi feito até então. Exemplo: transferir R$ 100 entre
+          contas exige UPDATE em duas linhas; se a segunda falhar, a primeira precisa ser revertida.</li>
+          <li><strong>C &mdash; Consistência.</strong> Uma transação leva o banco de um estado
+          válido para outro estado válido. Constraints (PK, FK, CHECK, NOT NULL) continuam
+          satisfeitas após o commit.</li>
+          <li><strong>I &mdash; Isolamento.</strong> Transações concorrentes não interferem
+          umas nas outras. Há diferentes níveis de isolamento (READ UNCOMMITTED, READ COMMITTED,
+          REPEATABLE READ, SERIALIZABLE) que equilibram performance e garantias. PostgreSQL
+          usa READ COMMITTED por padrão.</li>
+          <li><strong>D &mdash; Durabilidade.</strong> Uma vez que o banco confirmou o commit,
+          a mudança sobrevive a quedas de energia, crashes do processo e até falhas de disco
+          (se o storage replicar dados, como o RDS).</li>
+        </ul>
+        <p>
+          Bancos relacionais tradicionais (PostgreSQL, MySQL, Oracle, SQL Server) oferecem
+          ACID completo. Muitos NoSQLs oferecem ACID relaxado ou apenas transações por item.
+          DynamoDB suporta transações ACID em múltiplos itens desde 2018, mas com restrições
+          de tamanho e custo adicional.
+        </p>
+      </section>
+
+      <!-- ============================================================
+           MODULO 5 - CAP
+      ============================================================= -->
+      <section class="content-block">
+        <h2>Módulo 5 &mdash; Teorema CAP</h2>
+        <p>
+          O teorema CAP, formulado por Eric Brewer em 2000 e provado formalmente por Gilbert
+          e Lynch em 2002, afirma que, em um sistema de dados distribuído, é impossível
+          garantir simultaneamente as três propriedades: <strong>Consistência</strong>,
+          <strong>Disponibilidade</strong> e <strong>Tolerância a partições de rede</strong>.
+          Na prática, partições de rede acontecem (cabos são cortados, switches falham),
+          então o projetista escolhe entre <strong>CP</strong> (consistência + tolerância) e
+          <strong>AP</strong> (disponibilidade + tolerância).
+        </p>
+        <ul>
+          <li><strong>C &mdash; Consistency.</strong> Toda leitura enxerga o dado mais recente
+          já escrito, ou um erro.</li>
+          <li><strong>A &mdash; Availability.</strong> Toda requisição recebe uma resposta
+          não-erro, mas sem garantia de ser o dado mais recente.</li>
+          <li><strong>P &mdash; Partition tolerance.</strong> O sistema continua funcionando
+          mesmo quando há perda arbitrária de mensagens entre nós.</li>
+        </ul>
+
+        <h3>Exemplos concretos na AWS</h3>
+        <ul>
+          <li><strong>RDS Multi-AZ:</strong> sistema CP. Em caso de falha da AZ primária, há
+          um <em>failover</em> que pode causar indisponibilidade breve &mdash; mas não leitura
+          de dado stale.</li>
+          <li><strong>DynamoDB com leitura strongly consistent:</strong> comportamento CP.
+          Se a partição não puder ser lida consistente, retorna erro.</li>
+          <li><strong>DynamoDB com leitura eventually consistent (padrão):</strong> comportamento
+          AP. Retorna sempre, mas pode devolver um valor antigo por até um segundo.</li>
+          <li><strong>Cassandra / Amazon Keyspaces:</strong> AP configurável; o nível de
+          consistência é escolhido por operação (QUORUM, ONE, ALL).</li>
+        </ul>
+        <p>
+          O artigo <em>"CAP Twelve Years Later"</em>, do próprio Brewer, refina essa visão:
+          o trade-off não é tão binário. Sistemas modernos oferecem diferentes níveis de
+          consistência <em>por operação</em>, o que os permite ser CP em algumas chamadas e AP
+          em outras.
+        </p>
+      </section>
+
+      <!-- ============================================================
+           MODULO 6 - NoSQL
+      ============================================================= -->
+      <section class="content-block">
+        <h2>Módulo 6 &mdash; Famílias NoSQL</h2>
+        <p>
+          NoSQL ("Not Only SQL") é um termo guarda-chuva que cobre quatro grandes famílias
+          de bancos, cada uma otimizada para um tipo diferente de carga. Entender essa
+          taxonomia é essencial para escolher a ferramenta correta.
         </p>
 
-        <h3>Passo 1 — Criar a tabela DynamoDB</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Família</th>
+              <th>Modelo de dados</th>
+              <th>Caso de uso típico</th>
+              <th>Produto AWS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Documento</td><td>JSON/BSON hierárquico por documento</td><td>Catálogos de produtos, perfis de usuário, CMS</td><td>Amazon DocumentDB (MongoDB-compatible)</td></tr>
+            <tr><td>Chave-valor</td><td>Mapa <code>key -&gt; value</code> (value pode ser documento)</td><td>Sessões, carrinhos, cache, feature store</td><td>Amazon DynamoDB, Amazon ElastiCache (Redis/Memcached)</td></tr>
+            <tr><td>Colunar (wide-column)</td><td>Linhas com número variável de colunas agrupadas em famílias</td><td>Séries temporais, IoT, logs, mensagens</td><td>Amazon Keyspaces (Cassandra-compatible), Amazon Timestream</td></tr>
+            <tr><td>Grafo</td><td>Vértices e arestas com propriedades</td><td>Detecção de fraude, redes sociais, recomendação</td><td>Amazon Neptune</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Documento vs chave-valor &mdash; uma distinção sutil</h3>
+        <p>
+          DynamoDB costuma ser descrito como "chave-valor", mas seus valores são documentos
+          ricos (mapas aninhados, listas, sets, números, strings, booleanos). Por isso muitos
+          autores o classificam também como documento. A distinção prática é o foco: bancos
+          chave-valor priorizam <em>lookup por chave</em>; bancos documento priorizam
+          <em>consultas por campos internos</em> e <em>índices secundários flexíveis</em>.
+          DynamoDB se encaixa mais como chave-valor com valor documento.
+        </p>
+      </section>
+
+      <!-- ============================================================
+           MODULO 7 - DECISAO SQL vs NoSQL
+      ============================================================= -->
+      <section class="content-block">
+        <h2>Módulo 7 &mdash; Quando usar SQL e quando usar NoSQL</h2>
+        <p>
+          Não existe uma resposta universal: a escolha depende do padrão de acesso,
+          do volume, da evolução do schema e dos requisitos de consistência. A seguir,
+          heurísticas que costumam funcionar bem em engenharia de dados.
+        </p>
+
+        <h3>Prefira SQL quando</h3>
+        <ul>
+          <li>Seus dados são altamente relacionais (muitas entidades, muitos JOINs).</li>
+          <li>Você precisa de transações ACID envolvendo múltiplas linhas/tabelas.</li>
+          <li>O schema é estável e bem compreendido (domínios maduros: financeiro, contábil).</li>
+          <li>Você precisa fazer queries ad hoc, com agregações, GROUP BY e JOIN não previstos.</li>
+          <li>Há requisitos regulatórios ou de auditoria que se beneficiam da rigidez do schema.</li>
+        </ul>
+
+        <h3>Prefira NoSQL quando</h3>
+        <ul>
+          <li>Você precisa de escala horizontal massiva (milhões de ops/s).</li>
+          <li>Requisito de latência muito baixa e consistente (&lt; 10 ms p99).</li>
+          <li>O schema é flexível, evolutivo ou varia por documento.</li>
+          <li>Os padrões de acesso são bem conhecidos e giram em torno de chave (key lookup, key + range).</li>
+          <li>Você está modelando séries temporais, eventos, sessões, feature store.</li>
+        </ul>
+
+        <div class="tip">
+          <strong>Padrão comum em produção.</strong> Muitas empresas usam <em>polyglot
+          persistence</em>: RDS para dados transacionais relacionais, DynamoDB para sessões
+          e eventos, ElastiCache para cache, Redshift ou Athena para analítica. A decisão
+          não é "ou SQL ou NoSQL" &mdash; é "que ferramenta para que problema".
+        </div>
+      </section>
+
+      <!-- ============================================================
+           MODULO 8 - AMAZON RDS
+      ============================================================= -->
+      <section class="content-block">
+        <h2>Módulo 8 &mdash; Amazon RDS</h2>
+        <p>
+          Amazon Relational Database Service (RDS) é o serviço gerenciado da AWS para bancos
+          relacionais. A AWS cuida de provisioning, patching, backup, alta disponibilidade e
+          monitoramento; você cuida de schema, queries e otimização. RDS suporta os motores
+          PostgreSQL, MySQL, MariaDB, Oracle e SQL Server. Há ainda o <strong>Amazon Aurora</strong>,
+          uma reimplementação cloud-native dos protocolos PostgreSQL e MySQL, com storage
+          distribuído em 6 réplicas e escalabilidade superior.
+        </p>
+
+        <h3>Recursos principais</h3>
+        <ul>
+          <li><strong>Multi-AZ.</strong> Provisiona uma réplica <em>standby</em> síncrona em
+          outra Availability Zone. Em caso de falha, o failover é automático em 60&ndash;120
+          segundos. Multi-AZ não serve para escalar leitura &mdash; a standby não aceita
+          conexões de aplicação. Serve para <strong>alta disponibilidade</strong>.</li>
+          <li><strong>Read Replicas.</strong> Réplicas <em>assíncronas</em> que aceitam apenas
+          SELECTs. Servem para descarregar leitura analítica da instância principal. RDS
+          permite até 5 read replicas por instância; Aurora permite até 15.</li>
+          <li><strong>Backups automáticos.</strong> Snapshots diários incrementais, com
+          retenção configurável (até 35 dias). Suporte a point-in-time recovery (PITR) com
+          granularidade de segundos, dentro da janela de retenção.</li>
+          <li><strong>Segurança.</strong> RDS roda dentro de uma VPC; o acesso é controlado
+          por Security Groups. Dados em repouso podem ser criptografados com AWS KMS; em
+          trânsito, com TLS. Autenticação pode ser por senha, IAM database authentication
+          (para Postgres e MySQL) ou AWS Secrets Manager integrado.</li>
+          <li><strong>Performance Insights.</strong> Ferramenta de observabilidade que mostra
+          queries lentas, wait events e recursos consumidos.</li>
+        </ul>
+
+        <div class="warning">
+          <strong>Custo.</strong> RDS cobra por instância rodando (mesmo ociosa), storage
+          alocado e transferência de dados para fora da região. No AWS Learner Lab o budget
+          é limitado. Nesta aula usaremos <code>db.t3.micro</code>, que é a instância mais
+          barata e cabe no free-tier quando disponível. Ao final do lab, <strong>pare ou
+          delete</strong> o RDS para preservar o saldo.
+        </div>
+      </section>
+
+      <!-- ============================================================
+           MODULO 9 - DYNAMODB
+      ============================================================= -->
+      <section class="content-block">
+        <h2>Módulo 9 &mdash; Amazon DynamoDB</h2>
+        <p>
+          DynamoDB é o banco NoSQL <em>fully managed</em> da AWS. É serverless: você não
+          provisiona servidores nem escolhe tamanho de instância. Apenas define a tabela,
+          as chaves e (opcionalmente) a capacidade. DynamoDB entrega latência de milissegundos
+          em qualquer escala, replicado automaticamente em três AZs por região.
+        </p>
+
+        <h3>Modelo de tabela</h3>
+        <ul>
+          <li><strong>Partition Key (PK).</strong> Atributo obrigatório. O valor da PK é
+          hasheado e determina em qual <em>partição</em> física o item será armazenado.
+          Uma boa PK tem alta cardinalidade (muitos valores distintos) e distribuição uniforme,
+          para evitar <em>hot partitions</em>.</li>
+          <li><strong>Sort Key (SK).</strong> Atributo opcional. Permite ordenar itens dentro
+          da mesma PK e consultar por range (<code>begins_with</code>, <code>between</code>).
+          A combinação (PK, SK) deve ser única.</li>
+          <li><strong>Atributos adicionais.</strong> Cada item pode ter qualquer quantidade
+          de atributos extras, com tipos variados (string, number, binary, list, map, set,
+          boolean, null). Um item não precisa ter os mesmos atributos que outros.</li>
+          <li><strong>LSI (Local Secondary Index).</strong> Mesmo PK da tabela principal,
+          mas outro SK. Precisa ser criado na criação da tabela e não pode ser removido.
+          Compartilha a capacidade da tabela base.</li>
+          <li><strong>GSI (Global Secondary Index).</strong> PK e SK totalmente diferentes
+          da tabela base. Pode ser criado a qualquer momento. Replicado assincronamente
+          (eventually consistent). Tem capacidade própria.</li>
+        </ul>
+
+        <h3>Modos de capacidade</h3>
+        <ul>
+          <li><strong>On-demand (PAY_PER_REQUEST).</strong> Você paga por request (RCU para
+          leitura, WCU para escrita). A tabela escala automaticamente. Recomendado quando
+          a carga é imprevisível ou está começando.</li>
+          <li><strong>Provisioned.</strong> Você reserva RCU e WCU por segundo. Mais barato
+          quando a carga é previsível. Auto-scaling pode ajustar os limites dinamicamente
+          dentro de bandas configuradas.</li>
+        </ul>
+
+        <h3>DAX &mdash; DynamoDB Accelerator</h3>
+        <p>
+          DAX é um cache <em>write-through</em> em memória, compatível com a API DynamoDB.
+          Não altera o código da aplicação: você redireciona o client DynamoDB para o endpoint
+          DAX e passa a ter latências de microssegundos em reads repetidos. Útil em cenários
+          com leitura pesada do mesmo conjunto pequeno de itens (catálogos, configurações).
+        </p>
+
+        <div class="tip">
+          <strong>Design por padrões de acesso.</strong> Em DynamoDB, a modelagem começa
+          identificando <em>todas</em> as queries que a aplicação precisa rodar. Diferentemente
+          de SQL, você não pode "improvisar" uma query depois: ou ela se encaixa em uma PK/SK/GSI,
+          ou é um scan caríssimo. Leitura recomendada: <em>The DynamoDB Book</em>, Alex DeBrie.
+        </div>
+      </section>
+
+      <!-- ============================================================
+           MODULO 10 - INGESTAO OLTP -> DATA LAKE
+      ============================================================= -->
+      <section class="content-block">
+        <h2>Módulo 10 &mdash; Padrões de ingestão OLTP para data lake</h2>
+        <p>
+          Há três padrões clássicos para levar dados de um banco transacional ao data lake.
+          A escolha depende do volume da tabela, da existência de colunas de auditoria e do
+          requisito de latência.
+        </p>
+
+        <h3>Full snapshot</h3>
+        <p>
+          Exporta a tabela inteira periodicamente (diariamente, por exemplo) e escreve no lake
+          com particionamento por data. Simples, mas inviável para tabelas grandes. Ideal para
+          tabelas pequenas de referência (ex.: <code>products</code>, <code>categories</code>).
+        </p>
+
+        <h3>Ingestão incremental</h3>
+        <p>
+          Depende da existência de uma coluna <code>updated_at</code> (ou equivalente) na
+          tabela fonte. A cada execução, o pipeline lê apenas linhas com
+          <code>updated_at &gt; last_run</code> e mescla no destino. Reduz volume, mas não
+          captura deletes a menos que exista um esquema de soft delete.
+        </p>
+
+        <h3>CDC &mdash; Change Data Capture</h3>
+        <p>
+          O pipeline lê o próprio log de replicação do banco (WAL no PostgreSQL, binlog no
+          MySQL) e replica cada INSERT, UPDATE e DELETE para o destino, near real-time. É o
+          padrão mais robusto para tabelas grandes e captura todas as mudanças, inclusive
+          deletes. O AWS DMS implementa CDC com poucos cliques.
+        </p>
+
+        <h3>AWS Database Migration Service (DMS)</h3>
+        <p>
+          DMS é o serviço gerenciado da AWS para migrar e replicar bancos. Os componentes
+          principais são:
+        </p>
+        <ul>
+          <li><strong>Replication Instance</strong> &mdash; uma instância EC2 gerenciada que
+          roda o processo de replicação.</li>
+          <li><strong>Source Endpoint</strong> &mdash; RDS, Aurora, Oracle, SQL Server, MongoDB,
+          DocumentDB, entre outros.</li>
+          <li><strong>Target Endpoint</strong> &mdash; S3, Redshift, Kinesis, outro RDS,
+          DynamoDB etc.</li>
+          <li><strong>Migration Task</strong> &mdash; define quais tabelas replicar, com
+          quais filtros e transformações, em que modo (full load, CDC only, full load + CDC).</li>
+        </ul>
+
+        <h3>Trade-off: replicar ou consultar a fonte viva?</h3>
+        <p>
+          Há cenários em que consultar o banco transacional diretamente é aceitável &mdash;
+          especialmente se existir uma read replica dedicada à analítica. Mas, para qualquer
+          workload sério, replicar para o data lake é a escolha padrão. Os motivos:
+        </p>
+        <ul>
+          <li>Protege o OLTP de queries pesadas.</li>
+          <li>Permite manter histórico ilimitado no lake, mesmo que a fonte faça purge.</li>
+          <li>Desacopla consumidores analíticos da disponibilidade do OLTP.</li>
+          <li>Torna viável combinar múltiplas fontes (RDS + DynamoDB + SaaS) num único lugar.</li>
+        </ul>
+      </section>
+
+      <!-- ============================================================
+           MODULO 11 - PRATICA
+      ============================================================= -->
+      <section class="content-block">
+        <h2>Módulo 11 &mdash; Laboratório prático (20h30 &ndash; 22h00)</h2>
+        <p>
+          O laboratório desta aula usa o AWS Learner Lab. Abra o lab, clique em
+          <strong>Start Lab</strong>, aguarde o ponto verde e então acesse o console AWS.
+          Região padrão: <strong>us-east-1</strong>. Use a role <code>LabRole</code> sempre
+          que precisar escolher um role. Todos os recursos criados devem ficar na mesma conta
+          e região.
+        </p>
+
+        <h3>Passo 1 &mdash; Criar o RDS PostgreSQL</h3>
         <ol>
-          <li>No console AWS, acesse o <strong>Amazon DynamoDB</strong>.</li>
-          <li>Clique em <strong>Create table</strong>.</li>
-          <li>Em <strong>Table name</strong>, insira: <code>Ecommerce_Transactions_MBA</code>.</li>
-          <li>Em <strong>Partition key</strong>, insira <code>userID</code> com tipo <strong>String</strong>.</li>
-          <li>Em <strong>Sort key</strong>, insira <code>timestamp</code> com tipo <strong>String</strong>.</li>
-          <li>Em <strong>Table settings</strong>, selecione <strong>Customize settings</strong>.</li>
-          <li>Em <strong>Read/write capacity settings</strong>, selecione <strong>On-demand</strong>.</li>
-          <li>Clique em <strong>Create table</strong> e aguarde o status <strong>Active</strong>.</li>
-          <li><strong>Validação:</strong> a tabela aparece na lista com status Active e as chaves corretas.</li>
+          <li>No console, pesquise e abra <strong>RDS</strong>.</li>
+          <li>Clique em <strong>Create database</strong>.</li>
+          <li>Escolha <strong>Standard create</strong>.</li>
+          <li>Em <em>Engine options</em>, selecione <strong>PostgreSQL</strong> versão 15.x.</li>
+          <li>Em <em>Templates</em>, escolha <strong>Free tier</strong> (ou Dev/Test, se o free tier não estiver disponível).</li>
+          <li>Em <em>Settings</em>:
+            <ul>
+              <li>DB instance identifier: <code>olist-oltp</code></li>
+              <li>Master username: <code>postgres</code></li>
+              <li>Master password: defina uma senha forte e anote em local seguro</li>
+            </ul>
+          </li>
+          <li>Em <em>Instance configuration</em>, selecione <code>db.t3.micro</code>.</li>
+          <li>Em <em>Storage</em>: tipo gp3, 20 GB alocados, sem auto-scaling.</li>
+          <li>Em <em>Connectivity</em>:
+            <ul>
+              <li>VPC: default</li>
+              <li>Public access: <strong>Yes</strong></li>
+              <li>VPC security group: crie um novo chamado <code>olist-oltp-sg</code></li>
+              <li>Availability zone: qualquer</li>
+            </ul>
+          </li>
+          <li>Em <em>Additional configuration</em>: deixe o initial database em branco
+          (criaremos o banco <code>olist</code> manualmente via psql).</li>
+          <li>Clique em <strong>Create database</strong>. Aguarde alguns minutos até o status
+          ficar <code>Available</code>.</li>
+          <li>Depois de criado, abra o security group <code>olist-oltp-sg</code> e adicione
+          uma inbound rule: TCP 5432, <em>source</em>: seu IP público (<code>My IP</code>).</li>
         </ol>
 
-        <h3>Passo 2 — Inserir itens de exemplo com schema variável</h3>
-        <ol>
-          <li>Clique na tabela e depois em <strong>Explore table items</strong>.</li>
-          <li>Clique em <strong>Create item</strong> e insira o seguinte item (modo JSON):</li>
-        </ol>
-        <pre><code>{
-  "userID": {"S": "U001"},
-  "timestamp": {"S": "2026-04-01T10:00:00Z"},
-  "tipo": {"S": "compra"},
-  "produto": {"S": "Notebook Dell"},
-  "valor": {"N": "3500.00"},
-  "parcelas": {"N": "12"}
-}</code></pre>
-        <ol start="3">
-          <li>Clique em <strong>Create item</strong>.</li>
-          <li>Crie mais dois itens com schemas diferentes para simular a flexibilidade NoSQL:</li>
-        </ol>
-        <pre><code>{
-  "userID": {"S": "U002"},
-  "timestamp": {"S": "2026-04-01T11:30:00Z"},
-  "tipo": {"S": "visualizacao"},
-  "produto": {"S": "Smartphone Samsung"},
-  "duracao_segundos": {"N": "45"}
-}</code></pre>
-        <pre><code>{
-  "userID": {"S": "U001"},
-  "timestamp": {"S": "2026-04-02T09:15:00Z"},
-  "tipo": {"S": "devolucao"},
-  "produto": {"S": "Notebook Dell"},
-  "motivo": {"S": "defeito_bateria"},
-  "valor_reembolso": {"N": "3500.00"}
-}</code></pre>
-        <ol start="5">
-          <li><strong>Validação:</strong> os três itens aparecem na tabela com seus campos específicos.
-          Note que cada item tem atributos diferentes — o DynamoDB aceita schema livre.</li>
-        </ol>
+        <h3>Passo 2 &mdash; Conectar via psql</h3>
+        <p>
+          Instale o cliente <code>psql</code> se ainda não tiver. Em seguida, copie o
+          <em>endpoint</em> do RDS (aba Connectivity &amp; security) e conecte.
+        </p>
+<pre><code>## Linux (Ubuntu/Debian)
+sudo apt update &amp;&amp; sudo apt install -y postgresql-client
 
-        <h3>Passo 3 — Habilitar PITR e exportar para S3</h3>
-        <ol>
-          <li>Na tela da tabela, clique na aba <strong>Backups</strong>.</li>
-          <li>Em <strong>Point-in-time recovery (PITR)</strong>, clique em <strong>Enable</strong>.</li>
-          <li>Confirme a ativação. O PITR mantém um histórico contínuo das últimas 35 dias de mudanças.</li>
-          <li>Clique na aba <strong>Exports and streams</strong>.</li>
-          <li>Em <strong>Amazon S3 export</strong>, clique em <strong>Export to S3</strong>.</li>
-          <li>Em <strong>S3 bucket</strong>, selecione o bucket criado na Aula 02 ou crie um novo.</li>
-          <li>Em <strong>S3 bucket prefix</strong>, insira <code>raw/fonte=dynamodb/tabela=ecommerce/</code>.</li>
-          <li>Em <strong>Export format</strong>, selecione <strong>DynamoDB JSON</strong>.</li>
-          <li>Clique em <strong>Export</strong>.</li>
-          <li>Aguarde o status da exportação mudar para <strong>Completed</strong>.</li>
-          <li><strong>Validação:</strong> acesse o S3 e confirme que os arquivos JSON foram criados
-          no prefixo especificado. Inspecione um arquivo para verificar o formato dos dados exportados.</li>
-        </ol>
+## macOS
+brew install libpq &amp;&amp; brew link --force libpq
 
-        <h3>Passo 4 — Consultar os dados exportados com Athena</h3>
-        <ol>
-          <li>Acesse o <strong>Amazon Athena</strong>.</li>
-          <li>Execute o DDL para criar uma tabela apontando para os dados exportados do DynamoDB:</li>
-        </ol>
-        <pre><code>CREATE EXTERNAL TABLE datalake_lab.raw_dynamodb_ecommerce (
-  Item STRUCT&lt;
-    userID: STRUCT&lt;S: STRING&gt;,
-    timestamp: STRUCT&lt;S: STRING&gt;,
-    tipo: STRUCT&lt;S: STRING&gt;,
-    produto: STRUCT&lt;S: STRING&gt;,
-    valor: STRUCT&lt;N: STRING&gt;
-  &gt;
-)
-ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe'
-LOCATION 's3://seu-bucket/raw/fonte=dynamodb/tabela=ecommerce/AWSDynamoDB/';
+## conectar (substitua o endpoint)
+psql -h olist-oltp.abc123xyz.us-east-1.rds.amazonaws.com \
+     -U postgres -d postgres -p 5432
+
+## dentro do psql, criar o banco
+CREATE DATABASE olist;
+\c olist
 </code></pre>
-        <ol start="3">
-          <li>Execute uma query para validar os dados:</li>
-        </ol>
-        <pre><code>SELECT Item.userID.S AS user_id,
-       Item.tipo.S AS tipo_evento,
-       Item.produto.S AS produto
-FROM datalake_lab.raw_dynamodb_ecommerce;
+
+        <h3>Passo 3 &mdash; DDL das tabelas Olist</h3>
+        <p>Cole o bloco abaixo no psql, dentro do banco <code>olist</code>:</p>
+<pre><code>CREATE TABLE customers (
+  customer_id    VARCHAR(40) PRIMARY KEY,
+  customer_city  VARCHAR(80),
+  customer_state CHAR(2)
+);
+
+CREATE TABLE orders (
+  order_id                  VARCHAR(40) PRIMARY KEY,
+  customer_id               VARCHAR(40) REFERENCES customers(customer_id),
+  order_status              VARCHAR(20),
+  order_purchase_timestamp  TIMESTAMP
+);
+
+CREATE TABLE products (
+  product_id        VARCHAR(40) PRIMARY KEY,
+  product_category  VARCHAR(60),
+  product_weight_g  INT
+);
+
+CREATE TABLE order_items (
+  order_id      VARCHAR(40) REFERENCES orders(order_id),
+  order_item_id INT,
+  product_id    VARCHAR(40) REFERENCES products(product_id),
+  price         NUMERIC(10,2),
+  freight_value NUMERIC(10,2),
+  PRIMARY KEY (order_id, order_item_id)
+);
 </code></pre>
-        <ol start="4">
-          <li><strong>Validação:</strong> os registros exportados do DynamoDB aparecem na query
-          do Athena. O Data Lake agora contém dados tanto do RDS/CSV (Aula 02) quanto do DynamoDB.</li>
+
+        <h3>Passo 4 &mdash; Popular com dados Olist (subset)</h3>
+<pre><code>INSERT INTO customers VALUES
+  ('c1','sao paulo','SP'),
+  ('c2','rio de janeiro','RJ'),
+  ('c3','belo horizonte','MG');
+
+INSERT INTO products VALUES
+  ('p1','beleza_saude', 300),
+  ('p2','informatica',  800),
+  ('p3','casa_conforto',1200);
+
+INSERT INTO orders VALUES
+  ('o1','c1','delivered','2026-04-28 10:00'),
+  ('o2','c2','shipped',  '2026-04-29 14:30'),
+  ('o3','c3','delivered','2026-04-29 18:45');
+
+INSERT INTO order_items VALUES
+  ('o1',1,'p1', 59.90, 12.00),
+  ('o1',2,'p2',299.00, 22.50),
+  ('o2',1,'p3',189.90, 18.00),
+  ('o3',1,'p2',299.00, 22.50);
+</code></pre>
+
+        <h3>Passo 5 &mdash; Queries analíticas</h3>
+<pre><code>-- top 5 categorias por receita
+SELECT p.product_category,
+       SUM(oi.price) AS receita
+  FROM order_items oi
+  JOIN products p ON oi.product_id = p.product_id
+ GROUP BY p.product_category
+ ORDER BY receita DESC
+ LIMIT 5;
+
+-- ticket medio por estado
+SELECT c.customer_state,
+       ROUND(AVG(total.valor),2) AS ticket_medio
+  FROM (SELECT order_id, SUM(price + freight_value) AS valor
+          FROM order_items GROUP BY order_id) total
+  JOIN orders    o ON total.order_id  = o.order_id
+  JOIN customers c ON o.customer_id   = c.customer_id
+ GROUP BY c.customer_state
+ ORDER BY ticket_medio DESC;
+</code></pre>
+
+        <h3>Passo 6 &mdash; Criar tabela DynamoDB</h3>
+        <p>
+          Use o AWS CloudShell (ícone de terminal no topo do console) ou qualquer terminal
+          com AWS CLI configurada com as credenciais do Learner Lab.
+        </p>
+<pre><code>aws dynamodb create-table \
+  --table-name olist_events \
+  --attribute-definitions \
+      AttributeName=customer_id,AttributeType=S \
+      AttributeName=event_timestamp,AttributeType=S \
+  --key-schema \
+      AttributeName=customer_id,KeyType=HASH \
+      AttributeName=event_timestamp,KeyType=RANGE \
+  --billing-mode PAY_PER_REQUEST \
+  --region us-east-1
+</code></pre>
+
+        <h3>Passo 7 &mdash; Inserir eventos com batch-write-item</h3>
+        <p>Crie o arquivo <code>events.json</code>:</p>
+<pre><code>{
+  "olist_events": [
+    {"PutRequest":{"Item":{
+        "customer_id":{"S":"c1"},
+        "event_timestamp":{"S":"2026-04-30T19:05:00Z"},
+        "event_type":{"S":"page_view"},
+        "product_id":{"S":"p2"}}}},
+    {"PutRequest":{"Item":{
+        "customer_id":{"S":"c1"},
+        "event_timestamp":{"S":"2026-04-30T19:06:30Z"},
+        "event_type":{"S":"add_to_cart"},
+        "product_id":{"S":"p2"}}}},
+    {"PutRequest":{"Item":{
+        "customer_id":{"S":"c2"},
+        "event_timestamp":{"S":"2026-04-30T19:10:00Z"},
+        "event_type":{"S":"checkout"},
+        "order_id":{"S":"o2"}}}}
+  ]
+}
+</code></pre>
+        <p>Envie o batch:</p>
+<pre><code>aws dynamodb batch-write-item --request-items file://events.json
+</code></pre>
+
+        <h3>Passo 8 &mdash; Consultar com query e PartiQL</h3>
+<pre><code># query classico
+aws dynamodb query \
+  --table-name olist_events \
+  --key-condition-expression "customer_id = :c" \
+  --expression-attribute-values '{":c":{"S":"c1"}}'
+
+# PartiQL (SQL-like)
+aws dynamodb execute-statement \
+  --statement "SELECT * FROM olist_events WHERE customer_id = 'c1'"
+</code></pre>
+
+        <h3>Passo 9 &mdash; pg_dump para S3</h3>
+        <p>
+          Esta etapa simula a ingestão batch do OLTP para o data lake. Substitua
+          <code>&lt;seu-login&gt;</code> pelo prefixo do bucket <code>raw</code> que você criou
+          na Aula 01.
+        </p>
+<pre><code># exportar o banco olist
+pg_dump -h olist-oltp.abc123xyz.us-east-1.rds.amazonaws.com \
+        -U postgres -d olist \
+        -f olist_2026-04-30.sql
+
+# subir para o bucket raw com particionamento por data
+aws s3 cp olist_2026-04-30.sql \
+  s3://&lt;seu-login&gt;-raw/rds_snapshot/olist/dt=2026-04-30/olist.sql
+</code></pre>
+
+        <h3>Passo 10 &mdash; Encerrar o RDS (obrigatório)</h3>
+        <div class="danger">
+          <strong>Não pule este passo.</strong> RDS cobra enquanto a instância existe,
+          mesmo que você não esteja usando. No Learner Lab, esquecer uma instância pode
+          esgotar o budget antes do fim do curso.
+        </div>
+        <ol>
+          <li>No console RDS, selecione a instância <code>olist-oltp</code>.</li>
+          <li>Clique em <strong>Actions</strong> &rarr; <strong>Stop temporarily</strong>
+          (para estado parado por até 7 dias) ou <strong>Delete</strong> para remover tudo.</li>
+          <li>Se escolher Delete, desmarque <em>Create final snapshot</em> e <em>Retain
+          automated backups</em> para finalizar mais rápido.</li>
+          <li>DynamoDB em on-demand não cobra por ociosidade (cobra apenas por request).
+          Você pode manter a tabela <code>olist_events</code> ou executar
+          <code>aws dynamodb delete-table --table-name olist_events</code>.</li>
         </ol>
+
+        <h3>Checklist final do lab</h3>
+        <ul>
+          <li>RDS <code>olist-oltp</code> criado, populado e (ao final) parado ou deletado.</li>
+          <li>Queries analíticas executadas com sucesso no banco <code>olist</code>.</li>
+          <li>Tabela DynamoDB <code>olist_events</code> criada com PK/SK corretas.</li>
+          <li>Eventos inseridos via <code>batch-write-item</code> e consultados via query e PartiQL.</li>
+          <li>Arquivo <code>olist_2026-04-30.sql</code> publicado em
+          <code>s3://&lt;seu-login&gt;-raw/rds_snapshot/olist/dt=2026-04-30/</code>.</li>
+        </ul>
       </section>
 
-      <!-- =========================================================
-           EXERCÍCIOS DE FIXAÇÃO
-      ========================================================== -->
+      <!-- ============================================================
+           MODULO 12 - APROFUNDAMENTO
+      ============================================================= -->
+      <section class="content-block">
+        <h2>Módulo 12 &mdash; Aprofundamento pós-aula</h2>
+        <p>
+          Para quem quer ir além do que foi visto hoje, recomendo explorar:
+        </p>
+        <ul>
+          <li>Criar uma <strong>Read Replica</strong> do RDS e observar o lag de replicação.</li>
+          <li>Habilitar <strong>Performance Insights</strong> e analisar o custo de uma query
+          com <code>EXPLAIN ANALYZE</code>.</li>
+          <li>Projetar um <strong>GSI</strong> em <code>olist_events</code> para consultar por
+          <code>event_type</code> em vez de <code>customer_id</code>.</li>
+          <li>Usar <strong>DynamoDB Streams</strong> para capturar mudanças na tabela e
+          enviá-las a uma função Lambda (preview da Aula 04).</li>
+          <li>Configurar uma <strong>tarefa DMS</strong> com destino S3, substituindo o
+          <code>pg_dump</code> manual.</li>
+          <li>Ler o paper original do Dynamo (DeCandia et al., SOSP 2007) e o artigo
+          <em>"CAP Twelve Years Later"</em> de Eric Brewer.</li>
+        </ul>
+      </section>
+
+      <!-- ============================================================
+           EXERCICIOS DE FIXACAO
+      ============================================================= -->
       <section class="content-block">
         <h2>Exercícios de fixação</h2>
         <ol>
           <li>
-            <strong>RDS versus DynamoDB:</strong> uma startup está construindo um sistema
-            de agendamento de consultas médicas. O sistema precisa: registrar pacientes com dados
-            pessoais estruturados, armazenar consultas vinculadas a pacientes e médicos,
-            e responder a queries como "todos os agendamentos do médico X na semana Y".
-            Justifique qual banco (RDS ou DynamoDB) você usaria para cada entidade e
-            descreva um possível Single-Table Design para DynamoDB com exemplos de PK e SK.
+            <strong>OLTP vs OLAP na prática.</strong> Você é engenheiro de dados em uma
+            varejista que recebe 20.000 pedidos por dia em um PostgreSQL RDS. O time de BI
+            começou a rodar, a cada 15 minutos, uma query do tipo
+            <code>SELECT categoria, SUM(valor) FROM order_items GROUP BY categoria</code>
+            direto na instância principal, e o aplicativo de checkout começou a apresentar
+            timeouts. Explique detalhadamente o que está acontecendo, por que isso é um
+            anti-padrão, e proponha duas soluções diferentes usando serviços AWS, justificando
+            os trade-offs.
           </li>
           <li>
-            <strong>CDC e implicações no Data Lake:</strong> explique a diferença entre
-            extração incremental por timestamp e CDC via transaction log. Descreva um
-            cenário onde a extração por timestamp falha silenciosamente (retorna dados
-            incorretos sem gerar erro), e como o CDC via DMS resolveria esse problema.
+            <strong>Normalização.</strong> Dada a tabela a seguir, identifique todas as
+            violações de 1FN, 2FN e 3FN, e redesenhe o schema normalizado em 3FN.
+            Mostre o DDL SQL resultante com PKs e FKs.
+            <pre><code>pedidos (
+  pedido_id, data_compra,
+  cliente_cpf, cliente_nome, cliente_cep, cliente_cidade, cliente_uf,
+  itens_comprados   -- lista de "produto_id:quantidade" separada por virgula
+)</code></pre>
           </li>
           <li>
-            <strong>Hot partition no DynamoDB:</strong> um engenheiro modelou uma tabela
-            de logs de acesso usando <code>PK = data</code> (ex.: "2026-04-23") para
-            facilitar consultas por dia. Explique por que essa escolha de PK causa um
-            hot partition, quais são as consequências práticas, e proponha uma PK alternativa
-            que distribua melhor a carga.
+            <strong>ACID na vida real.</strong> Descreva um cenário concreto do Olist em que
+            a ausência de cada uma das propriedades ACID (Atomicidade, Consistência,
+            Isolamento, Durabilidade) causaria um bug visível para o cliente final.
+            Seja específico sobre que operação falha e que dado fica inconsistente.
           </li>
           <li>
-            <strong>Fluxo de dados transacional para analítico:</strong> descreva o fluxo
-            completo de dados desde uma transação de compra registrada no RDS MySQL
-            de produção até estar disponível para consulta no Athena na camada Trusted
-            do Data Lake. Inclua: o mecanismo de extração, o serviço de entrega,
-            o formato de armazenamento em cada camada, e a frequência de atualização.
+            <strong>Escolha CAP.</strong> Para cada sistema abaixo, decida se ele deve ser
+            projetado como CP ou AP, justificando: (a) sistema de autenticação bancária
+            (login + saldo), (b) feed de notícias de uma rede social, (c) controle de estoque
+            em um e-commerce, (d) leitura de métricas de IoT para dashboard operacional,
+            (e) transferência internacional entre bancos.
           </li>
           <li>
-            <strong>Limpeza de ambiente:</strong> após o laboratório, quais recursos da AWS
-            você deve deletar para evitar cobranças desnecessárias no ambiente de lab?
-            Liste os recursos na ordem correta de exclusão, justificando por que a ordem
-            importa (por exemplo, dependências entre recursos).
+            <strong>Modelagem DynamoDB.</strong> Projete a tabela DynamoDB para guardar
+            <em>todos</em> os eventos de sessão do site Olist, considerando as seguintes
+            consultas de acesso: (a) listar os últimos 50 eventos de um cliente ordenados
+            por timestamp decrescente; (b) contar os eventos do tipo <code>checkout</code>
+            por dia; (c) recuperar um evento específico por seu UUID. Defina PK, SK, índices
+            secundários necessários e justifique cada escolha.
+          </li>
+          <li>
+            <strong>SQL vs NoSQL.</strong> Uma startup de logística precisa armazenar:
+            (a) um cadastro de 10 milhões de clientes com CPF, nome, endereço; (b) o rastreio
+            em tempo real de 500.000 entregas simultâneas (posição GPS a cada 30 s); (c) um
+            catálogo de 200.000 produtos com descrição e fotos; (d) a contabilidade financeira
+            com débito/crédito entre 3 contas internas. Indique, para cada caso, qual produto
+            AWS você escolheria (RDS, DynamoDB, DocumentDB, Keyspaces, Timestream etc.) e
+            por quê.
+          </li>
+          <li>
+            <strong>Ingestão OLTP para data lake.</strong> Uma empresa tem três tabelas
+            importantes no RDS: <code>customers</code> com 2 milhões de linhas e
+            <code>updated_at</code>, <code>products</code> com 50 mil linhas sem coluna de
+            auditoria, e <code>order_events</code> com 500 milhões de linhas e mudanças
+            constantes. Para cada tabela, escolha entre <em>full snapshot</em>,
+            <em>incremental</em> ou <em>CDC via DMS</em>, justificando.
+          </li>
+          <li>
+            <strong>Custos e operação RDS.</strong> Em um laboratório do MBA, um aluno
+            criou uma instância <code>db.m5.large</code> com Multi-AZ, storage gp3 de 100 GB
+            e retenção de backup de 35 dias na região us-east-1. Ele esqueceu a instância
+            ligada por 30 dias. Explique, com base na documentação pública da AWS: (a) que
+            componentes geram cobrança, (b) qual ordem de grandeza do custo mensal estimado,
+            (c) quais práticas o aluno deveria ter adotado para evitar esse cenário e
+            (d) como o AWS Budgets e o AWS Cost Anomaly Detection ajudariam.
           </li>
         </ol>
       </section>
 
+      <!-- ============================================================
+           FOOTER
+      ============================================================= -->
       <footer class="actions">
         <a class="button" href="../slides/slide_aula_03_fontes_de_dados_bancos_relacionais_e_nosql.html">Voltar ao slide</a>
         <a class="button" href="../../../index.html">Voltar ao índice</a>

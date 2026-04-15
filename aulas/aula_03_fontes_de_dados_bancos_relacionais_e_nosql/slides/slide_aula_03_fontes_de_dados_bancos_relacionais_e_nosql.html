@@ -4,232 +4,1013 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" />
-  <title>Aula 03 — Fontes de Dados: Bancos Relacionais e NoSQL</title>
+  <title>Aula 03 - Fontes de Dados: Bancos Relacionais e NoSQL</title>
   <link href="../../../assets/slides.css" rel="stylesheet">
-  <style data-design-tokens>:root{--bg:#fff;--color:#000000}body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}a:hover{opacity:.8}a:focus{outline:2px solid #000000}</style>
+  <style data-design-tokens>:root{--bg:#fff;--color:#000000}body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}a:hover{opacity:.8}a:focus{outline:2px solid #000000}pre{background:#f3f4f6;border:2px solid #111;padding:14px;font-size:.78em;line-height:1.45;overflow-x:auto;margin:0}code{font-family:"Courier New",Courier,monospace}</style>
 </head>
 <body>
   <div class="slide-container">
 
-    <!-- SLIDE 1 — CAPA -->
+    <!-- ============================================================ -->
+    <!-- SLIDE 1 - CAPA                                                -->
+    <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
           <img class="deck-logo-full" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_e4vyyw.png" alt="Universidade Presbiteriana Mackenzie" />
-          <span class="deck-kicker">Cloud Computing e SRA</span>
+          <span class="deck-kicker">Cloud Computing e SRA - MBA Engenharia de Dados</span>
           <h1 class="deck-title">Fontes de Dados: Bancos Relacionais e NoSQL</h1>
-          <p class="deck-meta">Aula 03 • 30/04/2026</p>
+          <p class="deck-meta">Aula 03 &nbsp;&bull;&nbsp; 30/04/2026 &nbsp;&bull;&nbsp; 19h00 - 22h00</p>
           <p class="deck-year">2026</p>
-          <p class="deck-subtitle">MBA em Engenharia de Dados — CLOUD COMPUTING E SRA - VISAO PRATICA COM AWS</p>
+          <p class="deck-subtitle">Amazon RDS PostgreSQL e Amazon DynamoDB como fontes operacionais do data lake Olist.</p>
         </div>
       </div>
     </div>
 
-    <!-- SLIDE 2 — AGENDA -->
+    <!-- ============================================================ -->
+    <!-- SLIDE 2 - AGENDA                                              -->
+    <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Agenda</span>
-          <h2 class="deck-title">Agenda e Dinamica da Aula</h2>
+          <h2 class="deck-title">O que vai acontecer nesta aula</h2>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
-            <h3>19h00 - 20h00 · Teoria Exclusiva</h3>
+            <h3>19h00 - 20h30 &middot; Teoria</h3>
             <ul>
-              <li>O ecossistema transacional (Amazon RDS) e extracao CDC.</li>
-              <li>Entendendo o ecossistema NoSQL de alto throughput em tempo real com Amazon DynamoDB.</li>
+              <li>OLTP vs OLAP e o papel das fontes operacionais</li>
+              <li>Modelagem relacional, normalizacao e chaves</li>
+              <li>ACID e o Teorema CAP</li>
+              <li>Familias NoSQL e quando escolher SQL vs NoSQL</li>
+              <li>Amazon RDS e Amazon DynamoDB</li>
+              <li>Padroes de ingestao OLTP para data lake</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>20h00 - 22h00 · Pratica Exclusiva</h3>
+            <h3>20h30 - 22h00 &middot; Pratica AWS Student</h3>
             <ul>
-              <li><strong>Ambiente OBRIGATORIO:</strong> <code>AWS Student</code>.</li>
-              <li><strong>Hands-on:</strong> Modelagem Single-Table e importacao/exportacao no DynamoDB para S3 (O inicio de nosso Data Lake).</li>
+              <li>RDS PostgreSQL db.t3.micro com banco Olist</li>
+              <li>DDL, insercao e queries analiticas em SQL</li>
+              <li>DynamoDB olist_events com AWS CLI e PartiQL</li>
+              <li>pg_dump do RDS para S3 raw (ingestao batch)</li>
+              <li>Encerrar RDS para preservar o budget do lab</li>
             </ul>
           </article>
         </div>
       </div>
     </div>
 
-    <!-- SLIDE 3 — INTRODUCAO -->
+    <!-- ============================================================ -->
+    <!-- SLIDE 3 - PLACEHOLDER / RECAP                                 -->
+    <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Introducao</span>
-          <h2 class="deck-title">Fontes Transacionais</h2>
-          <p class="deck-summary">Nossos Data Lakes nascem da necessidade de analisar dados que servem nativamente a sistemas operacionais transacionais do dia-a-dia.</p>
+          <span class="deck-kicker">Abertura &middot; Recap</span>
+          <h2 class="deck-title">De onde viemos e para onde vamos</h2>
+          <p class="deck-summary">Aula 01: IAM, contas, buckets. Aula 02: Data Lake em S3 + Athena. Hoje: as fontes que alimentam o lake.</p>
         </div>
         <div class="deck-placeholder">
           <div class="deck-panel">
-            <strong>Bancos Relacionais (SQL)</strong>
+            <strong>Recap rapido</strong>
             <ul>
-              <li>Estruturados, normalizados, focados em integridade referencial.</li>
-              <li>O processamento analitico (OLAP) pesa em bancos focados em transacoes (OLTP). Precisamos leva-los para um Data Warehouse ou Data Lake!</li>
+              <li><strong>Aula 01</strong> - grupo DataEngineers, usuario IAM, buckets raw/trusted/refined.</li>
+              <li><strong>Aula 02</strong> - Olist no S3 raw, catalogo Glue, queries Athena.</li>
+              <li><strong>Hoje</strong> - subir fontes operacionais (RDS e DynamoDB) e ingerir para o lake.</li>
+            </ul>
+          </div>
+          <div class="deck-callout">
+            <strong>Pergunta guia</strong>
+            <p style="margin:10px 0 0;">O que e melhor: consultar o banco de producao diretamente ou replicar para o data lake? Por que?</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 4 - FONTES OPERACIONAIS NO PIPELINE                     -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Contexto</span>
+          <h2 class="deck-title">Fontes operacionais no pipeline de dados</h2>
+          <p class="deck-summary">Toda analitica comeca em algum lugar. Na maioria das empresas esse lugar e um banco transacional.</p>
+        </div>
+        <div class="deck-callout">
+          <strong>O fluxo tipico</strong>
+          <p style="margin:10px 0 0;">
+            <strong>Fontes OLTP</strong> (RDS, DynamoDB, SaaS) &#8594;
+            <strong>Ingestao</strong> (snapshot, incremental, CDC) &#8594;
+            <strong>Data Lake</strong> (S3 raw/trusted/refined) &#8594;
+            <strong>OLAP</strong> (Athena, Redshift, BI).
+          </p>
+          <p style="margin:10px 0 0;">Nunca rode relatorios pesados na base de producao: voce derruba o sistema transacional.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 5 - OLTP vs OLAP                                        -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; OLTP vs OLAP</span>
+          <h2 class="deck-title">Dois mundos, duas cargas</h2>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr>
+              <th>Aspecto</th>
+              <th>OLTP (transacional)</th>
+              <th>OLAP (analitico)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Objetivo</td><td>Registrar operacoes do negocio</td><td>Analisar dados historicos</td></tr>
+            <tr><td>Operacoes</td><td>INSERT/UPDATE/DELETE curtos</td><td>SELECT agregado em milhoes de linhas</td></tr>
+            <tr><td>Modelagem</td><td>Normalizada (3FN)</td><td>Desnormalizada (star, denormalized)</td></tr>
+            <tr><td>Latencia</td><td>Milissegundos</td><td>Segundos a minutos</td></tr>
+            <tr><td>Usuarios</td><td>Apps, APIs, clientes finais</td><td>Analistas, BI, ML</td></tr>
+            <tr><td>AWS</td><td>RDS, Aurora, DynamoDB</td><td>Athena, Redshift, EMR</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 6 - MODELAGEM RELACIONAL                                -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Modelo relacional</span>
+          <h2 class="deck-title">Entidades, atributos e relacionamentos</h2>
+          <p class="deck-summary">Codd, 1970. A base conceitual que continua viva em 2026.</p>
+        </div>
+        <div class="deck-grid">
+          <article class="deck-card">
+            <h3>Entidade</h3>
+            <ul>
+              <li>Objeto do mundo real: cliente, pedido, produto.</li>
+              <li>Vira uma <strong>tabela</strong>.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Atributo</h3>
+            <ul>
+              <li>Propriedade da entidade: nome, preco, cep.</li>
+              <li>Vira uma <strong>coluna</strong>.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Tupla / Linha</h3>
+            <ul>
+              <li>Uma ocorrencia concreta da entidade.</li>
+              <li>Ex.: pedido 1234 do cliente A em 30/04/2026.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Relacionamento</h3>
+            <ul>
+              <li>1:1, 1:N, N:N.</li>
+              <li>Implementado com chave estrangeira.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 7 - NORMALIZACAO 1FN                                    -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Normalizacao</span>
+          <h2 class="deck-title">1FN - Primeira Forma Normal</h2>
+          <p class="deck-summary">Elimina valores multiplos em uma mesma celula. Cada coluna deve conter um valor atomico.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Antes (viola 1FN)</strong>
+<pre><code>pedido_id | itens
+1001      | camiseta, bone, meia
+1002      | tenis</code></pre>
+          </div>
+          <div class="deck-panel">
+            <strong>Depois (em 1FN)</strong>
+<pre><code>pedido_id | produto
+1001      | camiseta
+1001      | bone
+1001      | meia
+1002      | tenis</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 8 - NORMALIZACAO 2FN                                    -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Normalizacao</span>
+          <h2 class="deck-title">2FN - Segunda Forma Normal</h2>
+          <p class="deck-summary">Ja esta em 1FN e todo atributo nao-chave depende da chave inteira, nao apenas de parte dela.</p>
+        </div>
+        <div class="deck-callout">
+          <strong>Exemplo Olist</strong>
+          <p style="margin:10px 0 0;">Chave composta <code>(pedido_id, produto_id)</code> com colunas <code>quantidade</code> e <code>nome_produto</code>.</p>
+          <p style="margin:10px 0 0;">
+            <code>quantidade</code> depende da chave inteira - OK.<br>
+            <code>nome_produto</code> depende apenas de <code>produto_id</code> - <strong>viola 2FN</strong>. Mova para a tabela <code>products</code>.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 9 - NORMALIZACAO 3FN                                    -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Normalizacao</span>
+          <h2 class="deck-title">3FN - Terceira Forma Normal</h2>
+          <p class="deck-summary">Ja esta em 2FN e nao ha dependencia transitiva entre atributos nao-chave.</p>
+        </div>
+        <div class="deck-callout">
+          <strong>Exemplo Olist</strong>
+          <p style="margin:10px 0 0;">Na tabela <code>customers</code> com colunas <code>customer_id</code>, <code>cep</code> e <code>cidade</code>.</p>
+          <p style="margin:10px 0 0;">
+            <code>cidade</code> depende de <code>cep</code>, que depende de <code>customer_id</code> - <strong>dependencia transitiva</strong>.<br>
+            Solucao: crie uma tabela <code>geolocation (cep, cidade, uf)</code>.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 10 - CHAVES                                             -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Chaves</span>
+          <h2 class="deck-title">Chaves primarias e estrangeiras</h2>
+        </div>
+        <div class="deck-grid">
+          <article class="deck-card">
+            <h3>Primary Key (PK)</h3>
+            <ul>
+              <li>Identifica unicamente uma linha.</li>
+              <li>NOT NULL e UNIQUE.</li>
+              <li>Ex.: <code>order_id</code> em <code>orders</code>.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Foreign Key (FK)</h3>
+            <ul>
+              <li>Aponta para a PK de outra tabela.</li>
+              <li>Garante integridade referencial.</li>
+              <li>Ex.: <code>customer_id</code> em <code>orders</code>.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Chave natural</h3>
+            <ul>
+              <li>Valor do negocio (CPF, email, CEP).</li>
+              <li>Pode mudar - cuidado.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Surrogate key</h3>
+            <ul>
+              <li>Gerada pelo sistema (serial, UUID).</li>
+              <li>Estavel, sem significado de negocio.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 11 - ACID                                               -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Transacoes</span>
+          <h2 class="deck-title">ACID - o contrato das transacoes</h2>
+          <p class="deck-summary">Propriedades que garantem que operacoes sobre um banco sejam confiaveis.</p>
+        </div>
+        <div class="deck-grid">
+          <article class="deck-card">
+            <h3>A - Atomicidade</h3>
+            <ul><li>Tudo ou nada. Se uma etapa falha, rollback da transacao inteira.</li></ul>
+          </article>
+          <article class="deck-card">
+            <h3>C - Consistencia</h3>
+            <ul><li>O banco passa de um estado valido para outro. Respeita constraints.</li></ul>
+          </article>
+          <article class="deck-card">
+            <h3>I - Isolamento</h3>
+            <ul><li>Transacoes concorrentes nao interferem umas nas outras. Niveis: READ COMMITTED, SERIALIZABLE.</li></ul>
+          </article>
+          <article class="deck-card">
+            <h3>D - Durabilidade</h3>
+            <ul><li>Uma vez commitada, a transacao persiste mesmo apos queda do servidor.</li></ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 12 - TEOREMA CAP                                        -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Sistemas distribuidos</span>
+          <h2 class="deck-title">Teorema CAP - escolha 2 de 3</h2>
+          <p class="deck-summary">Em um sistema distribuido, diante de uma particao de rede, voce escolhe entre consistencia e disponibilidade.</p>
+        </div>
+        <div class="deck-grid">
+          <article class="deck-card">
+            <h3>C - Consistency</h3>
+            <ul><li>Toda leitura enxerga o dado mais recente.</li></ul>
+          </article>
+          <article class="deck-card">
+            <h3>A - Availability</h3>
+            <ul><li>Toda requisicao recebe uma resposta nao-erro.</li></ul>
+          </article>
+          <article class="deck-card">
+            <h3>P - Partition tolerance</h3>
+            <ul><li>O sistema continua funcionando mesmo com falhas de rede entre nos.</li></ul>
+          </article>
+          <article class="deck-card">
+            <h3>Na pratica</h3>
+            <ul>
+              <li><strong>CP</strong>: RDS Multi-AZ, DynamoDB strongly consistent.</li>
+              <li><strong>AP</strong>: DynamoDB eventually consistent, Cassandra.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 13 - FAMILIAS NOSQL                                     -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; NoSQL</span>
+          <h2 class="deck-title">As 4 familias NoSQL</h2>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr>
+              <th>Familia</th>
+              <th>Modelo</th>
+              <th>Caso de uso</th>
+              <th>AWS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Documento</td><td>JSON/BSON hierarquico</td><td>Catalogos, perfis, conteudo</td><td>DocumentDB</td></tr>
+            <tr><td>Chave-valor</td><td>Map key -&gt; value</td><td>Sessao, cache, feature store</td><td>DynamoDB, ElastiCache</td></tr>
+            <tr><td>Colunar</td><td>Column family wide</td><td>Time-series, IoT, logs</td><td>Keyspaces (Cassandra)</td></tr>
+            <tr><td>Grafo</td><td>Vertices e arestas</td><td>Fraude, social, recomendacao</td><td>Neptune</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 14 - SQL vs NoSQL                                       -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Decisao</span>
+          <h2 class="deck-title">Quando usar SQL e quando usar NoSQL</h2>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Prefira SQL quando</strong>
+            <ul>
+              <li>Dados altamente relacionais.</li>
+              <li>Transacoes com ACID forte.</li>
+              <li>Schema estavel e conhecido.</li>
+              <li>Queries ad hoc com JOIN.</li>
+              <li>Relatorios regulatorios e financeiros.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Prefira NoSQL quando</strong>
+            <ul>
+              <li>Escala horizontal massiva.</li>
+              <li>Baixa latencia consistente (&lt; 10 ms).</li>
+              <li>Schema flexivel ou evolutivo.</li>
+              <li>Padroes de acesso conhecidos (key lookup).</li>
+              <li>Workloads com alta cardinalidade.</li>
             </ul>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- SLIDE 4 — AMAZON RDS -->
+    <!-- ============================================================ -->
+    <!-- SLIDE 15 - AMAZON RDS                                         -->
+    <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Servico AWS</span>
-          <h2 class="deck-title">Amazon RDS</h2>
+          <span class="deck-kicker">Teoria &middot; Amazon RDS</span>
+          <h2 class="deck-title">Amazon RDS - SQL gerenciado</h2>
+          <p class="deck-summary">Motores suportados: PostgreSQL, MySQL, MariaDB, Oracle, SQL Server. Aurora e uma variante cloud-native.</p>
         </div>
-        <div class="deck-placeholder">
-          <div class="deck-panel">
-            <strong>Caracteristicas</strong>
+        <div class="deck-grid">
+          <article class="deck-card">
+            <h3>Alta disponibilidade</h3>
             <ul>
-              <li>Servico de banco de dados relacional (PaaS) totalmente gerenciado.</li>
-              <li>Motores suportados: PostgreSQL, MySQL, MariaDB, Oracle, SQL Server.</li>
-              <li>Amazon Aurora: Motor Enterprise criado nativamente na nuvem.</li>
-              <li><strong>Como os dados saem do RDS?</strong> Utilizamos pipelines de CDC (Change Data Capture) como o servico <em>AWS Database Migration Service (DMS)</em>.</li>
+              <li><strong>Multi-AZ</strong>: standby sincrono em outra AZ.</li>
+              <li>Failover automatico em 60-120 s.</li>
             </ul>
-          </div>
+          </article>
+          <article class="deck-card">
+            <h3>Escala de leitura</h3>
+            <ul>
+              <li><strong>Read replicas</strong> assincronas.</li>
+              <li>Ate 15 replicas no Aurora.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Backup e restore</h3>
+            <ul>
+              <li>Snapshots automaticos diarios.</li>
+              <li>Point-in-time recovery.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Seguranca</h3>
+            <ul>
+              <li>VPC, Security Group, KMS at rest.</li>
+              <li>IAM database authentication (Postgres/MySQL).</li>
+            </ul>
+          </article>
         </div>
       </div>
     </div>
 
-    <!-- SLIDE 5 — POR QUE NoSQL -->
+    <!-- ============================================================ -->
+    <!-- SLIDE 16 - DYNAMODB CONCEITOS                                 -->
+    <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">NoSQL</span>
-          <h2 class="deck-title">Por que Bancos NoSQL?</h2>
-          <p class="deck-summary">Quando escalar verticalmente (Adicionar RAM/CPU) um banco relacional nao e suficiente.</p>
-        </div>
-        <div class="deck-placeholder">
-          <div class="deck-panel">
-            <strong>Vantagens</strong>
-            <ul>
-              <li>Performance previsivel em milissegundos, independente da quantidade de dados (O(1)).</li>
-              <li>Escalabilidade horizontal infinita (Sharding) tratada de forma transparente para nos da Engenharia de Dados.</li>
-              <li>Esquema de dados hiper flexivel.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SLIDE 6 — DYNAMODB -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Servico AWS</span>
-          <h2 class="deck-title">Amazon DynamoDB (Chave-Valor)</h2>
-        </div>
-        <div class="deck-placeholder">
-          <div class="deck-panel">
-            <strong>Caracteristicas</strong>
-            <ul>
-              <li>Banco de dados NoSQL chave-valor e documento totalmente gerenciado (Serverless).</li>
-              <li>Replicacao Multi-AZ automatica.</li>
-              <li>Modelagem foca na arquitetura <em>Single-Table Design</em> (Tabelas unicas contendo multiplos tipos de registros de sua aplicacao).</li>
-              <li>Completamente baseado em cobrancas por Requisicoes em massa (RCU/WCU).</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SLIDE 7 — COMPONENTES DYNAMODB -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Arquitetura</span>
-          <h2 class="deck-title">Componentes do DynamoDB</h2>
+          <span class="deck-kicker">Teoria &middot; Amazon DynamoDB</span>
+          <h2 class="deck-title">DynamoDB - modelo de tabela</h2>
+          <p class="deck-summary">Serverless, chave-valor e documento. Latencia de milissegundos em qualquer escala.</p>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
             <h3>Partition Key (PK)</h3>
             <ul>
-              <li>Como os dados serao agrupados e espalhados nas AZs. OBRIGATORIA.</li>
+              <li>Obrigatoria. Determina o node de armazenamento.</li>
+              <li>Deve ter alta cardinalidade para distribuir carga.</li>
             </ul>
           </article>
           <article class="deck-card">
             <h3>Sort Key (SK)</h3>
             <ul>
-              <li>Como ordenamos dados dentro da mesma PK. OPCIONAL.</li>
+              <li>Opcional. Ordena itens dentro da mesma PK.</li>
+              <li>Habilita queries por range.</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>GSI (Global Secondary Index)</h3>
+            <h3>LSI</h3>
             <ul>
-              <li>A verdadeira magia do DynamoDB. Criar projecoes indexadas secundarias para consultar o dado de diferentes perspectivas de acesso.</li>
+              <li>Local Secondary Index - mesma PK, outro SK.</li>
+              <li>Criado na criacao da tabela.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>GSI</h3>
+            <ul>
+              <li>Global Secondary Index - nova PK e SK.</li>
+              <li>Replicado assincronamente.</li>
             </ul>
           </article>
         </div>
       </div>
     </div>
 
-    <!-- SLIDE 8 — TRANSICAO PRATICA -->
+    <!-- ============================================================ -->
+    <!-- SLIDE 17 - DYNAMODB CAPACIDADE                                -->
+    <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Transicao</span>
-          <h2 class="deck-title">Fim da Teoria (20h00) — Iniciando o Hands-on</h2>
+          <span class="deck-kicker">Teoria &middot; Amazon DynamoDB</span>
+          <h2 class="deck-title">Capacidade e cache</h2>
         </div>
-        <div class="deck-placeholder">
+        <div class="deck-columns">
           <div class="deck-panel">
-            <strong>Preparacao</strong>
+            <strong>On-demand</strong>
             <ul>
-              <li>Acesse o portal do Bootcamp e ative a console AWS.</li>
-              <li>Ambiente: <code>AWS Student</code></li>
-              <li>Regiao: <code>us-east-1</code> (N. Virginia)</li>
+              <li>Paga por request (RCU/WCU consumidos).</li>
+              <li>Escala automaticamente, sem planejamento.</li>
+              <li>Ideal para workloads imprevisiveis.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Provisioned</strong>
+            <ul>
+              <li>Voce reserva RCU/WCU por segundo.</li>
+              <li>Mais barato para workload previsivel.</li>
+              <li>Auto-scaling opcional.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="deck-callout">
+          <strong>DAX (DynamoDB Accelerator)</strong>
+          <p style="margin:10px 0 0;">Cache in-memory compativel com a API DynamoDB. Reduz latencia de milissegundos para microssegundos em leituras repetidas.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 18 - PADROES DE INGESTAO                                -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Ingestao</span>
+          <h2 class="deck-title">3 padroes de ingestao OLTP para data lake</h2>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr>
+              <th>Padrao</th>
+              <th>Como funciona</th>
+              <th>Quando usar</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Full snapshot</td><td>Exporta a tabela inteira periodicamente</td><td>Tabela pequena, historico simples</td></tr>
+            <tr><td>Incremental</td><td>Filtro por <code>updated_at &gt; last_run</code></td><td>Tabela grande com coluna de audit</td></tr>
+            <tr><td>CDC</td><td>Le o WAL / binlog e replica mudancas</td><td>Near real-time, menor impacto na fonte</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 19 - AWS DMS                                            -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; AWS DMS</span>
+          <h2 class="deck-title">AWS Database Migration Service</h2>
+          <p class="deck-summary">Servico gerenciado para replicar bancos com minimo downtime. Suporta full load, CDC e a combinacao dos dois.</p>
+        </div>
+        <div class="deck-callout">
+          <strong>Componentes</strong>
+          <ul style="margin:10px 0 0; padding-left:22px;">
+            <li><strong>Replication instance</strong> - roda o processo de replicacao.</li>
+            <li><strong>Source endpoint</strong> - RDS, Oracle, SQL Server, MongoDB.</li>
+            <li><strong>Target endpoint</strong> - S3, Redshift, Kinesis, outro RDS.</li>
+            <li><strong>Task</strong> - define tabelas, filtros e transformacoes.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 20 - TRADE-OFF REPLICAR VS CONSULTAR                    -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Decisao arquitetural</span>
+          <h2 class="deck-title">Replicar para o lake ou consultar a fonte?</h2>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Replicar para o lake</strong>
+            <ul>
+              <li>Analitica nao impacta OLTP.</li>
+              <li>Historico ilimitado.</li>
+              <li>Custo de armazenar e pipeline.</li>
+              <li>Latencia de horas ou minutos.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Consultar a fonte viva</strong>
+            <ul>
+              <li>Dados sempre atualizados.</li>
+              <li>Risco de prejudicar producao.</li>
+              <li>Sem historico alem da retencao da fonte.</li>
+              <li>Uso aceitavel: read replica dedicada a analitica.</li>
             </ul>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- SLIDE 9 — HANDS-ON -->
+    <!-- ============================================================ -->
+    <!-- SLIDE 21 - INICIO PRATICA                                     -->
+    <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Hands-on</span>
-          <h2 class="deck-title">O DynamoDB para a Eng. de Dados</h2>
-        </div>
-        <div class="deck-grid">
-          <article class="deck-card">
-            <h3>Etapa 1</h3>
-            <ul><li>Entenda a Console do DynamoDB.</li></ul>
-          </article>
-          <article class="deck-card">
-            <h3>Etapa 2</h3>
-            <ul><li>Crie uma Tabela: <strong>"Ecommerce_Transactions_MBA"</strong> na regiao <code>us-east-1</code>.</li></ul>
-          </article>
-          <article class="deck-card">
-            <h3>Etapa 3</h3>
-            <ul><li>PK: <code>userID</code> | SK: <code>timestamp</code>.</li></ul>
-          </article>
-          <article class="deck-card">
-            <h3>Etapa 4</h3>
-            <ul><li>Use "Explore Items" inserindo compras variadas com diferentes colunas JSON (livre de schema).</li></ul>
-          </article>
+          <span class="deck-kicker">Pratica &middot; 20h30 - 22h00</span>
+          <h2 class="deck-title">Laboratorio AWS Student</h2>
+          <p class="deck-summary">Ambiente: AWS Learner Lab, regiao us-east-1, role LabRole. Abra o Lab e clique em Start Lab.</p>
         </div>
         <div class="deck-callout">
-          <strong>Integracao S3:</strong> Habilite "Point-in-time recovery" (PITR) em gerenciamento e Export Data to S3. Jogue a baseline do NoSQL em um bucket RAW nativo!
+          <strong>Roteiro da pratica</strong>
+          <ol style="margin:10px 0 0; padding-left:22px;">
+            <li>Criar RDS PostgreSQL db.t3.micro.</li>
+            <li>Conectar com psql e criar o banco olist.</li>
+            <li>Criar tabelas e inserir dados Olist (subset).</li>
+            <li>Rodar queries analiticas.</li>
+            <li>Criar tabela DynamoDB olist_events.</li>
+            <li>Inserir e consultar eventos via CLI e PartiQL.</li>
+            <li>pg_dump do RDS para o S3 raw.</li>
+            <li>Encerrar o RDS.</li>
+          </ol>
         </div>
       </div>
     </div>
 
-    <!-- SLIDE 10 — ENCERRAMENTO -->
+    <!-- ============================================================ -->
+    <!-- SLIDE 22 - CRIAR RDS                                          -->
+    <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Encerramento</span>
-          <h2 class="deck-title">Encerramento (22h00)</h2>
-          <p class="deck-summary">Limpeza do Ambiente: Apague tabelas DynamoDB e os Buckets de trabalho.</p>
+          <span class="deck-kicker">Pratica &middot; Passo 1</span>
+          <h2 class="deck-title">Criar RDS PostgreSQL</h2>
+          <p class="deck-summary">Console AWS &#8594; RDS &#8594; Create database. Use Easy create + Free tier quando disponivel.</p>
+        </div>
+        <div class="deck-panel">
+          <strong>Parametros</strong>
+          <ul>
+            <li><strong>Engine</strong>: PostgreSQL 15.x</li>
+            <li><strong>Template</strong>: Free tier / Dev-Test</li>
+            <li><strong>DB instance identifier</strong>: <code>olist-oltp</code></li>
+            <li><strong>Master username</strong>: <code>postgres</code></li>
+            <li><strong>Master password</strong>: anote em local seguro</li>
+            <li><strong>Instance class</strong>: <code>db.t3.micro</code></li>
+            <li><strong>Storage</strong>: 20 GB gp3</li>
+            <li><strong>Public access</strong>: <strong>Yes</strong> (para conectar do laptop)</li>
+            <li><strong>VPC security group</strong>: novo, permitindo TCP 5432 do seu IP</li>
+            <li><strong>Initial database name</strong>: (deixe vazio, criaremos manualmente)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 23 - CONECTAR PSQL                                      -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Pratica &middot; Passo 2</span>
+          <h2 class="deck-title">Conectar via psql</h2>
+          <p class="deck-summary">Aguarde o status <code>Available</code>. Copie o endpoint na aba Connectivity &amp; security.</p>
+        </div>
+<pre><code># instale se necessario
+sudo apt install -y postgresql-client   # Linux
+brew install libpq                      # macOS
+
+# conecte
+psql -h olist-oltp.abc123.us-east-1.rds.amazonaws.com \
+     -U postgres -d postgres -p 5432
+
+# dentro do psql
+CREATE DATABASE olist;
+\c olist</code></pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 24 - DDL OLIST                                          -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Pratica &middot; Passo 3</span>
+          <h2 class="deck-title">DDL - tabelas Olist</h2>
+        </div>
+<pre><code>CREATE TABLE customers (
+  customer_id    VARCHAR(40) PRIMARY KEY,
+  customer_city  VARCHAR(80),
+  customer_state CHAR(2)
+);
+
+CREATE TABLE orders (
+  order_id     VARCHAR(40) PRIMARY KEY,
+  customer_id  VARCHAR(40) REFERENCES customers(customer_id),
+  order_status VARCHAR(20),
+  order_purchase_timestamp TIMESTAMP
+);
+
+CREATE TABLE products (
+  product_id         VARCHAR(40) PRIMARY KEY,
+  product_category   VARCHAR(60),
+  product_weight_g   INT
+);
+
+CREATE TABLE order_items (
+  order_id    VARCHAR(40) REFERENCES orders(order_id),
+  order_item_id INT,
+  product_id  VARCHAR(40) REFERENCES products(product_id),
+  price       NUMERIC(10,2),
+  freight_value NUMERIC(10,2),
+  PRIMARY KEY (order_id, order_item_id)
+);</code></pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 25 - INSERIR DADOS                                      -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Pratica &middot; Passo 4</span>
+          <h2 class="deck-title">Popular com dados Olist (subset)</h2>
+          <p class="deck-summary">Insercoes manuais para o laboratorio. O dataset completo sera tratado via Glue na Aula 05.</p>
+        </div>
+<pre><code>INSERT INTO customers VALUES
+  ('c1','sao paulo','SP'),
+  ('c2','rio de janeiro','RJ'),
+  ('c3','belo horizonte','MG');
+
+INSERT INTO products VALUES
+  ('p1','beleza_saude', 300),
+  ('p2','informatica',  800),
+  ('p3','casa_conforto',1200);
+
+INSERT INTO orders VALUES
+  ('o1','c1','delivered','2026-04-28 10:00'),
+  ('o2','c2','shipped',  '2026-04-29 14:30'),
+  ('o3','c3','delivered','2026-04-29 18:45');
+
+INSERT INTO order_items VALUES
+  ('o1',1,'p1', 59.90, 12.00),
+  ('o1',2,'p2',299.00, 22.50),
+  ('o2',1,'p3',189.90, 18.00),
+  ('o3',1,'p2',299.00, 22.50);</code></pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 26 - QUERIES ANALITICAS                                 -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Pratica &middot; Passo 5</span>
+          <h2 class="deck-title">Queries analiticas em SQL</h2>
+        </div>
+<pre><code>-- top 5 categorias por receita
+SELECT p.product_category,
+       SUM(oi.price) AS receita
+  FROM order_items oi
+  JOIN products p ON oi.product_id = p.product_id
+ GROUP BY p.product_category
+ ORDER BY receita DESC
+ LIMIT 5;
+
+-- ticket medio por estado
+SELECT c.customer_state,
+       ROUND(AVG(total.valor),2) AS ticket_medio
+  FROM (SELECT order_id, SUM(price + freight_value) AS valor
+          FROM order_items GROUP BY order_id) total
+  JOIN orders o    ON total.order_id   = o.order_id
+  JOIN customers c ON o.customer_id    = c.customer_id
+ GROUP BY c.customer_state
+ ORDER BY ticket_medio DESC;</code></pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 27 - CRIAR DYNAMODB                                     -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Pratica &middot; Passo 6</span>
+          <h2 class="deck-title">Criar tabela DynamoDB olist_events</h2>
+          <p class="deck-summary">Eventos de sessao do site Olist. PK por cliente, SK por timestamp do evento.</p>
+        </div>
+<pre><code>aws dynamodb create-table \
+  --table-name olist_events \
+  --attribute-definitions \
+      AttributeName=customer_id,AttributeType=S \
+      AttributeName=event_timestamp,AttributeType=S \
+  --key-schema \
+      AttributeName=customer_id,KeyType=HASH \
+      AttributeName=event_timestamp,KeyType=RANGE \
+  --billing-mode PAY_PER_REQUEST \
+  --region us-east-1</code></pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 28 - INSERIR DYNAMODB                                   -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Pratica &middot; Passo 7</span>
+          <h2 class="deck-title">Inserir eventos com batch-write-item</h2>
+        </div>
+<pre><code># events.json
+{
+  "olist_events": [
+    {"PutRequest":{"Item":{
+        "customer_id":{"S":"c1"},
+        "event_timestamp":{"S":"2026-04-30T19:05:00Z"},
+        "event_type":{"S":"page_view"},
+        "product_id":{"S":"p2"}}}},
+    {"PutRequest":{"Item":{
+        "customer_id":{"S":"c1"},
+        "event_timestamp":{"S":"2026-04-30T19:06:30Z"},
+        "event_type":{"S":"add_to_cart"},
+        "product_id":{"S":"p2"}}}},
+    {"PutRequest":{"Item":{
+        "customer_id":{"S":"c2"},
+        "event_timestamp":{"S":"2026-04-30T19:10:00Z"},
+        "event_type":{"S":"checkout"},
+        "order_id":{"S":"o2"}}}}
+  ]
+}
+
+aws dynamodb batch-write-item --request-items file://events.json</code></pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 29 - CONSULTAR DYNAMODB                                 -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Pratica &middot; Passo 8</span>
+          <h2 class="deck-title">Consultar: query e PartiQL</h2>
+        </div>
+<pre><code># query classico (todos os eventos do cliente c1)
+aws dynamodb query \
+  --table-name olist_events \
+  --key-condition-expression "customer_id = :c" \
+  --expression-attribute-values '{":c":{"S":"c1"}}'
+
+# PartiQL (SQL-like)
+aws dynamodb execute-statement \
+  --statement "SELECT * FROM olist_events WHERE customer_id = 'c1'"</code></pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 30 - PG_DUMP PARA S3                                    -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Pratica &middot; Passo 9</span>
+          <h2 class="deck-title">Snapshot logico: pg_dump para S3</h2>
+          <p class="deck-summary">Simula ingestao batch da fonte OLTP para a camada raw do data lake.</p>
+        </div>
+<pre><code># exportar o schema olist para arquivo SQL
+pg_dump -h olist-oltp.abc123.us-east-1.rds.amazonaws.com \
+        -U postgres -d olist \
+        -f olist_2026-04-30.sql
+
+# subir para o bucket raw criado na Aula 01
+aws s3 cp olist_2026-04-30.sql \
+  s3://&lt;seu-login&gt;-raw/rds_snapshot/olist/dt=2026-04-30/olist.sql</code></pre>
+        <div class="deck-callout">
+          <strong>Proximo passo conceitual</strong>
+          <p style="margin:10px 0 0;">Na Aula 05 substituimos pg_dump por AWS DMS ou AWS Glue JDBC para fazer ingestao incremental automatica.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 31 - ENCERRAR RDS                                       -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Pratica &middot; Passo 10 (obrigatorio)</span>
+          <h2 class="deck-title">Parar ou deletar o RDS</h2>
+          <p class="deck-summary">RDS consome budget mesmo ocioso. Sem esse passo o Learner Lab pode ficar sem saldo antes do fim do curso.</p>
+        </div>
+        <div class="deck-panel">
+          <strong>Opcoes</strong>
+          <ol>
+            <li><strong>Stop</strong>: Console RDS &#8594; selecionar instancia &#8594; Actions &#8594; Stop temporarily (ate 7 dias).</li>
+            <li><strong>Delete</strong>: Console RDS &#8594; Actions &#8594; Delete. Desmarque "Create final snapshot" para ir mais rapido.</li>
+            <li><strong>DynamoDB on-demand</strong>: cobrado por request, pode deixar. Se preferir, delete a tabela <code>olist_events</code>.</li>
+          </ol>
+        </div>
+        <div class="deck-callout">
+          <strong>Checklist de encerramento</strong>
+          <ul style="margin:10px 0 0; padding-left:22px;">
+            <li>RDS parado ou deletado.</li>
+            <li>Arquivo SQL enviado para s3://...-raw/rds_snapshot/.</li>
+            <li>Tabela DynamoDB criada (ou removida).</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 32 - RESUMO                                             -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Fechamento &middot; 1/2</span>
+          <h2 class="deck-title">Resumo da aula</h2>
+        </div>
+        <div class="deck-grid">
+          <article class="deck-card">
+            <h3>O que vimos hoje</h3>
+            <ul>
+              <li>OLTP vs OLAP e papel das fontes operacionais.</li>
+              <li>Normalizacao 1FN/2FN/3FN e chaves PK/FK.</li>
+              <li>ACID e Teorema CAP.</li>
+              <li>Familias NoSQL e decisao SQL vs NoSQL.</li>
+              <li>Amazon RDS e DynamoDB (PK/SK, capacidade).</li>
+              <li>Ingestao: snapshot, incremental, CDC, DMS.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>O que ficou pronto no lab</h3>
+            <ul>
+              <li>RDS PostgreSQL olist-oltp criado e populado.</li>
+              <li>Queries analiticas sobre Olist rodando.</li>
+              <li>DynamoDB olist_events com eventos simulados.</li>
+              <li>Dump do RDS publicado em s3://...-raw/rds_snapshot/.</li>
+              <li>RDS encerrado para preservar budget.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 33 - PROXIMOS PASSOS                                    -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Fechamento &middot; 2/2</span>
+          <h2 class="deck-title">Proximos passos e estudo</h2>
+        </div>
+        <div class="deck-grid">
+          <article class="deck-card">
+            <h3>Proxima aula - 07/05/2026</h3>
+            <ul>
+              <li>Ingestao e processamento near real-time.</li>
+              <li>Amazon Kinesis Data Streams e Firehose.</li>
+              <li>Da tabela DynamoDB de hoje para um stream.</li>
+              <li>Integracao do stream com S3 raw.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Estudo complementar</h3>
+            <ul>
+              <li>The DynamoDB Book - Alex DeBrie.</li>
+              <li>Documentacao AWS RDS e DynamoDB Developer Guide.</li>
+              <li>Paper original do Dynamo (Amazon, SOSP 2007).</li>
+              <li>CAP Twelve Years Later - Eric Brewer.</li>
+            </ul>
+          </article>
         </div>
       </div>
     </div>
 
   </div>
 
+  <!-- Mackenzie mini logo -->
   <img class="slide-logo-mini" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" alt="Mackenzie" />
 
+  <!-- GLOBAL navigation footer -->
   <div class="slide-footer">
     <div class="footer-links">
       <a href="../../../index.html" class="back-home">Indice</a>
@@ -243,6 +1024,7 @@
     <button class="fullscreen-btn" onclick="toggleFullScreen()" title="Tela cheia">&#9974;</button>
   </div>
 
+  <!-- Navigation script -->
   <script>
     let currentSlide = 0;
     const slides = document.querySelectorAll('.slide');

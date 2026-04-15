@@ -6,396 +6,944 @@
     <link rel="icon" type="image/png" href="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" />
     <title>Material Aula 07 — Data Reliability e SRE Aplicados a Pipelines de Dados</title>
     <link rel="stylesheet" href="../../../assets/styles.css" />
-    <style data-design-tokens>:root{--bg:#fff;--color:#000000}body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}a:hover{opacity:.8}a:focus{outline:2px solid #000000}</style>
+    <style data-design-tokens>
+      :root{--bg:#fff;--color:#000000}
+      body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}
+      a:hover{opacity:.8}
+      a:focus{outline:2px solid #000000}
+      table{width:100%;border-collapse:collapse;margin:18px 0;font-size:.97rem}
+      th,td{border:1px solid var(--border,#d7d7d7);padding:10px 14px;text-align:left}
+      th{background:var(--surface,#f6f6f6);font-weight:700}
+      pre{background:var(--surface,#f6f6f6);border:1px solid var(--border,#d7d7d7);border-radius:6px;padding:18px;overflow-x:auto;font-size:.92rem;line-height:1.5}
+      code{font-family:"Courier New",Courier,monospace}
+      .tip{background:#f0f7f0;border-left:4px solid #2a7a2a;padding:14px 18px;margin:16px 0;border-radius:4px}
+      .warning{background:#fef6e8;border-left:4px solid #c08800;padding:14px 18px;margin:16px 0;border-radius:4px}
+      .danger{background:#fef0f0;border-left:4px solid #b30000;padding:14px 18px;margin:16px 0;border-radius:4px}
+    </style>
   </head>
   <body class="material">
     <main class="page">
 
+      <!-- ============================================================
+           HEADER
+      ============================================================= -->
       <section class="content-block">
-        <p class="meta">Aula 07 &nbsp;•&nbsp; 28/05/2026 &nbsp;•&nbsp; 19h00 – 22h00</p>
+        <p class="meta">Aula 07 &nbsp;&bull;&nbsp; 28/05/2026 &nbsp;&bull;&nbsp; 19h00 &ndash; 22h00</p>
         <h1>Data Reliability e SRE Aplicados a Pipelines de Dados</h1>
         <p class="summary">
-          Este material aprofunda os conceitos apresentados nos slides da Aula 07.
-          Cobre os princípios de Site Reliability Engineering (SRE) aplicados a pipelines
-          de dados, a definição de SLOs e SLAs para entrega de dados, o uso do Amazon
-          CloudWatch para observabilidade, e as ferramentas de orquestração resiliente
-          — MWAA (Managed Workflows for Apache Airflow) e AWS Step Functions —
-          com estratégias de retry e recuperação de falhas.
+          Este material acompanha a s&eacute;tima aula da disciplina <strong>Cloud Computing e SRA &mdash; Vis&atilde;o Pr&aacute;tica com AWS</strong>
+          do MBA em Engenharia de Dados. At&eacute; aqui, constru&iacute;mos um pipeline Olist funcional que vai do ingest de streaming
+          (Kinesis + Lambda, aula 04), passa pelas camadas raw/silver/gold do Data Lake (aulas 02 e 05) e chega ao Data Warehouse
+          (Redshift/Athena, aula 06). Esta aula responde a uma pergunta diferente: <em>como garantir que esse pipeline seja
+          confi&aacute;vel em produ&ccedil;&atilde;o?</em>
+          As duas primeiras horas e meia (19h00 &ndash; 20h30) s&atilde;o dedicadas &agrave; teoria de Site Reliability Engineering
+          aplicada a dados &mdash; SLI, SLO, SLA, error budget, observabilidade, data quality e padr&otilde;es de resili&ecirc;ncia.
+          A partir das 20h30, entramos no laborat&oacute;rio AWS Student: criamos alarmes no CloudWatch, fila SQS com
+          Dead Letter Queue, ruleset DQDL no AWS Glue Data Quality e um workflow completo no AWS Step Functions
+          (com Retry e Catch) orquestrando o pipeline Olist. O material inclui o ASL (Amazon States Language) completo
+          do <code>olist-pipeline</code> e o DQDL completo do ruleset <code>rs_olist_gold_orders</code>, al&eacute;m de
+          exerc&iacute;cios de fixa&ccedil;&atilde;o para estudo aut&ocirc;nomo.
         </p>
       </section>
 
-      <!-- =========================================================
-           MÓDULO 1 — SRE PARA DADOS
-      ========================================================== -->
+      <!-- ============================================================
+           MODULO 1 - POR QUE DATA RELIABILITY
+      ============================================================= -->
       <section class="content-block">
-        <h2>Módulo 1 — SRE Aplicado a Pipelines de Dados</h2>
+        <h2>M&oacute;dulo 1 &mdash; Por que Data Reliability?</h2>
 
-        <h3>O que é SRE e como se aplica a dados</h3>
+        <h3>O pipeline at&eacute; aqui</h3>
         <p>
-          Site Reliability Engineering (SRE) é uma disciplina que aplica práticas de
-          engenharia de software a operações de infraestrutura, com o objetivo de criar
-          sistemas escaláveis e altamente confiáveis. Originada no Google, a SRE define
-          métricas objetivas de confiabilidade (SLOs) e usa automação para reduzir
-          o trabalho manual repetitivo (toil).
+          Nas aulas anteriores, constru&iacute;mos um pipeline de dados fim-a-fim sobre o dataset Olist. Come&ccedil;amos
+          pela camada de infraestrutura (IAM, contas, buckets S3), passamos pelas arquiteturas de Data Lake e Data Warehouse,
+          conectamos fontes relacionais (RDS) e NoSQL (DynamoDB), implementamos streaming near-real-time com Kinesis e Lambda,
+          constru&iacute;mos jobs de ETL com Glue transformando raw &rarr; silver &rarr; gold e consumimos os resultados
+          no Redshift e Athena para analytics. O pipeline <em>funciona</em> &mdash; do ponto de vista de acionamento manual,
+          ele executa com sucesso e entrega dados na tabela gold.
         </p>
         <p>
-          Para pipelines de dados, a SRE se manifesta como <strong>Data Reliability Engineering</strong>:
-          garantir que os dados cheguem ao destino correto, no tempo correto,
-          com a qualidade correta. Assim como um serviço web tem um SLO de disponibilidade
-          (ex.: 99,9% de uptime), um pipeline de dados pode ter um SLO de freshness
-          (ex.: dados disponíveis com no máximo 4 horas de atraso) e de completeness
-          (ex.: no máximo 0,01% de registros perdidos).
+          A diferen&ccedil;a entre um pipeline que funciona e um pipeline que est&aacute; pronto para produ&ccedil;&atilde;o
+          s&atilde;o os cen&aacute;rios que n&atilde;o vemos quando tudo d&aacute; certo: o dia em que o Glue Job trava
+          por 4 horas, a semana em que uma mudan&ccedil;a no schema do parceiro derruba silenciosamente metade das linhas,
+          a madrugada em que ningu&eacute;m percebe que o pipeline n&atilde;o rodou porque o Crawler falhou em um erro
+          transit&oacute;rio. Produ&ccedil;&atilde;o significa lidar com esses cen&aacute;rios de forma sistem&aacute;tica.
         </p>
 
-        <h3>SLIs, SLOs e SLAs para pipelines de dados</h3>
-        <p>
-          <strong>SLI (Service Level Indicator):</strong> uma métrica quantitativa que mede
-          um aspecto do comportamento do pipeline. Exemplos para pipelines de dados:
-        </p>
+        <h3>Sintomas t&iacute;picos de um pipeline sem reliability</h3>
         <ul>
-          <li><em>Freshness:</em> tempo entre a chegada do dado na fonte e a disponibilidade
-          na camada Trusted. Medido em minutos ou horas.</li>
-          <li><em>Completeness:</em> percentual de registros esperados que efetivamente
-          chegaram ao destino. Ex.: 99,98% dos eventos de um sistema foram ingeridos.</li>
-          <li><em>Accuracy:</em> percentual de registros com valores corretos (sem erros
-          de transformação ou corrupção).</li>
-          <li><em>Availability:</em> percentual do tempo em que o pipeline está operacional
-          e processando dados.</li>
+          <li><strong>Dashboards desatualizados</strong> detectados pelo usu&aacute;rio de neg&oacute;cio, n&atilde;o pelo
+          monitoramento do time.</li>
+          <li><strong>Metade das linhas faltando</strong> na tabela Gold, mas o job do Glue ficou verde &mdash; porque
+          o c&oacute;digo n&atilde;o falhou, apenas filtrou a mais.</li>
+          <li><strong>Alertas &agrave;s 3h da manh&atilde;</strong> sem runbook. O plantonista precisa redescobrir a causa
+          raiz todo dia.</li>
+          <li><strong>Falhas transit&oacute;rias</strong> (um nslookup que falhou, um throttle do S3) viram incidente
+          porque n&atilde;o havia retry.</li>
+          <li><strong>Reprocessamentos manuais</strong> feitos por linha de comando, sem auditoria, sem idempot&ecirc;ncia.</li>
         </ul>
-        <p>
-          <strong>SLO (Service Level Objective):</strong> o alvo definido para um SLI.
-          Exemplo: "o pipeline de vendas deve entregar dados com freshness menor que 60 minutos
-          em 99,5% do tempo em qualquer janela de 30 dias."
-        </p>
-        <p>
-          <strong>SLA (Service Level Agreement):</strong> o acordo formal entre o provedor
-          (equipe de dados) e o consumidor (time de BI, time de negócio), geralmente com
-          consequências contratuais se o SLO não for atingido. O SLA é mais conservador
-          que o SLO — se o SLO interno é 99,5%, o SLA externo pode ser 99%.
-        </p>
 
-        <h3>Error budgets: aceitando falhas de forma controlada</h3>
+        <h3>A raiz do problema</h3>
         <p>
-          O error budget é a quantidade de falha permitida antes que o SLO seja violado.
-          Se o SLO é 99,5% de freshness em 30 dias, o error budget é 0,5% de 30 dias
-          = 3,6 horas de falha permitida por mês. Quando o error budget está esgotado,
-          a prioridade da equipe deve mudar de novas features para estabilidade e
-          redução de toil.
+          Esses sintomas t&ecirc;m uma raiz comum: o time n&atilde;o definiu formalmente <em>o que &eacute; um pipeline
+          saud&aacute;vel</em>. Sem essa defini&ccedil;&atilde;o, n&atilde;o d&aacute; para medir, n&atilde;o d&aacute;
+          para alertar e n&atilde;o d&aacute; para priorizar. A resposta que SRE nos oferece &eacute; um conjunto
+          de conceitos &mdash; SLI, SLO, SLA, error budget &mdash; que permite transformar a vaga ideia de
+          &ldquo;funcionar bem&rdquo; em m&eacute;tricas, metas e contratos.
         </p>
       </section>
 
-      <!-- =========================================================
-           MÓDULO 2 — CLOUDWATCH
-      ========================================================== -->
+      <!-- ============================================================
+           MODULO 2 - SRE
+      ============================================================= -->
       <section class="content-block">
-        <h2>Módulo 2 — Amazon CloudWatch: Observabilidade para Pipelines</h2>
+        <h2>M&oacute;dulo 2 &mdash; Site Reliability Engineering</h2>
 
-        <h3>Os três pilares da observabilidade</h3>
+        <h3>Origem e defini&ccedil;&atilde;o</h3>
         <p>
-          Observabilidade é a capacidade de inferir o estado interno de um sistema
-          a partir de suas saídas externas. Os três pilares são:
-        </p>
-        <ul>
-          <li>
-            <strong>Métricas:</strong> valores numéricos agregados ao longo do tempo.
-            Exemplos: número de registros processados por hora, latência média de
-            execução de um Glue Job, número de falhas em 24h. No CloudWatch, as métricas
-            são armazenadas com granularidade de 1 segundo (high resolution) ou 1 minuto
-            (standard) e podem ser visualizadas em dashboards.
-          </li>
-          <li>
-            <strong>Logs:</strong> registros textuais de eventos que ocorreram no sistema.
-            Exemplos: stack traces de erros em Glue Jobs, mensagens de progresso de pipelines,
-            logs de acesso do Athena. No CloudWatch Logs, os logs são organizados em
-            Log Groups (um por aplicação/serviço) e Log Streams (um por instância/execução).
-          </li>
-          <li>
-            <strong>Traces:</strong> registro do fluxo de uma requisição ou job através
-            de múltiplos serviços. O AWS X-Ray fornece tracing distribuído para entender
-            onde o tempo é gasto em pipelines com múltiplos componentes.
-          </li>
-        </ul>
-
-        <h3>CloudWatch Alarms para pipelines de dados</h3>
-        <p>
-          Um CloudWatch Alarm monitora uma métrica e executa uma ação quando o valor
-          cruza um limiar. Para pipelines de dados, alarmes essenciais incluem:
-        </p>
-        <ul>
-          <li><strong>Glue Job failures:</strong> alarme quando o número de execuções
-          com erro excede 1 em qualquer período de 1 hora.</li>
-          <li><strong>Kinesis iterator age:</strong> alarme quando o GetRecords.IteratorAgeMilliseconds
-          do Kinesis excede 60.000 ms (indicando que o consumidor está atrasado em relação
-          ao produtor).</li>
-          <li><strong>Athena query scan volume:</strong> alarme quando uma única query
-          escaneia mais de 100 GB (indicando query problemática ou mal otimizada).</li>
-          <li><strong>S3 bucket size:</strong> alarme quando o bucket cresce mais de
-          X% ao dia em relação à média histórica (anomalia de volume que pode indicar
-          problema de duplicação).</li>
-        </ul>
-        <p>
-          A ação típica de um alarme é publicar uma notificação no SNS (Simple Notification Service),
-          que então pode enviar emails, mensagens Slack via Lambda, ou disparar uma função
-          de remediação automática.
+          Site Reliability Engineering (SRE) nasceu no Google por volta de 2003, quando Ben Treynor Sloss foi contratado
+          para liderar uma equipe de opera&ccedil;&otilde;es e optou por mont&aacute;-la como uma equipe de engenharia
+          de software. A defini&ccedil;&atilde;o original dele &eacute; memor&aacute;vel: &ldquo;SRE &eacute; o que acontece
+          quando voc&ecirc; pede a um engenheiro de software para projetar uma equipe de opera&ccedil;&otilde;es&rdquo;.
+          O livro aberto <em>Site Reliability Engineering: How Google Runs Production Systems</em>, publicado em 2016,
+          consolidou as pr&aacute;ticas da disciplina e &eacute; hoje refer&ecirc;ncia mundial para engenharia de confiabilidade.
         </p>
 
-        <h3>CloudWatch Logs Insights para análise de falhas</h3>
-        <p>
-          O Logs Insights é um motor de query para pesquisar e analisar logs no CloudWatch.
-          Exemplo de query para encontrar erros em logs de Glue Jobs nas últimas 24h:
-        </p>
-        <pre><code>fields @timestamp, @message
-| filter @message like /ERROR/
-| sort @timestamp desc
-| limit 50
-</code></pre>
-        <p>
-          O Logs Insights suporta agregações, filtros com regex, e funções de estatística,
-          tornando-o poderoso para análise de incidentes e identificação de padrões
-          de falha recorrentes.
-        </p>
-      </section>
-
-      <!-- =========================================================
-           MÓDULO 3 — ORQUESTRAÇÃO RESILIENTE
-      ========================================================== -->
-      <section class="content-block">
-        <h2>Módulo 3 — Orquestração Resiliente: MWAA e Step Functions</h2>
-
-        <h3>Por que orquestração é crítica</h3>
-        <p>
-          Um pipeline de dados típico é composto por múltiplas etapas com dependências:
-          o job de transformação Trusted só deve rodar depois que o Crawler Raw terminar;
-          o job de Refined só deve rodar depois que o Trusted estiver completo;
-          a notificação ao time de BI só deve ser enviada após validações de qualidade.
-          Executar essas etapas manualmente é insustentável e propenso a erros.
-          Um orquestrador gerencia essas dependências automaticamente e define o que
-          fazer quando uma etapa falha.
-        </p>
-
-        <h3>Amazon MWAA: Apache Airflow gerenciado</h3>
-        <p>
-          O MWAA (Managed Workflows for Apache Airflow) é o serviço gerenciado da AWS
-          para executar o Apache Airflow. O Airflow usa DAGs (Directed Acyclic Graphs)
-          escritas em Python para definir pipelines. Cada nó do DAG é uma Task (uma
-          unidade de trabalho), e as arestas definem as dependências entre tasks.
-        </p>
-        <p>
-          Exemplo de DAG Airflow simples para o pipeline da disciplina:
-        </p>
-        <pre><code>from airflow import DAG
-from airflow.providers.amazon.aws.operators.glue import GlueJobOperator
-from airflow.providers.amazon.aws.operators.glue_crawler import GlueCrawlerOperator
-from datetime import datetime, timedelta
-
-default_args = {
-    'owner': 'data-engineering',
-    'retries': 2,
-    'retry_delay': timedelta(minutes=5),
-    'email_on_failure': True,
-    'email': ['alertas@empresa.com']
-}
-
-with DAG(
-    dag_id='pipeline_vendas_diario',
-    default_args=default_args,
-    schedule_interval='0 6 * * *',  # Todo dia às 06h00
-    start_date=datetime(2026, 4, 1),
-    catchup=False
-) as dag:
-
-    crawl_raw = GlueCrawlerOperator(
-        task_id='crawl_raw',
-        config={'Name': 'crawler-raw-lab'}
-    )
-
-    etl_trusted = GlueJobOperator(
-        task_id='etl_raw_to_trusted',
-        job_name='etl-raw-to-trusted-pedidos'
-    )
-
-    crawl_trusted = GlueCrawlerOperator(
-        task_id='crawl_trusted',
-        config={'Name': 'crawler-trusted-lab'}
-    )
-
-    crawl_raw >> etl_trusted >> crawl_trusted
-</code></pre>
-        <p>
-          O parâmetro <code>retries=2</code> faz o Airflow tentar reexecutar uma task
-          que falhou até 2 vezes adicionais, com 5 minutos de intervalo entre tentativas.
-          Isso cobre falhas transitórias (ex.: timeout de rede, throttling da AWS)
-          sem intervenção manual.
-        </p>
-
-        <h3>AWS Step Functions: orquestração serverless</h3>
-        <p>
-          O Step Functions é uma alternativa serverless ao MWAA para orquestração de
-          workflows. Em vez de Python, os workflows são definidos em Amazon States Language
-          (JSON). Cada estado pode invocar uma Lambda, um Glue Job, um ECS Task, ou aguardar
-          um evento.
-        </p>
-        <p>
-          Vantagens do Step Functions sobre MWAA:
-        </p>
-        <ul>
-          <li>Sem servidor para gerenciar — sem preocupação com escalabilidade do scheduler.</li>
-          <li>Integração nativa com praticamente todos os serviços AWS via SDK integrations.</li>
-          <li>Visualização do estado de execução em tempo real no console.</li>
-          <li>Custo baseado em transições de estado (paga por execução, não por hora de servidor).</li>
-        </ul>
-        <p>
-          Vantagens do MWAA sobre Step Functions:
-        </p>
-        <ul>
-          <li>Airflow é uma plataforma open-source com enorme ecossistema de providers e plugins.</li>
-          <li>Portabilidade: a mesma DAG pode rodar on-premises, em qualquer cloud, ou no MWAA.</li>
-          <li>Interface web rica para monitoramento, reexecução de tasks individuais e debugging.</li>
-          <li>Melhor para pipelines complexos com muitas dependências e lógica condicional sofisticada.</li>
-        </ul>
-
-        <h3>Retry patterns: estratégias de recuperação</h3>
-        <p>
-          Não basta configurar retries — é preciso configurar retries corretos.
-          Alguns padrões essenciais:
-        </p>
-        <ul>
-          <li>
-            <strong>Exponential backoff:</strong> aumenta o tempo de espera exponencialmente
-            entre tentativas (1s, 2s, 4s, 8s). Reduz a sobrecarga em sistemas que estão
-            sob pressão. Evita o "retry storm" onde múltiplos clientes tentam simultaneamente.
-          </li>
-          <li>
-            <strong>Jitter:</strong> adiciona um componente aleatório ao intervalo de retry.
-            Evita que múltiplos jobs que falharam ao mesmo tempo façam retry exatamente
-            ao mesmo instante, sobrecarregando o sistema novamente.
-          </li>
-          <li>
-            <strong>Dead letter queue (DLQ):</strong> após o número máximo de tentativas,
-            o evento ou job que falhou é movido para uma fila DLQ para análise posterior.
-            Evita perda silenciosa de dados e permite investigar e reprocessar
-            manualmente os casos problemáticos.
-          </li>
-          <li>
-            <strong>Circuit breaker:</strong> interrompe tentativas quando o sistema
-            detecta falhas sistemáticas (não apenas transitórias), evitando desperdício
-            de recursos e cascata de falhas.
-          </li>
-        </ul>
-      </section>
-
-      <!-- =========================================================
-           MÓDULO 4 — LABORATÓRIO
-      ========================================================== -->
-      <section class="content-block">
-        <h2>Módulo 4 — Laboratório: Configurando Alarmes no CloudWatch</h2>
-        <p>
-          A prática utiliza o ambiente <strong>AWS Student</strong>.
-          O objetivo é criar um alarme no CloudWatch que notifique quando um Glue Job falha.
-        </p>
-
-        <h3>Passo 1 — Executar um Glue Job e explorar os logs</h3>
+        <h3>Princ&iacute;pios centrais</h3>
         <ol>
-          <li>No console AWS, acesse <strong>AWS Glue</strong> e execute o job criado na Aula 05.</li>
-          <li>Aguarde a conclusão (sucesso ou falha).</li>
-          <li>Clique no job e na aba <strong>Runs</strong>, clique na execução mais recente.</li>
-          <li>Clique em <strong>Output logs</strong> para abrir o CloudWatch Logs.</li>
-          <li>Explore os logs: procure por mensagens de progresso, erros (se houver)
-          e o tempo de execução.</li>
-          <li><strong>Validação:</strong> você consegue localizar nos logs o início
-          e o fim da execução do job.</li>
+          <li>
+            <strong>Embrace risk.</strong> 100% de disponibilidade n&atilde;o &eacute; uma meta realista nem desej&aacute;vel.
+            Cada &ldquo;nove&rdquo; adicional (99% &rarr; 99.9% &rarr; 99.99%) custa uma ordem de grandeza mais caro.
+            O time deve escolher conscientemente o n&iacute;vel de confiabilidade certo para o valor do neg&oacute;cio.
+          </li>
+          <li>
+            <strong>SLOs como linguagem de decis&atilde;o.</strong> Em vez de discutir subjetivamente se um servi&ccedil;o
+            est&aacute; &ldquo;est&aacute;vel&rdquo; ou &ldquo;inst&aacute;vel&rdquo;, compara-se o SLI com o SLO pactuado.
+            A resposta &eacute; num&eacute;rica.
+          </li>
+          <li>
+            <strong>Eliminate toil.</strong> Toil &eacute; trabalho manual, repetitivo, reativo e sem valor a longo prazo.
+            SRE trata toil como inimigo: mede e combate automatizando.
+          </li>
+          <li>
+            <strong>Monitoring as a first-class concern.</strong> Logs, m&eacute;tricas e traces n&atilde;o s&atilde;o
+            afterthought &mdash; s&atilde;o parte do produto.
+          </li>
+          <li>
+            <strong>Release engineering.</strong> Deploy deve ser autom&aacute;tico, gradual e revers&iacute;vel (canary,
+            blue-green, feature flags).
+          </li>
+          <li>
+            <strong>Blameless postmortem.</strong> Incidentes s&atilde;o oportunidades de aprendizado sobre o sistema,
+            n&atilde;o ocasi&otilde;es para culpar pessoas.
+          </li>
         </ol>
 
-        <h3>Passo 2 — Criar um alarme de falha do Glue Job</h3>
+        <h3>SRE cl&aacute;ssico vs SRE de dados</h3>
+        <p>
+          O SRE cl&aacute;ssico foi criado pensando em servi&ccedil;os online: uma API responde um request HTTP em
+          milissegundos e o SLI &eacute; a taxa de sucesso. Quando aplicamos SRE a pipelines de dados, a unidade
+          de valor muda: o produto &eacute; o <em>dataset</em>, e a lat&ecirc;ncia relevante &eacute; a <em>freshness</em>
+          do dado. As comunidades DataOps, DMBOK e DORA ajudam a adaptar o vocabul&aacute;rio para dados.
+        </p>
+
+        <table>
+          <thead>
+            <tr><th>Dimens&atilde;o</th><th>SRE cl&aacute;ssico (servi&ccedil;o)</th><th>SRE de dados (dataset)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Unidade de valor</td><td>Request HTTP</td><td>Linha/registro em tabela</td></tr>
+            <tr><td>Disponibilidade</td><td>% de requests com 2xx</td><td>Pipeline rodou dentro da janela?</td></tr>
+            <tr><td>Lat&ecirc;ncia</td><td>p95, p99 da resposta</td><td>Freshness do dataset</td></tr>
+            <tr><td>Corretude</td><td>Resposta v&aacute;lida</td><td>Completeness + accuracy do dado</td></tr>
+            <tr><td>Refer&ecirc;ncias</td><td>Google SRE book</td><td>DataOps + DMBOK + DORA</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ============================================================
+           MODULO 3 - SLI SLO SLA ERROR BUDGET
+      ============================================================= -->
+      <section class="content-block">
+        <h2>M&oacute;dulo 3 &mdash; SLI, SLO, SLA e Error Budget</h2>
+
+        <h3>Service Level Indicator (SLI)</h3>
+        <p>
+          Um SLI &eacute; uma m&eacute;trica quantitativa de um aspecto do servi&ccedil;o &mdash; sempre expressa como
+          uma raz&atilde;o entre eventos bons e eventos totais v&aacute;lidos, em um intervalo de tempo. Essa defini&ccedil;&atilde;o
+          can&ocirc;nica &eacute; importante porque produz um n&uacute;mero entre 0 e 1, f&aacute;cil de agregar e comparar
+          com um SLO.
+        </p>
+        <pre><code>SLI = eventos_bons / eventos_v&aacute;lidos_totais</code></pre>
+        <p>Exemplos:</p>
+        <ul>
+          <li><strong>Web</strong>: <code>(HTTP 2xx + HTTP 3xx) / (todos os requests exceto 5xx de rate limit)</code>.</li>
+          <li><strong>Pipeline (availability)</strong>: <code>execu&ccedil;&otilde;es_no_prazo / execu&ccedil;&otilde;es_agendadas</code>.</li>
+          <li><strong>Dataset (completeness)</strong>: <code>linhas_com_order_id_n&atilde;o_nulo / total_linhas</code>.</li>
+          <li><strong>Streaming (lat&ecirc;ncia)</strong>: <code>eventos_processados_em_&lt;_60s / total_eventos</code>.</li>
+        </ul>
+
+        <h3>Service Level Objective (SLO)</h3>
+        <p>
+          Um SLO &eacute; uma meta interna sobre um SLI, dentro de uma janela de tempo. O SLO d&aacute; sentido
+          operacional ao SLI &mdash; sem SLO, o SLI &eacute; s&oacute; um gr&aacute;fico bonito. Um SLO bem formulado tem
+          quatro componentes: a m&eacute;trica (SLI), o alvo (ex.: 99.5%), a janela de medi&ccedil;&atilde;o
+          (ex.: 30 dias rolantes) e o escopo (qual dataset ou pipeline).
+        </p>
+
+        <div class="tip">
+          <strong>Exemplos de SLO para o pipeline Olist</strong>
+          <ul>
+            <li>99% das execu&ccedil;&otilde;es do job <code>silver_to_gold</code> terminam antes das 06h00 em uma janela
+            de 30 dias.</li>
+            <li>99.5% das linhas de <code>gold.orders</code> t&ecirc;m <code>order_id</code> n&atilde;o nulo em uma janela
+            de 7 dias.</li>
+            <li>95% dos eventos Kinesis s&atilde;o processados pelo Lambda em menos de 60 segundos, em uma janela de 24 horas.</li>
+          </ul>
+        </div>
+
+        <h3>Service Level Agreement (SLA)</h3>
+        <p>
+          Um SLA &eacute; um contrato com um cliente ou usu&aacute;rio de neg&oacute;cio e <em>tem consequ&ecirc;ncia</em>
+          quando quebrado: pode envolver cr&eacute;dito financeiro, multa, indicador de performance do fornecedor ou
+          simplesmente impacto em CSAT. A regra pr&aacute;tica &eacute; que o SLA &eacute; sempre <strong>mais folgado</strong>
+          que o SLO interno: se prometo 99% para o cliente, internamente persigo 99.5%. Essa folga &eacute; o buffer
+          de seguran&ccedil;a do time.
+        </p>
+
+        <table>
+          <thead>
+            <tr><th>Conceito</th><th>SLI</th><th>SLO</th><th>SLA</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>O que &eacute;</td><td>M&eacute;trica</td><td>Meta interna</td><td>Contrato externo</td></tr>
+            <tr><td>P&uacute;blico</td><td>Engenharia</td><td>Engenharia + Produto</td><td>Cliente/neg&oacute;cio</td></tr>
+            <tr><td>Consequ&ecirc;ncia de quebra</td><td>N&atilde;o aplica</td><td>Alerta; error budget queima</td><td>Cr&eacute;dito, multa, impacto contratual</td></tr>
+            <tr><td>Rigor t&iacute;pico</td><td>Observa&ccedil;&atilde;o direta</td><td>Mais rigoroso que o SLA</td><td>Folgado para criar buffer</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Error Budget</h3>
+        <p>
+          Se o SLO &eacute; 99%, existe 1% de &ldquo;falhas aceit&aacute;veis&rdquo; por design. Esse 1% &eacute;
+          chamado de <strong>error budget</strong> e &eacute; o conceito mais pr&aacute;tico de todos: ele transforma
+          a tens&atilde;o entre engenharia (quer lan&ccedil;ar features) e opera&ccedil;&otilde;es (quer estabilidade)
+          em uma equa&ccedil;&atilde;o quantitativa.
+        </p>
+        <p>
+          C&aacute;lculo: para um SLO mensal de 99%, o error budget &eacute; <code>0.01 &times; 30 dias = 7.2 horas</code>
+          de indisponibilidade permitida. Durante esse tempo, o time pode experimentar, fazer deploys agressivos e correr
+          riscos; depois que o budget zerar, a regra &eacute; congelar mudan&ccedil;as e focar em estabilidade at&eacute;
+          a pr&oacute;xima janela.
+        </p>
+
+        <div class="tip">
+          <strong>Como operar com error budget</strong>
+          <ul>
+            <li>Budget sobrando &rarr; libera deploy, experimenta&ccedil;&atilde;o, refactor agressivo.</li>
+            <li>Budget queimando r&aacute;pido &rarr; time reduz cad&ecirc;ncia e foca em hardening.</li>
+            <li>Budget zerado &rarr; <em>freeze</em> de features at&eacute; recuperar o SLO.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           MODULO 4 - SLIS DE PIPELINE
+      ============================================================= -->
+      <section class="content-block">
+        <h2>M&oacute;dulo 4 &mdash; SLIs para pipelines de dados</h2>
+        <p>
+          Em dados, cinco dimens&otilde;es de SLI cobrem a maior parte dos casos de uso. Um pipeline maduro mede todas;
+          um pipeline b&aacute;sico come&ccedil;a com freshness e completeness.
+        </p>
+
+        <h3>Freshness &mdash; o dado est&aacute; atual?</h3>
+        <p>
+          Freshness mede o tempo decorrido desde a &uacute;ltima atualiza&ccedil;&atilde;o bem-sucedida do dataset.
+          Em SQL: <code>SELECT NOW() - MAX(updated_at) FROM gold.orders</code>. No AWS, tamb&eacute;m podemos
+          derivar freshness do timestamp da &uacute;ltima execu&ccedil;&atilde;o de sucesso do Glue Job, obtido
+          via CloudWatch ou via metadados do Glue Catalog.
+        </p>
+        <p>
+          <strong>SLO exemplo</strong>: 99% dos dias, a tabela <code>gold.orders</code> est&aacute; atualizada antes
+          das 07h00. <strong>Alarme</strong>: freshness &gt; 8h dispara SNS para <code>data-pipeline-alerts</code>.
+        </p>
+
+        <h3>Completeness &mdash; tudo chegou?</h3>
+        <p>
+          Completeness mede a raz&atilde;o entre linhas recebidas e linhas esperadas. Detecta perda silenciosa de dados
+          &mdash; o pior tipo de falha, porque o job fica verde mas o dado est&aacute; errado. Estrat&eacute;gias comuns:
+        </p>
+        <ul>
+          <li><strong>Volume esperado</strong>: comparar contagem atual com a m&eacute;dia dos &uacute;ltimos 7 dias
+          (toler&acirc;ncia &plusmn;20%).</li>
+          <li><strong>Reconcilia&ccedil;&atilde;o por camada</strong>: <code>COUNT(raw) = COUNT(silver) = COUNT(gold)</code>,
+          a menos de filtros explicitamente declarados.</li>
+          <li><strong>Nulos em chave</strong>: <code>% order_id IS NULL</code> deve ser zero.</li>
+          <li><strong>Cobertura de parti&ccedil;&otilde;es</strong>: toda parti&ccedil;&atilde;o <code>dt=YYYY-MM-DD</code>
+          esperada existe?</li>
+        </ul>
+
+        <h3>Accuracy &mdash; os valores fazem sentido?</h3>
+        <p>
+          Accuracy mede o percentual de valores que passam em regras de valida&ccedil;&atilde;o de neg&oacute;cio.
+          Exemplos para o pipeline Olist:
+        </p>
+        <ul>
+          <li><code>price &gt; 0</code> e <code>price &lt; 100000</code>.</li>
+          <li><code>order_status IN ('created','paid','shipped','delivered','canceled')</code>.</li>
+          <li><code>customer_city</code> em lista de munic&iacute;pios v&aacute;lidos (ou pelo menos em um formato conhecido).</li>
+          <li>Timestamps no futuro = inv&aacute;lidos; timestamps antes de 2010 = suspeitos.</li>
+        </ul>
+
+        <h3>Consistency &mdash; reconcilia&ccedil;&atilde;o entre fontes</h3>
+        <p>
+          Consistency responde: &ldquo;o dado em sistemas diferentes conta a mesma hist&oacute;ria?&rdquo;. Essa &eacute;
+          a dimens&atilde;o mais pol&iacute;tica dos SLIs, porque exp&otilde;e diverg&ecirc;ncias entre times.
+          Checagens t&iacute;picas:
+        </p>
+        <ul>
+          <li><code>SUM(gold.orders.price)</code> para um dia bate com <code>SUM(raw.orders.price)</code> para o mesmo dia.</li>
+          <li><code>COUNT(DISTINCT customer_id)</code> no CRM operacional &eacute; igual &agrave; contagem no DW
+          (toler&acirc;ncia &lt; 0.1%).</li>
+          <li>Receita agregada no Redshift bate com extrato no sistema transacional.</li>
+          <li>Cardinalidade entre fato e dimens&atilde;o respeita o modelo declarado.</li>
+        </ul>
+
+        <h3>Availability &mdash; o pipeline rodou?</h3>
+        <p>
+          Availability para dados &eacute; o percentual de janelas agendadas em que o pipeline produziu resultado
+          dentro do prazo. &ldquo;Dentro do prazo&rdquo; significa concluir com sucesso antes do deadline definido
+          no SLO &mdash; e retries contam a favor: se a segunda tentativa passou, o pipeline est&aacute; dispon&iacute;vel.
+          Fontes de dados no AWS: status de execu&ccedil;&atilde;o do Step Functions, regras do EventBridge, Logs
+          do Glue Job.
+        </p>
+      </section>
+
+      <!-- ============================================================
+           MODULO 5 - OBSERVABILIDADE
+      ============================================================= -->
+      <section class="content-block">
+        <h2>M&oacute;dulo 5 &mdash; Observabilidade</h2>
+        <p>
+          H&aacute; uma distin&ccedil;&atilde;o importante entre <em>monitoring</em> e <em>observability</em>: monitoring
+          responde &ldquo;est&aacute; quebrado?&rdquo; (alarme ligado/desligado); observability responde
+          &ldquo;por que est&aacute; quebrado?&rdquo; (diagn&oacute;stico). Em sistemas distribu&iacute;dos modernos,
+          n&atilde;o basta saber que falhou &mdash; &eacute; preciso ter dados suficientes para investigar sem
+          precisar reproduzir.
+        </p>
+
+        <h3>Os tr&ecirc;s pilares</h3>
+        <table>
+          <thead>
+            <tr><th>Pilar</th><th>O que &eacute;</th><th>Quando usar</th><th>Servi&ccedil;o AWS</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Logs</strong></td>
+              <td>Eventos textuais com contexto, timestamp e correlation ID</td>
+              <td>Investigar incidente espec&iacute;fico, rastrear decis&otilde;es do c&oacute;digo</td>
+              <td>CloudWatch Logs, Logs Insights</td>
+            </tr>
+            <tr>
+              <td><strong>Metrics</strong></td>
+              <td>S&eacute;ries temporais agregadas (contador, gauge, histograma)</td>
+              <td>Dashboards, alarmes, tend&ecirc;ncias</td>
+              <td>CloudWatch Metrics</td>
+            </tr>
+            <tr>
+              <td><strong>Traces</strong></td>
+              <td>Caminho de uma execu&ccedil;&atilde;o atrav&eacute;s de m&uacute;ltiplos servi&ccedil;os</td>
+              <td>Encontrar gargalos em sistemas distribu&iacute;dos</td>
+              <td>AWS X-Ray, OpenTelemetry</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>M&eacute;tricas relevantes do AWS Glue</h3>
+        <p>
+          Todos os Glue Jobs publicam m&eacute;tricas no namespace <code>AWS/Glue</code>. As mais &uacute;teis para
+          SRE de dados:
+        </p>
+        <ul>
+          <li><code>glue.driver.aggregate.elapsedTime</code> &mdash; tempo total da execu&ccedil;&atilde;o, em ms.
+          Serve para alarme de &ldquo;job lento demais&rdquo;.</li>
+          <li><code>glue.driver.aggregate.numFailedTasks</code> &mdash; quantidade de tasks que falharam.
+          <code>&gt; 0</code> &eacute; alerta imediato.</li>
+          <li><code>glue.driver.aggregate.numCompletedTasks</code> &mdash; tasks conclu&iacute;das. Serve como
+          contraponto para calcular taxa de falha.</li>
+          <li><code>glue.driver.BlockManager.disk.diskSpaceUsed_MB</code> &mdash; uso de disco do driver.
+          Cresce indica spill &mdash; sinal de job mal dimensionado.</li>
+        </ul>
+      </section>
+
+      <!-- ============================================================
+           MODULO 6 - DATA QUALITY
+      ============================================================= -->
+      <section class="content-block">
+        <h2>M&oacute;dulo 6 &mdash; Data Quality</h2>
+        <p>
+          Data Quality (DQ) &eacute; a pr&aacute;tica de expressar expectativas sobre o dado de forma declarativa
+          e executar valida&ccedil;&otilde;es como parte do pipeline. Um check de DQ pode rodar antes de escrever
+          (valida&ccedil;&atilde;o defensiva) ou depois (auditoria). Em ambos os casos, o output &eacute; um relat&oacute;rio
+          estruturado de regras e viola&ccedil;&otilde;es.
+        </p>
+
+        <h3>Frameworks mais usados</h3>
+        <ul>
+          <li><strong>Great Expectations</strong> &mdash; Python, open-source, rico em <em>expectations</em> pr&eacute;-constru&iacute;das.
+          Gera <em>Data Docs</em> em HTML. Integra com Airflow, dbt, Spark.</li>
+          <li><strong>Deequ / PyDeequ</strong> &mdash; biblioteca da AWS sobre Spark. Expressa constraints em Scala ou Python,
+          mant&eacute;m <em>metrics repository</em> para detec&ccedil;&atilde;o de anomalias. Escala para datasets grandes.</li>
+          <li><strong>dbt tests</strong> &mdash; nativo no dbt, escreve testes em SQL. Os b&aacute;sicos s&atilde;o
+          <code>unique</code>, <code>not_null</code>, <code>relationships</code> e <code>accepted_values</code>. Testes customizados
+          via macros.</li>
+          <li><strong>AWS Glue Data Quality</strong> &mdash; servi&ccedil;o gerenciado lan&ccedil;ado em 2023. Usa uma DSL
+          pr&oacute;pria chamada DQDL. Roda como transform dentro de Glue ETL ou como evaluator direto no Catalog.</li>
+        </ul>
+
+        <h3>AWS Glue Data Quality e DQDL</h3>
+        <p>
+          O DQDL (Data Quality Definition Language) &eacute; uma linguagem declarativa compacta para definir rulesets.
+          A estrutura geral &eacute; <code>Rules = [ regra1, regra2, ... ]</code>. Tipos de regra mais usados:
+        </p>
+        <ul>
+          <li><code>RowCount &gt; N</code> ou <code>RowCount between A and B</code> &mdash; verifica volume.</li>
+          <li><code>IsComplete "coluna"</code> &mdash; n&atilde;o pode haver nulos.</li>
+          <li><code>IsUnique "coluna"</code> &mdash; todos os valores s&atilde;o &uacute;nicos.</li>
+          <li><code>IsPrimaryKey "coluna"</code> &mdash; completude + unicidade.</li>
+          <li><code>ColumnValues "coluna" in [...]</code> &mdash; valores em conjunto permitido.</li>
+          <li><code>ColumnValues "coluna" &gt; N</code> / <code>&lt; N</code> &mdash; ranges num&eacute;ricos.</li>
+          <li><code>Completeness "coluna" &gt; 0.98</code> &mdash; pelo menos 98% n&atilde;o nulo.</li>
+          <li><code>ColumnCorrelation "a" "b" &gt; 0.1</code> &mdash; correla&ccedil;&atilde;o m&iacute;nima.</li>
+        </ul>
+
+        <p>Ruleset completo usado no lab (alvo: tabela <code>olist_gold.orders</code>):</p>
+        <pre><code>Rules = [
+    RowCount &gt; 100,
+    IsComplete "order_id",
+    IsUnique "order_id",
+    IsPrimaryKey "order_id",
+    IsComplete "customer_id",
+    ColumnValues "order_status" in [
+        "created","paid","shipped","delivered","canceled"
+    ],
+    ColumnValues "price" &gt; 0,
+    ColumnValues "price" &lt; 100000,
+    Completeness "customer_city" &gt; 0.98,
+    ColumnDataType "price" = "DOUBLE",
+    ColumnDataType "order_id" = "STRING",
+    ColumnCorrelation "price" "freight_value" &gt; 0.1
+]</code></pre>
+      </section>
+
+      <!-- ============================================================
+           MODULO 7 - LINHAGEM
+      ============================================================= -->
+      <section class="content-block">
+        <h2>M&oacute;dulo 7 &mdash; Linhagem de dados</h2>
+        <p>
+          Linhagem (ou <em>data lineage</em>) &eacute; o rastro que conecta datasets: de onde cada campo veio, como foi
+          transformado e para onde foi consumido. &Eacute; fundamental para auditoria (LGPD, SOX), para root cause analysis
+          em incidentes (um bug no silver afeta quais dashboards?) e para avalia&ccedil;&atilde;o de impacto em mudan&ccedil;as.
+        </p>
+        <ul>
+          <li><strong>OpenLineage</strong> &mdash; padr&atilde;o aberto mantido pela Linux Foundation. Integra Spark,
+          Airflow, dbt. Backends: Marquez (reference), DataHub, OpenMetadata.</li>
+          <li><strong>AWS Glue Lineage</strong> &mdash; visualiza&ccedil;&atilde;o nativa no Glue Catalog, derivada
+          automaticamente das transforma&ccedil;&otilde;es dos jobs.</li>
+          <li><strong>AWS Lake Formation</strong> &mdash; camada de governan&ccedil;a com permiss&otilde;es fine-grained
+          e registro de fluxo.</li>
+          <li><strong>AWS DataZone</strong> &mdash; cat&aacute;logo corporativo com b&uacute;sca sem&acirc;ntica, glossary
+          de neg&oacute;cio e lineage.</li>
+        </ul>
+      </section>
+
+      <!-- ============================================================
+           MODULO 8 - RESILIENCIA
+      ============================================================= -->
+      <section class="content-block">
+        <h2>M&oacute;dulo 8 &mdash; Padr&otilde;es de resili&ecirc;ncia</h2>
+        <p>
+          Um pipeline resiliente absorve falhas transit&oacute;rias sem virar incidente. Os padr&otilde;es a seguir
+          s&atilde;o cl&aacute;ssicos do design de sistemas distribu&iacute;dos e s&atilde;o igualmente v&aacute;lidos
+          para dados.
+        </p>
+
+        <h3>Retry com backoff exponencial</h3>
+        <p>
+          A primeira linha de defesa contra falhas transit&oacute;rias (rede instante&acirc;nea, throttle de servi&ccedil;o,
+          lock momentaneamente segurado) &eacute; tentar de novo. Por&eacute;m, retry cego tende a piorar a situa&ccedil;&atilde;o
+          quando o servi&ccedil;o destino est&aacute; sobrecarregado. A solu&ccedil;&atilde;o &eacute; o backoff exponencial:
+          esperar 1s, depois 2s, depois 4s, depois 8s... com um fator de multiplica&ccedil;&atilde;o (backoff rate).
+          Adicionar <em>jitter</em> (varia&ccedil;&atilde;o aleat&oacute;ria) evita que todos os clientes retentem
+          simultaneamente (<em>thundering herd</em>).
+        </p>
+
+        <h3>Circuit Breaker</h3>
+        <p>
+          Quando uma depend&ecirc;ncia est&aacute; claramente indispon&iacute;vel, insistir em retry &eacute; desperd&iacute;cio.
+          O padr&atilde;o Circuit Breaker abre o &ldquo;circuito&rdquo; ap&oacute;s N falhas consecutivas, rejeitando
+          chamadas por um per&iacute;odo. Depois disso, entra em estado <em>half-open</em> para testar se recuperou.
+        </p>
+
+        <h3>Dead Letter Queue (DLQ)</h3>
+        <p>
+          Mensagens que falham repetidamente precisam sair do fluxo principal para n&atilde;o bloquear outras.
+          DLQ &eacute; uma fila auxiliar para onde as mensagens v&atilde;o ap&oacute;s N tentativas. Depois, um humano
+          ou um processo dedicado analisa.
+        </p>
+
+        <h3>Idempot&ecirc;ncia e checkpoint</h3>
+        <p>
+          Retry s&oacute; &eacute; seguro se a opera&ccedil;&atilde;o for idempotente &mdash; executar duas vezes produz
+          o mesmo resultado. Em ETL, isso &eacute; obtido por chaves idempotentes (ex.: <code>MERGE INTO</code> ao
+          inv&eacute;s de <code>INSERT</code>) e checkpoint de progresso (registrar at&eacute; onde processou para
+          retomar, n&atilde;o reprocessar tudo).
+        </p>
+      </section>
+
+      <!-- ============================================================
+           MODULO 9 - ORQUESTRACAO STEP FUNCTIONS
+      ============================================================= -->
+      <section class="content-block">
+        <h2>M&oacute;dulo 9 &mdash; Orquestra&ccedil;&atilde;o com AWS Step Functions</h2>
+        <p>
+          AWS Step Functions &eacute; o servi&ccedil;o gerenciado de m&aacute;quinas de estado da AWS. Voc&ecirc; descreve
+          o workflow em JSON (ASL &mdash; Amazon States Language) e o servi&ccedil;o cuida de execu&ccedil;&atilde;o,
+          retry, persist&ecirc;ncia de estado e visualiza&ccedil;&atilde;o.
+        </p>
+
+        <h3>Estados principais</h3>
+        <table>
+          <thead><tr><th>Estado</th><th>Uso</th></tr></thead>
+          <tbody>
+            <tr><td><code>Task</code></td><td>Executa uma a&ccedil;&atilde;o (Lambda, Glue Job, Crawler, DynamoDB)</td></tr>
+            <tr><td><code>Choice</code></td><td>Ramifica fluxo baseado em condi&ccedil;&atilde;o</td></tr>
+            <tr><td><code>Parallel</code></td><td>Executa branches simultaneamente</td></tr>
+            <tr><td><code>Map</code></td><td>Itera sobre cole&ccedil;&atilde;o (ex.: por parti&ccedil;&atilde;o)</td></tr>
+            <tr><td><code>Wait</code></td><td>Pausa por tempo fixo ou timestamp</td></tr>
+            <tr><td><code>Pass / Succeed / Fail</code></td><td>Estados de controle e termina&ccedil;&atilde;o</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Retry e Catch &mdash; resili&ecirc;ncia embutida</h3>
+        <p>
+          Cada Task aceita dois blocos opcionais: <code>Retry</code> (pol&iacute;tica de tentativa) e <code>Catch</code>
+          (desvio em caso de erro persistente).
+        </p>
+        <pre><code>"Retry": [{
+  "ErrorEquals": ["States.TaskFailed"],
+  "IntervalSeconds": 10,
+  "MaxAttempts": 3,
+  "BackoffRate": 2.0
+}]</code></pre>
+        <p>
+          Par&acirc;metros: <code>IntervalSeconds</code> &eacute; o intervalo inicial; <code>MaxAttempts</code> &eacute;
+          o n&uacute;mero m&aacute;ximo de tentativas adicionais; <code>BackoffRate</code> multiplica o intervalo
+          entre tentativas. Com <code>IntervalSeconds=10, BackoffRate=2, MaxAttempts=3</code>, as esperas s&atilde;o
+          10s, 20s e 40s.
+        </p>
+      </section>
+
+      <!-- ============================================================
+           MODULO 10 - RUNBOOK E POSTMORTEM
+      ============================================================= -->
+      <section class="content-block">
+        <h2>M&oacute;dulo 10 &mdash; Runbook e postmortem blameless</h2>
+
+        <h3>Runbook</h3>
+        <p>
+          Um runbook &eacute; um documento operacional que descreve, passo a passo, como tratar um alerta espec&iacute;fico.
+          Um bom runbook &eacute; escrito pensando em quem est&aacute; de plant&atilde;o &agrave;s 3h da manh&atilde;:
+        </p>
+        <ul>
+          <li>Qual alerta dispara e o que ele significa em linguagem de neg&oacute;cio.</li>
+          <li>Links diretos para dashboards, logs, consoles relevantes.</li>
+          <li>Comandos prontos para copiar e colar (com vari&aacute;veis destacadas).</li>
+          <li>&Aacute;rvore de decis&atilde;o: &ldquo;se X, fa&ccedil;a Y; sen&atilde;o, escale para Z&rdquo;.</li>
+          <li>Dono atual e canal de comunica&ccedil;&atilde;o.</li>
+        </ul>
+
+        <h3>Postmortem blameless</h3>
+        <p>
+          Ap&oacute;s um incidente relevante, o time escreve um postmortem. A chave &eacute; o qualificador
+          <em>blameless</em>: o foco &eacute; no sistema, n&atilde;o em pessoas. Estrutura t&iacute;pica:
+        </p>
         <ol>
-          <li>Acesse o <strong>Amazon CloudWatch</strong> no console AWS.</li>
-          <li>No menu lateral, clique em <strong>Alarms</strong> e depois em
-          <strong>Create alarm</strong>.</li>
-          <li>Clique em <strong>Select metric</strong>.</li>
-          <li>Navegue para <strong>Glue</strong> e depois <strong>Job Metrics</strong>.</li>
-          <li>Procure pelo seu job e selecione a métrica <strong>glue.driver.aggregate.numFailedTasks</strong>.</li>
-          <li>Configure: período = <strong>5 minutos</strong>, estatística = <strong>Sum</strong>.</li>
-          <li>Em <strong>Conditions</strong>: tipo = <strong>Static</strong>,
-          quando a métrica for <strong>Greater than</strong> <code>0</code>.</li>
-          <li>Em <strong>Actions</strong>:
+          <li><strong>Resumo</strong>: uma frase sobre o que aconteceu.</li>
+          <li><strong>Impacto</strong>: quantos usu&aacute;rios, qual receita, quanto tempo.</li>
+          <li><strong>Timeline</strong>: cronologia dos eventos (detec&ccedil;&atilde;o, mitiga&ccedil;&atilde;o, resolu&ccedil;&atilde;o).</li>
+          <li><strong>Root cause</strong>: an&aacute;lise de 5 whys ou equivalente.</li>
+          <li><strong>O que funcionou bem</strong>.</li>
+          <li><strong>O que funcionou mal</strong>.</li>
+          <li><strong>A&ccedil;&otilde;es corretivas</strong>: item, dono, prazo, link para ticket.</li>
+        </ol>
+      </section>
+
+      <!-- ============================================================
+           LAB
+      ============================================================= -->
+      <section class="content-block">
+        <h2>Laborat&oacute;rio AWS Student &mdash; 20h30 &ndash; 22h00</h2>
+        <p>
+          Na pr&aacute;tica, vamos transformar o pipeline Olist das aulas anteriores em um pipeline
+          confi&aacute;vel. Entraremos no AWS Student Lab, regi&atilde;o <strong>us-east-1</strong>, usando o
+          <code>LabRole</code> &mdash; que j&aacute; tem permiss&atilde;o para CloudWatch, SNS, SQS, Step Functions
+          e Glue.
+        </p>
+
+        <div class="warning">
+          <strong>Limita&ccedil;&atilde;o do AWS Student.</strong> O SNS no Learner Lab pode impor limite de
+          destinat&aacute;rios n&atilde;o verificados. Use um e-mail real e confirme imediatamente a
+          inscri&ccedil;&atilde;o quando receber o e-mail de subscription.
+        </div>
+
+        <h3>Lab 1 &mdash; Criar SNS <code>data-pipeline-alerts</code></h3>
+        <ol>
+          <li>Console AWS &rarr; <strong>Simple Notification Service (SNS)</strong> &rarr; <em>Topics</em> &rarr;
+          <em>Create topic</em>.</li>
+          <li>Type: <strong>Standard</strong>. Name: <code>data-pipeline-alerts</code>. Display name (opcional):
+          &ldquo;Olist Pipeline Alerts&rdquo;. Clique em <em>Create topic</em>.</li>
+          <li>Na p&aacute;gina do t&oacute;pico, clique em <em>Create subscription</em>.</li>
+          <li>Protocol: <strong>Email</strong>. Endpoint: seu e-mail real.</li>
+          <li>Abra o e-mail de confirma&ccedil;&atilde;o do AWS e clique em <em>Confirm subscription</em>.</li>
+          <li>De volta ao console, clique em <em>Publish message</em> com um texto qualquer para validar.</li>
+          <li>Anote o <strong>Topic ARN</strong> (algo como
+          <code>arn:aws:sns:us-east-1:&lt;account&gt;:data-pipeline-alerts</code>) &mdash; ser&aacute; usado nos
+          alarmes e no Step Functions.</li>
+        </ol>
+
+        <h3>Lab 2 &mdash; CloudWatch Alarms no Glue Job</h3>
+        <p>Alarmamos sobre as m&eacute;tricas do Glue Job <code>olist_raw_to_silver</code> criado na aula 05.</p>
+
+        <p><strong>Alarm A &mdash; job lento (&gt; 10 minutos)</strong></p>
+        <ol>
+          <li>Console &rarr; <strong>CloudWatch</strong> &rarr; <em>Alarms</em> &rarr; <em>Create alarm</em>.</li>
+          <li>Select metric &rarr; <strong>Glue</strong> &rarr; <strong>Job Metrics</strong> &rarr;
+          <code>glue.driver.aggregate.elapsedTime</code> para <code>JobName = olist_raw_to_silver</code>.</li>
+          <li>Statistic: <strong>Maximum</strong>. Period: <strong>1 minute</strong>.</li>
+          <li>Threshold type: Static. Condition: <em>Greater &gt;</em> <strong>600000</strong> (10 min em ms).</li>
+          <li>Datapoints to alarm: <strong>1 out of 1</strong>.</li>
+          <li>Notification: Existing SNS topic &rarr; <code>data-pipeline-alerts</code>.</li>
+          <li>Alarm name: <code>olist-glue-job-slow</code>. <em>Create alarm</em>.</li>
+        </ol>
+
+        <p><strong>Alarm B &mdash; tasks falharam</strong></p>
+        <ol>
+          <li>Repetir o fluxo de cria&ccedil;&atilde;o.</li>
+          <li>Select metric &rarr; <code>glue.driver.aggregate.numFailedTasks</code>.</li>
+          <li>Statistic: <strong>Sum</strong>. Period: <strong>1 minute</strong>. Threshold: <em>Greater &gt;</em>
+          <strong>0</strong>.</li>
+          <li>Notification: <code>data-pipeline-alerts</code>.</li>
+          <li>Alarm name: <code>olist-glue-job-failed-tasks</code>.</li>
+        </ol>
+
+        <h3>Lab 3 &mdash; SQS + DLQ no Lambda consumer</h3>
+        <ol>
+          <li>Console &rarr; <strong>SQS</strong> &rarr; <em>Create queue</em>. Type: Standard. Name:
+          <code>olist-events-dlq</code>. Aceite defaults. Create.</li>
+          <li>Criar outra fila: Name <code>olist-events-queue</code>. Na sess&atilde;o <em>Dead-letter queue</em>:
+          <ul>
+            <li><em>Set this queue to receive undeliverable messages from source queues</em>: n&atilde;o marque.</li>
+            <li>Abaixo, em <em>Dead-letter queue</em> &rarr; <em>Enabled</em>. Selecione <code>olist-events-dlq</code>.</li>
+            <li><em>Maximum receives</em>: <strong>3</strong>.</li>
+          </ul></li>
+          <li>Console &rarr; <strong>Lambda</strong> &rarr; fun&ccedil;&atilde;o da aula 04 (consumer do Kinesis).
+          <em>Configuration</em> &rarr; <em>Triggers</em> &rarr; <em>Add trigger</em>.</li>
+          <li>Source: <strong>SQS</strong>. Queue: <code>olist-events-queue</code>. Batch size: 5. Add.</li>
+          <li>Edite o c&oacute;digo da Lambda para fazer <code>raise Exception("invalid payload")</code> quando o JSON
+          n&atilde;o tiver <code>order_id</code>. Deploy.</li>
+          <li>No console do SQS, envie 10 mensagens em <code>olist-events-queue</code>: 8 v&aacute;lidas, 2 inv&aacute;lidas
+          (JSON sem <code>order_id</code>).</li>
+          <li>Ap&oacute;s ~1 minuto, verifique: as 2 mensagens inv&aacute;lidas aparecer&atilde;o em
+          <code>olist-events-dlq</code> (m&eacute;trica <em>ApproximateNumberOfMessages</em>).</li>
+        </ol>
+
+        <h3>Lab 4 &mdash; Ruleset DQDL no Glue Data Quality</h3>
+        <ol>
+          <li>Console &rarr; <strong>AWS Glue</strong> &rarr; <em>Data Catalog</em> &rarr; <em>Databases</em> &rarr;
+          selecione <code>olist_gold</code> &rarr; tabela <code>orders</code>.</li>
+          <li>Aba <em>Data quality</em> &rarr; <em>Create data quality rules</em>.</li>
+          <li>Cole o ruleset DQDL:</li>
+        </ol>
+        <pre><code>Rules = [
+    RowCount &gt; 100,
+    IsComplete "order_id",
+    IsUnique "order_id",
+    IsPrimaryKey "order_id",
+    IsComplete "customer_id",
+    ColumnValues "order_status" in [
+        "created","paid","shipped","delivered","canceled"
+    ],
+    ColumnValues "price" &gt; 0,
+    ColumnValues "price" &lt; 100000,
+    Completeness "customer_city" &gt; 0.98,
+    ColumnDataType "price" = "DOUBLE",
+    ColumnDataType "order_id" = "STRING",
+    ColumnCorrelation "price" "freight_value" &gt; 0.1
+]</code></pre>
+        <ol start="4">
+          <li>Ruleset name: <code>rs_olist_gold_orders</code>. Save.</li>
+          <li>Execute o ruleset: <em>Run</em>. Aguarde ~2 min. Verifique que todas as regras passam.</li>
+        </ol>
+
+        <h3>Lab 5 &mdash; Step Functions <code>olist-pipeline</code></h3>
+        <p>
+          Vamos orquestrar o pipeline com Retry e Catch em cada Task cr&iacute;tica. Console &rarr;
+          <strong>Step Functions</strong> &rarr; <em>Create state machine</em> &rarr; <em>Write your workflow in code</em>.
+          Type: <strong>Standard</strong>. Cole o ASL completo abaixo, ajustando ARNs para a sua conta.
+        </p>
+
+        <pre><code>{
+  "Comment": "Pipeline Olist com retry, catch e data quality",
+  "StartAt": "StartCrawler",
+  "States": {
+    "StartCrawler": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:glue:startCrawler",
+      "Parameters": { "Name": "olist_raw" },
+      "Retry": [{
+        "ErrorEquals": ["Glue.CrawlerRunningException","States.TaskFailed"],
+        "IntervalSeconds": 10,
+        "MaxAttempts": 3,
+        "BackoffRate": 2.0
+      }],
+      "Catch": [{
+        "ErrorEquals": ["States.ALL"],
+        "Next": "NotifyFailure",
+        "ResultPath": "$.error"
+      }],
+      "Next": "WaitForCrawler"
+    },
+    "WaitForCrawler": {
+      "Type": "Wait",
+      "Seconds": 60,
+      "Next": "RunRawToSilver"
+    },
+    "RunRawToSilver": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::glue:startJobRun.sync",
+      "Parameters": { "JobName": "olist_raw_to_silver" },
+      "Retry": [{
+        "ErrorEquals": [
+          "Glue.ConcurrentRunsExceededException",
+          "States.TaskFailed"
+        ],
+        "IntervalSeconds": 10,
+        "MaxAttempts": 3,
+        "BackoffRate": 2.0
+      }],
+      "Catch": [{
+        "ErrorEquals": ["States.ALL"],
+        "Next": "NotifyFailure",
+        "ResultPath": "$.error"
+      }],
+      "Next": "RunSilverToGold"
+    },
+    "RunSilverToGold": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::glue:startJobRun.sync",
+      "Parameters": { "JobName": "olist_silver_to_gold" },
+      "Retry": [{
+        "ErrorEquals": [
+          "Glue.ConcurrentRunsExceededException",
+          "States.TaskFailed"
+        ],
+        "IntervalSeconds": 10,
+        "MaxAttempts": 3,
+        "BackoffRate": 2.0
+      }],
+      "Catch": [{
+        "ErrorEquals": ["States.ALL"],
+        "Next": "NotifyFailure",
+        "ResultPath": "$.error"
+      }],
+      "Next": "CheckDataQuality"
+    },
+    "CheckDataQuality": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:glue:startDataQualityRulesetEvaluationRun",
+      "Parameters": {
+        "DataSource": {
+          "GlueTable": {
+            "DatabaseName": "olist_gold",
+            "TableName": "orders"
+          }
+        },
+        "Role": "LabRole",
+        "RulesetNames": ["rs_olist_gold_orders"]
+      },
+      "Retry": [{
+        "ErrorEquals": ["States.TaskFailed"],
+        "IntervalSeconds": 15,
+        "MaxAttempts": 2,
+        "BackoffRate": 2.0
+      }],
+      "Catch": [{
+        "ErrorEquals": ["States.ALL"],
+        "Next": "LogIncident",
+        "ResultPath": "$.error"
+      }],
+      "Next": "EvaluateDQResult"
+    },
+    "EvaluateDQResult": {
+      "Type": "Choice",
+      "Choices": [{
+        "Variable": "$.ResultIds[0]",
+        "IsPresent": true,
+        "Next": "NotifySuccess"
+      }],
+      "Default": "LogIncident"
+    },
+    "LogIncident": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::dynamodb:putItem",
+      "Parameters": {
+        "TableName": "pipeline_incidents",
+        "Item": {
+          "incident_id": { "S.$": "$$.Execution.Id" },
+          "timestamp": { "S.$": "$$.Execution.StartTime" },
+          "pipeline": { "S": "olist-pipeline" },
+          "error": { "S.$": "States.JsonToString($.error)" }
+        }
+      },
+      "Next": "NotifyFailure"
+    },
+    "NotifySuccess": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "TopicArn": "arn:aws:sns:us-east-1:&lt;ACCOUNT&gt;:data-pipeline-alerts",
+        "Subject": "[OLIST] Pipeline OK",
+        "Message": "Execu&ccedil;&atilde;o do olist-pipeline concluiu com DQ aprovado."
+      },
+      "End": true
+    },
+    "NotifyFailure": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "TopicArn": "arn:aws:sns:us-east-1:&lt;ACCOUNT&gt;:data-pipeline-alerts",
+        "Subject": "[OLIST] Pipeline FAIL",
+        "Message.$": "States.JsonToString($.error)"
+      },
+      "End": true
+    }
+  }
+}</code></pre>
+
+        <ol>
+          <li>Role: <strong>LabRole</strong>. Logging: ALL. Create state machine.</li>
+          <li>Clique em <em>Start execution</em>. Deixe o input vazio <code>{}</code>.</li>
+          <li>Acompanhe a visualiza&ccedil;&atilde;o gr&aacute;fica: cada estado acende em verde ao passar.</li>
+          <li>Ao final, voc&ecirc; recebe o e-mail do <code>data-pipeline-alerts</code>.</li>
+        </ol>
+
+        <div class="warning">
+          <strong>Tabela DynamoDB para incidentes.</strong> Crie a tabela <code>pipeline_incidents</code> com
+          partition key <code>incident_id</code> (String) antes de rodar, ou comente o estado <code>LogIncident</code>
+          se n&atilde;o for usar.
+        </div>
+
+        <h3>Lab 6 &mdash; Inje&ccedil;&atilde;o de falha proposital</h3>
+        <p><strong>Cen&aacute;rio 1 &mdash; Retry do Glue Job.</strong> Sem alterar o c&oacute;digo, induza um erro
+        transit&oacute;rio rodando duas execu&ccedil;&otilde;es do Step Functions simultaneamente. A segunda vai colidir
+        em <code>Glue.ConcurrentRunsExceededException</code>; observe o Retry atuando no timeline do Step Functions.</p>
+
+        <p><strong>Cen&aacute;rio 2 &mdash; Data Quality reprovando.</strong> Edite o job <code>silver_to_gold</code>
+        para dropar a coluna <code>customer_city</code> antes de gravar o Gold. Rode o pipeline. Quando chegar em
+        <code>CheckDataQuality</code>, a regra <code>Completeness "customer_city" &gt; 0.98</code> vai reprovar,
+        o <code>EvaluateDQResult</code> desvia para <code>LogIncident</code> e em seguida <code>NotifyFailure</code>
+        envia o e-mail. Restaure o job ao final.</p>
+
+        <h3>Lab 7 &mdash; Dashboard do pipeline no CloudWatch</h3>
+        <ol>
+          <li>Console &rarr; <strong>CloudWatch</strong> &rarr; <em>Dashboards</em> &rarr; <em>Create dashboard</em>.
+          Name: <code>olist-pipeline</code>.</li>
+          <li>Adicione widgets:
             <ul>
-              <li>Em caso de alarme, enviar notificação para um tópico SNS.</li>
-              <li>Clique em <strong>Create new topic</strong>.</li>
-              <li>Nome do tópico: <code>alertas-pipeline-dados</code>.</li>
-              <li>Email de notificação: insira seu email.</li>
-              <li>Clique em <strong>Create topic</strong>.</li>
+              <li><em>Line</em> &mdash; <code>glue.driver.aggregate.elapsedTime</code> dos jobs
+              <code>olist_raw_to_silver</code> e <code>olist_silver_to_gold</code>, janela de 7 dias.</li>
+              <li><em>Number</em> &mdash; <code>glue.driver.aggregate.numFailedTasks</code> &uacute;ltimas 24h.</li>
+              <li><em>Number</em> &mdash; execu&ccedil;&otilde;es do Step Functions:
+              <code>AWS/States.ExecutionsSucceeded</code> vs <code>ExecutionsFailed</code>.</li>
+              <li><em>Logs table</em> &mdash; Logs Insights em <code>/aws-glue/jobs/output</code> filtrando
+              <code>filter @message like /ERROR/</code>.</li>
+              <li><em>Number</em> &mdash; <code>ApproximateNumberOfMessagesVisible</code> da fila
+              <code>olist-events-dlq</code>.</li>
+              <li><em>Text</em> &mdash; link para o runbook do pipeline.</li>
             </ul>
           </li>
-          <li>Nome do alarme: <code>glue-job-failure-alert</code>.</li>
-          <li>Clique em <strong>Create alarm</strong>.</li>
-          <li>Verifique seu email e confirme a inscrição no SNS topic.</li>
-          <li><strong>Validação:</strong> o alarme aparece no painel do CloudWatch
-          com status <strong>OK</strong> (assumindo que o job não falhou recentemente).</li>
-        </ol>
-
-        <h3>Passo 3 — Criar um CloudWatch Dashboard</h3>
-        <ol>
-          <li>No CloudWatch, clique em <strong>Dashboards</strong> e depois em
-          <strong>Create dashboard</strong>.</li>
-          <li>Nome: <code>pipeline-monitoramento</code>.</li>
-          <li>Clique em <strong>Create dashboard</strong>.</li>
-          <li>Adicione um widget de <strong>Alarm status</strong> mostrando o alarme criado.</li>
-          <li>Adicione um widget de <strong>Metric</strong> mostrando o histórico de execuções
-          do Glue Job.</li>
-          <li>Salve o dashboard.</li>
-          <li><strong>Validação:</strong> o dashboard exibe o status do alarme e as métricas
-          do job em uma única tela.</li>
+          <li>Save dashboard.</li>
         </ol>
       </section>
 
-      <!-- =========================================================
-           EXERCÍCIOS DE FIXAÇÃO
-      ========================================================== -->
+      <!-- ============================================================
+           EXERCICIOS
+      ============================================================= -->
       <section class="content-block">
-        <h2>Exercícios de fixação</h2>
+        <h2>Exerc&iacute;cios de fixa&ccedil;&atilde;o</h2>
         <ol>
           <li>
-            <strong>Definindo SLOs para um pipeline:</strong> um pipeline de dados alimenta
-            um dashboard de vendas que é consultado pelo time comercial toda manhã às 08h.
-            Os dados vêm de um RDS via CDC, passam por um Glue Job de transformação,
-            e são carregados no Redshift. Defina dois SLOs para esse pipeline —
-            um de freshness e um de completeness — especificando: o SLI exato, o objetivo
-            numérico, a janela de avaliação, e como você mediria cada SLI tecnicamente.
+            <strong>Defini&ccedil;&atilde;o formal de SLO.</strong> Para o dataset <code>gold.customers</code> do pipeline
+            Olist, defina tr&ecirc;s SLOs completos (SLI, alvo, janela, escopo) cobrindo freshness, completeness e
+            accuracy. Justifique o alvo escolhido em cada um, considerando o uso pelo time de BI para relat&oacute;rios
+            di&aacute;rios.
           </li>
           <li>
-            <strong>MWAA versus Step Functions:</strong> uma empresa está decidindo entre
-            MWAA e Step Functions para orquestrar um pipeline que: roda diariamente,
-            tem 15 etapas sequenciais, usa Glue Jobs, Lambda e ECS Tasks, e precisa
-            de reexecução manual de etapas individuais quando algo falha. Liste os critérios
-            decisivos para cada opção e faça uma recomendação fundamentada.
+            <strong>C&aacute;lculo de error budget.</strong> Um pipeline tem SLO de availability de 99.5% em uma janela
+            de 30 dias (execu&ccedil;&otilde;es agendadas hor&aacute;rias, 24&times;7). Quantos minutos totais de
+            indisponibilidade o error budget permite por m&ecirc;s? Se uma falha recente consumiu 3 horas de budget,
+            quantos % do budget mensal ainda restam? Que a&ccedil;&otilde;es o time deveria tomar com 10% de budget
+            restante na metade do m&ecirc;s?
           </li>
           <li>
-            <strong>Retry storm e solução:</strong> um pipeline processa 500 jobs paralelos.
-            Todos falham simultaneamente devido a um throttling da AWS. Os jobs são configurados
-            para retry imediato após 1 segundo. Explique o que acontece a seguir (retry storm),
-            por que isso piora o problema, e como configurar exponential backoff com jitter
-            para evitar essa situação.
+            <strong>Escolha de framework de DQ.</strong> Compare AWS Glue Data Quality, Great Expectations e dbt tests
+            em cinco dimens&otilde;es: (a) curva de aprendizado, (b) integra&ccedil;&atilde;o com AWS, (c) expressividade
+            das regras, (d) alertas, (e) custo. Para uma empresa que j&aacute; usa dbt no Redshift e quer adicionar
+            DQ ao Gold do Data Lake em S3, qual seria sua recomenda&ccedil;&atilde;o e por qu&ecirc;?
           </li>
           <li>
-            <strong>Investigação de incidente com CloudWatch:</strong> às 03h, o alarme de
-            falha do Glue Job disparou. Descreva o processo de investigação passo a passo:
-            quais logs você consultaria, quais métricas você observaria, como distinguiria
-            uma falha transitória de uma falha sistemática, e qual seria o critério para
-            decidir entre reprocessar automaticamente ou escalar para a equipe.
+            <strong>Escreva um DQDL.</strong> Para a tabela <code>gold.order_items</code> com colunas
+            <code>order_id</code>, <code>product_id</code>, <code>seller_id</code>, <code>shipping_limit_date</code>,
+            <code>price</code> (decimal) e <code>freight_value</code> (decimal), escreva um ruleset DQDL completo com
+            pelo menos 8 regras. Justifique a escolha de cada regra em termos de neg&oacute;cio.
           </li>
           <li>
-            <strong>Data quality como SLO:</strong> além de freshness e completeness,
-            proponha dois SLOs de qualidade de dados para um pipeline de ingestão de
-            transações financeiras. Para cada SLO, especifique: o que é medido, como
-            implementar a medição tecnicamente na AWS (serviço, métrica), o valor alvo,
-            e a ação automática a ser tomada quando o SLO for violado.
+            <strong>Desenho de Step Functions.</strong> Desenhe um workflow Step Functions (em texto narrativo, com os
+            nomes dos estados e transi&ccedil;&otilde;es) para um pipeline que: (a) lista arquivos em S3, (b) processa
+            cada arquivo em paralelo (Map state) com at&eacute; 10 execu&ccedil;&otilde;es simult&acirc;neas, (c) se
+            qualquer arquivo falhar ap&oacute;s 3 retries, envia para uma &ldquo;quarentena&rdquo; em S3 e continua
+            com os demais, (d) ao final, gera um relat&oacute;rio consolidado no DynamoDB.
+          </li>
+          <li>
+            <strong>Analise um postmortem.</strong> Leia o postmortem p&uacute;blico do incidente do Slack de 04/01/2021
+            (dispon&iacute;vel em <code>slack.engineering</code>). Identifique: (a) qual foi o SLI degradado,
+            (b) se havia SLO expl&iacute;cito, (c) qual foi a root cause, (d) quais a&ccedil;&otilde;es corretivas
+            eles listaram, (e) dois elementos que caracterizam o postmortem como &ldquo;blameless&rdquo;.
+          </li>
+          <li>
+            <strong>Retry seguro.</strong> Um job ETL l&ecirc; eventos do Kinesis, agrega por <code>customer_id</code>
+            e grava no DynamoDB via <code>PutItem</code>. Se o job falhar no meio da execu&ccedil;&atilde;o e for
+            reexecutado do in&iacute;cio, que problemas podem acontecer? Proponha duas estrat&eacute;gias para tornar
+            o job idempotente e explique em quais circunst&acirc;ncias cada uma &eacute; apropriada.
+          </li>
+          <li>
+            <strong>Dashboard executivo.</strong> Projete um dashboard CloudWatch para o diretor de dados que mostre,
+            em uma &uacute;nica tela, a sa&uacute;de do pipeline Olist ponta a ponta. Liste pelo menos 8 widgets,
+            especifique a m&eacute;trica, a agrega&ccedil;&atilde;o e o per&iacute;odo de cada um, e justifique a
+            escolha em fun&ccedil;&atilde;o do p&uacute;blico (n&atilde;o t&eacute;cnico, interesse em
+            impacto de neg&oacute;cio).
           </li>
         </ol>
       </section>
 
+      <!-- ============================================================
+           FOOTER
+      ============================================================= -->
       <footer class="actions">
         <a class="button" href="../slides/slide_aula_07_data_reliability_e_sre_aplicados_a_pipelines_de_dados.html">Voltar ao slide</a>
-        <a class="button" href="../../../index.html">Voltar ao índice</a>
+        <a class="button" href="../../../index.html">Voltar ao &iacute;ndice</a>
       </footer>
 
     </main>

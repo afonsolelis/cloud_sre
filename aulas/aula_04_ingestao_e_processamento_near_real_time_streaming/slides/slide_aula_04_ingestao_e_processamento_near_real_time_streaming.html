@@ -4,28 +4,32 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" />
-  <title>Aula 04 — Ingestao e Processamento Near Real-time com Streaming</title>
+  <title>Aula 04 — Ingestão e Processamento Near Real-time (Streaming)</title>
   <link href="../../../assets/slides.css" rel="stylesheet">
-  <style data-design-tokens>:root{--bg:#fff;--color:#000000}body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}a:hover{opacity:.8}a:focus{outline:2px solid #000000}</style>
+  <style data-design-tokens>:root{--bg:#fff;--color:#000000}body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}a:hover{opacity:.8}a:focus{outline:2px solid #000000}pre{background:#f3f4f6;border:2px solid #111;border-radius:6px;padding:12px 14px;font-size:.78em;line-height:1.45;overflow:auto;margin:0}code{font-family:"Courier New",monospace}</style>
 </head>
 <body>
   <div class="slide-container">
 
-    <!-- SLIDE 1 — CAPA -->
+    <!-- ============================================================ -->
+    <!-- SLIDE 1 - CAPA                                               -->
+    <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
           <img class="deck-logo-full" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_e4vyyw.png" alt="Universidade Presbiteriana Mackenzie" />
-          <span class="deck-kicker">Cloud Computing e SRA</span>
-          <h1 class="deck-title">Ingestao e Processamento Near Real-time com Streaming</h1>
-          <p class="deck-meta">Aula 04 • 07/05/2026</p>
+          <span class="deck-kicker">Cloud Computing e SRA &mdash; MBA Engenharia de Dados</span>
+          <h1 class="deck-title">Ingestão e Processamento Near Real-time (Streaming)</h1>
+          <p class="deck-meta">Aula 04 &nbsp;&bull;&nbsp; 07/05/2026 &nbsp;&bull;&nbsp; 19h00 &ndash; 22h00</p>
           <p class="deck-year">2026</p>
-          <p class="deck-subtitle">Arquitetura de ingestao continua com eventos, logs e processamento distribuido na AWS.</p>
+          <p class="deck-subtitle">Do batch ao contínuo: como capturar eventos enquanto eles acontecem usando Kinesis, Firehose e Lambda.</p>
         </div>
       </div>
     </div>
 
-    <!-- SLIDE 2 — AGENDA -->
+    <!-- ============================================================ -->
+    <!-- SLIDE 2 - AGENDA                                             -->
+    <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
@@ -34,83 +38,988 @@
         </div>
         <div class="deck-grid">
           <article class="deck-card">
-            <h3>Bloco 1</h3>
+            <h3>19h00 &ndash; 20h30 &middot; Teoria</h3>
             <ul>
-              <li>Logs e eventos em tempo real.</li>
-              <li>Kinesis Data Streams e Data Firehose.</li>
+              <li>Recap das Aulas 01 a 03 e onde streaming se encaixa</li>
+              <li>Batch, micro-batch e streaming</li>
+              <li>Produtor, broker, consumidor e janelas</li>
+              <li>Garantias de entrega e idempotência</li>
+              <li>Kinesis Data Streams, Firehose e Lambda</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>Bloco 2</h3>
+            <h3>20h30 &ndash; 22h00 &middot; Prática AWS Student</h3>
             <ul>
-              <li>Entrega no S3 com particionamento automatico.</li>
-              <li>Latencia, throughput e custo.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Bloco 3</h3>
-            <ul>
-              <li>Panorama de Spark e Hadoop no EMR.</li>
-              <li>Integracao com o restante do Data Lake.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Entrega esperada</h3>
-            <ul>
-              <li>Fluxo inicial de streaming configurado.</li>
-              <li>Entendimento dos componentes de ingestao continua.</li>
+              <li>Criar stream <code>olist-eventos</code> (1 shard)</li>
+              <li>Produtor Python em CloudShell</li>
+              <li>Firehose &rarr; S3 em Parquet</li>
+              <li>Lambda consumer &rarr; DynamoDB</li>
+              <li>Athena + CloudWatch</li>
             </ul>
           </article>
         </div>
       </div>
     </div>
 
-    <!-- SLIDE 3 — PLACEHOLDER -->
+    <!-- ============================================================ -->
+    <!-- SLIDE 3 - PLACEHOLDER / ONDE ESTAMOS                         -->
+    <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Placeholder</span>
-          <h2 class="deck-title">Slide inicial para evolucao do conteudo</h2>
-          <p class="deck-summary">Estrutura pronta para receber fluxos, diagramas de ingestao e exemplos de particionamento por evento.</p>
+          <span class="deck-kicker">Ponto de partida</span>
+          <h2 class="deck-title">Onde estamos na jornada Olist</h2>
+          <p class="deck-summary">Nas Aulas 01 a 03 montamos base, data lake e fontes. Agora o dado chega em movimento, evento por evento.</p>
         </div>
         <div class="deck-placeholder">
           <div class="deck-panel">
-            <strong>Conteudo a desenvolver</strong>
+            <strong>Construído até aqui</strong>
             <ul>
-              <li>Arquitetura de eventos ponta a ponta.</li>
-              <li>Diferencas praticas entre Streams e Firehose.</li>
-              <li>Casos de uso para EMR no pipeline.</li>
+              <li>Aula 01 &mdash; conta AWS, IAM, buckets raw/trusted/refined</li>
+              <li>Aula 02 &mdash; data lake Olist no S3 e consultas Athena</li>
+              <li>Aula 03 &mdash; fontes relacionais (RDS) e NoSQL (DynamoDB)</li>
             </ul>
           </div>
           <div class="deck-panel">
-            <strong>Proximos incrementos</strong>
+            <strong>O que falta</strong>
             <ul>
-              <li>Adicionar fluxo visual ate o S3.</li>
-              <li>Inserir checklist do laboratorio.</li>
-              <li>Detalhar escolhas de desenho tecnico.</li>
+              <li>Capturar eventos enquanto eles acontecem</li>
+              <li>Abastecer raw/streaming em paralelo ao batch</li>
+              <li>Reagir em segundos, não em horas</li>
             </ul>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 4 - RECAP CONEXAO                                      -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Recap &middot; Aulas 01 a 03</span>
+          <h2 class="deck-title">Do dado parado ao dado em movimento</h2>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr>
+              <th>Aula</th>
+              <th>Fonte</th>
+              <th>Padrão de ingestão</th>
+              <th>Frequência</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>02</td><td>Arquivos CSV Olist</td><td>Upload em lote no S3</td><td>Diária</td></tr>
+            <tr><td>03</td><td>RDS PostgreSQL</td><td>Extração via SQL ou DMS</td><td>Horária</td></tr>
+            <tr><td>03</td><td>DynamoDB</td><td>Export S3 / Streams</td><td>Sob demanda</td></tr>
+            <tr><td><strong>04</strong></td><td><strong>Clickstream, logs, IoT</strong></td><td><strong>Streaming contínuo</strong></td><td><strong>Segundos</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 5 - POR QUE STREAMING                                  -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Motivação</span>
+          <h2 class="deck-title">Por que streaming importa para Olist</h2>
+          <p class="deck-summary">Decisões que dependem do evento recém-ocorrido não cabem em um job batch de 24h.</p>
+        </div>
+        <div class="deck-grid">
+          <article class="deck-card">
+            <h3>Casos de uso</h3>
+            <ul>
+              <li>Clickstream: cliente entra no produto</li>
+              <li>Carrinho abandonado em 10 minutos</li>
+              <li>Detecção de fraude em pagamento</li>
+              <li>Alerta de estoque e logística</li>
+              <li>Dashboards em tempo quase real</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Valor de negócio</h3>
+            <ul>
+              <li>Agir antes do cliente sair do site</li>
+              <li>Recomendar agora, não amanhã</li>
+              <li>Operar com menos latência entre causa e resposta</li>
+              <li>Complementar o batch, não substituir</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 6 - BATCH VS MICRO-BATCH VS STREAMING                  -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Espectro de latência</span>
+          <h2 class="deck-title">Batch, micro-batch e streaming</h2>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr>
+              <th>Dimensão</th>
+              <th>Batch</th>
+              <th>Micro-batch</th>
+              <th>Streaming</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Latência</td><td>Horas</td><td>Segundos a minutos</td><td>Milissegundos a segundos</td></tr>
+            <tr><td>Unidade</td><td>Arquivo ou tabela</td><td>Pequena janela</td><td>Evento individual</td></tr>
+            <tr><td>Throughput</td><td>Muito alto</td><td>Alto</td><td>Alto se bem dimensionado</td></tr>
+            <tr><td>Exemplo AWS</td><td>EMR, Glue</td><td>Spark Structured Streaming, Firehose</td><td>Kinesis, Lambda, Flink</td></tr>
+            <tr><td>Complexidade</td><td>Baixa</td><td>Média</td><td>Alta</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 7 - LATENCIA VS THROUGHPUT                             -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Trade-offs</span>
+          <h2 class="deck-title">Latência vs throughput</h2>
+          <p class="deck-summary">Não existe sistema que maximize ambos ao mesmo tempo: você escolhe o ponto de operação.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Latência baixa</strong>
+            <ul>
+              <li>Processar o evento tão logo ele chega</li>
+              <li>Buffers pequenos, commits rápidos</li>
+              <li>Custo por evento mais alto</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Throughput alto</strong>
+            <ul>
+              <li>Agregar eventos em lotes maiores</li>
+              <li>Menos overhead de rede e serialização</li>
+              <li>Custo por evento mais baixo</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 8 - METAFORA DINAMICA DO AVIAO                         -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Metáfora</span>
+          <h2 class="deck-title">Dinâmica do avião aplicada a streaming</h2>
+          <p class="deck-summary">Lembra da esteira de bagagem? Ela volta como modelo mental de produtor, broker e consumidor.</p>
+        </div>
+        <div class="deck-grid">
+          <article class="deck-card">
+            <h3>Produtor &middot; check-in</h3>
+            <ul>
+              <li>Aplicação web, app mobile, IoT</li>
+              <li>Gera o evento e entrega ao broker</li>
+              <li>Não espera o consumidor ler</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Broker &middot; esteira</h3>
+            <ul>
+              <li>Kinesis, Kafka, MSK</li>
+              <li>Mantém a ordem por partição</li>
+              <li>Guarda o evento por um tempo</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Consumidor &middot; balcão</h3>
+            <ul>
+              <li>Lambda, Firehose, Flink</li>
+              <li>Lê no próprio ritmo</li>
+              <li>Marca onde parou (checkpoint)</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Separação de tempos</h3>
+            <ul>
+              <li>Produtor e consumidor não se conhecem</li>
+              <li>Broker absorve picos</li>
+              <li>Acoplamento fraco, escala independente</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 9 - ANATOMIA DE EVENTO                                 -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria</span>
+          <h2 class="deck-title">Anatomia de um evento</h2>
+          <p class="deck-summary">Todo evento carrega identidade, tempo, chave de partição e payload. Projete bem desde o início.</p>
+        </div>
+        <div class="deck-panel">
+          <strong>Exemplo &mdash; evento de clickstream Olist</strong>
+<pre><code>{
+  "event_id": "6f3a...",
+  "event_time": "2026-05-07T19:41:12Z",
+  "session_id": "sess-1823",
+  "customer_id": "cust-9981",
+  "product_id": "prod-4421",
+  "category": "bed_bath_table",
+  "action": "add_to_cart",
+  "price": 129.90
+}</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 10 - JANELAS                                           -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Windowing</span>
+          <h2 class="deck-title">Tipos de janela</h2>
+          <p class="deck-summary">Streaming puro trata um evento por vez, mas agregações exigem agrupar eventos em janelas de tempo.</p>
+        </div>
+        <div class="deck-grid">
+          <article class="deck-card">
+            <h3>Tumbling</h3>
+            <ul>
+              <li>Janelas fixas e sem sobreposição</li>
+              <li>Ex.: vendas a cada 1 minuto</li>
+              <li><code>[0-60) [60-120) [120-180)</code></li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Sliding</h3>
+            <ul>
+              <li>Janelas com sobreposição</li>
+              <li>Ex.: média dos últimos 5 min a cada 1 min</li>
+              <li>Mais suave, mais cálculo</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Session</h3>
+            <ul>
+              <li>Agrupa por inatividade</li>
+              <li>Fecha quando usuário fica ocioso</li>
+              <li>Ideal para navegação em site</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Como escolher</h3>
+            <ul>
+              <li>Métricas regulares &rarr; tumbling</li>
+              <li>Alertas com suavização &rarr; sliding</li>
+              <li>Comportamento de usuário &rarr; session</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 11 - EVENT TIME VS PROCESSING TIME                     -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Tempo</span>
+          <h2 class="deck-title">Event time vs processing time</h2>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Event time</strong>
+            <ul>
+              <li>Quando o fato aconteceu</li>
+              <li>Está dentro do próprio evento</li>
+              <li>Invariante ao atraso de rede</li>
+              <li>Correto para relatórios de negócio</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Processing time</strong>
+            <ul>
+              <li>Quando o sistema leu o evento</li>
+              <li>Depende da fila e do consumidor</li>
+              <li>Sensível a backlog e lentidão</li>
+              <li>Útil para SLAs operacionais</li>
+            </ul>
+          </div>
+        </div>
+        <div class="deck-callout">
+          <strong>Watermark</strong><br>
+          Marca até que ponto no tempo o sistema confia que já viu todos os eventos. Janelas só fecham depois do watermark passar.
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 12 - GARANTIAS DE ENTREGA                              -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Garantias</span>
+          <h2 class="deck-title">At-most-once, at-least-once, exactly-once</h2>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr>
+              <th>Garantia</th>
+              <th>Pode perder?</th>
+              <th>Pode duplicar?</th>
+              <th>Custo</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>At-most-once</td><td>Sim</td><td>Não</td><td>Baixo</td></tr>
+            <tr><td>At-least-once</td><td>Não</td><td>Sim</td><td>Médio</td></tr>
+            <tr><td>Exactly-once</td><td>Não</td><td>Não</td><td>Alto (transacional)</td></tr>
+          </tbody>
+        </table>
+        <div class="deck-callout">
+          Kinesis entrega <strong>at-least-once</strong> por padrão. Cabe ao consumidor ser <strong>idempotente</strong>.
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 13 - BACKPRESSURE E IDEMPOTENCIA                       -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Robustez</span>
+          <h2 class="deck-title">Backpressure e idempotência</h2>
+        </div>
+        <div class="deck-grid">
+          <article class="deck-card">
+            <h3>Backpressure</h3>
+            <ul>
+              <li>Consumidor mais lento que produtor</li>
+              <li>Fila cresce, latência cresce</li>
+              <li>Resposta: escalar shards ou consumidores</li>
+              <li>Métrica chave: <code>IteratorAge</code></li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Idempotência</h3>
+            <ul>
+              <li>Processar duas vezes deve dar o mesmo resultado</li>
+              <li>Usar chave única (<code>event_id</code>)</li>
+              <li>Upsert em vez de insert cego</li>
+              <li>Essencial em at-least-once</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 14 - AMAZON KINESIS DATA STREAMS                       -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">AWS &middot; Kinesis Data Streams</span>
+          <h2 class="deck-title">Kinesis Data Streams</h2>
+          <p class="deck-summary">Broker de eventos gerenciado pela AWS, com o conceito central de <strong>shard</strong>.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Capacidade por shard</strong>
+            <ul>
+              <li>Escrita: 1 MB/s ou 1000 registros/s</li>
+              <li>Leitura: 2 MB/s por shard</li>
+              <li>Escala aumentando shards</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Retenção</strong>
+            <ul>
+              <li>Padrão: 24h</li>
+              <li>Máximo: até 365 dias</li>
+              <li>Permite reprocessar histórico recente</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 15 - SHARDS E PARTITION KEY                            -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Kinesis &middot; Internals</span>
+          <h2 class="deck-title">Shards e partition key</h2>
+          <p class="deck-summary">O shard é a unidade de paralelismo. A partition key determina em qual shard cada evento cai.</p>
+        </div>
+        <div class="deck-panel">
+          <strong>Regras práticas</strong>
+          <ul>
+            <li>Partition key com <strong>alta cardinalidade</strong> distribui melhor</li>
+            <li>Eventos com mesma key vão para o mesmo shard e preservam ordem</li>
+            <li><strong>Hot shard</strong>: uma key concentra tráfego e satura o shard</li>
+            <li>Para Olist, <code>customer_id</code> costuma ser uma boa partition key</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 16 - KINESIS DATA FIREHOSE                             -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">AWS &middot; Firehose</span>
+          <h2 class="deck-title">Kinesis Data Firehose</h2>
+          <p class="deck-summary">Entrega gerenciada para S3, Redshift, OpenSearch e parceiros. Sem shards para gerenciar.</p>
+        </div>
+        <div class="deck-grid">
+          <article class="deck-card">
+            <h3>Recursos</h3>
+            <ul>
+              <li>Buffering por tempo ou tamanho</li>
+              <li>Conversão para Parquet / ORC</li>
+              <li>Compressão e criptografia</li>
+              <li>Transformação com Lambda</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Quando usar</h3>
+            <ul>
+              <li>Aterrissar eventos no data lake</li>
+              <li>Near real-time, não real-time puro</li>
+              <li>Sem necessidade de replay fino</li>
+              <li>Custo menor que Streams puro</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 17 - LAMBDA COMO CONSUMER                              -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">AWS &middot; Lambda</span>
+          <h2 class="deck-title">Lambda como consumer de Kinesis</h2>
+          <p class="deck-summary">Event source mapping liga shards a funções Lambda automaticamente.</p>
+        </div>
+        <div class="deck-panel">
+          <strong>Como funciona</strong>
+          <ul>
+            <li>Lambda polla o shard em seu nome</li>
+            <li>Envia batches de até 10.000 registros</li>
+            <li>Commit de checkpoint após sucesso</li>
+            <li>Retry configurável, <code>BisectBatchOnFunctionError</code>, DLQ</li>
+            <li>Concorrência limitada pelo número de shards</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 18 - SERVERLESS PARA STREAMING                         -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Serverless</span>
+          <h2 class="deck-title">Características serverless em streaming</h2>
+          <p class="deck-summary">Lambda e Firehose seguem o mesmo modelo mental: stateless, efêmero, event-driven e por consumo.</p>
+        </div>
+        <div class="deck-grid">
+          <article class="deck-card">
+            <h3>Stateless</h3>
+            <ul>
+              <li>Cada execução é independente</li>
+              <li>Estado vai para S3, DynamoDB ou ElastiCache</li>
+              <li>Fácil de escalar horizontalmente</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Efêmero</h3>
+            <ul>
+              <li>O container vive minutos</li>
+              <li>Arquivos temporários em <code>/tmp</code> somem</li>
+              <li>Não confie em cache local</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Event-driven</h3>
+            <ul>
+              <li>Dispara em resposta a eventos</li>
+              <li>Kinesis, S3, SQS, EventBridge</li>
+              <li>Integra naturalmente com broker</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Cobrança por uso</h3>
+            <ul>
+              <li>Lambda: por GB-s e invocação</li>
+              <li>Firehose: por GB processado</li>
+              <li>Sem cobrança quando ocioso</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 19 - KINESIS VS KAFKA/MSK                              -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Comparação</span>
+          <h2 class="deck-title">Kinesis vs Kafka / MSK</h2>
+          <p class="deck-summary">Mesmo modelo mental, ergonomias diferentes. No Learner Lab usamos Kinesis (MSK geralmente bloqueado).</p>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr>
+              <th>Aspecto</th>
+              <th>Kinesis</th>
+              <th>Kafka / MSK</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Unidade</td><td>Shard</td><td>Partition</td></tr>
+            <tr><td>Gerenciamento</td><td>Totalmente AWS</td><td>Cluster (MSK simplifica)</td></tr>
+            <tr><td>Retenção</td><td>Até 365 dias</td><td>Configurável (também longa)</td></tr>
+            <tr><td>Ecossistema</td><td>AWS nativo</td><td>Confluent, Flink, open source</td></tr>
+            <tr><td>Vendor lock-in</td><td>Alto</td><td>Baixo</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 20 - ARQUITETURAS LAMBDA E KAPPA                       -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Padrões de arquitetura</span>
+          <h2 class="deck-title">Lambda architecture e Kappa architecture</h2>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Lambda architecture</strong>
+            <ul>
+              <li>Duas trilhas: batch e streaming (speed)</li>
+              <li>Batch recalcula tudo periodicamente</li>
+              <li>Streaming complementa o último intervalo</li>
+              <li>Robusto, porém duplica código</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Kappa architecture</strong>
+            <ul>
+              <li>Uma única trilha: streaming</li>
+              <li>Reprocessar é reler o log</li>
+              <li>Requer broker com retenção longa</li>
+              <li>Mais simples, exige disciplina</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 21 - ARQUITETURA DO LAB                                -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; 20h30 &ndash; 22h00</span>
+          <h2 class="deck-title">Arquitetura do laboratório</h2>
+          <p class="deck-summary">Vamos montar ponta a ponta: produtor &rarr; Kinesis &rarr; Firehose &rarr; S3 + Lambda &rarr; DynamoDB.</p>
+        </div>
+        <div class="deck-panel">
+          <strong>Fluxo</strong>
+<pre><code>CloudShell (Python + boto3)
+      |
+      | put_record
+      v
+Kinesis Data Stream  olist-eventos  (1 shard)
+      |                          |
+      | Firehose delivery        | Event source mapping
+      v                          v
+S3  raw/streaming/              Lambda  consumer
+(Parquet, buffer 60s)           |
+      |                         v
+      v                  DynamoDB  aggregates
+Athena (database olist_streaming)</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 22 - PASSO 1 CRIAR STREAM                              -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Lab &middot; Passo 1</span>
+          <h2 class="deck-title">Criar o Kinesis Data Stream</h2>
+        </div>
+        <div class="deck-panel">
+          <strong>Console</strong>
+          <ol>
+            <li>Abra <strong>Kinesis</strong> na região <strong>us-east-1</strong>.</li>
+            <li>Clique em <strong>Create data stream</strong>.</li>
+            <li>Nome: <code>olist-eventos</code>.</li>
+            <li>Capacity mode: <strong>Provisioned</strong>, 1 shard.</li>
+            <li>Confirme e aguarde status <strong>Active</strong>.</li>
+          </ol>
+        </div>
+        <div class="deck-panel">
+          <strong>Alternativa &mdash; AWS CLI</strong>
+<pre><code>aws kinesis create-stream \
+  --stream-name olist-eventos \
+  --shard-count 1 \
+  --region us-east-1</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 23 - PASSO 2 AMBIENTE PYTHON                           -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Lab &middot; Passo 2</span>
+          <h2 class="deck-title">Preparar ambiente Python</h2>
+          <p class="deck-summary">CloudShell já vem com Python e boto3. EC2 <code>t3.micro</code> é alternativa se quiser rodar mais tempo.</p>
+        </div>
+        <div class="deck-panel">
+          <strong>CloudShell</strong>
+<pre><code>python3 -V
+pip3 install --user boto3
+aws s3 cp s3://&lt;aluno&gt;-raw/olist/olist_order_items_dataset.csv .
+ls -lh olist_order_items_dataset.csv</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 24 - PASSO 3 PRODUTOR                                  -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Lab &middot; Passo 3</span>
+          <h2 class="deck-title">Produtor Python</h2>
+        </div>
+        <div class="deck-panel">
+          <strong>producer.py (trecho)</strong>
+<pre><code>import boto3, csv, json, random, time, uuid
+from datetime import datetime, timezone
+
+STREAM = "olist-eventos"
+ACTIONS = ["view", "add_to_cart", "checkout", "purchase"]
+client = boto3.client("kinesis", region_name="us-east-1")
+
+with open("olist_order_items_dataset.csv") as f:
+    rows = list(csv.DictReader(f))
+
+while True:
+    row = random.choice(rows)
+    event = {
+      "event_id": str(uuid.uuid4()),
+      "event_time": datetime.now(timezone.utc).isoformat(),
+      "customer_id": f"cust-{random.randint(1,500)}",
+      "product_id": row["product_id"],
+      "action": random.choice(ACTIONS),
+      "price": float(row["price"]),
+    }
+    client.put_record(
+      StreamName=STREAM,
+      Data=json.dumps(event).encode("utf-8"),
+      PartitionKey=event["customer_id"],
+    )
+    time.sleep(0.2)</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 25 - PASSO 4 FIREHOSE                                  -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Lab &middot; Passo 4</span>
+          <h2 class="deck-title">Firehose com destino S3</h2>
+        </div>
+        <div class="deck-panel">
+          <strong>Configuração</strong>
+          <ol>
+            <li><strong>Source</strong>: Amazon Kinesis Data Streams &rarr; <code>olist-eventos</code>.</li>
+            <li><strong>Destination</strong>: Amazon S3, bucket <code>&lt;aluno&gt;-raw</code>, prefix <code>streaming/olist-eventos/</code>.</li>
+            <li><strong>Buffer</strong>: 1 MB ou 60 s (o que vier primeiro).</li>
+            <li><strong>Formato</strong>: Parquet (exige tabela no Glue Catalog).</li>
+            <li><strong>IAM role</strong>: <code>LabRole</code> (Learner Lab).</li>
+          </ol>
+        </div>
+        <div class="deck-callout">
+          <strong>Nome sugerido</strong>: <code>olist-eventos-to-s3</code>. Revise permissões do <code>LabRole</code> antes de criar.
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 26 - PASSO 5 CATALOG E ATHENA                          -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Lab &middot; Passo 5</span>
+          <h2 class="deck-title">Glue Catalog e Athena</h2>
+        </div>
+        <div class="deck-panel">
+          <strong>Passo a passo</strong>
+          <ol>
+            <li>No Glue, crie o database <code>olist_streaming</code>.</li>
+            <li>Crie um Crawler apontando para <code>s3://&lt;aluno&gt;-raw/streaming/olist-eventos/</code>.</li>
+            <li>Execute o Crawler e verifique a tabela criada.</li>
+            <li>No Athena, selecione o database e rode a query de validação.</li>
+          </ol>
+        </div>
+        <div class="deck-panel">
+          <strong>Query de validação</strong>
+<pre><code>SELECT action, COUNT(*) AS eventos
+FROM olist_streaming.olist_eventos
+GROUP BY action
+ORDER BY eventos DESC;</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 27 - PASSO 6 LAMBDA CONSUMER                           -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Lab &middot; Passo 6</span>
+          <h2 class="deck-title">Lambda consumer &rarr; DynamoDB</h2>
+        </div>
+        <div class="deck-panel">
+          <strong>Preparativos</strong>
+          <ol>
+            <li>Crie a tabela DynamoDB <code>olist_eventos_agg</code>, chave <code>action</code> (String).</li>
+            <li>Crie a função Lambda <code>olist-stream-consumer</code>, runtime Python 3.x, role <code>LabRole</code>.</li>
+            <li>Configure um <strong>Kinesis trigger</strong> apontando para <code>olist-eventos</code>, batch size 100.</li>
+          </ol>
+        </div>
+        <div class="deck-panel">
+          <strong>lambda_function.py</strong>
+<pre><code>import base64, json, boto3
+ddb = boto3.resource("dynamodb").Table("olist_eventos_agg")
+
+def lambda_handler(event, context):
+    for r in event["Records"]:
+        data = json.loads(base64.b64decode(r["kinesis"]["data"]))
+        ddb.update_item(
+          Key={"action": data["action"]},
+          UpdateExpression="ADD contagem :one",
+          ExpressionAttributeValues={":one": 1},
+        )
+    return {"processed": len(event["Records"])}</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 28 - PASSO 7 CLOUDWATCH                                -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Lab &middot; Passo 7</span>
+          <h2 class="deck-title">Observabilidade com CloudWatch</h2>
+        </div>
+        <div class="deck-grid">
+          <article class="deck-card">
+            <h3>Métricas do stream</h3>
+            <ul>
+              <li><code>IncomingRecords</code> &mdash; volume entrando</li>
+              <li><code>IncomingBytes</code> &mdash; vazão em bytes</li>
+              <li><code>IteratorAge</code> &mdash; atraso do consumer</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>O que observar</h3>
+            <ul>
+              <li>IncomingRecords subindo durante o produtor</li>
+              <li>IteratorAge próximo de zero indica consumer saudável</li>
+              <li>Firehose <code>DeliveryToS3.Success</code></li>
+              <li>Logs da Lambda em CloudWatch Logs</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 29 - VALIDACAO                                         -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Lab &middot; Validação</span>
+          <h2 class="deck-title">Checklist de fim de lab</h2>
+        </div>
+        <div class="deck-panel">
+          <strong>Tudo verde?</strong>
+          <ul>
+            <li>Stream <code>olist-eventos</code> <strong>Active</strong>, recebendo eventos</li>
+            <li>Firehose entregando Parquet em <code>s3://&lt;aluno&gt;-raw/streaming/olist-eventos/</code></li>
+            <li>Crawler criou tabela e Athena consulta com sucesso</li>
+            <li>Lambda <code>olist-stream-consumer</code> com invocações &gt; 0</li>
+            <li>DynamoDB <code>olist_eventos_agg</code> com contagens por <code>action</code></li>
+            <li>CloudWatch mostra IncomingRecords e IteratorAge baixos</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 30 - LIMPEZA                                           -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Lab &middot; Custos</span>
+          <h2 class="deck-title">Limpeza obrigatória</h2>
+          <p class="deck-summary">Kinesis cobra por <strong>shard-hora</strong>. Esquecer o stream ligado consome crédito do AWS Student rapidamente.</p>
+        </div>
+        <div class="deck-panel">
+          <strong>Ordem de desligamento</strong>
+          <ol>
+            <li>Parar o script produtor (<code>Ctrl+C</code>).</li>
+            <li>Desabilitar o trigger da Lambda (ou deletar a Lambda).</li>
+            <li>Deletar o Firehose delivery stream.</li>
+            <li>Deletar o Kinesis Data Stream <code>olist-eventos</code>.</li>
+            <li>(Opcional) Deletar a tabela DynamoDB de agregados.</li>
+            <li>Manter os buckets S3 e o catalog para próximas aulas.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 31 - FECHAMENTO RESUMO                                 -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Fechamento &middot; 1/2</span>
+          <h2 class="deck-title">Resumo da aula</h2>
+        </div>
+        <div class="deck-grid">
+          <article class="deck-card">
+            <h3>Teoria</h3>
+            <ul>
+              <li>Batch, micro-batch e streaming</li>
+              <li>Produtor, broker, consumidor</li>
+              <li>Janelas, event time, watermarks</li>
+              <li>At-least-once e idempotência</li>
+              <li>Serverless para streaming</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Prática</h3>
+            <ul>
+              <li>Kinesis Data Stream criado</li>
+              <li>Produtor Python gerando eventos</li>
+              <li>Firehose gravando Parquet no S3</li>
+              <li>Lambda consumer em DynamoDB</li>
+              <li>Athena + CloudWatch validando</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 32 - PROXIMA AULA                                      -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Fechamento &middot; 2/2</span>
+          <h2 class="deck-title">Próxima aula &mdash; 14/05/2026</h2>
+        </div>
+        <div class="deck-grid">
+          <article class="deck-card">
+            <h3>Aula 05 &mdash; ETL Serverless e Catalog</h3>
+            <ul>
+              <li>AWS Glue jobs em PySpark</li>
+              <li>Glue Data Catalog como backbone</li>
+              <li>Workflows e orquestração</li>
+              <li>Pipelines raw &rarr; trusted &rarr; refined</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Estudo complementar</h3>
+            <ul>
+              <li>AWS docs: Kinesis Data Streams Developer Guide</li>
+              <li>Designing Data-Intensive Applications &mdash; cap. 11</li>
+              <li>Blog AWS: Firehose data format conversion</li>
+              <li>Material escrito da aula 04</li>
+            </ul>
+          </article>
         </div>
       </div>
     </div>
 
   </div>
 
+  <!-- Mackenzie mini logo -->
   <img class="slide-logo-mini" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" alt="Mackenzie" />
 
+  <!-- GLOBAL navigation footer -->
   <div class="slide-footer">
     <div class="footer-links">
-      <a href="../../../index.html" class="back-home">Indice</a>
+      <a href="../../../index.html" class="back-home">Índice</a>
       <a href="../material/material_aula_04_ingestao_e_processamento_near_real_time_streaming.html" class="material-link">Material</a>
     </div>
     <div class="nav-wrapper">
       <div class="nav-buttons"><button id="prev-btn" onclick="previousSlide()">&#8592; Anterior</button></div>
       <div class="slide-counter"><span id="current-slide">1</span> / <span id="total-slides">1</span></div>
-      <div class="nav-buttons"><button id="next-btn" onclick="nextSlide()">Proximo &#8594;</button></div>
+      <div class="nav-buttons"><button id="next-btn" onclick="nextSlide()">Próximo &#8594;</button></div>
     </div>
     <button class="fullscreen-btn" onclick="toggleFullScreen()" title="Tela cheia">&#9974;</button>
   </div>
 
+  <!-- Navigation script -->
   <script>
     let currentSlide = 0;
     const slides = document.querySelectorAll('.slide');

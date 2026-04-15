@@ -4,455 +4,930 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/png" href="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" />
-    <title>Material Aula 08 — Segurança de Dados, FinOps e Projeto Final Integrado</title>
+    <title>Material Aula 08 &mdash; Seguranca de Dados, FinOps e Projeto Final Integrado</title>
     <link rel="stylesheet" href="../../../assets/styles.css" />
-    <style data-design-tokens>:root{--bg:#fff;--color:#000000}body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}a:hover{opacity:.8}a:focus{outline:2px solid #000000}</style>
+    <style data-design-tokens>
+      :root{--bg:#fff;--color:#000000}
+      body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}
+      a:hover{opacity:.8}
+      a:focus{outline:2px solid #000000}
+      table{width:100%;border-collapse:collapse;margin:18px 0;font-size:.97rem}
+      th,td{border:1px solid var(--border,#d7d7d7);padding:10px 14px;text-align:left;vertical-align:top}
+      th{background:var(--surface,#f6f6f6);font-weight:700}
+      pre{background:var(--surface,#f6f6f6);border:1px solid var(--border,#d7d7d7);border-radius:6px;padding:18px;overflow-x:auto;font-size:.92rem;line-height:1.5}
+      code{font-family:"Courier New",Courier,monospace}
+      .tip{background:#f0f7f0;border-left:4px solid #2a7a2a;padding:14px 18px;margin:16px 0;border-radius:4px}
+      .warning{background:#fef6e8;border-left:4px solid #c08800;padding:14px 18px;margin:16px 0;border-radius:4px}
+      .danger{background:#fef0f0;border-left:4px solid #b30000;padding:14px 18px;margin:16px 0;border-radius:4px}
+    </style>
   </head>
   <body class="material">
     <main class="page">
 
+      <!-- ============================================================
+           HEADER
+      ============================================================= -->
       <section class="content-block">
-        <p class="meta">Aula 08 &nbsp;•&nbsp; 11/06/2026 &nbsp;•&nbsp; 19h00 – 22h00</p>
-        <h1>Segurança de Dados, FinOps e Projeto Final Integrado</h1>
+        <p class="meta">Aula 08 &nbsp;&bull;&nbsp; 11/06/2026 &nbsp;&bull;&nbsp; 19h00 &ndash; 22h00</p>
+        <h1>Seguranca de Dados, FinOps e Projeto Final Integrado</h1>
         <p class="summary">
-          Este material aprofunda os conceitos apresentados nos slides da Aula 08
-          e fecha a disciplina com uma visão integrada. Cobre o AWS Lake Formation
-          para governança de dados com controle de acesso fino, as práticas de
-          FinOps para redução de custo em workloads analíticos, as melhores práticas
-          de segurança para o pipeline completo, e a revisão do fluxo integrado
-          end-to-end construído ao longo das 8 aulas.
+          Este material acompanha a oitava e ultima aula da disciplina <strong>Cloud Computing e SRA &mdash; Visao Pratica com AWS</strong>
+          do MBA em Engenharia de Dados. Ele cobre, de forma aprofundada, todos os topicos apresentados nos slides:
+          o recap do pipeline Olist construido nas Aulas 02 a 07, o modelo de responsabilidade compartilhada da AWS,
+          a criptografia em repouso com SSE-S3, SSE-KMS e SSE-C, o funcionamento do AWS KMS e do esquema de envelope
+          encryption, a criptografia em transito com TLS e VPC endpoints, as boas praticas de IAM com permission
+          boundaries e SCPs, as bucket policies e o Block Public Access, as tecnicas de mascaramento e tokenizacao
+          de PII com AWS Macie, a LGPD aplicada ao pipeline de dados e a classificacao de sensibilidade no catalogo.
+          Na segunda metade, o material aprofunda FinOps: os tres principios (Inform / Optimize / Operate), as
+          unidades de cobranca de cada servico, as storage classes do S3, as lifecycle rules, as cost allocation
+          tags, o Cost Explorer, o AWS Budgets e o Cost Anomaly Detection. Traz ainda a releitura dos 5 Rs de
+          migracao para o contexto de plataforma analitica, OKRs de dados e a transicao de CAPEX para OPEX.
+          A aula fecha com a apresentacao do Projeto Final Integrado e um laboratorio pratico de seguranca + FinOps
+          sobre os buckets do Olist. O material inclui JSON completo da bucket policy, configuracao de lifecycle,
+          comandos CLI para tags, estimativa de custo detalhada e a rubrica completa do projeto final.
+          A divisao de tempo seguida foi 19h00 &ndash; 20h30 de teoria e 20h30 &ndash; 22h00 de pratica + apresentacoes.
         </p>
       </section>
 
-      <!-- =========================================================
-           MÓDULO 1 — LAKE FORMATION E GOVERNANÇA
-      ========================================================== -->
+      <!-- ============================================================
+           MODULO 0 - RECAP
+      ============================================================= -->
       <section class="content-block">
-        <h2>Módulo 1 — AWS Lake Formation: Governança de Dados em Escala</h2>
-
-        <h3>Por que o IAM sozinho não é suficiente para governança de dados</h3>
+        <h2>Modulo 0 &mdash; Recap do pipeline Olist</h2>
         <p>
-          O AWS IAM controla o acesso a APIs da AWS: quem pode chamar o
-          <code>s3:GetObject</code>, quem pode criar um Glue Crawler, quem pode
-          executar uma query no Athena. Mas o IAM não entende dados — ele não sabe
-          que dentro de um bucket S3 existem dados sensíveis de clientes ao lado
-          de dados públicos de catálogo de produtos.
-        </p>
-        <p>
-          O resultado prático é que, com apenas IAM, você precisaria criar um bucket
-          separado para cada nível de sensibilidade de dado, ou dar acesso total ao
-          bucket inteiro a qualquer usuário que precise de qualquer dado dentro dele.
-          Nenhuma das duas opções escala bem em um Data Lake com dezenas de fontes,
-          centenas de tabelas e múltiplos perfis de acesso.
-        </p>
-        <p>
-          O AWS Lake Formation resolve isso adicionando uma camada de controle de acesso
-          no nível de tabela, coluna e linha sobre o Glue Data Catalog. Em vez de
-          gerenciar permissões de bucket S3 no IAM, você gerencia permissões de
-          database/tabela/coluna no Lake Formation, e ele traduz isso para permissões
-          no nível de objeto S3 automaticamente.
-        </p>
-
-        <h3>Conceitos do Lake Formation</h3>
-        <p>
-          <strong>Data Administrators:</strong> usuários com permissão de administrar o
-          Lake Formation. Eles concedem permissões a outros usuários e definem quais
-          buckets S3 estão registrados como parte do Lake.
-        </p>
-        <p>
-          <strong>Registered locations:</strong> prefixos S3 que estão sob governança
-          do Lake Formation. Após o registro, o acesso a esses prefixos é controlado
-          pelo Lake Formation em vez de pelo IAM diretamente.
-        </p>
-        <p>
-          <strong>Data permissions:</strong> permissões no nível de database, tabela,
-          coluna ou linha. Exemplos:
+          Antes de entrar em seguranca e custo, vale revisitar o que foi construido nas 7 aulas anteriores.
+          A plataforma do dataset Olist que usamos como fio condutor do curso tem hoje todas as camadas
+          esperadas de uma plataforma analitica moderna:
         </p>
         <ul>
-          <li>Analista de BI: SELECT nas colunas não-sensíveis da tabela
-          <code>trusted_clientes</code>, sem acesso às colunas <code>cpf</code>
-          e <code>data_nascimento</code>.</li>
-          <li>Cientista de dados: SELECT em todas as tabelas do database <code>trusted</code>,
-          mas sem acesso ao database <code>raw</code>.</li>
-          <li>Engenheiro de dados: CREATE TABLE, ALTER TABLE, INSERT, SELECT em todos
-          os databases do lake.</li>
+          <li><strong>Aula 01:</strong> fundacao de conta AWS, IAM (users, groups, roles, policies), criacao dos 3 buckets S3.</li>
+          <li><strong>Aula 02:</strong> Data Lake serverless em S3 com camadas raw / trusted / refined e consulta via Athena.</li>
+          <li><strong>Aula 03:</strong> integracao com fontes relacionais (RDS PostgreSQL) e NoSQL (DynamoDB) para pedidos, clientes e reviews.</li>
+          <li><strong>Aula 04:</strong> ingestao near real-time com Kinesis Data Streams e Lambda para eventos de pedido.</li>
+          <li><strong>Aula 05:</strong> ETL serverless com Glue (crawlers, jobs Spark), catalogacao e orquestracao com Step Functions.</li>
+          <li><strong>Aula 06:</strong> Data Warehousing com Redshift e/ou Athena sobre Iceberg; modelagem dimensional.</li>
+          <li><strong>Aula 07:</strong> Data Reliability e SRE aplicados ao pipeline: SLO, SLI, Data Quality, observabilidade.</li>
         </ul>
         <p>
-          <strong>Column-level security (CLS):</strong> o Lake Formation pode mascarar
-          ou excluir colunas inteiras para determinados usuários. Um analista que
-          consulta a tabela de clientes via Athena simplesmente não verá as colunas
-          para as quais não tem permissão — elas não aparecem no resultado da query.
-        </p>
-        <p>
-          <strong>Row-level security (RLS):</strong> via Lake Formation filters, é possível
-          restringir quais linhas um usuário pode ver. Por exemplo, um analista regional
-          só pode ver registros onde <code>regiao = 'Sul'</code>.
-        </p>
-
-        <h3>Data Catalog e descoberta de dados sensíveis</h3>
-        <p>
-          O AWS Glue Sensitive Data Detection (baseado em Macie) pode escanear tabelas
-          no Catalog para identificar automaticamente dados pessoais (PII): números de CPF,
-          cartões de crédito, emails, telefones. Os resultados são registrados e podem
-          ser usados para aplicar automaticamente as políticas de CLS/RLS corretas.
+          Hoje, na Aula 08, envolvemos tudo isso em duas camadas transversais: <strong>seguranca de dados</strong>,
+          para garantir que o pipeline respeita LGPD e boas praticas de Cloud Security; e <strong>FinOps</strong>,
+          para garantir que ele e sustentavel financeiramente. Sao duas disciplinas que, em organizacoes maduras,
+          sao responsabilidade compartilhada entre engenharia de dados, seguranca e financeiro.
         </p>
       </section>
 
-      <!-- =========================================================
-           MÓDULO 2 — SEGURANÇA DO PIPELINE
-      ========================================================== -->
+      <!-- ============================================================
+           MODULO 1 - SEGURANCA DE DADOS
+      ============================================================= -->
       <section class="content-block">
-        <h2>Módulo 2 — Melhores Práticas de Segurança para o Pipeline Completo</h2>
+        <h2>Modulo 1 &mdash; Seguranca de dados em plataforma analitica</h2>
 
-        <h3>Criptografia em repouso e em trânsito</h3>
+        <h3>Modelo de responsabilidade compartilhada</h3>
         <p>
-          <strong>Em repouso (at rest):</strong> todo dado no S3 deve ser criptografado.
-          Use SSE-S3 (chave gerenciada pela AWS, sem custo extra) para dados internos
-          de baixa sensibilidade, ou SSE-KMS (AWS Key Management Service) para dados
-          sensíveis onde você precisa de controle sobre a chave de criptografia,
-          auditoria de uso da chave via CloudTrail, e possibilidade de revogar acesso
-          invalidando a chave.
+          A AWS adota o chamado <strong>Shared Responsibility Model</strong>. A propria AWS resume em uma frase:
+          <em>AWS is responsible for security OF the cloud; the customer is responsible for security IN the cloud</em>.
+          Na pratica, isso significa que a AWS cuida dos datacenters fisicos, da rede fisica, dos racks, da energia,
+          da virtualizacao, do plano de controle dos servicos gerenciados e dos patches de hipervisor. Ja o cliente
+          cuida de tudo que coloca dentro: a classificacao do dado, a criptografia, as permissoes IAM, a
+          configuracao de cada servico (abrir ou nao um bucket, publicar ou nao um endpoint), as redes (VPC,
+          subnets, security groups) e o monitoramento proprio.
         </p>
         <p>
-          <strong>Em trânsito (in transit):</strong> toda comunicação com serviços AWS
-          usa HTTPS/TLS por padrão. Nunca use endpoints HTTP não criptografados.
-          Para conexões JDBC de Glue para RDS, certifique-se de que a conexão está
-          configurada com SSL.
+          Em plataforma de dados, isso se traduz em cinco verticais que o time de engenharia controla:
+          <strong>classificacao</strong> (quais dados sao publicos, internos, confidenciais ou restritos);
+          <strong>criptografia</strong> (em repouso e em transito); <strong>identidade e acesso</strong> (IAM,
+          Lake Formation, Redshift users); <strong>rede</strong> (VPC endpoints, security groups, private subnets
+          para RDS e Redshift); e <strong>auditoria</strong> (CloudTrail, Config, Access Analyzer, CloudWatch Logs).
+          Nao adianta a AWS ter infraestrutura de ponta se o bucket continua publico.
         </p>
 
-        <h3>VPC e isolamento de rede</h3>
+        <h3>Criptografia em repouso: SSE-S3, SSE-KMS e SSE-C</h3>
         <p>
-          Para pipelines de produção, execute Glue Jobs e outras cargas de trabalho
-          dentro de uma VPC (Virtual Private Cloud) em vez de na rede pública da AWS.
-          Isso permite:
-        </p>
-        <ul>
-          <li>Comunicação com RDS e outros bancos de dados sem expô-los à internet.</li>
-          <li>Controle de saída via Security Groups e NACLs (Network Access Control Lists).</li>
-          <li>Uso de VPC Endpoints para S3 e outros serviços AWS, eliminando tráfego
-          pela internet mesmo para serviços públicos.</li>
-        </ul>
-
-        <h3>CloudTrail: auditoria de todas as chamadas de API</h3>
-        <p>
-          O AWS CloudTrail registra todas as chamadas de API feitas na conta AWS:
-          quem fez, de onde (IP), quando, qual ação, em qual recurso, e qual foi
-          o resultado. Para governança de dados, o CloudTrail permite auditar:
+          Desde 2023, todo bucket S3 novo ja vem com criptografia em repouso ativada por padrao (SSE-S3). A pergunta
+          relevante nao e mais <em>&ldquo;meu dado esta criptografado?&rdquo;</em>, mas <em>&ldquo;quem controla a
+          chave, e como essa operacao e auditada?&rdquo;</em>. A escolha entre as tres opcoes impacta custo,
+          governanca e capacidade de isolar dados entre contas.
         </p>
         <ul>
-          <li>Quem acessou quais objetos no S3 (via S3 Data Events).</li>
-          <li>Quais queries foram executadas no Athena.</li>
-          <li>Quem criou ou modificou tabelas no Glue Catalog.</li>
-          <li>Quais mudanças foram feitas em políticas IAM e no Lake Formation.</li>
+          <li>
+            <strong>SSE-S3:</strong> AWS gerencia a chave internamente com AES-256. O cliente nao tem visibilidade
+            de quais chaves criptografam qual objeto. Nao cobra nada extra. Adequado para dados publicos ou pouco
+            sensiveis. Nao recomendado para ambiente corporativo serio.
+          </li>
+          <li>
+            <strong>SSE-KMS com chave gerenciada pela AWS (<code>aws/s3</code>):</strong> chave criada e rotacionada
+            automaticamente pela AWS dentro do KMS da conta. Cada uso gera log em CloudTrail (operacoes
+            <code>GenerateDataKey</code> e <code>Decrypt</code>). Custo baixo (USD 0,03 por 10 mil requests). E o
+            padrao corporativo recomendado, e o que usaremos no lab.
+          </li>
+          <li>
+            <strong>SSE-KMS com CMK (Customer Managed Key):</strong> voce cria e controla a chave. Pode aplicar
+            rotacao anual, key policy propria, grants, alias descritivo. Essencial para separacao multi-conta,
+            compliance LGPD em dados restritos e auditoria fina. Custo USD 1/mes por chave + USD 0,03/10k API calls.
+          </li>
+          <li>
+            <strong>SSE-C:</strong> o cliente fornece a chave em cada request HTTP. A AWS nunca armazena a chave.
+            Usado raramente, apenas em casos onde a regulamentacao proibe armazenar chaves na AWS. A operacao
+            e complexa e a perda da chave causa perda total do dado.
+          </li>
         </ul>
         <p>
-          Configure o CloudTrail para enviar logs para um bucket S3 separado e
-          de longa retenção, e ative a validação de integridade dos logs para
-          garantir que não foram modificados.
+          <strong>Recomendacao para o Olist:</strong> SSE-KMS com <code>aws/s3</code> para trusted e refined
+          (nosso padrao no lab) e SSE-KMS com CMK dedicada em ambiente corporativo real.
         </p>
 
-        <h3>Gestão de segredos com AWS Secrets Manager</h3>
+        <h3>AWS KMS e envelope encryption</h3>
         <p>
-          Senhas de banco de dados, chaves de API e outros segredos nunca devem
-          ser hardcoded em código ou armazenados em variáveis de ambiente não
-          criptografadas. O AWS Secrets Manager armazena, rotaciona automaticamente
-          e controla o acesso a segredos. Em Glue Jobs, use o SDK do Secrets Manager
-          para buscar a senha do banco em tempo de execução:
-        </p>
-        <pre><code>import boto3
-import json
-
-def get_secret(secret_name):
-    client = boto3.client('secretsmanager', region_name='us-east-1')
-    response = client.get_secret_value(SecretId=secret_name)
-    return json.loads(response['SecretString'])
-
-rds_creds = get_secret('prod/rds/datalake')
-</code></pre>
-      </section>
-
-      <!-- =========================================================
-           MÓDULO 3 — FINOPS
-      ========================================================== -->
-      <section class="content-block">
-        <h2>Módulo 3 — FinOps para Workloads Analíticos</h2>
-
-        <h3>O que é FinOps</h3>
-        <p>
-          FinOps (Financial Operations) é a prática de gestão financeira em cloud que
-          une equipes de engenharia, finanças e negócio para otimizar custos sem
-          sacrificar performance ou agilidade. O princípio central é: quem usa os
-          recursos é responsável por gerenciar seus custos — não apenas o time de
-          infra ou financeiro.
-        </p>
-
-        <h3>Principais alavancas de custo em workloads analíticos na AWS</h3>
-
-        <h4>Amazon S3</h4>
-        <ul>
-          <li>Use S3 Lifecycle policies para migrar dados para classes mais baratas
-          (Standard-IA, Glacier) após períodos de inatividade. Dados Raw com mais
-          de 90 dias raramente são relidos.</li>
-          <li>Ative S3 Intelligent-Tiering para dados com padrões de acesso imprevisíveis —
-          o S3 move automaticamente os objetos entre tiers sem custo de monitoramento
-          adicional acima de 128 KB.</li>
-          <li>Monitore e delete versões antigas de objetos em buckets com versionamento
-          habilitado. Versões antigas acumulam custo sem valor se não houver processo
-          de limpeza.</li>
-        </ul>
-
-        <h4>Amazon Athena</h4>
-        <ul>
-          <li>Converta dados de CSV/JSON para Parquet com compressão Snappy.
-          Uma tabela de 1 TB em CSV pode ser reduzida para 100-200 GB em Parquet,
-          reduzindo o custo por query em 5-10x.</li>
-          <li>Adicione particionamento às tabelas mais consultadas. Filtros por
-          partição eliminam o scan de dados irrelevantes.</li>
-          <li>Configure Athena Workgroups com limites de bytes por query para evitar
-          queries acidentalmente custosas de analistas.</li>
-          <li>Use o Athena Query Results Cache para queries repetitivas — resultados
-          de queries idênticas são reutilizados por até 7 dias sem custo adicional.</li>
-        </ul>
-
-        <h4>AWS Glue</h4>
-        <ul>
-          <li>Dimensione o número de DPUs corretamente. Muitos jobs são configurados
-          com 10 DPUs quando 2-3 seriam suficientes. Use o Glue Job Metrics para
-          identificar jobs com baixa utilização de workers.</li>
-          <li>Prefira Glue Flex execution tier (40% mais barato que Standard) para
-          jobs não urgentes que podem tolerar latência variável.</li>
-          <li>Configure o número máximo de retries adequado — um job que falha 3 vezes
-          cobra 3x o custo de execução.</li>
-        </ul>
-
-        <h4>Amazon Redshift</h4>
-        <ul>
-          <li>Use o Redshift Serverless para workloads intermitentes — você paga
-          por RPU (Redshift Processing Unit) segundo enquanto consultas estão rodando,
-          sem custo em períodos ociosos.</li>
-          <li>Configure o Redshift Auto Pause para clusters provisionados — pausa
-          automática após X minutos de inatividade e retoma na próxima query.</li>
-          <li>Use Redshift Spectrum para dados históricos que são consultados com
-          baixa frequência, mantendo apenas dados quentes no cluster.</li>
-          <li>Execute VACUUM regularmente para reclamar espaço de linhas deletadas
-          e manter a performance de scan.</li>
-        </ul>
-
-        <h3>Tags de custo: visibilidade por projeto e equipe</h3>
-        <p>
-          Todo recurso AWS deve ser tagueado com metadados de negócio: projeto,
-          equipe, ambiente (dev/prod), e centro de custo. As tags são propagadas
-          automaticamente para o AWS Cost Explorer e AWS Budgets, permitindo
-          visualizar e alertar sobre custos por dimensão de negócio, não apenas
-          por serviço.
-        </p>
-        <p>
-          Configure AWS Budgets com alertas quando o custo mensal de uma tag específica
-          atingir 80% e 100% do orçamento definido. Isso permite intervenção
-          proativa antes que o orçamento seja estourado.
-        </p>
-      </section>
-
-      <!-- =========================================================
-           MÓDULO 4 — PIPELINE INTEGRADO
-      ========================================================== -->
-      <section class="content-block">
-        <h2>Módulo 4 — Revisão: O Pipeline Integrado da Disciplina</h2>
-
-        <h3>Fluxo completo end-to-end</h3>
-        <p>
-          Ao longo das 8 aulas, construímos os blocos de um pipeline analítico completo
-          na AWS. O fluxo integrado funciona da seguinte forma:
+          Envelope encryption e o esquema que permite ao KMS escalar para bilhoes de objetos sem gargalar. A ideia
+          e que a chave mestra (CMK) nunca sai do modulo HSM do KMS. Ela nao criptografa o objeto diretamente;
+          ela criptografa uma chave temporaria (Data Encryption Key, DEK) que, essa sim, e usada para criptografar
+          o objeto. O fluxo detalhado e:
         </p>
         <ol>
+          <li>S3 chama <code>kms:GenerateDataKey</code> pedindo uma DEK para uma CMK especifica.</li>
+          <li>KMS gera uma DEK aleatoria de 256 bits e retorna duas versoes: uma em claro (plaintext DEK) e uma criptografada com a CMK (encrypted DEK).</li>
+          <li>S3 criptografa o objeto com a DEK em claro em memoria e descarta a plaintext DEK.</li>
+          <li>S3 guarda o objeto criptografado + a encrypted DEK juntos.</li>
+          <li>Ao ler o objeto, S3 chama <code>kms:Decrypt</code> enviando a encrypted DEK. KMS usa a CMK para decriptar e retorna a DEK em claro.</li>
+          <li>S3 usa a DEK para decriptar o objeto e entrega ao cliente.</li>
+        </ol>
+        <p>
+          <strong>Boas praticas:</strong> habilitar rotacao automatica anual na CMK; usar alias descritivo
+          (<code>alias/olist-refined</code>); escrever key policy explicita e usar IAM policy apenas como segunda
+          camada; registrar <em>KMS Data Events</em> em CloudTrail para rastrear cada uso.
+        </p>
+        <div class="danger">
+          <strong>Aviso critico:</strong> deletar uma CMK significa perder acesso a todos os dados criptografados
+          por ela. Por isso o KMS obriga um periodo de &ldquo;pending deletion&rdquo; de 7 a 30 dias. Antes de
+          deletar, sempre valide se nenhum objeto ainda depende da chave.
+        </div>
+
+        <h3>Criptografia em transito: TLS 1.2+ e VPC endpoints</h3>
+        <p>
+          Dado criptografado em repouso nao ajuda muito se ele trafega em HTTP no meio do caminho. Hoje todos
+          os endpoints AWS exigem TLS 1.2 ou superior por padrao, mas ainda existem dois ajustes que valem
+          aplicar:
+        </p>
+        <ul>
           <li>
-            <strong>Aula 01 — Fundação de segurança:</strong> criação das roles IAM
-            (GlueJobRole, etc.), grupos de usuários (DataEngineers, DataScientists),
-            e políticas de menor privilégio. Todo o pipeline roda com as identidades
-            corretas definidas nesta aula.
+            <strong>Bucket policy TLS-only:</strong> adicionar um <code>Deny</code> condicionado a
+            <code>aws:SecureTransport = false</code>. Isso garante que mesmo que algum cliente antigo tente usar
+            HTTP, o request e rejeitado na camada do bucket, nao so do endpoint.
           </li>
           <li>
-            <strong>Aula 02 — Data Lake no S3:</strong> bucket criado com estrutura
-            de prefixos Raw/Trusted/Refined, versionamento e criptografia habilitados.
-            Primeira exploração com Athena.
+            <strong>VPC endpoints para S3:</strong> quando o processamento (Glue, EMR, Lambda em VPC) precisa
+            acessar S3, usar Gateway VPC endpoint para S3 elimina o caminho pela internet publica, reduz custo
+            de NAT gateway e permite aplicar <em>endpoint policy</em> controlando quais buckets sao alcancaveis.
+          </li>
+        </ul>
+
+        <h3>IAM best practices: menor privilegio e permission boundaries</h3>
+        <p>
+          Em auditorias internas, a causa mais comum de incidentes em Data Lake corporativo e <strong>IAM
+          permissivo demais</strong>. O antidoto e um conjunto simples de regras:
+        </p>
+        <ul>
+          <li>Nao usar a conta root para tarefas do dia a dia. Criar um Admin user com MFA e trancar o root.</li>
+          <li>Um role dedicado por servico (Glue, Lambda, EMR, Redshift) com apenas as permissoes necessarias.</li>
+          <li>Nunca colocar access keys em codigo ou em notebooks. Rodar na AWS e assumir role.</li>
+          <li>MFA obrigatorio para todos os humanos que fazem login no console.</li>
+          <li><strong>Permission boundary:</strong> politica adicional que limita o teto do que um role pode fazer, mesmo que outra policy tente conceder mais.</li>
+          <li><strong>SCPs (Service Control Policies):</strong> em organizacoes com AWS Organizations, aplicam regras globais (ex.: &ldquo;ninguem nessa OU pode usar us-west-1&rdquo;).</li>
+          <li><strong>IAM Access Analyzer:</strong> varre as policies e aponta acessos externos nao intencionais.</li>
+          <li><strong>Credential Report:</strong> relatorio periodico com uso de cada credencial. Util para detectar keys nao rotacionadas.</li>
+        </ul>
+
+        <h3>Bucket policies e Block Public Access</h3>
+        <p>
+          A bucket policy e a ultima linha de defesa contra vazamentos de S3. Mesmo que alguem coloque um ACL
+          publico por engano, a policy pode negar o acesso. Combinada com o <strong>Block Public Access</strong>
+          (que pode ser aplicado em nivel de conta), elimina a classe de incidente famosa de &ldquo;bucket aberto
+          na internet&rdquo;.
+        </p>
+        <p>
+          A bucket policy abaixo e a que aplicaremos no bucket refined do Olist. Ela nega tres coisas importantes:
+          qualquer request sem TLS, qualquer PutObject sem SSE-KMS e qualquer principal que nao seja da propria
+          conta. Note o uso de <code>aws:SecureTransport</code> e <code>s3:x-amz-server-side-encryption</code>
+          como chaves de condicao.
+        </p>
+<pre>{
+  "Version": "2012-10-17",
+  "Id": "OlistRefinedBucketHardening",
+  "Statement": [
+    {
+      "Sid": "DenyInsecureTransport",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": [
+        "arn:aws:s3:::&lt;aluno&gt;-refined",
+        "arn:aws:s3:::&lt;aluno&gt;-refined/*"
+      ],
+      "Condition": {
+        "Bool": { "aws:SecureTransport": "false" }
+      }
+    },
+    {
+      "Sid": "DenyUnencryptedUploads",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:PutObject",
+      "Resource": "arn:aws:s3:::&lt;aluno&gt;-refined/*",
+      "Condition": {
+        "StringNotEquals": {
+          "s3:x-amz-server-side-encryption": "aws:kms"
+        }
+      }
+    },
+    {
+      "Sid": "DenyForeignPrincipals",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": [
+        "arn:aws:s3:::&lt;aluno&gt;-refined",
+        "arn:aws:s3:::&lt;aluno&gt;-refined/*"
+      ],
+      "Condition": {
+        "StringNotEquals": {
+          "aws:PrincipalAccount": "&lt;AWS_ACCOUNT_ID&gt;"
+        }
+      }
+    }
+  ]
+}</pre>
+
+        <h3>Mascaramento, tokenizacao e AWS Macie</h3>
+        <p>
+          O dataset Olist contem campos sensiveis: <code>customer_unique_id</code>, <code>customer_zip_code_prefix</code>,
+          comentarios de review. Mesmo quando um ID nao e um CPF explicito, a combinacao com outras colunas pode
+          re-identificar o titular. Por isso, mesmo em ambiente academico, adotamos boas praticas de proteger PII.
+        </p>
+        <ul>
+          <li>
+            <strong>Mascaramento (masking):</strong> substitui parte do valor por caractere fixo. Ex.:
+            <code>111.222.333-44</code> vira <code>***.***.***-44</code>. Irreversivel.
           </li>
           <li>
-            <strong>Aula 03 — Fontes de dados:</strong> dados de RDS extraídos via CDC
-            com DMS para S3 Raw. Tabela DynamoDB exportada via PITR para S3 Raw.
-            Ambas as fontes alimentam a camada Raw do lake.
+            <strong>Tokenizacao:</strong> substitui o valor real por um token. O mapeamento token -&gt; valor
+            real fica em um cofre separado (DynamoDB com KMS, ou AWS Secrets Manager). Reversivel, mas so por
+            quem tem acesso ao cofre.
           </li>
           <li>
-            <strong>Aula 04 — Streaming:</strong> eventos em tempo real chegando via
-            Kinesis Firehose, entregues ao S3 Raw com particionamento dinâmico por data e tipo.
+            <strong>Hash com salt:</strong> aplicar SHA-256 com um salt fixo da organizacao permite que o mesmo
+            valor gere sempre o mesmo hash (deterministic), permitindo joins sem expor o valor original.
           </li>
           <li>
-            <strong>Aula 05 — ETL e catálogo:</strong> Glue Crawlers descobrem o schema
-            dos dados Raw. Glue Jobs transformam Raw → Trusted (limpeza, tipagem, Parquet).
-            Glue Catalog mantém o metastore central.
+            <strong>Redaction:</strong> remove completamente a coluna da camada refined. Mais seguro, mas perde
+            analise.
+          </li>
+        </ul>
+        <p>
+          <strong>AWS Macie</strong> e o servico que escaneia buckets S3 e usa ML para identificar automaticamente
+          PII: CPF, CNPJ, cartao de credito, email, telefone, nome completo. Gera findings que podem disparar
+          EventBridge rules para remediar. Como cobra por GB escaneado, a pratica e configurar amostragem
+          (1% a 10%) em buckets grandes e escaneamento completo so em buckets criticos.
+        </p>
+
+        <h3>LGPD: principios, bases legais e impactos no pipeline</h3>
+        <p>
+          A Lei Geral de Protecao de Dados (Lei 13.709/2018) regula o tratamento de dados pessoais no Brasil e se
+          aplica a qualquer pipeline que ingere dados de pessoas fisicas brasileiras. O engenheiro de dados, ao
+          manipular esses dados, atua como parte do <strong>operador</strong> (em alguns casos, como
+          <strong>controlador</strong>).
+        </p>
+        <p>
+          Os 10 principios do Art. 6 orientam o tratamento: finalidade, adequacao, necessidade, livre acesso,
+          qualidade, transparencia, seguranca, prevencao, nao discriminacao e responsabilizacao. Na pratica
+          tecnica, isso significa: nao coletar dado que voce nao vai usar, nao reter por mais tempo do que
+          necessario e poder responder aos direitos do titular.
+        </p>
+        <p>
+          As 10 bases legais do Art. 7 determinam quando se pode tratar dado: consentimento, obrigacao legal,
+          execucao de contrato, legitimo interesse, protecao ao credito, execucao de politicas publicas,
+          pesquisa, protecao da vida, tutela da saude e exercicio regular de direitos. A base legal mais rigorosa
+          e o consentimento, porque pode ser revogado a qualquer momento.
+        </p>
+        <table>
+          <thead>
+            <tr><th>Direito do titular</th><th>Impacto tecnico</th><th>Como o pipeline atende</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Confirmacao e acesso</td><td>Localizar todos os registros do titular</td><td>Tabela indice por hash(customer_unique_id) que mapeia para particoes</td></tr>
+            <tr><td>Correcao</td><td>Atualizar valor em todas as camadas</td><td>Reprocessar trusted e refined a partir de raw com novo valor</td></tr>
+            <tr><td>Anonimizacao / eliminacao</td><td>Apagar registros do titular em raw, trusted e refined</td><td>Job Glue que recebe lista de IDs e remove; Iceberg facilita por ter DELETE eficiente</td></tr>
+            <tr><td>Portabilidade</td><td>Exportar em formato estruturado aberto</td><td>Export CSV/Parquet em S3 temporario com pre-signed URL</td></tr>
+            <tr><td>Revogacao de consentimento</td><td>Propagar flag na fonte para todas as camadas</td><td>CDC da fonte + filtro <code>consent_flag = true</code> em todas as views/queries</td></tr>
+            <tr><td>Informacao sobre compartilhamento</td><td>Registrar quem acessou e com quem foi compartilhado</td><td>CloudTrail + data contracts documentados</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Catalogo com classificacao de sensibilidade</h3>
+        <p>
+          O Glue Data Catalog permite adicionar <em>comment</em> por coluna e tags por tabela. Em ambiente
+          corporativo serio, usa-se Lake Formation para aplicar controle por coluna e por linha baseado na
+          classificacao. A base e sempre a mesma: primeiro classifique, depois controle.
+        </p>
+        <table>
+          <thead>
+            <tr><th>Nivel</th><th>Definicao</th><th>Exemplos Olist</th><th>Controle tecnico</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Publico</td><td>Pode ser divulgado externamente</td><td>product_category_name, customer_state</td><td>Read amplo via Athena; sem restricao</td></tr>
+            <tr><td>Interno</td><td>Uso interno na empresa</td><td>price, freight_value, order_status</td><td>Role <code>analytics-read</code></td></tr>
+            <tr><td>Confidencial</td><td>Uso restrito a time especifico</td><td>seller_id, review_comment_message</td><td>Lake Formation column-level + tag-based</td></tr>
+            <tr><td>Restrito (PII)</td><td>Contem dado pessoal identificavel</td><td>customer_unique_id, customer_zip_code_prefix</td><td>Mascarado, hashed ou redacted na refined</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ============================================================
+           MODULO 2 - FINOPS
+      ============================================================= -->
+      <section class="content-block">
+        <h2>Modulo 2 &mdash; FinOps para plataforma de dados</h2>
+
+        <h3>Os 3 principios do FinOps</h3>
+        <p>
+          FinOps, conforme definido pela <a href="https://www.finops.org/">FinOps Foundation</a>, e uma
+          disciplina operacional e cultural que traz responsabilidade financeira para o time de engenharia,
+          em parceria com financeiro e negocio. O framework se apoia em tres principios que se reforcam em
+          ciclo continuo:
+        </p>
+        <ul>
+          <li>
+            <strong>Inform:</strong> visibilidade de quanto cada time, produto, ambiente e servico custa. E
+            pre-requisito de tudo. Sem inform, nao ha otimizacao. Viabiliza-se com cost allocation tags,
+            Cost Explorer, Cost &amp; Usage Report e dashboards proprios.
           </li>
           <li>
-            <strong>Aula 06 — Data Warehouse:</strong> dados da camada Refined são
-            carregados no Redshift via COPY command. Star schema criado para análise
-            de vendas. Redshift Spectrum acessa dados históricos no S3 sem mover.
+            <strong>Optimize:</strong> aplicar alavancas para reduzir custo sem perder funcionalidade. Exemplos:
+            right-sizing de RDS e Redshift; lifecycle em S3; compressao Parquet com Snappy ou ZSTD; Savings
+            Plans para cargas previsiveis; Graviton para compute ARM; desligar dev em fim de semana.
           </li>
           <li>
-            <strong>Aula 07 — Confiabilidade:</strong> DAG no MWAA orquestra a sequência
-            Crawler → ETL → Crawler → Carga Redshift com retries configurados.
-            CloudWatch Alarms alertam sobre falhas. SLOs definidos para freshness
-            e completeness.
+            <strong>Operate:</strong> tornar FinOps parte do operacional diario. Budgets com alerta, revisao
+            mensal de anomalias, custo como metrica de engenharia em retrospectivas, Cost Anomaly Detection
+            para deteccao rapida.
+          </li>
+        </ul>
+
+        <h3>Como cada servico cobra</h3>
+        <p>
+          Decisoes de arquitetura mudam quando se entende a unidade de cobranca. Athena cobra por TB escaneado,
+          entao particionar e usar Parquet reduz custo em ordens de grandeza. Glue cobra por DPU-hora, entao
+          reduzir o tempo do job ou o numero de DPUs importa. Lambda cobra por ms-GB, entao ajustar memoria
+          e reduzir tempo de execucao importa. A tabela abaixo consolida os principais servicos do pipeline Olist:
+        </p>
+        <table>
+          <thead>
+            <tr><th>Servico</th><th>Unidade</th><th>Preco us-east-1 (Abril 2026, ordem de grandeza)</th><th>Alavanca principal</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>S3 Standard</td><td>GB-mes + requests</td><td>USD 0,023/GB armazenado + USD 0,005/1k PUT</td><td>Storage class + lifecycle + tamanho de arquivo</td></tr>
+            <tr><td>Athena</td><td>USD/TB escaneado</td><td>USD 5 por TB</td><td>Parquet + compressao + particionamento + predicate pushdown</td></tr>
+            <tr><td>Glue job (Spark)</td><td>DPU-hora (minimo 2 DPUs, cobra/seg)</td><td>USD 0,44/DPU-hora</td><td>Numero de DPUs, tempo do job, Flex vs Standard</td></tr>
+            <tr><td>Glue Crawler</td><td>DPU-hora</td><td>USD 0,44/DPU-hora</td><td>Agendar raro; so quando schema muda</td></tr>
+            <tr><td>Lambda</td><td>ms-GB + requests</td><td>USD 0,0000166667/GB-s + USD 0,20/1M requests</td><td>Memoria, tempo, arm64 (Graviton) 20% mais barato</td></tr>
+            <tr><td>Kinesis Data Streams</td><td>Shard-hora + PUT payload units</td><td>USD 0,015/shard-hora + USD 0,014/1M PUTs</td><td>Numero correto de shards; on-demand para carga variavel</td></tr>
+            <tr><td>RDS PostgreSQL</td><td>Instancia-hora + storage</td><td>USD 0,017/hora (t3.micro) + USD 0,115/GB-mes GP3</td><td>Instance type, stop em janela ociosa, Reserved Instance</td></tr>
+            <tr><td>Redshift Serverless</td><td>RPU-hora (base 8 RPUs)</td><td>USD 0,375/RPU-hora</td><td>Base RPU, auto-pause, materialized views</td></tr>
+            <tr><td>DynamoDB</td><td>RCU/WCU ou on-demand</td><td>USD 1,25/1M writes on-demand</td><td>On-demand para carga imprevisivel, provisioned para estavel</td></tr>
+            <tr><td>KMS</td><td>CMK + API requests</td><td>USD 1/mes por CMK + USD 0,03/10k API calls</td><td>Compartilhar CMK entre servicos quando faz sentido</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Storage classes do S3</h3>
+        <p>
+          O S3 oferece 7 classes de armazenamento. A escolha depende de <em>frequencia de acesso</em> e
+          <em>latencia tolerada</em>. Em um Data Lake bem desenhado, o dado comeca quente em Standard e
+          migra progressivamente para classes mais frias conforme envelhece.
+        </p>
+        <table>
+          <thead>
+            <tr><th>Classe</th><th>Custo relativo</th><th>Durabilidade</th><th>Latencia de leitura</th><th>Quando usar no Olist</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Standard</td><td>1,00x (USD 0,023/GB-mes)</td><td>99,999999999% (11 noves)</td><td>ms</td><td>refined atual + trusted dos ultimos 30 dias</td></tr>
+            <tr><td>Intelligent-Tiering</td><td>~1,0x + USD 0,0025/1k obj monitorados</td><td>11 noves</td><td>ms</td><td>Quando nao se conhece o padrao de acesso</td></tr>
+            <tr><td>Standard-IA</td><td>~0,55x (USD 0,0125/GB-mes)</td><td>11 noves</td><td>ms</td><td>raw entre 30 e 90 dias</td></tr>
+            <tr><td>One Zone-IA</td><td>~0,44x (USD 0,01/GB-mes)</td><td>99,5% (uma AZ)</td><td>ms</td><td>Dado reproduzivel que pode ser recriado</td></tr>
+            <tr><td>Glacier Instant Retrieval</td><td>~0,22x (USD 0,004/GB-mes)</td><td>11 noves</td><td>ms</td><td>Arquivo legal acessado poucas vezes ao ano</td></tr>
+            <tr><td>Glacier Flexible Retrieval</td><td>~0,15x (USD 0,0036/GB-mes)</td><td>11 noves</td><td>Minutos a horas</td><td>raw antigo (90+ dias) para compliance</td></tr>
+            <tr><td>Glacier Deep Archive</td><td>~0,04x (USD 0,00099/GB-mes)</td><td>11 noves</td><td>12 horas</td><td>Arquivo legal de 7+ anos</td></tr>
+          </tbody>
+        </table>
+        <div class="tip">
+          <strong>Dica de economia:</strong> migrar raw com mais de 90 dias para Glacier Flexible Retrieval
+          custa cerca de 15% do Standard. Em 1 TB de raw antigo, a economia anual e de aproximadamente USD 234.
+        </div>
+
+        <h3>S3 Lifecycle rules</h3>
+        <p>
+          Lifecycle rules automatizam as transicoes entre storage classes e expiracoes. Sao configuradas por
+          prefixo ou por tag. No Olist, a estrategia e manter raw/streaming/ quente por 30 dias, migrar para
+          IA ate 90 dias, Glacier ate 365 e apagar depois. A configuracao em JSON (para aplicar via CLI com
+          <code>aws s3api put-bucket-lifecycle-configuration</code>) fica assim:
+        </p>
+<pre>{
+  "Rules": [
+    {
+      "ID": "olist-streaming-tiering",
+      "Status": "Enabled",
+      "Filter": { "Prefix": "streaming/" },
+      "Transitions": [
+        { "Days": 30,  "StorageClass": "STANDARD_IA" },
+        { "Days": 90,  "StorageClass": "GLACIER" }
+      ],
+      "Expiration": { "Days": 365 },
+      "NoncurrentVersionExpiration": { "NoncurrentDays": 30 },
+      "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 7 }
+    }
+  ]
+}</pre>
+        <div class="warning">
+          <strong>Atencao:</strong> transitions so compensam para objetos acima de 128 KB (existe overhead por
+          objeto em IA e Glacier). Alem disso, Glacier tem cobranca minima de 90 dias e Standard-IA de 30 dias:
+          apagar antes desse periodo incorre em custo proporcional. Sempre teste uma regra em um prefixo de
+          amostra antes de aplicar em todo o bucket.
+        </div>
+
+        <h3>Cost allocation tags</h3>
+        <p>
+          FinOps sem tags e impossivel. A tag e o mecanismo que liga um recurso (bucket, instancia, funcao) a
+          um time, produto, ambiente e centro de custo. O Olist deveria ter, no minimo, 5 tags:
+        </p>
+        <ul>
+          <li><code>Project</code>: nome do produto/dataset. Ex.: <code>Olist</code>.</li>
+          <li><code>Environment</code>: <code>dev</code>, <code>staging</code>, <code>prod</code>.</li>
+          <li><code>Owner</code>: email do time ou pessoa. Ex.: <code>dados@mackenzie.br</code>.</li>
+          <li><code>CostCenter</code>: codigo contabil da area.</li>
+          <li><code>DataClassification</code>: <code>public</code>, <code>internal</code>, <code>confidential</code>, <code>restricted</code>.</li>
+        </ul>
+        <p>
+          Apos aplicar as tags nos recursos, e preciso <em>ativa-las</em> em Billing &rarr; Cost allocation tags.
+          So tags ativadas aparecem no Cost Explorer, e o delay para o primeiro relatorio e de ate 24h.
+        </p>
+
+        <h3>Cost Explorer, Budgets e Cost Anomaly Detection</h3>
+        <p>
+          Esses tres servicos formam a base da operacao FinOps no dia a dia. <strong>Cost Explorer</strong> e
+          gratuito, mostra o historico ate 13 meses, permite filtros complexos e exporta CSV. <strong>AWS
+          Budgets</strong> cobra USD 0,02/dia por budget que excede dois budgets gratuitos, e permite definir
+          limites por conta, servico, tag. <strong>Cost Anomaly Detection</strong> e gratuito, usa ML para
+          detectar picos fora do padrao e alertar via SNS ou email.
+        </p>
+        <p>
+          Em ambiente corporativo serio, recomenda-se tambem habilitar o <strong>Cost &amp; Usage Report (CUR)</strong>.
+          Ele escreve em S3 um arquivo Parquet com granularidade por hora e todos os metadados de tag. Em cima
+          disso, constroi-se dashboard proprio em QuickSight ou se consulta com Athena. E o padrao de mercado.
+        </p>
+
+        <h3>5 Rs de migracao reinterpretados para plataforma analitica</h3>
+        <p>
+          Os 5 Rs de migracao da AWS sao um framework originalmente desenhado para aplicacoes transacionais.
+          Quando traduzidos para plataforma de dados, ajudam a mapear decisoes estrategicas de arquitetura e
+          sua implicacao em custo inicial e recorrente. Essa releitura vem direto do material da Aula 07 (5 Rs)
+          adaptada ao nosso contexto:
+        </p>
+        <table>
+          <thead>
+            <tr><th>R</th><th>Traducao analitica</th><th>Exemplo concreto</th><th>Custo inicial</th><th>Custo recorrente</th><th>Risco</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Rehost</strong></td>
+              <td>Lift-and-shift do DW on-prem para AWS sem mudar arquitetura</td>
+              <td>SQL Server DW on-prem &rarr; RDS SQL Server ou Redshift com migracao de schema</td>
+              <td>Baixo</td>
+              <td>Alto (mantem modelo caro)</td>
+              <td>Baixo</td>
+            </tr>
+            <tr>
+              <td><strong>Refactor</strong></td>
+              <td>Pipeline Airflow on-prem vira serverless</td>
+              <td>Airflow + Spark on-prem &rarr; Glue + Step Functions + Athena</td>
+              <td>Medio</td>
+              <td>Medio (economiza ops, mantem servicos gerenciados)</td>
+              <td>Medio</td>
+            </tr>
+            <tr>
+              <td><strong>Rearchitect</strong></td>
+              <td>DW monolitico vira lakehouse multi-camada</td>
+              <td>Oracle DW monolitico &rarr; S3 + Iceberg + Athena + Redshift Spectrum</td>
+              <td>Alto</td>
+              <td>Baixo (escala linear, otimizavel)</td>
+              <td>Alto</td>
+            </tr>
+            <tr>
+              <td><strong>Rebuild</strong></td>
+              <td>Plataforma nascida cloud-native</td>
+              <td>Olist (nosso projeto do curso)</td>
+              <td>Alto</td>
+              <td>Baixo (custo ligado ao uso)</td>
+              <td>Medio</td>
+            </tr>
+            <tr>
+              <td><strong>Replace</strong></td>
+              <td>Adotar SaaS analytics pronto</td>
+              <td>QuickSight, Snowflake, Databricks, Fivetran, dbt Cloud</td>
+              <td>Baixo</td>
+              <td>Variavel (licenca + consumo)</td>
+              <td>Baixo (ops) / Alto (lock-in)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>OKRs de dados</h3>
+        <p>
+          Uma plataforma de dados custa dinheiro; o inverso, ela precisa gerar valor mensuravel. OKRs sao a
+          ferramenta que traduz esse valor em metas. O material original da disciplina sugeria 3 objetivos
+          (confiabilidade, custo, adocao); aqui adicionamos conformidade para fechar o quadro pos-LGPD:
+        </p>
+        <ul>
+          <li>
+            <strong>Objetivo 1 &mdash; Plataforma confiavel.</strong> KR1: freshness &lt; 30 min em trusted.
+            KR2: taxa de falha de job &lt; 2%. KR3: 100% dos datasets criticos com Data Quality check.
           </li>
           <li>
-            <strong>Aula 08 — Governança e custo:</strong> Lake Formation controla
-            o acesso fino por tabela e coluna. Lifecycle policies no S3 otimizam custo.
-            CloudTrail audita todos os acessos. Tags aplicadas em todos os recursos.
+            <strong>Objetivo 2 &mdash; Custo sob controle.</strong> KR1: custo/TB escaneado em Athena &lt; USD 2.
+            KR2: 70% do raw em IA ou Glacier apos 30 dias. KR3: 100% dos recursos com tag <code>Project</code>.
+          </li>
+          <li>
+            <strong>Objetivo 3 &mdash; Adocao pelo negocio.</strong> KR1: 80% das areas com dashboard ativo.
+            KR2: NPS de dados &ge; 40. KR3: 5 casos de uso auto-servico por trimestre.
+          </li>
+          <li>
+            <strong>Objetivo 4 &mdash; Conformidade.</strong> KR1: 100% dos buckets com SSE-KMS. KR2: 0 findings
+            criticos do Macie por mes. KR3: SLA de 15 dias para responder direito do titular LGPD.
+          </li>
+        </ul>
+
+        <h3>De CAPEX para OPEX</h3>
+        <p>
+          Migrar para cloud muda a forma como a empresa compra capacidade. Essa mudanca tambem vem do material
+          da Aula 2 (CAF) e tem implicacoes contabeis reais. No modelo <strong>CAPEX</strong> (Capital Expenditure)
+          tipico do datacenter proprio, compra-se hardware com depreciacao de 3 a 5 anos, dimensiona-se para o
+          pico (com muita ociosidade na media) e o ciclo de compra e anual e rigido. Hardware ocioso e perda pura.
+        </p>
+        <p>
+          No modelo <strong>OPEX</strong> (Operational Expenditure) da cloud, paga-se so o que se usa no mes.
+          A elasticidade e real: um processamento de fim de mes que precisa de 10x mais capacidade nao exige
+          comprar hardware novo. A despesa vai para o mes em que foi consumida, o que simplifica tributacao em
+          muitos cenarios. O lado dificil: sem disciplina de FinOps, a conta explode.
+        </p>
+      </section>
+
+      <!-- ============================================================
+           MODULO 3 - PROJETO FINAL
+      ============================================================= -->
+      <section class="content-block">
+        <h2>Modulo 3 &mdash; Projeto Final Integrado</h2>
+        <p>
+          O projeto final consolida tudo o que foi construido no semestre. Cada dupla entrega uma analise
+          end-to-end do dataset Olist usando o pipeline das Aulas 02 a 07, aplicando seguranca e FinOps do
+          que acabamos de estudar.
+        </p>
+
+        <h3>Entregaveis</h3>
+        <ul>
+          <li>
+            <strong>Dashboard ou notebook:</strong> respondendo aos 6 KPIs listados abaixo. QuickSight conectado
+            ao Athena OU notebook Jupyter (SageMaker Studio ou local conectado ao Athena via boto3/pyathena).
+          </li>
+          <li>
+            <strong>Diagrama do pipeline:</strong> mostrando as fontes (RDS, DynamoDB, Kinesis), a ingestao
+            (Glue, Lambda), o Data Lake (S3 com 3 camadas), o catalogo (Glue Data Catalog), a query (Athena) e
+            o consumo (QuickSight ou notebook). Pode ser feito em draw.io, Excalidraw ou Lucidchart.
+          </li>
+          <li>
+            <strong>Reflexao escrita (1 pagina):</strong> responder, com justificativa tecnica, &ldquo;quais
+            decisoes de design minimizaram custo e maximizaram confiabilidade?&rdquo;. Citar pelo menos 3
+            trade-offs conscientes.
+          </li>
+        </ul>
+
+        <h3>Os 6 KPIs Olist</h3>
+        <ol>
+          <li>
+            <strong>Receita top 10 categorias:</strong> <code>SUM(price)</code> agrupado por
+            <code>product_category_name</code>, ordenado decrescente, limite 10.
+          </li>
+          <li>
+            <strong>Ticket medio por estado:</strong> <code>AVG(order_total)</code> por
+            <code>customer_state</code>. Ordenar por ticket decrescente.
+          </li>
+          <li>
+            <strong>Lead time medio de entrega:</strong> <code>AVG(order_delivered_customer_date - order_purchase_timestamp)</code>
+            em dias. Considerar apenas <code>order_status = 'delivered'</code>.
+          </li>
+          <li>
+            <strong>Taxa de cancelamento por mes:</strong> <code>COUNT(CASE WHEN order_status = 'canceled' THEN 1 END)
+            / COUNT(*)</code> agrupado por <code>date_trunc('month', order_purchase_timestamp)</code>.
+          </li>
+          <li>
+            <strong>Top 20 vendedores por receita:</strong> <code>SUM(price)</code> por <code>seller_id</code>,
+            limite 20. Join com <code>olist_sellers</code> para pegar cidade.
+          </li>
+          <li>
+            <strong>Distribuicao de reviews por categoria:</strong> percentual de <code>review_score</code> 1 a 5
+            por <code>product_category_name</code>. Apresentar em heatmap ou stacked bar.
           </li>
         </ol>
 
-        <h3>Arquiteturas Lambda e Kappa aplicadas ao pipeline da disciplina</h3>
+        <h3>Rubrica completa</h3>
+        <table>
+          <thead>
+            <tr><th>Dimensao</th><th>Peso</th><th>Criterios de avaliacao</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Arquitetura</strong></td>
+              <td>20%</td>
+              <td>
+                Coerencia do pipeline. Uso correto das 3 camadas (raw / trusted / refined).
+                Escolha de servicos adequada aos requisitos. Uso do catalogo Glue.
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Qualidade do dado</strong></td>
+              <td>15%</td>
+              <td>
+                Checks de DQ documentados (nao-nulo, range, unicidade).
+                Deduplicacao. Tratamento explicito de valores faltantes.
+                Evidencia de que dados entregues passaram nos checks.
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Analise / KPIs</strong></td>
+              <td>25%</td>
+              <td>
+                Os 6 KPIs respondidos corretamente, com visualizacao adequada.
+                Insight de negocio para cada KPI (nao so grafico, tambem interpretacao).
+                SQL eficiente (particoes usadas, sem SELECT *).
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Seguranca</strong></td>
+              <td>15%</td>
+              <td>
+                Bucket refined com SSE-KMS e policy TLS-only.
+                IAM minimo (role dedicada, sem access key em notebook).
+                Classificacao de colunas sensiveis documentada.
+              </td>
+            </tr>
+            <tr>
+              <td><strong>FinOps</strong></td>
+              <td>10%</td>
+              <td>
+                Tag <code>Project=Olist</code> aplicada. Lifecycle ativo em raw/streaming/.
+                Estimativa mensal de custo no Pricing Calculator anexa.
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Apresentacao</strong></td>
+              <td>15%</td>
+              <td>
+                Clareza na exposicao em 10 minutos. Live demo funcional.
+                Reflexao escrita com 3+ trade-offs concretos.
+                Respostas objetivas a perguntas.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
         <p>
-          O pipeline construído ao longo da disciplina implementa uma arquitetura
-          <strong>Lambda</strong>: existe um caminho batch (CDC do RDS via DMS,
-          processado em Glue Jobs que rodam periodicamente) e um caminho streaming
-          (Kinesis Firehose entregando eventos em near real-time ao S3).
-          Os consumidores finais (Redshift, Athena) combinam as visões das duas fontes.
-        </p>
-        <p>
-          Uma evolução para <strong>Kappa</strong> seria migrar também a extração do
-          RDS para um stream contínuo (Kinesis + DMS em modo CDC streaming),
-          eliminando o caminho batch e unificando toda a ingestão em um único
-          paradigma de eventos. O trade-off é maior complexidade de reprocessamento
-          histórico e necessidade de maior retenção no stream.
+          <strong>Formato da apresentacao:</strong> 10 minutos por dupla + 5 minutos de perguntas. Demo ao vivo
+          do dashboard ou notebook. Diagrama exibido durante a apresentacao. Reflexao entregue em PDF com
+          no maximo uma pagina.
         </p>
       </section>
 
-      <!-- =========================================================
-           MÓDULO 5 — LABORATÓRIO
-      ========================================================== -->
+      <!-- ============================================================
+           MODULO 4 - LABORATORIO PRATICO
+      ============================================================= -->
       <section class="content-block">
-        <h2>Módulo 5 — Laboratório: Governança com Lake Formation e Revisão Final</h2>
+        <h2>Modulo 4 &mdash; Laboratorio pratico (20h30 &ndash; 22h00)</h2>
         <p>
-          A prática utiliza o ambiente <strong>AWS Student</strong>.
-          O foco é explorar as configurações do Lake Formation e revisar o pipeline construído.
+          O laboratorio aplica os conceitos em cima dos buckets criados na Aula 01 e alimentados ao longo do
+          semestre. Tudo roda em <strong>us-east-1</strong> dentro do AWS Academy Learner Lab. A role padrao
+          do Learner Lab (<code>LabRole</code>) ja tem permissao suficiente para todos os passos.
         </p>
+        <div class="warning">
+          <strong>Limites do Learner Lab:</strong> Cost Explorer pode estar desabilitado em algumas sessoes.
+          Nesses casos, use o <strong>Billing Dashboard</strong> ou faca a leitura do Cost &amp; Usage Report
+          direto pelo S3 (alternativa oficial da AWS). Alem disso, algumas acoes de billing (ativar tag, criar
+          budget) podem estar bloqueadas; o lab foca em aplicar a tag e a lifecycle, mesmo que a ativacao no
+          billing nao seja possivel.
+        </div>
 
-        <h3>Passo 1 — Configurar o Lake Formation</h3>
+        <h3>Passo 1 &mdash; Bucket policy TLS-only e SSE-KMS obrigatorio</h3>
         <ol>
-          <li>No console AWS, acesse <strong>AWS Lake Formation</strong>.</li>
-          <li>Se for o primeiro acesso, clique em <strong>Get started</strong>.</li>
-          <li>Em <strong>Administrators</strong>, verifique se seu usuário está listado.
-          Se não estiver, clique em <strong>Add myself</strong>.</li>
-          <li>Em <strong>Data lake settings</strong>, desmarque a opção
-          <strong>"Use only IAM access control for new databases and tables"</strong>.
-          Isso ativa o controle pelo Lake Formation.</li>
-          <li>Clique em <strong>Save</strong>.</li>
-          <li><strong>Validação:</strong> a configuração do Lake Formation está ativa.</li>
+          <li>Acesse S3 &rarr; bucket <code>&lt;aluno&gt;-refined</code> &rarr; aba <strong>Permissions</strong>.</li>
+          <li>Em <strong>Block public access</strong>, clique Edit, ligue todas as opcoes e Save.</li>
+          <li>Em <strong>Bucket policy</strong>, clique Edit e cole o JSON mostrado no Modulo 1 (trocando <code>&lt;aluno&gt;</code> pelo seu nome e <code>&lt;AWS_ACCOUNT_ID&gt;</code> pelo ID da conta).</li>
+          <li>Salvar. Nao deve dar erro de sintaxe.</li>
+          <li>Vá para a aba <strong>Properties</strong> &rarr; <strong>Default encryption</strong>.</li>
+          <li>Selecione <strong>Server-side encryption with AWS Key Management Service keys (SSE-KMS)</strong>, chave <code>aws/s3</code>, ligar Bucket Key (reduz custo de KMS API).</li>
+          <li>
+            <strong>Teste:</strong> no Cloud9 ou terminal do Learner Lab, tente um upload sem TLS
+            (forcando endpoint HTTP) ou sem KMS:
+<pre>aws s3 cp arquivo.txt s3://&lt;aluno&gt;-refined/test.txt \
+  --sse AES256   # deve falhar: policy exige aws:kms</pre>
+            O comando deve retornar <code>AccessDenied</code>. Com <code>--sse aws:kms</code> ele deve funcionar.
+          </li>
         </ol>
 
-        <h3>Passo 2 — Registrar a localização S3</h3>
+        <h3>Passo 2 &mdash; Lifecycle rule em raw/streaming/</h3>
         <ol>
-          <li>No menu lateral do Lake Formation, clique em <strong>Data lake locations</strong>.</li>
-          <li>Clique em <strong>Register location</strong>.</li>
-          <li>Em <strong>Amazon S3 location</strong>, insira o bucket do Data Lake:
-          <code>s3://seu-bucket-datalake/</code></li>
-          <li>Em <strong>IAM role</strong>, selecione a LakeFormationServiceRole
-          (ou crie uma nova com as permissões necessárias).</li>
-          <li>Clique em <strong>Register location</strong>.</li>
-          <li><strong>Validação:</strong> o bucket aparece na lista de localizações registradas.</li>
+          <li>S3 &rarr; bucket <code>&lt;aluno&gt;-raw</code> &rarr; aba <strong>Management</strong>.</li>
+          <li>Clique <strong>Create lifecycle rule</strong>.</li>
+          <li>Nome: <code>olist-streaming-tiering</code>.</li>
+          <li>Scope: <strong>Limit the scope with one or more filters</strong>, prefix <code>streaming/</code>.</li>
+          <li>Marque <strong>Transition current versions</strong>:
+            <ul>
+              <li>30 dias apos criacao &rarr; Standard-IA.</li>
+              <li>90 dias apos criacao &rarr; Glacier Flexible Retrieval.</li>
+            </ul>
+          </li>
+          <li>Marque <strong>Expire current versions</strong>: 365 dias.</li>
+          <li>Marque <strong>Permanently delete noncurrent versions</strong>: 30 dias.</li>
+          <li>Marque <strong>Delete incomplete multipart uploads</strong>: 7 dias.</li>
+          <li>Revise o resumo e clique <strong>Create rule</strong>.</li>
+          <li>Valide via CLI: <code>aws s3api get-bucket-lifecycle-configuration --bucket &lt;aluno&gt;-raw</code>.</li>
         </ol>
 
-        <h3>Passo 3 — Conceder permissões granulares de tabela</h3>
+        <h3>Passo 3 &mdash; Aplicar cost allocation tags em massa</h3>
         <ol>
-          <li>No Lake Formation, clique em <strong>Permissions</strong> e depois em
-          <strong>Data lake permissions</strong>.</li>
-          <li>Clique em <strong>Grant</strong>.</li>
-          <li>Em <strong>IAM users and roles</strong>, selecione o usuário
-          <code>engenheiro-dados-lab</code> criado na Aula 01.</li>
-          <li>Em <strong>LF-Tags or catalog resources</strong>, selecione
-          <strong>Named data catalog resources</strong>.</li>
-          <li>Database: <code>datalake_lab</code>. Table: <strong>All tables</strong>.</li>
-          <li>Em <strong>Table permissions</strong>, marque: <strong>SELECT, DESCRIBE</strong>.</li>
-          <li>Clique em <strong>Grant</strong>.</li>
-          <li><strong>Validação:</strong> a permissão aparece na lista com o usuário,
-          database e tipo de acesso corretos.</li>
+          <li>No terminal do Learner Lab, valide que a CLI esta autenticada: <code>aws sts get-caller-identity</code>.</li>
+          <li>Aplique a tag nos 3 buckets simultaneamente:
+<pre>aws resourcegroupstaggingapi tag-resources \
+  --resource-arn-list \
+    arn:aws:s3:::&lt;aluno&gt;-raw \
+    arn:aws:s3:::&lt;aluno&gt;-trusted \
+    arn:aws:s3:::&lt;aluno&gt;-refined \
+  --tags Project=Olist,Environment=lab,Owner=&lt;seu_email&gt;,DataClassification=internal</pre>
+          </li>
+          <li>Valide: <code>aws s3api get-bucket-tagging --bucket &lt;aluno&gt;-refined</code>.</li>
+          <li>
+            <strong>Nota:</strong> em ambiente corporativo voce ainda precisa ativar a tag em Billing &rarr;
+            Cost allocation tags &rarr; Activate. Em Learner Lab essa tela costuma estar indisponivel.
+            O que importa e que a tag foi aplicada e sera propagada quando a conta estiver em ambiente pleno.
+          </li>
         </ol>
 
-        <h3>Passo 4 — Cheklist de revisão do pipeline completo</h3>
+        <h3>Passo 4 &mdash; Estimativa mensal no AWS Pricing Calculator</h3>
         <ol>
-          <li>Verifique que o bucket S3 está com criptografia SSE-S3 habilitada
-          (Aula 02).</li>
-          <li>Confirme que a GlueJobRole tem as permissões mínimas necessárias
-          e não usa <code>"Resource": "*"</code> sem necessidade (Aula 01).</li>
-          <li>Verifique que a camada Raw tem prefixos com o formato Hive
-          (<code>chave=valor</code>) para particionamento automático (Aula 02).</li>
-          <li>Confirme que os dados da camada Trusted estão em formato Parquet
-          com compressão Snappy (Aula 05).</li>
-          <li>Verifique que o CloudWatch Alarm de falha do Glue Job está configurado
-          e com estado OK (Aula 07).</li>
-          <li>Confirme que os recursos estão tagueados com <code>projeto=datalake-mba</code>
-          e <code>ambiente=lab</code>.</li>
-          <li>Ao final do lab, delete os recursos criados para evitar cobranças:
-          Glue Jobs, Crawlers, tabelas do Catalog, DynamoDB table, Firehose stream.
-          O bucket S3 pode ser mantido se o lab for encerrado com o ambiente.</li>
-          <li><strong>Validação final:</strong> você consegue descrever cada componente
-          do pipeline e sua relação com os outros sem consultar o material.</li>
+          <li>Abra <code>https://calculator.aws</code> em uma nova aba (nao precisa estar logado).</li>
+          <li>Clique <strong>Create estimate</strong>.</li>
+          <li>Adicione os servicos com as premissas:
+            <ul>
+              <li><strong>Amazon S3:</strong> Standard, 100 GB armazenados; 50 GB data transfer OUT.</li>
+              <li><strong>AWS Glue:</strong> 10 DPU-hora/mes de ETL Spark.</li>
+              <li><strong>Amazon Athena:</strong> 50 GB escaneados por mes.</li>
+              <li><strong>AWS Lambda:</strong> 1M invocacoes, 256 MB, duracao media 500 ms, arm64.</li>
+              <li><strong>Amazon RDS:</strong> PostgreSQL, db.t3.micro, on-demand, 8h/dia, 30 dias, 20 GB GP3.</li>
+              <li><strong>Amazon Kinesis Data Streams:</strong> 1 shard 24/7 por 30 dias.</li>
+            </ul>
+          </li>
+          <li>Revise o total e exporte como <strong>PDF</strong> ou compartilhe a URL.</li>
         </ol>
+        <table>
+          <thead>
+            <tr><th>Servico</th><th>Premissa</th><th>Custo mensal aprox.</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>S3 Standard</td><td>100 GB + 50 GB egress</td><td>USD 3,00</td></tr>
+            <tr><td>Glue</td><td>10 DPU-hora/mes</td><td>USD 4,40</td></tr>
+            <tr><td>Athena</td><td>50 GB escaneado</td><td>USD 0,25</td></tr>
+            <tr><td>Lambda</td><td>1M invocacoes, 256 MB, 500 ms</td><td>USD 2,30</td></tr>
+            <tr><td>RDS db.t3.micro</td><td>8h/dia, 30 dias</td><td>USD 4,20</td></tr>
+            <tr><td>Kinesis</td><td>1 shard 24/7</td><td>USD 10,80</td></tr>
+            <tr><td><strong>Total estimado</strong></td><td>&mdash;</td><td><strong>~ USD 25</strong></td></tr>
+          </tbody>
+        </table>
+        <div class="tip">
+          <strong>Reflexao:</strong> note como o Kinesis representa quase metade da conta. Em um pipeline real,
+          essa e a primeira alavanca: rodar em horario comercial ou usar Kinesis On-Demand em carga variavel.
+        </div>
+
+        <h3>Passo 5 &mdash; Apresentacao do Projeto Final (duplas)</h3>
+        <p>
+          Cada dupla tem 10 minutos para apresentar. A ordem e alfabetica por primeiro nome. Use o tempo para:
+        </p>
+        <ol>
+          <li>Mostrar o diagrama do pipeline (30 segundos).</li>
+          <li>Live demo do dashboard ou notebook (6 minutos, navegando pelos 6 KPIs).</li>
+          <li>Ler ou parafrasear a reflexao de 1 pagina (2 minutos).</li>
+          <li>Perguntas rapidas do professor e da turma (1 a 3 minutos).</li>
+        </ol>
+
+        <h3>Passo 6 &mdash; Cleanup do Learner Lab</h3>
+        <p>
+          Ao fim da aula, <strong>apagar todos os recursos criados no semestre</strong>. O Learner Lab expira,
+          mas apagar manualmente libera o orcamento imediatamente e vira habito profissional.
+        </p>
+        <ol>
+          <li>RDS: Instance &rarr; Actions &rarr; Delete. Desmarcar final snapshot.</li>
+          <li>Kinesis: Data Streams &rarr; selecionar stream &rarr; Delete.</li>
+          <li>Glue: apagar crawlers, jobs e databases criados.</li>
+          <li>S3: esvaziar buckets (inclusive versoes antigas) e depois apagar os buckets.</li>
+          <li>IAM: apagar users e roles temporarios criados.</li>
+          <li>CloudWatch: apagar log groups antigos (cobranca baixa mas acumula).</li>
+          <li>Validar: <code>aws ec2 describe-nat-gateways</code> e <code>aws rds describe-db-instances</code> nao devem retornar recursos ativos.</li>
+        </ol>
+        <div class="danger">
+          <strong>Armadilhas comuns:</strong> NAT Gateway esquecido custa aproximadamente USD 1/dia em us-east-1;
+          snapshots de RDS continuam cobrando depois da instancia ser apagada; buckets com versionamento exigem
+          deletar todas as versoes antes de apagar; CloudWatch Logs retem por tempo configurado (default: forever).
+        </div>
       </section>
 
-      <!-- =========================================================
-           EXERCÍCIOS DE FIXAÇÃO
-      ========================================================== -->
+      <!-- ============================================================
+           MODULO 5 - RETROSPECTIVA E CAMINHOS
+      ============================================================= -->
       <section class="content-block">
-        <h2>Exercícios de fixação</h2>
+        <h2>Modulo 5 &mdash; Retrospectiva do semestre e caminhos</h2>
+        <p>
+          Em 24 horas de aula (8 encontros de 3 horas), construimos uma plataforma analitica moderna ponta a
+          ponta. Voce agora sabe desenhar um Data Lake em 3 camadas sobre S3, ingerir de fontes relacionais
+          (RDS), NoSQL (DynamoDB) e streaming (Kinesis), catalogar e transformar com Glue, consultar com
+          Athena e modelar em Data Warehouse com Redshift ou lakehouse com Iceberg. Sabe tambem aplicar
+          Data Reliability (SLO, SLI, DQ) e proteger o pipeline com seguranca e FinOps.
+        </p>
+        <p>
+          Caminhos para continuar evoluindo:
+        </p>
+        <ul>
+          <li><strong>Certificacoes AWS:</strong> Data Engineer Associate (DEA-C01), Solutions Architect Associate, Security Specialty.</li>
+          <li><strong>Ecossistemas alternativos:</strong> Databricks (Spark + Delta Lake), Snowflake (DW SaaS), Google BigQuery.</li>
+          <li><strong>Lakehouse aberto:</strong> Apache Iceberg (usado no AWS), Delta Lake, Apache Hudi.</li>
+          <li><strong>MLOps:</strong> SageMaker Pipelines, MLflow, Feature Store. A mesma plataforma pode alimentar ML.</li>
+          <li><strong>Data Contracts:</strong> formalizar contratos entre produtor e consumidor de dados.</li>
+          <li><strong>Data Mesh:</strong> paradigma de descentralizacao que vimos na Aula 01, agora com contexto pratico.</li>
+        </ul>
+      </section>
+
+      <!-- ============================================================
+           EXERCICIOS DE FIXACAO
+      ============================================================= -->
+      <section class="content-block">
+        <h2>Exercicios de fixacao</h2>
         <ol>
           <li>
-            <strong>Governança com Lake Formation:</strong> uma empresa de saúde armazena
-            dados de pacientes no Data Lake. A tabela <code>trusted_pacientes</code> tem
-            as colunas: <code>paciente_id</code>, <code>nome</code>, <code>cpf</code>,
-            <code>data_nascimento</code>, <code>diagnostico</code>, <code>medico_responsavel</code>.
-            Defina uma matriz de permissões para três perfis — médico, pesquisador e
-            auditor —, especificando para cada perfil quais colunas podem ser vistas,
-            com ou sem máscara, e justificando com base em requisitos de LGPD.
+            <strong>Envelope encryption:</strong> explique com suas palavras por que o KMS usa envelope
+            encryption em vez de criptografar o objeto diretamente com a CMK. Cite pelo menos 3 beneficios
+            dessa arquitetura para um Data Lake com 100 milhoes de objetos.
           </li>
           <li>
-            <strong>Otimização FinOps:</strong> a conta AWS do time de dados está
-            custando R$ 15.000/mês. A análise do Cost Explorer mostra: 40% em Athena
-            (queries sem particionamento em CSV), 30% em Glue (jobs com 10 DPUs para
-            datasets de 500 MB), 20% em S3 (todos os dados em Standard incluindo 5 anos
-            de histórico), 10% em outros. Estime o potencial de redução de cada categoria
-            e descreva as ações concretas para implementar cada otimização.
+            <strong>Analise de bucket policy:</strong> a bucket policy do Modulo 1 bloqueia uploads sem SSE-KMS.
+            Um colega sugere trocar a condicao por
+            <code>"StringNotEquals": { "s3:x-amz-server-side-encryption": "AES256" }</code>.
+            Explique se essa troca tem o mesmo efeito, e quais sao as implicacoes de seguranca e auditoria de cada escolha.
           </li>
           <li>
-            <strong>Pipeline end-to-end:</strong> descreva o fluxo completo de dados
-            de uma compra realizada em um e-commerce — desde o INSERT no banco de dados
-            de produção até estar disponível em um dashboard de vendas em tempo real
-            e em um relatório histórico mensal. Para cada etapa, identifique o serviço
-            AWS utilizado nesta disciplina, o formato dos dados, a latência esperada,
-            e o mecanismo de recuperação de falhas.
+            <strong>LGPD direito ao esquecimento:</strong> desenhe um job Glue (descreva em pseudocodigo) que
+            recebe uma lista de <code>customer_unique_id</code> e os remove das tabelas <code>orders</code>,
+            <code>order_items</code>, <code>order_reviews</code> em todas as 3 camadas (raw, trusted, refined).
+            Justifique por que essa operacao e mais facil se a camada refined estiver em Apache Iceberg.
           </li>
           <li>
-            <strong>Arquitetura Lambda versus Kappa — decisão final:</strong> com base
-            em tudo que foi visto na disciplina, você está projetando a arquitetura
-            de dados para uma empresa de logística com 10 milhões de entregas/mês.
-            Os dados vêm de sistemas OLTP, GPS de veículos (streaming), e APIs de
-            terceiros (batch diário). O time de BI precisa de dashboards diários e
-            o time de operações precisa de alertas em 2 minutos. Escolha entre Lambda
-            e Kappa (ou uma combinação), justifique sua escolha, e esboce a arquitetura
-            com os serviços AWS específicos para cada componente.
+            <strong>Trade-off de storage class:</strong> um bucket tem 500 GB em objetos de 2 MB cada, acessados
+            em media 1 vez por mes. Calcule o custo mensal se ele estiver em Standard, Standard-IA ou
+            Intelligent-Tiering. Considere custos de armazenamento, retrieval e requests. Qual opcao ganha e por que?
           </li>
           <li>
-            <strong>Checklist de segurança:</strong> antes de fazer o deploy de um
-            pipeline de dados para produção, você precisa garantir que atende a todos
-            os requisitos de segurança. Crie um checklist de pelo menos 10 itens
-            verificáveis (não genéricos — cada item deve especificar o serviço AWS,
-            a configuração exata e como verificar que está correto), cobrindo:
-            IAM, criptografia, rede, auditoria, governança de dados e FinOps.
+            <strong>Desenho de tags:</strong> uma empresa tem 4 produtos de dados (Olist, Logistica, Financeiro,
+            Marketing), 3 ambientes (dev, staging, prod) e 5 times de dados. Proponha um padrao de tags completo
+            (com chaves e valores) que permita calcular: (a) custo por produto; (b) custo por time; (c) custo por
+            ambiente; e (d) custo por produto dentro de cada ambiente. Justifique.
+          </li>
+          <li>
+            <strong>5 Rs:</strong> uma empresa tem um Data Warehouse Oracle on-prem de 10 TB com ETL em SSIS
+            rodando sobre SQL Server. Para cada um dos 5 Rs, proponha uma arquitetura AWS concreta e estime
+            qualitativamente o custo inicial, o custo recorrente e o risco de cada opcao. Qual R voce escolheria e por que?
+          </li>
+          <li>
+            <strong>OKR de custo:</strong> o time definiu o KR &ldquo;custo/TB escaneado em Athena &lt; USD 2&rdquo;.
+            No mes atual, foram escaneados 800 GB e gastos USD 4. Voce bateu a meta? Liste pelo menos 4
+            alavancas tecnicas que voce aplicaria para garantir a meta nos proximos meses, mesmo com crescimento
+            de 30% no volume de query.
+          </li>
+          <li>
+            <strong>Rubrica do projeto final:</strong> uma dupla entrega um dashboard com 5 dos 6 KPIs corretos,
+            usa bucket refined com SSE-S3 (nao SSE-KMS), aplica tag <code>Project=Olist</code>, tem diagrama
+            claro mas nao entrega a reflexao escrita. Aplique a rubrica e calcule a nota final, justificando
+            ponto a ponto.
           </li>
         </ol>
       </section>
 
+      <!-- ============================================================
+           FOOTER
+      ============================================================= -->
       <footer class="actions">
         <a class="button" href="../slides/slide_aula_08_seguranca_de_dados_finops_e_projeto_final_integrado.html">Voltar ao slide</a>
-        <a class="button" href="../../../index.html">Voltar ao índice</a>
+        <a class="button" href="../../../index.html">Voltar ao indice</a>
       </footer>
 
     </main>

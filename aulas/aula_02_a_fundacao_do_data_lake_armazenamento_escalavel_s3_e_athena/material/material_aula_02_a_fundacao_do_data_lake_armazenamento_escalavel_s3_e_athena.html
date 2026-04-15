@@ -6,609 +6,892 @@
     <link rel="icon" type="image/png" href="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" />
     <title>Material Aula 02 — A Fundação do Data Lake: Armazenamento Escalável com S3 e Athena</title>
     <link rel="stylesheet" href="../../../assets/styles.css" />
-    <style data-design-tokens>:root{--bg:#fff;--color:#000000}body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}a:hover{opacity:.8}a:focus{outline:2px solid #000000}</style>
+    <style data-design-tokens>
+      :root{--bg:#fff;--color:#000000}
+      body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}
+      a:hover{opacity:.8}
+      a:focus{outline:2px solid #000000}
+      table{width:100%;border-collapse:collapse;margin:18px 0;font-size:.97rem}
+      th,td{border:1px solid var(--border,#d7d7d7);padding:10px 14px;text-align:left;vertical-align:top}
+      th{background:var(--surface,#f6f6f6);font-weight:700}
+      pre{background:var(--surface,#f6f6f6);border:1px solid var(--border,#d7d7d7);border-radius:6px;padding:18px;overflow-x:auto;font-size:.92rem;line-height:1.5}
+      code{font-family:"Courier New",Courier,monospace}
+      .tip{background:#f0f7f0;border-left:4px solid #2a7a2a;padding:14px 18px;margin:16px 0;border-radius:4px}
+      .warning{background:#fef6e8;border-left:4px solid #c08800;padding:14px 18px;margin:16px 0;border-radius:4px}
+      .danger{background:#fef0f0;border-left:4px solid #b30000;padding:14px 18px;margin:16px 0;border-radius:4px}
+    </style>
   </head>
   <body class="material">
     <main class="page">
 
+      <!-- ============================================================
+           HEADER
+      ============================================================= -->
       <section class="content-block">
-        <p class="meta">Aula 02 &nbsp;•&nbsp; 23/04/2026 &nbsp;•&nbsp; 19h00 – 22h00</p>
+        <p class="meta">Aula 02 &nbsp;&bull;&nbsp; 23/04/2026 &nbsp;&bull;&nbsp; 19h00 &ndash; 22h00</p>
         <h1>A Fundação do Data Lake: Armazenamento Escalável com S3 e Athena</h1>
         <p class="summary">
-          Este material aprofunda os conceitos apresentados nos slides da Aula 02.
-          Cobre a arquitetura de um Data Lake moderno na AWS, a estruturação de
-          buckets e camadas no Amazon S3, estratégias de particionamento e escolha
-          de formatos de arquivo, e o uso do Amazon Athena para consultas SQL
-          serverless diretamente sobre os dados armazenados no lake.
+          Este material acompanha a segunda aula da disciplina <strong>Cloud Computing e SRA &mdash; Visão Prática com AWS</strong>
+          do MBA em Engenharia de Dados. Ele cobre, em profundidade, todos os tópicos apresentados nos slides:
+          definição de Data Lake e seu contraste com Data Warehouse, Medallion architecture (raw, bronze, silver, gold),
+          o serviço <strong>Amazon S3</strong> (conceitos, classes de armazenamento, durabilidade, consistência forte),
+          formatos de arquivo comuns em Data Lake (CSV, JSON, Avro, Parquet, ORC), o ganho do formato colunar,
+          a importância da compressão e do particionamento, o <strong>AWS Glue Data Catalog</strong> como Hive Metastore gerenciado
+          e o <strong>Amazon Athena</strong> como engine SQL serverless. O material inclui ainda o laboratório
+          completo com o dataset <strong>Olist Brazilian E-commerce</strong>: download, upload via AWS CLI, criação do
+          database no Glue, execução do Crawler, primeiras consultas SQL e materialização de uma camada trusted
+          em Parquet particionado via CTAS, com comparativo de custo e performance.
+          A aula tem 3 horas: 19h00 &ndash; 20h30 de teoria e 20h30 &ndash; 22h00 de laboratório prático no AWS Student.
+          Este texto foi escrito para funcionar como guia de estudo autônomo &mdash; é possível revisar todo o conteúdo
+          sem depender de anotações adicionais e reexecutar o laboratório fora do horário de aula.
         </p>
       </section>
 
-      <!-- =========================================================
-           MÓDULO 1 — AMAZON S3 COMO FUNDAÇÃO DO DATA LAKE
-      ========================================================== -->
+      <!-- ============================================================
+           RECAP E PONTE COM A AULA 01
+      ============================================================= -->
       <section class="content-block">
-        <h2>Módulo 1 — Amazon S3: A Fundação do Data Lake</h2>
-
-        <h3>Por que o S3 se torna a fundação do Data Lake?</h3>
+        <h2>Recap da Aula 01 e ponte para hoje</h2>
         <p>
-          O Amazon Simple Storage Service (S3) é um serviço de armazenamento de objetos
-          projetado para escala praticamente ilimitada. Diferente de sistemas de arquivos
-          tradicionais, o S3 não tem diretórios reais — os "prefixos" (caminhos que parecem
-          pastas) são apenas convenções de nomenclatura que os serviços interpretam como
-          estrutura hierárquica. Essa distinção importa porque afeta como você lê, lista
-          e cobra pelo acesso aos dados.
+          Na Aula 01 construímos a base operacional do curso: conta AWS Student em us-east-1,
+          grupo IAM <code>DataEngineers</code>, usuário pessoal <code>eng-dados-01</code> e os três buckets do
+          Data Lake: <code>raw</code>, <code>trusted</code> e <code>refined</code>. Também revisamos conceitos
+          fundamentais de Cloud Computing, modelos de serviço (IaaS/PaaS/SaaS) e os princípios do Modelo de
+          Responsabilidade Compartilhada da AWS. Ao final da aula, todos tinham um ambiente funcional, porém vazio.
         </p>
         <p>
-          A durabilidade do S3 é de 99,999999999% (11 noves), conseguida por replicação
-          automática dos objetos em múltiplas instalações físicas dentro de uma região.
-          Isso significa que a perda de um arquivo por falha de hardware da AWS é
-          essencialmente impossível na prática. Para dados de missão crítica, o S3
-          Cross-Region Replication adiciona ainda mais camadas de proteção geográfica.
-        </p>
-        <p>
-          A separação entre armazenamento e computação é o argumento definitivo para
-          usar o S3 como base: o S3 armazena os dados, enquanto serviços como Athena,
-          Glue, EMR, Redshift Spectrum e SageMaker os processam sem precisar mover
-          terabytes para dentro de um cluster. Isso elimina o acoplamento entre custo
-          de armazenamento e custo de processamento, permitindo escalá-los
-          independentemente.
-        </p>
-
-        <h3>Buckets: criação e configuração essencial</h3>
-        <p>
-          Um bucket é o container raiz no S3. Todo objeto (arquivo) precisa pertencer
-          a um bucket. Cada bucket tem um nome globalmente único em toda a AWS —
-          dois clientes diferentes não podem ter buckets com o mesmo nome no mesmo momento.
-          Isso significa que nomes simples como <code>dados</code> ou <code>analytics</code>
-          certamente já estão ocupados; a convenção é usar prefixos de domínio ou identificadores
-          de organização, como <code>minha-empresa-datalake-prod</code>.
-        </p>
-        <p>
-          Ao criar um bucket, as configurações mais importantes são:
+          Hoje damos o próximo passo lógico: <strong>popular o Data Lake com dados reais</strong> e
+          aprender a consultá-los. A aula tem dois blocos:
         </p>
         <ul>
-          <li>
-            <strong>Região:</strong> escolha a mesma região dos serviços que vão consumir os
-            dados (ex.: us-east-1). Transferência de dados entre regiões gera custo adicional
-            e latência.
-          </li>
-          <li>
-            <strong>Bloqueio de acesso público:</strong> mantenha todas as opções de bloqueio
-            ativadas por padrão. Buckets públicos são uma das principais causas de vazamento de
-            dados em cloud. Acesso público só deve ser liberado deliberadamente para casos
-            como sites estáticos.
-          </li>
-          <li>
-            <strong>Versionamento:</strong> habilite especialmente nas camadas Raw e Trusted.
-            O versionamento mantém versões anteriores dos objetos, permitindo recuperação
-            de arquivos sobrescritos ou deletados acidentalmente.
-          </li>
-          <li>
-            <strong>Criptografia padrão:</strong> ative SSE-S3 (criptografia gerenciada pela AWS)
-            ou SSE-KMS (criptografia com chave gerenciada pelo AWS KMS) para garantir que todos os
-            objetos sejam criptografados em repouso automaticamente.
-          </li>
-        </ul>
-
-        <h3>Classes de armazenamento e custo</h3>
-        <p>
-          O S3 oferece múltiplas classes de armazenamento com diferentes perfis de custo e
-          disponibilidade. A escolha correta pode reduzir significativamente o custo do lake:
-        </p>
-        <ul>
-          <li>
-            <strong>S3 Standard:</strong> alta disponibilidade (99,99%), acesso frequente.
-            Custo mais alto de armazenamento por GB. Use para camadas Trusted e Refined
-            com acesso analítico frequente.
-          </li>
-          <li>
-            <strong>S3 Standard-IA (Infrequent Access):</strong> custo de armazenamento menor,
-            mas cobra por GB lido. Use para dados Raw acessados apenas para reprocessamento.
-          </li>
-          <li>
-            <strong>S3 Glacier Instant Retrieval:</strong> custo muito baixo de armazenamento,
-            acesso em milissegundos. Ideal para dados históricos que raramente são consultados
-            mas precisam de acesso imediato quando necessário.
-          </li>
-          <li>
-            <strong>S3 Glacier Flexible Retrieval:</strong> custo mínimo de armazenamento,
-            recuperação em minutos a horas. Use para arquivamento de longo prazo.
-          </li>
+          <li><strong>19h00 &ndash; 20h30 (Teoria, 90 min):</strong> conceitos de Data Lake, Medallion,
+            S3, formatos de arquivo, Parquet, particionamento, Glue Data Catalog e Athena.</li>
+          <li><strong>20h30 &ndash; 22h00 (Prática AWS Student, 90 min):</strong> ingerir o dataset Olist
+            Brazilian E-commerce, catalogar com Crawler, rodar queries no Athena e materializar a camada trusted
+            em Parquet particionado.</li>
         </ul>
         <p>
-          As políticas de Lifecycle do S3 automatizam a migração entre classes. Por exemplo:
-          dados na camada Raw mais antigos que 90 dias podem ser movidos automaticamente
-          para Standard-IA, e após 1 ano para Glacier Instant Retrieval, sem nenhuma
-          ação manual.
+          O dataset Olist é o <strong>dataset-âncora do curso</strong>. Ele entra oficialmente no pipeline nesta aula
+          (raw) e será progressivamente enriquecido nas próximas (streaming, ETL, DW, monitoramento).
         </p>
       </section>
 
-      <!-- =========================================================
-           MÓDULO 2 — CAMADAS DO DATA LAKE
-      ========================================================== -->
+      <!-- ============================================================
+           MODULO 1 — DATA LAKE: DEFINICAO E PRINCIPIOS
+      ============================================================= -->
       <section class="content-block">
-        <h2>Módulo 2 — Camadas do Data Lake: Raw, Trusted e Refined</h2>
+        <h2>Módulo 1 &mdash; Data Lake: definição e princípios</h2>
 
-        <h3>Por que organizar em camadas?</h3>
+        <h3>O que é um Data Lake</h3>
         <p>
-          A organização em camadas é a espinha dorsal de um Data Lake bem governado.
-          Sem ela, dados brutos se misturam com dados processados, é impossível rastrear
-          a origem de um valor incorreto, e o reprocessamento após uma correção de lógica
-          se torna inviável. Cada camada tem uma responsabilidade clara e uma audiência
-          definida.
-        </p>
-
-        <h3>Camada Raw / Bronze</h3>
-        <p>
-          A camada Raw recebe dados exatamente como chegaram da fonte, sem nenhuma
-          transformação. Isso inclui erros de digitação, valores nulos inesperados,
-          formatos inconsistentes e duplicatas — tudo preservado fielmente.
-          O objetivo é ter um ponto de verdade auditável: se algo der errado
-          em qualquer etapa posterior, você pode sempre reler o dado bruto
-          e reprocessar a partir do zero.
+          Um Data Lake é um repositório centralizado projetado para armazenar volumes arbitrariamente grandes
+          de dados em <strong>seu formato original</strong>, sem modelagem prévia. A expressão foi popularizada
+          por James Dixon (CTO da Pentaho) em 2010 para contrastar com o modelo rígido dos Data Warehouses.
+          A ideia central é simples: em vez de projetar um esquema antes de ingerir os dados (abordagem típica
+          de DW), o Data Lake aceita qualquer coisa &mdash; CSV, JSON, imagens, logs, eventos, Parquet &mdash;
+          e deixa a decisão sobre como interpretar para o momento da leitura.
         </p>
         <p>
-          Boas práticas para a camada Raw:
-        </p>
-        <ul>
-          <li>Nunca sobrescreva um arquivo Raw já gravado. Use particionamento por data
-          de ingestão para garantir imutabilidade.</li>
-          <li>Não aplique transformações de schema. Se a fonte envia JSON com campos extras,
-          preserve todos os campos.</li>
-          <li>Aplique compressão leve (gzip, snappy) para economizar espaço sem comprometer
-          a fidelidade dos dados.</li>
-          <li>Configure o S3 Lifecycle para migrar para Standard-IA após 60-90 dias,
-          pois o Raw raramente é relido depois que as camadas superiores estão populadas.</li>
-        </ul>
-        <p>
-          Convenção de prefixo recomendada para Raw:
-          <code>raw/fonte=orders/ano=2026/mes=04/dia=23/arquivo.json.gz</code>
+          Essa inversão resolve três dores históricas da engenharia de dados: (1) o tempo entre coletar
+          e analisar um novo conjunto de dados deixa de ser semanas ou meses de modelagem formal; (2) dados
+          raros ou exploratórios que não justificariam um datamart podem ser preservados com custo marginal;
+          (3) múltiplos consumidores (BI, ciência de dados, ML) podem usar os mesmos bytes sem disputa pelo schema "oficial".
         </p>
 
-        <h3>Camada Trusted / Silver</h3>
+        <h3>Schema-on-read vs Schema-on-write</h3>
         <p>
-          A camada Trusted contém dados que passaram por um processo de qualidade:
-          tipos de dados validados e padronizados, valores nulos tratados (eliminados ou
-          imputados com justificativa), duplicatas removidas, encoding normalizado para UTF-8,
-          e campos renomeados para seguir convenções de nomenclatura da organização.
+          O contraste com o Data Warehouse é direto. Em um DW, aplica-se <strong>schema-on-write</strong>:
+          toda linha precisa caber no esquema da tabela de destino no momento da ingestão.
+          Isso garante qualidade e consistência, mas torna a estrutura cara de evoluir.
         </p>
         <p>
-          Os dados na camada Trusted são o ponto de consumo para times técnicos — engenheiros
-          de ML, analistas avançados e jobs de Glue que alimentam a camada Refined.
-          O formato preferencial é Parquet com compressão Snappy, que oferece boa razão
-          de compressão sem overhead excessivo de CPU na leitura.
-        </p>
-        <p>
-          Convenção de prefixo recomendada para Trusted:
-          <code>trusted/dominio=vendas/entidade=pedidos/ano=2026/mes=04/parte-0001.parquet</code>
+          Em um Data Lake, aplica-se <strong>schema-on-read</strong>: os arquivos são guardados como chegaram,
+          e cada consumidor aplica seu próprio esquema ao ler. Um cientista de dados pode interpretar um JSON
+          aninhado com uma visão; um analista pode achatar o mesmo JSON com outra. Ambos partem do mesmo objeto
+          imutável em S3. Isso traz flexibilidade, mas exige disciplina: sem governança, o Data Lake vira
+          "Data Swamp" &mdash; dados presentes, porém inusáveis.
         </p>
 
-        <h3>Camada Refined / Gold</h3>
+        <h3>Princípios fundamentais</h3>
+        <ol>
+          <li><strong>Desacoplamento de armazenamento e computação:</strong> os arquivos ficam em S3 (barato,
+            durável, elástico); engines diferentes (Athena, EMR, Redshift Spectrum, SageMaker, Spark, Flink)
+            leem os mesmos dados. Se a demanda analítica dobra, não é preciso redimensionar o "banco".</li>
+          <li><strong>Formatos abertos:</strong> Parquet, ORC, Avro, JSON e CSV são padrões públicos.
+            Um pipeline construído corretamente pode ser lido por qualquer ferramenta compatível.
+            Isso elimina lock-in &mdash; trocar de engine não exige migração de dados.</li>
+          <li><strong>Escala praticamente ilimitada:</strong> o S3 absorve de kilobytes a exabytes com
+            o mesmo modelo de preço por GB armazenado. Não há planejamento de capacidade.</li>
+          <li><strong>Multi-workload:</strong> o mesmo objeto S3 alimenta um dashboard Power BI,
+            um notebook Jupyter, um job Spark e um modelo SageMaker. Os metadados descritivos ficam em um
+            catálogo compartilhado (Glue Data Catalog).</li>
+          <li><strong>Custo linear e previsível:</strong> armazenamento por GB/mês, classes Glacier para
+            dados frios e cobrança por TB escaneado nas engines. O custo acompanha o uso.</li>
+        </ol>
+      </section>
+
+      <!-- ============================================================
+           MODULO 2 — DATA LAKE VS DATA WAREHOUSE
+      ============================================================= -->
+      <section class="content-block">
+        <h2>Módulo 2 &mdash; Data Lake vs Data Warehouse</h2>
+
         <p>
-          A camada Refined contém dados modelados para consumo direto por ferramentas
-          de BI, dashboards operacionais e modelos de machine learning em produção.
-          Aqui os dados já estão agregados, enriquecidos com atributos de outras fontes
-          e organizados por domínio ou produto analítico.
+          Muita discussão "Lake vs Warehouse" é falsa dicotomia: são ferramentas diferentes que convivem bem.
+          O DW otimiza analytics tabulares de alta performance com schema e integridade bem definidos; o Lake
+          otimiza escala, variedade e custo. Organizações grandes quase sempre têm os dois, conectados por
+          pipelines que promovem dados refinados do Lake para o DW.
         </p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Aspecto</th>
+              <th>Data Lake</th>
+              <th>Data Warehouse</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Abordagem de schema</td><td>Schema-on-read</td><td>Schema-on-write</td></tr>
+            <tr><td>Tipos de dado</td><td>Estruturado, semi-estruturado, não estruturado</td><td>Estruturado tabular</td></tr>
+            <tr><td>Custo por TB</td><td>Muito baixo (S3, ~US$ 23/TB/mês em Standard)</td><td>Alto (storage proprietário MPP)</td></tr>
+            <tr><td>Performance analítica</td><td>Boa com Parquet + partição</td><td>Excelente (indexação, distribuição, MPP)</td></tr>
+            <tr><td>Concorrência</td><td>Alta, serverless ou elástica</td><td>Limitada pela capacidade do cluster</td></tr>
+            <tr><td>Flexibilidade de schema</td><td>Alta &mdash; dados imutáveis, schema evolui no consumo</td><td>Baixa &mdash; ALTER TABLE explícito</td></tr>
+            <tr><td>Principais consumidores</td><td>ML, engenheiros, exploração ad-hoc</td><td>BI corporativo, dashboards, relatórios</td></tr>
+            <tr><td>Exemplo AWS</td><td>S3 + Glue + Athena</td><td>Amazon Redshift</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Data Lakehouse</h3>
         <p>
-          Exemplos de datasets na camada Refined: tabela de fatos de vendas diárias
-          por região, indicadores de NPS calculados por coorte de clientes, dataset
-          de features para modelo de churn. Cada um tem um proprietário de negócio
-          e um SLA de atualização definido.
-        </p>
-        <p>
-          Convenção de prefixo recomendada para Refined:
-          <code>refined/produto=dashboard-vendas/versao=v2/snapshot=2026-04-23/dados.parquet</code>
+          Entre as duas abordagens surgiu o <strong>Data Lakehouse</strong>, que combina custo e flexibilidade
+          do Lake com transações ACID e performance do DW, via formatos de tabela como Apache Iceberg,
+          Delta Lake e Apache Hudi. Nesses formatos, os dados permanecem como Parquet em S3, mas ganham
+          metadados transacionais que permitem upserts, time travel, schema evolution controlada e
+          otimizações sem perder interoperabilidade. A AWS suporta Iceberg nativamente via Athena, Glue, EMR
+          e Redshift Spectrum. Aula 06 retomará Lakehouse com mais profundidade.
         </p>
       </section>
 
-      <!-- =========================================================
-           MÓDULO 3 — FORMATOS E PARTICIONAMENTO
-      ========================================================== -->
+      <!-- ============================================================
+           MODULO 3 — MEDALLION ARCHITECTURE
+      ============================================================= -->
       <section class="content-block">
-        <h2>Módulo 3 — Formatos de Arquivo e Particionamento</h2>
+        <h2>Módulo 3 &mdash; Medallion Architecture</h2>
 
-        <h3>CSV: simples, mas custoso em escala</h3>
         <p>
-          O CSV é o formato mais universalmente suportado e ideal para a ingestão inicial
-          na camada Raw, especialmente quando a fonte é um sistema legado ou um arquivo
-          exportado manualmente. A leitura analítica de CSV, porém, tem custo elevado
-          no Athena porque o mecanismo precisa ler a linha inteira mesmo quando a consulta
-          só precisa de duas colunas de uma tabela com 50.
+          Medallion é um padrão arquitetural popularizado pela Databricks que organiza o Data Lake em camadas
+          de qualidade e valor crescentes: <strong>Bronze &rarr; Silver &rarr; Gold</strong>.
+          No curso, usamos os nomes equivalentes <strong>raw &rarr; trusted &rarr; refined</strong>
+          para alinhar com convenções comuns em engenharia de dados brasileira.
         </p>
 
-        <h3>JSON: flexível, mas volumoso</h3>
+        <h3>Raw / Bronze</h3>
         <p>
-          O JSON é preferido quando os dados têm schema variável — por exemplo, eventos
-          de plataforma onde cada tipo de ação tem atributos diferentes. O JSON Lines
-          (JSONL, onde cada linha é um objeto JSON independente) facilita o processamento
-          paralelo. Assim como o CSV, o JSON é row-oriented e custoso para leituras
-          analíticas que acessam subconjuntos de colunas.
+          Camada de ingestão fiel. Os dados chegam no formato original da fonte e são gravados no S3
+          sem modificação. É intencionalmente "feia": CSVs com encoding problemático, JSONs aninhados,
+          logs semi-estruturados, tudo convive. A regra de ouro é <strong>imutabilidade</strong>: nada se
+          sobrescreve, cada ingestão produz novos arquivos, normalmente com carimbo temporal no prefixo.
+          Essa camada é a garantia de reprocessamento: se um bug for descoberto semanas depois na camada
+          trusted, sempre é possível regenerá-la a partir da raw.
         </p>
 
-        <h3>Parquet: o formato analítico padrão</h3>
+        <h3>Trusted / Silver</h3>
         <p>
-          O Apache Parquet é um formato colunar: em vez de armazenar linha por linha,
-          armazena coluna por coluna. Quando uma query do Athena precisa apenas das
-          colunas <code>data_pedido</code> e <code>valor_total</code> de uma tabela
-          com 30 colunas, o Athena lê apenas os blocos físicos dessas duas colunas,
-          ignorando completamente as outras 28. O resultado é uma redução drástica
-          no volume de dados lido — e o Athena cobra por volume lido.
-        </p>
-        <p>
-          Além da leitura seletiva, o Parquet inclui estatísticas por bloco (valor mínimo,
-          máximo e contagem de nulos por coluna). O Athena usa essas estatísticas para
-          pular blocos inteiros que não satisfazem os filtros da query, sem nem precisar
-          ler os dados. Isso é chamado de <em>predicate pushdown</em>.
-        </p>
-        <p>
-          A compressão padrão para Parquet na AWS é Snappy, que oferece boa velocidade
-          de compressão/descompressão em troca de uma razão de compressão ligeiramente
-          menor que Gzip. Para dados históricos raramente acessados, Gzip pode reduzir
-          ainda mais o tamanho, ao custo de mais CPU na leitura.
+          Dados limpos, validados e deduplicados. Os tipos são corretamente convertidos
+          (datas viram <code>timestamp</code>, números viram <code>double</code>), registros duplicados são
+          removidos, chaves nulas tratadas, e o formato passa a ser <strong>Parquet comprimido e particionado</strong>.
+          A camada trusted tem schema estável &mdash; mudanças exigem versionamento explícito. Esta é a
+          "fonte de verdade operacional" do Data Lake: a maioria das análises e modelos ML consome daqui.
         </p>
 
-        <h3>Particionamento estratégico</h3>
+        <h3>Refined / Gold</h3>
         <p>
-          Particionar significa organizar os dados em subpastas baseadas em valores de
-          uma ou mais colunas. O Athena usa a estrutura de partições para pular prefixos
-          inteiros do S3 que não satisfazem os filtros de uma query, sem precisar
-          listar ou ler nenhum arquivo dentro deles.
-        </p>
-        <p>
-          Critérios para escolher colunas de particionamento:
-        </p>
-        <ul>
-          <li>A coluna deve aparecer frequentemente nos filtros <code>WHERE</code> das consultas.
-          Se quase toda query filtra por <code>data</code>, particionar por data é a
-          escolha óbvia.</li>
-          <li>A cardinalidade deve ser moderada. Particionar por <code>user_id</code>
-          em uma tabela com 10 milhões de usuários criaria 10 milhões de partições,
-          causando problemas de listagem e overhead de metadados no Glue.</li>
-          <li>Evite partições com poucos arquivos pequenos (menos de ~100 MB cada).
-          O overhead de abertura de arquivo no S3 se torna dominante quando há
-          muitos arquivos diminutos.</li>
-        </ul>
-        <p>
-          Exemplo de hierarquia de particionamento para uma tabela de eventos:
-          <code>trusted/dominio=eventos/tipo=click/ano=2026/mes=04/dia=23/parte-0001.parquet</code>
-        </p>
-        <p>
-          O formato <code>chave=valor</code> nos prefixos é a convenção do Hive Metastore,
-          que o AWS Glue Catalog reconhece automaticamente ao executar um Crawler,
-          eliminando a necessidade de cadastrar partições manualmente.
+          Dados modelados para casos de uso específicos. Aqui vivem tabelas agregadas, modelos dimensionais
+          (fatos e dimensões), marts por área de negócio (vendas, marketing, logística), features de ML
+          prontas para inferência. A camada gold é opinativa: existe para servir consumidores bem definidos,
+          com SLAs claros de atualização e qualidade. Ferramentas de BI conectam majoritariamente aqui.
         </p>
 
-        <h3>O problema dos arquivos pequenos</h3>
+        <h3>Aplicação no curso</h3>
         <p>
-          Cada arquivo no S3 tem um custo mínimo de operação: o Athena faz uma requisição
-          HTTP separada para abrir cada arquivo. Quando um pipeline gera milhares de
-          arquivos de 1-2 MB (o "small files problem"), o tempo de abertura de arquivos
-          domina o tempo total da query. A solução é compactar esses arquivos em um
-          job periódico de compaction — um job Glue que lê todos os arquivos pequenos
-          de uma partição e os reescreve como um ou dois arquivos grandes.
+          Nosso pipeline Olist percorrerá as três camadas ao longo das aulas: hoje populamos <code>raw</code>
+          e criamos a primeira tabela <code>trusted</code> (orders em Parquet particionado); nas aulas 04 e 05
+          adicionamos streaming e ETL serverless que alimentam trusted; na aula 06 promovemos para
+          <code>refined</code> em Redshift/Iceberg.
         </p>
       </section>
 
-      <!-- =========================================================
-           MÓDULO 4 — AMAZON ATHENA
-      ========================================================== -->
+      <!-- ============================================================
+           MODULO 4 — AMAZON S3
+      ============================================================= -->
       <section class="content-block">
-        <h2>Módulo 4 — Amazon Athena: Consultas Serverless sobre o Data Lake</h2>
+        <h2>Módulo 4 &mdash; Amazon S3 em profundidade</h2>
 
-        <h3>O que é o Athena e como funciona</h3>
+        <h3>Visão geral</h3>
         <p>
-          O Amazon Athena é um serviço de query interativo baseado no motor open-source
-          Presto (agora Trino). Ele executa SQL ANSI sobre dados armazenados no S3 sem
-          precisar provisionar ou gerenciar nenhum servidor. Você define as tabelas
-          no AWS Glue Data Catalog (que atua como metastore compatível com Hive),
-          submete a query, e o Athena lê os arquivos diretamente do S3, processa
-          em paralelo em uma frota de workers gerenciados pela AWS, e retorna
-          os resultados.
-        </p>
-        <p>
-          O modelo de precificação é baseado em dados lidos: US$ 5,00 por terabyte de
-          dados varridos. Isso cria um incentivo direto para usar Parquet (reduz volume
-          lido por projeção de colunas), compressão (reduz o tamanho físico), e
-          particionamento (reduz o número de arquivos abertos). Uma query que escaneia
-          10 GB em CSV pode escanear apenas 500 MB em Parquet particionado para
-          o mesmo conjunto de resultados, reduzindo o custo em 20x.
+          O Amazon <strong>Simple Storage Service (S3)</strong> é o serviço mais antigo da AWS, lançado em 2006.
+          É um sistema de armazenamento de objetos distribuído globalmente, acessível via API HTTP, com
+          modelo de preço pay-per-use. Praticamente todo Data Lake moderno na AWS é construído sobre S3,
+          e serviços como Glue, Athena, EMR, Redshift Spectrum e SageMaker leem e escrevem nele nativamente.
         </p>
 
-        <h3>Configuração inicial do Athena</h3>
-        <p>
-          Antes de executar a primeira query, o Athena precisa de um bucket S3 configurado
-          para armazenar os resultados. Essa configuração é feita em Settings no console
-          do Athena. Os arquivos de resultado ficam nesse bucket e podem ser consultados
-          ou baixados. Crie um bucket separado exclusivamente para resultados do Athena,
-          como <code>minha-empresa-athena-results</code>, para manter o lake organizado.
-        </p>
-
-        <h3>Criando tabelas externas no Athena</h3>
-        <p>
-          Uma tabela externa no Athena é apenas um mapeamento de metadados: ela
-          descreve como interpretar os arquivos no S3 (formato, schema, partições),
-          mas não move nem copia os dados. Deletar a tabela não apaga os arquivos.
-        </p>
-        <p>
-          Exemplo de DDL para criar uma tabela CSV na camada Raw:
-        </p>
-        <pre><code>CREATE EXTERNAL TABLE raw_pedidos (
-  pedido_id   STRING,
-  cliente_id  STRING,
-  data_pedido STRING,
-  valor       DOUBLE,
-  status      STRING
-)
-ROW FORMAT DELIMITED
-FIELDS TERMINATED BY ','
-LINES TERMINATED BY '\n'
-TBLPROPERTIES ('skip.header.line.count'='1')
-LOCATION 's3://meu-datalake/raw/fonte=pedidos/';
-</code></pre>
-        <p>
-          Exemplo de DDL para criar uma tabela Parquet particionada na camada Trusted:
-        </p>
-        <pre><code>CREATE EXTERNAL TABLE trusted_pedidos (
-  pedido_id   STRING,
-  cliente_id  STRING,
-  data_pedido DATE,
-  valor       DOUBLE,
-  status      STRING
-)
-PARTITIONED BY (ano STRING, mes STRING, dia STRING)
-STORED AS PARQUET
-LOCATION 's3://meu-datalake/trusted/dominio=vendas/entidade=pedidos/';
-</code></pre>
-        <p>
-          Após criar a tabela particionada, é necessário registrar as partições para
-          que o Athena as reconheça. O comando <code>MSCK REPAIR TABLE trusted_pedidos;</code>
-          escaneia os prefixos no S3 e registra automaticamente todas as partições
-          que seguem o formato Hive.
-        </p>
-
-        <h3>Otimizando consultas no Athena</h3>
-        <p>
-          As quatro regras mais impactantes para reduzir custo e tempo de consulta:
-        </p>
+        <h3>Conceitos centrais</h3>
         <ul>
-          <li>
-            <strong>Selecione apenas as colunas necessárias:</strong> use
-            <code>SELECT coluna1, coluna2</code> em vez de <code>SELECT *</code>.
-            Com Parquet, isso reduz o volume lido na proporção das colunas não selecionadas.
-          </li>
-          <li>
-            <strong>Filtre por colunas de partição:</strong> sempre inclua
-            <code>WHERE ano='2026' AND mes='04'</code> quando possível.
-            O Athena pula prefixos inteiros que não correspondem ao filtro.
-          </li>
-          <li>
-            <strong>Use Parquet com compressão:</strong> converta dados de Raw (CSV/JSON)
-            para Parquet na camada Trusted com um job Glue. A diferença de custo
-            por consulta justifica o custo do job de conversão em poucas execuções.
-          </li>
-          <li>
-            <strong>Evite <code>SELECT COUNT(*)</code> em tabelas grandes sem filtro:</strong>
-            esse tipo de query escaneia a tabela inteira. Use estimativas ou tabelas
-            de summary pré-calculadas para métricas operacionais frequentes.
-          </li>
+          <li><strong>Bucket:</strong> contêiner raiz de objetos. Nomes são globalmente únicos no mundo todo.
+            O bucket vive em uma <em>região</em> específica (us-east-1 no nosso caso) e herda dela características
+            de latência, preço e compliance.</li>
+          <li><strong>Object:</strong> a unidade de armazenamento. Cada objeto tem um corpo (bytes), uma
+            <em>key</em> (caminho lógico) e metadados (Content-Type, tamanho, checksum, tags opcionais).
+            O tamanho varia de 0 bytes a 5 TB por objeto.</li>
+          <li><strong>Key:</strong> o identificador único dentro do bucket. Apesar de parecer um caminho
+            hierárquico (<code>olist/orders/2026/04/23/file.csv</code>), na verdade é uma string plana &mdash;
+            não existem "diretórios" de fato. O S3 usa <em>prefixos</em> (a parte inicial da key) para
+            agrupar objetos logicamente.</li>
+          <li><strong>Prefix:</strong> convenção que transforma o S3 em um pseudo-filesystem. Ferramentas
+            como o console AWS exibem prefixos como pastas. Para Data Lakes, os prefixos são essenciais:
+            cada camada, dataset e partição é um prefixo.</li>
         </ul>
 
-        <h3>Workgroups no Athena</h3>
+        <h3>Durabilidade e disponibilidade</h3>
         <p>
-          Os Workgroups permitem isolar consultas por equipe, controlar limites de custo
-          e configurar output locations diferentes. Por exemplo, o workgroup
-          <code>DataScientists</code> pode ter um limite de 50 GB por query e apontar
-          resultados para um bucket separado, enquanto o workgroup <code>DataEngineers</code>
-          tem limite de 500 GB e acesso a tabelas de todas as camadas.
+          O S3 Standard oferece <strong>99,999999999% de durabilidade</strong> (os famosos "eleven nines").
+          Na prática isso significa que, se você armazenar 10 milhões de objetos, a probabilidade estatística
+          de perder um é de aproximadamente um a cada 10.000 anos. A AWS atinge esse número replicando
+          cada objeto automaticamente em <strong>pelo menos três Availability Zones</strong> dentro da região,
+          com checksums verificados em cada operação e auto-recuperação de corrupção detectada.
+        </p>
+        <p>
+          A disponibilidade (capacidade de responder a requisições) é de 99,99% para S3 Standard, com SLAs
+          menores para classes de arquivamento.
         </p>
 
-        <h3>AWS Glue Data Catalog como metastore</h3>
+        <h3>Consistência forte (strong read-after-write)</h3>
         <p>
-          O Glue Data Catalog é o repositório central de metadados do ecossistema analítico
-          da AWS. Ele armazena databases e tables, que descrevem onde os dados estão no S3
-          e como interpretá-los. O Athena, o Redshift Spectrum, o EMR e o Glue Jobs
-          compartilham o mesmo Glue Catalog, garantindo que todos os serviços vejam
-          o mesmo schema de tabelas sem duplicação de definições.
+          Desde dezembro de 2020 o S3 oferece <strong>consistência forte</strong> para todas as operações:
+          após um <code>PUT</code> bem-sucedido, qualquer <code>GET</code> ou <code>LIST</code> subsequente
+          enxerga a versão final do objeto. Antes, objetos recém-criados tinham read-after-write consistente,
+          mas sobrescritas e deletes eram <em>eventualmente consistentes</em> &mdash; o que exigia
+          workarounds em pipelines. Hoje isso não é mais necessário, o que simplifica ETL, ingestão em
+          streaming e orquestração.
+        </p>
+
+        <h3>Classes de armazenamento</h3>
+        <p>
+          Cada objeto tem uma storage class associada, que determina custo por GB, custo por requisição,
+          latência de recuperação e disponibilidade. A tabela abaixo resume as classes mais usadas para
+          Data Lakes:
+        </p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Classe</th>
+              <th>Uso típico</th>
+              <th>Latência de acesso</th>
+              <th>Custo relativo</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>S3 Standard</td><td>Dados ativos, analytics frequente</td><td>Milissegundos</td><td>Alto</td></tr>
+            <tr><td>S3 Intelligent-Tiering</td><td>Padrão de acesso desconhecido ou variável</td><td>Milissegundos</td><td>Otimizado automaticamente</td></tr>
+            <tr><td>S3 Standard-IA (Infrequent Access)</td><td>Backup, dados acessados mensalmente</td><td>Milissegundos</td><td>Médio (menor armazenamento, requisição mais cara)</td></tr>
+            <tr><td>S3 One Zone-IA</td><td>Cópias secundárias recriáveis</td><td>Milissegundos</td><td>20% menor que Standard-IA</td></tr>
+            <tr><td>S3 Glacier Instant Retrieval</td><td>Arquivamento com necessidade de acesso imediato</td><td>Milissegundos</td><td>Baixo</td></tr>
+            <tr><td>S3 Glacier Flexible Retrieval</td><td>Compliance, retenção longa (meses)</td><td>Minutos a horas</td><td>Muito baixo</td></tr>
+            <tr><td>S3 Glacier Deep Archive</td><td>Retenção regulatória (7+ anos)</td><td>Até 12 horas</td><td>Mínimo da AWS</td></tr>
+          </tbody>
+        </table>
+
+        <div class="tip">
+          <strong>Dica prática:</strong> configure <strong>Lifecycle Rules</strong> no bucket raw para
+          mover automaticamente objetos com mais de 90 dias para Glacier Instant, e com mais de 365 dias
+          para Glacier Deep Archive. Isso reduz custo em 70% ou mais para dados históricos sem trabalho manual.
+        </div>
+
+        <h3>Recursos complementares</h3>
+        <ul>
+          <li><strong>Versioning:</strong> cada overwrite cria uma nova versão; objetos "deletados" ganham delete marker.
+            Permite desfazer erros.</li>
+          <li><strong>Replication:</strong> cópia automática para outro bucket (mesma região ou cross-region)
+            para DR e latência geográfica.</li>
+          <li><strong>Object Lock:</strong> bloqueio WORM (write once, read many) para compliance regulatória.</li>
+          <li><strong>Server-Side Encryption:</strong> SSE-S3 (chaves gerenciadas pelo S3), SSE-KMS
+            (integração com AWS KMS) e SSE-C (chaves do cliente).</li>
+        </ul>
+      </section>
+
+      <!-- ============================================================
+           MODULO 5 — FORMATOS DE ARQUIVO
+      ============================================================= -->
+      <section class="content-block">
+        <h2>Módulo 5 &mdash; Formatos de arquivo no Data Lake</h2>
+
+        <h3>Por que o formato importa</h3>
+        <p>
+          A escolha do formato determina custo, performance de consulta, interoperabilidade e
+          facilidade de evolução. Formatos baseados em texto (CSV, JSON) são humanamente legíveis e
+          fáceis de produzir, mas são lentos para analytics em larga escala e ocupam muito espaço.
+          Formatos binários colunares (Parquet, ORC) são o padrão de facto em camadas trusted e refined.
+        </p>
+
+        <h3>Panorama dos formatos</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Formato</th>
+              <th>Tipo</th>
+              <th>Quando usar</th>
+              <th>Quando evitar</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>CSV</td><td>Texto, linhas</td><td>Ingestão inicial, intercâmbio com áreas não técnicas, dumps manuais</td><td>Analytics em escala, schemas complexos</td></tr>
+            <tr><td>JSON / JSONL</td><td>Texto, semi-estruturado</td><td>APIs REST, eventos, schemas aninhados e flexíveis</td><td>Volumes grandes (alto custo de parse e tamanho)</td></tr>
+            <tr><td>Avro</td><td>Binário, linha</td><td>Streaming (Kafka, Kinesis), evolução de schema automática</td><td>Consultas analíticas colunares</td></tr>
+            <tr><td>Parquet</td><td>Binário, colunar</td><td>Analytics OLAP, camadas trusted e refined, formato padrão do curso</td><td>Escrita frequente de registros individuais (OLTP)</td></tr>
+            <tr><td>ORC</td><td>Binário, colunar</td><td>Ambientes Hive/Hadoop on-premises legados</td><td>Ambientes AWS modernos (prefira Parquet)</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Row-based vs Column-based</h3>
+        <p>
+          Em formatos <strong>row-based</strong> (CSV, JSON, Avro), registros são armazenados completos em
+          sequência: <code>linha1[col1,col2,col3] linha2[col1,col2,col3]...</code>. Para ler uma coluna
+          específica, o engine precisa ler o arquivo inteiro. Isso é ótimo para OLTP, onde cada transação
+          lê ou grava uma linha inteira.
         </p>
         <p>
-          Os Glue Crawlers descobrem automaticamente o schema de dados no S3, criam ou
-          atualizam tabelas no Catalog e detectam novas partições. Um Crawler configurado
-          para rodar diariamente mantém o Catalog sempre atualizado sem intervenção manual.
+          Em formatos <strong>column-based</strong> (Parquet, ORC), os dados são reorganizados por coluna
+          dentro de blocos chamados <em>row groups</em>:
+          <code>rowgroup[col1(linha1,2,3...) col2(linha1,2,3...) col3(linha1,2,3...)]</code>.
+          Isso habilita duas otimizações cruciais:
+        </p>
+        <ul>
+          <li><strong>Projection pushdown:</strong> o engine lê apenas as colunas mencionadas no
+            <code>SELECT</code>. Se você seleciona 2 colunas de uma tabela com 20, lê 10% dos bytes.</li>
+          <li><strong>Predicate pushdown:</strong> Parquet guarda estatísticas (min/max) por row group.
+            Um <code>WHERE price &gt; 1000</code> permite pular row groups cujo <code>max &lt;= 1000</code>
+            sem abrir o conteúdo.</li>
+        </ul>
+        <p>
+          Além disso, valores similares ficam juntos dentro de uma coluna, o que melhora drasticamente
+          a compressão. Uma coluna <code>order_status</code> com 5 valores distintos em 100 mil linhas
+          comprime para poucos bytes em Parquet.
+        </p>
+
+        <h3>Parquet em detalhes</h3>
+        <p>
+          Apache Parquet é um formato colunar open source criado em 2013 pelo Twitter e Cloudera, hoje
+          mantido pela Apache Foundation. Especificação e codecs são abertos; leitores existem em
+          praticamente toda linguagem moderna (Java, Python/pandas/PyArrow, R, Rust, Go).
+        </p>
+        <p>
+          A estrutura interna de um arquivo Parquet é:
+        </p>
+        <ol>
+          <li><strong>Header</strong> com magic bytes (<code>PAR1</code>).</li>
+          <li>Um ou mais <strong>row groups</strong>, cada um contendo <strong>column chunks</strong> (um por coluna).</li>
+          <li>Cada column chunk é dividido em <strong>pages</strong> comprimidas, com estatísticas.</li>
+          <li><strong>Footer</strong> com metadados globais (schema, localização de cada row group, estatísticas).</li>
+        </ol>
+
+        <h3>Compressão</h3>
+        <p>
+          Parquet suporta múltiplos codecs de compressão por coluna. A escolha é um trade-off entre
+          taxa de compressão, CPU de leitura/escrita e se o arquivo é <em>splittable</em>
+          (capaz de ser processado em paralelo por múltiplos workers).
+        </p>
+        <ul>
+          <li><strong>Snappy:</strong> compressão média, CPU mínima, splittable em Parquet.
+            É o padrão recomendado para analytics. Parquet+Snappy é a combinação usada no curso.</li>
+          <li><strong>Gzip:</strong> taxa de compressão alta, CPU alto, <em>não splittable em CSV</em>
+            mas splittable em Parquet (Parquet comprime por página, não o arquivo inteiro).
+            Bom para dados frios, arquivamento.</li>
+          <li><strong>Zstd:</strong> codec moderno da Facebook. Taxa comparável ao Gzip com muito
+            menos CPU. Substituto natural do Gzip em pipelines novos.</li>
+          <li><strong>Sem compressão:</strong> usado apenas para depuração.</li>
+        </ul>
+      </section>
+
+      <!-- ============================================================
+           MODULO 6 — PARTICIONAMENTO
+      ============================================================= -->
+      <section class="content-block">
+        <h2>Módulo 6 &mdash; Particionamento</h2>
+
+        <p>
+          Particionar um dataset é dividir os arquivos em subdiretórios (prefixos S3) de acordo com o
+          valor de uma ou mais colunas. Quando um engine SQL sabe como as partições estão organizadas,
+          ele pode <strong>eliminar partições inteiras do plano de execução</strong> com base no WHERE
+          da consulta &mdash; técnica conhecida como <em>partition pruning</em>.
+        </p>
+
+        <h3>Convenção estilo Hive</h3>
+        <p>
+          A convenção mais usada é a herdada do Apache Hive, no formato
+          <code>coluna=valor</code> em cada nível de prefixo:
+        </p>
+
+<pre>s3://aluno-trusted/olist/orders/
+  year=2026/month=04/day=23/part-00000.parquet
+  year=2026/month=04/day=24/part-00000.parquet
+  year=2026/month=05/day=01/part-00000.parquet</pre>
+
+        <p>
+          Uma consulta como <code>SELECT ... FROM orders WHERE year=2026 AND month=04</code> fará
+          o Athena abrir apenas os arquivos do prefixo <code>year=2026/month=04/</code>.
+          Sem partição, o Athena teria de ler o dataset inteiro.
+        </p>
+
+        <h3>Boas práticas</h3>
+        <ul>
+          <li><strong>Particione por colunas frequentemente usadas em WHERE</strong>, tipicamente datas
+            (year/month/day, ingestion_date).</li>
+          <li><strong>Evite cardinalidade muito alta:</strong> particionar por <code>user_id</code> gera
+            milhões de prefixos com arquivos minúsculos, degrada performance e aumenta custos de metadados.</li>
+          <li><strong>Prefira arquivos de 128&ndash;512 MB:</strong> row groups menores têm overhead alto de
+            metadados, e arquivos muito grandes reduzem paralelismo.</li>
+          <li><strong>Partição composta:</strong> <code>year=.../month=.../day=.../</code> é melhor
+            que apenas <code>day=.../</code> porque permite queries de intervalo em cada nível.</li>
+          <li><strong>Partition projection:</strong> recurso do Athena que dispensa registrar partições
+            explicitamente &mdash; útil quando a estrutura é determinística (data diária, por exemplo).</li>
+        </ul>
+
+        <div class="warning">
+          <strong>Atenção &mdash; small file problem:</strong> particionar com granularidade muito fina
+          (por exemplo, uma partição por minuto) gera milhares de arquivos pequenos. Cada arquivo exige
+          uma requisição S3 e contribui ao overhead de planning do Athena. Consolide com processos de
+          <em>compaction</em> (união periódica de arquivos pequenos) ou reduza a granularidade da partição.
+        </div>
+      </section>
+
+      <!-- ============================================================
+           MODULO 7 — GLUE DATA CATALOG
+      ============================================================= -->
+      <section class="content-block">
+        <h2>Módulo 7 &mdash; AWS Glue Data Catalog</h2>
+
+        <p>
+          O <strong>AWS Glue Data Catalog</strong> é um metastore gerenciado pela AWS, compatível com a
+          API do <em>Apache Hive Metastore</em>. Ele guarda a descrição dos dados &mdash; schema das tabelas,
+          localização dos arquivos no S3, formatos, partições registradas &mdash; mas <strong>não guarda os
+          dados em si</strong>, que permanecem em S3.
+        </p>
+
+        <h3>Objetos do catálogo</h3>
+        <ul>
+          <li><strong>Database:</strong> namespace lógico que agrupa tabelas relacionadas
+            (ex.: <code>olist_raw</code>, <code>olist_trusted</code>).</li>
+          <li><strong>Table:</strong> definição de schema (colunas e tipos), formato (CSV, Parquet),
+            SerDe (Serializer/Deserializer), <em>location</em> no S3 e colunas de partição.</li>
+          <li><strong>Partition:</strong> combinação de valores das colunas de partição (ex.:
+            <code>year=2026, month=04</code>) com um <em>location</em> específico.</li>
+          <li><strong>Crawler:</strong> programa gerenciado que varre um prefixo S3, infere schema
+            automaticamente (inclusive partições) e cria/atualiza tabelas.</li>
+          <li><strong>Classifier:</strong> regra usada pelo Crawler para reconhecer formatos customizados.</li>
+        </ul>
+
+        <h3>Quem consome</h3>
+        <p>
+          O Glue Data Catalog é a <strong>camada de metadados compartilhada</strong> da plataforma de dados AWS:
+        </p>
+        <ul>
+          <li><strong>Athena:</strong> executa SQL diretamente sobre tabelas do catálogo.</li>
+          <li><strong>Redshift Spectrum:</strong> estende clusters Redshift para consultar S3 via Catalog.</li>
+          <li><strong>Amazon EMR:</strong> clusters Spark/Hive leem o catálogo como Hive Metastore.</li>
+          <li><strong>AWS Glue Jobs (Spark):</strong> jobs ETL gerenciados.</li>
+          <li><strong>AWS Lake Formation:</strong> governa permissões em nível fino no catálogo.</li>
+          <li><strong>Amazon SageMaker:</strong> leitura de datasets para treino de modelos.</li>
+        </ul>
+
+        <h3>Preço</h3>
+        <p>
+          O Data Catalog tem free tier generoso: o primeiro milhão de objetos armazenados e o primeiro
+          milhão de requisições por mês são gratuitos. A cobrança começa em cerca de US$ 1 por 100 mil
+          objetos adicionais. Para o escopo do curso, o uso é gratuito.
         </p>
       </section>
 
-      <!-- =========================================================
-           MÓDULO 5 — LABORATÓRIO
-      ========================================================== -->
+      <!-- ============================================================
+           MODULO 8 — AMAZON ATHENA
+      ============================================================= -->
       <section class="content-block">
-        <h2>Módulo 5 — Laboratório: Estruturando o Data Lake no S3 e Consultando com Athena</h2>
+        <h2>Módulo 8 &mdash; Amazon Athena</h2>
+
+        <h3>O que é</h3>
         <p>
-          A prática ocorre entre 21h00 e 22h00 utilizando o ambiente <strong>AWS Student</strong>.
-          Siga cada passo na ordem indicada e valide o resultado antes de avançar.
+          Amazon Athena é um serviço de consulta SQL <strong>serverless</strong> baseado no engine de código
+          aberto <strong>Trino</strong> (antigo PrestoSQL). Não há cluster para provisionar, dimensionar ou
+          manter &mdash; você envia uma query, o Athena a executa usando capacidade interna da AWS e
+          devolve o resultado.
         </p>
 
-        <h3>Passo 1 — Acessar o ambiente AWS Student e verificar a região</h3>
+        <h3>Três propriedades essenciais</h3>
         <ol>
-          <li>Acesse o portal da sua instituição e inicie o lab clicando em <strong>Start Lab</strong>.</li>
-          <li>Aguarde o ícone de status ficar verde e clique em <strong>AWS</strong> para abrir o console.</li>
-          <li>No canto superior direito, confirme que a região é <strong>us-east-1 (N. Virginia)</strong>.
-          Se não estiver, altere agora — recursos criados em outras regiões não serão visíveis.</li>
-          <li>No campo de busca do console, acesse o <strong>S3</strong> para confirmar que você tem acesso.</li>
-          <li><strong>Validação:</strong> você consegue visualizar a lista de buckets (vazia ou com buckets existentes) sem erros.</li>
+          <li><strong>Serverless:</strong> zero administração. Escala automaticamente para queries
+            simultâneas de múltiplos usuários.</li>
+          <li><strong>SQL ANSI + extensões Trino:</strong> suporte completo a SELECT, JOIN, GROUP BY,
+            window functions, CTEs, subqueries correlacionadas, funções analíticas, CAST, JSON functions,
+            geoespaciais (via extensões), expressões regex.</li>
+          <li><strong>Pay-per-query:</strong> cobrado pelos <strong>terabytes escaneados</strong>
+            (aproximadamente US$ 5,00 por TB, na região us-east-1). Queries que leem muito pagam muito,
+            queries eficientes pagam pouco. Isso muda o jogo: otimização não é só performance, é economia direta.</li>
         </ol>
 
-        <h3>Passo 2 — Criar o bucket do Data Lake</h3>
+        <h3>Como o Athena reduz scan</h3>
+        <p>
+          Três alavancas combinadas, cada uma multiplicando o efeito das outras:
+        </p>
+        <ul>
+          <li><strong>Parquet (ou ORC) + compressão:</strong> formato colunar lê apenas as colunas
+            mencionadas no <code>SELECT</code>. Snappy/Zstd reduzem tamanho em 2&ndash;5x.</li>
+          <li><strong>Particionamento:</strong> filtros no <code>WHERE</code> que combinam com colunas
+            de partição eliminam prefixos inteiros antes de abrir qualquer arquivo.</li>
+          <li><strong>Colunas explícitas no SELECT:</strong> nunca use <code>SELECT *</code> em produção.
+            Liste apenas as colunas que você realmente precisa.</li>
+        </ul>
+        <p>
+          Exemplo real: a mesma consulta "total de pedidos entregues em 2017" sobre CSV bruto pode ler
+          50 MB; sobre Parquet particionado por ano-mês, pode ler 1 MB. Em escala de terabytes, isso é a
+          diferença entre US$ 5 e US$ 0,10 por execução.
+        </p>
+
+        <h3>Workgroups e guardrails</h3>
+        <p>
+          Workgroups são agrupamentos lógicos de queries e usuários. Cada workgroup isola métricas,
+          histórico, bucket de resultado e &mdash; crucial em ambiente corporativo &mdash; permite
+          configurar <strong>limite máximo de TB escaneados por query</strong>. Uma consulta que tente
+          ler mais é abortada antes de executar, prevenindo "query bomb" acidental.
+        </p>
+        <p>
+          O Athena também integra com CloudWatch, enviando métricas de bytes scanned, tempo de execução,
+          queries bem-sucedidas e falhas. Alarmes e budgets são construídos sobre essas métricas.
+        </p>
+
+        <h3>Query result location</h3>
+        <p>
+          Cada query grava seu resultado em um bucket S3 configurado no workgroup. Antes da primeira query,
+          é obrigatório configurar essa localização, por exemplo
+          <code>s3://&lt;aluno&gt;-athena-results/</code>. Esse bucket também acumula metadados de execução.
+          Configure uma lifecycle rule para apagar objetos com mais de 30 dias e evitar crescimento indefinido.
+        </p>
+      </section>
+
+      <!-- ============================================================
+           LABORATORIO
+      ============================================================= -->
+      <section class="content-block">
+        <h2>Laboratório AWS Student (20h30 &ndash; 22h00)</h2>
+
+        <p>
+          A partir daqui, todos os exercícios usam o AWS Learner Lab (AWS Academy) em <strong>us-east-1</strong>.
+          Para qualquer serviço que exija role de execução, selecione a role pré-provisionada <strong>LabRole</strong>
+          &mdash; não tente criar roles IAM novas, o Learner Lab não permite.
+        </p>
+
+        <h3>Pré-requisitos</h3>
+        <ul>
+          <li>AWS Student ativo em us-east-1 (montado na Aula 01).</li>
+          <li>Três buckets S3 prontos: <code>&lt;aluno&gt;-raw</code>, <code>&lt;aluno&gt;-trusted</code>, <code>&lt;aluno&gt;-refined</code>.</li>
+          <li>AWS CLI instalado e autenticado localmente (credenciais do Learner Lab).</li>
+          <li>Conta Kaggle gratuita para baixar o dataset Olist.</li>
+          <li>Bucket adicional para resultados do Athena: <code>&lt;aluno&gt;-athena-results</code>
+            (criaremos no Passo 5).</li>
+        </ul>
+
+        <h3>Passo 1 &mdash; Baixar o dataset Olist Brazilian E-commerce</h3>
         <ol>
-          <li>No console do S3, clique em <strong>Create bucket</strong>.</li>
-          <li>Em <strong>Bucket name</strong>, insira um nome único globalmente, por exemplo:
-          <code>datalake-mba-seusobrenome-2026</code>.</li>
-          <li>Em <strong>AWS Region</strong>, confirme <strong>US East (N. Virginia) us-east-1</strong>.</li>
-          <li>Em <strong>Block Public Access settings</strong>, mantenha todos os bloqueios ativados
-          (configuração padrão e correta para um Data Lake privado).</li>
-          <li>Em <strong>Bucket Versioning</strong>, selecione <strong>Enable</strong>.</li>
-          <li>Em <strong>Default encryption</strong>, selecione <strong>SSE-S3</strong>.</li>
-          <li>Clique em <strong>Create bucket</strong>.</li>
-          <li><strong>Validação:</strong> o bucket aparece na lista com o status correto. Clique nele para
-          confirmar que está vazio e as configurações foram aplicadas.</li>
+          <li>Acesse <code>https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce</code>.</li>
+          <li>Faça login no Kaggle (conta gratuita).</li>
+          <li>Clique no botão <strong>Download</strong> (~45 MB compactados).</li>
+          <li>Extraia o ZIP em <code>~/olist/</code>.</li>
+          <li>Liste os arquivos: devem existir 9 CSVs, entre eles
+            <code>olist_orders_dataset.csv</code>, <code>olist_order_items_dataset.csv</code>,
+            <code>olist_customers_dataset.csv</code>, <code>olist_products_dataset.csv</code>,
+            <code>olist_sellers_dataset.csv</code>, <code>olist_order_payments_dataset.csv</code>,
+            <code>olist_order_reviews_dataset.csv</code>, <code>olist_geolocation_dataset.csv</code>
+            e <code>product_category_name_translation.csv</code>.</li>
+          <li>Abra um terminal na pasta: <code>cd ~/olist</code>.</li>
         </ol>
 
-        <h3>Passo 3 — Criar a estrutura de prefixos (camadas)</h3>
+        <h3>Passo 2 &mdash; Upload para o bucket raw via AWS CLI</h3>
+        <p>
+          A estrutura de prefixos importa: cada tabela ganha seu próprio subprefixo, o que permite que o
+          Crawler crie uma tabela por subprefixo automaticamente.
+        </p>
+
+<pre>aws s3 cp olist_orders_dataset.csv \
+  s3://&lt;aluno&gt;-raw/olist/orders/olist_orders_dataset.csv
+
+aws s3 cp olist_order_items_dataset.csv \
+  s3://&lt;aluno&gt;-raw/olist/order_items/olist_order_items_dataset.csv
+
+aws s3 cp olist_customers_dataset.csv \
+  s3://&lt;aluno&gt;-raw/olist/customers/olist_customers_dataset.csv
+
+aws s3 cp olist_products_dataset.csv \
+  s3://&lt;aluno&gt;-raw/olist/products/olist_products_dataset.csv
+
+aws s3 cp olist_sellers_dataset.csv \
+  s3://&lt;aluno&gt;-raw/olist/sellers/olist_sellers_dataset.csv
+
+aws s3 cp olist_order_payments_dataset.csv \
+  s3://&lt;aluno&gt;-raw/olist/payments/olist_order_payments_dataset.csv
+
+aws s3 cp olist_order_reviews_dataset.csv \
+  s3://&lt;aluno&gt;-raw/olist/reviews/olist_order_reviews_dataset.csv
+
+aws s3 cp olist_geolocation_dataset.csv \
+  s3://&lt;aluno&gt;-raw/olist/geolocation/olist_geolocation_dataset.csv
+
+aws s3 cp product_category_name_translation.csv \
+  s3://&lt;aluno&gt;-raw/olist/category_translation/product_category_name_translation.csv
+
+# Conferir o resultado
+aws s3 ls s3://&lt;aluno&gt;-raw/olist/ --recursive --summarize --human-readable</pre>
+
+        <p>
+          O comando final mostra tamanho total e contagem de objetos. Confirme 9 arquivos.
+        </p>
+
+        <h3>Passo 3 &mdash; Criar o database olist_raw no Glue</h3>
         <ol>
-          <li>Dentro do bucket, clique em <strong>Create folder</strong>.</li>
-          <li>No campo <strong>Folder name</strong>, insira <code>raw</code> e clique em <strong>Create folder</strong>.</li>
-          <li>Repita o processo criando as pastas <code>trusted</code> e <code>refined</code>.</li>
-          <li>Entre na pasta <code>raw</code> e crie a subpasta <code>fonte=pedidos</code>.</li>
-          <li>Dentro de <code>fonte=pedidos</code>, crie a subpasta <code>ano=2026</code>.</li>
-          <li>Dentro de <code>ano=2026</code>, crie <code>mes=04</code>.</li>
-          <li><strong>Validação:</strong> a estrutura
-          <code>raw/fonte=pedidos/ano=2026/mes=04/</code>
-          existe e está acessível no bucket.</li>
+          <li>Abra o Console AWS e pesquise <strong>AWS Glue</strong>.</li>
+          <li>No menu lateral, vá em <strong>Data Catalog &rarr; Databases</strong>.</li>
+          <li>Clique em <strong>Add database</strong>.</li>
+          <li>Name: <code>olist_raw</code>.</li>
+          <li>Location (opcional): <code>s3://&lt;aluno&gt;-raw/olist/</code>.</li>
+          <li>Description: <code>Dataset Olist Brazilian E-commerce, camada raw em CSV.</code></li>
+          <li>Clique em <strong>Create database</strong>.</li>
         </ol>
 
-        <h3>Passo 4 — Criar e fazer upload de um arquivo de dados CSV de exemplo</h3>
+        <h3>Passo 4 &mdash; Configurar e rodar o Crawler</h3>
         <ol>
-          <li>No seu computador, crie um arquivo chamado <code>pedidos_2026_04.csv</code>
-          com o seguinte conteúdo:</li>
-        </ol>
-        <pre><code>pedido_id,cliente_id,data_pedido,valor,status
-P001,C001,2026-04-01,150.00,entregue
-P002,C002,2026-04-01,89.90,processando
-P003,C001,2026-04-02,320.50,entregue
-P004,C003,2026-04-03,45.00,cancelado
-P005,C004,2026-04-03,210.75,processando
-</code></pre>
-        <ol start="2">
-          <li>No console do S3, navegue até <code>raw/fonte=pedidos/ano=2026/mes=04/</code>.</li>
-          <li>Clique em <strong>Upload</strong>, depois em <strong>Add files</strong> e selecione o arquivo CSV.</li>
-          <li>Clique em <strong>Upload</strong> para concluir.</li>
-          <li><strong>Validação:</strong> o arquivo <code>pedidos_2026_04.csv</code> aparece no prefixo
-          correto com o tamanho esperado.</li>
-        </ol>
-
-        <h3>Passo 5 — Configurar o Athena e criar a tabela</h3>
-        <ol>
-          <li>No console AWS, acesse o <strong>Amazon Athena</strong> pelo campo de busca.</li>
-          <li>Se for o primeiro acesso, o console exibirá um aviso para configurar o output location.
-          Clique em <strong>Edit settings</strong>.</li>
-          <li>Em <strong>Query result location</strong>, insira o caminho de um prefixo no seu bucket:
-          <code>s3://datalake-mba-seusobrenome-2026/athena-results/</code></li>
-          <li>Clique em <strong>Save</strong>.</li>
-          <li>No editor de queries, clique em <strong>+</strong> para abrir uma nova query.</li>
-          <li>Execute o seguinte DDL para criar o database:</li>
-        </ol>
-        <pre><code>CREATE DATABASE IF NOT EXISTS datalake_lab;</code></pre>
-        <ol start="7">
-          <li>No seletor de database à esquerda, selecione <strong>datalake_lab</strong>.</li>
-          <li>Execute o seguinte DDL para criar a tabela externa, substituindo o nome do bucket:</li>
-        </ol>
-        <pre><code>CREATE EXTERNAL TABLE datalake_lab.raw_pedidos (
-  pedido_id   STRING,
-  cliente_id  STRING,
-  data_pedido STRING,
-  valor       DOUBLE,
-  status      STRING
-)
-ROW FORMAT DELIMITED
-FIELDS TERMINATED BY ','
-LINES TERMINATED BY '\n'
-TBLPROPERTIES ('skip.header.line.count'='1')
-LOCATION 's3://datalake-mba-seusobrenome-2026/raw/fonte=pedidos/';
-</code></pre>
-        <ol start="9">
-          <li><strong>Validação:</strong> a tabela <code>raw_pedidos</code> aparece no painel
-          de tabelas à esquerda, sob o database <code>datalake_lab</code>.</li>
-        </ol>
-
-        <h3>Passo 6 — Executar a primeira consulta</h3>
-        <ol>
-          <li>No editor do Athena, execute a query de validação:</li>
-        </ol>
-        <pre><code>SELECT * FROM datalake_lab.raw_pedidos LIMIT 10;</code></pre>
-        <ol start="2">
-          <li>Observe o painel de resultados — os 5 registros do CSV devem aparecer com os tipos corretos.</li>
-          <li>Observe também o indicador de dados varridos no canto superior direito do resultado,
-          que deve mostrar o tamanho aproximado do arquivo CSV lido.</li>
-          <li>Agora execute uma query com filtro para ver como o Athena reporta os dados varridos:</li>
-        </ol>
-        <pre><code>SELECT pedido_id, valor
-FROM datalake_lab.raw_pedidos
-WHERE status = 'entregue';
-</code></pre>
-        <ol start="5">
-          <li><strong>Validação:</strong> a query retorna apenas os registros com status "entregue".
-          Note que os dados varridos são iguais ao da query anterior — em CSV, a tabela inteira
-          é lida mesmo com filtro, porque o formato não suporta predicate pushdown.</li>
-        </ol>
-
-        <h3>Passo 7 — Explorar o AWS Glue Crawler (opcional, se houver tempo)</h3>
-        <ol>
-          <li>No console AWS, acesse o <strong>AWS Glue</strong>.</li>
-          <li>No menu lateral, clique em <strong>Crawlers</strong> e depois em <strong>Create crawler</strong>.</li>
-          <li>Nome: <code>crawler-raw-pedidos</code>.</li>
-          <li>Em <strong>Data source</strong>, selecione <strong>S3</strong> e insira o caminho:
-          <code>s3://datalake-mba-seusobrenome-2026/raw/</code></li>
-          <li>Em <strong>IAM Role</strong>, selecione ou crie uma role com permissões de Glue e S3.</li>
-          <li>Em <strong>Target database</strong>, selecione <code>datalake_lab</code>.</li>
-          <li>Em <strong>Schedule</strong>, selecione <strong>On demand</strong>.</li>
+          <li>No Glue, vá em <strong>Crawlers</strong> &rarr; <strong>Create crawler</strong>.</li>
+          <li><strong>Step 1 &mdash; Name:</strong> <code>olist-raw-crawler</code>.</li>
+          <li><strong>Step 2 &mdash; Data sources:</strong> clique em <strong>Add data source</strong>;
+            tipo <strong>S3</strong>; path <code>s3://&lt;aluno&gt;-raw/olist/</code>;
+            subsequent runs: <em>Crawl all sub-folders</em>.</li>
+          <li><strong>Step 3 &mdash; IAM role:</strong> selecione <strong>LabRole</strong>.</li>
+          <li><strong>Step 4 &mdash; Target database:</strong> <code>olist_raw</code>. Table prefix: vazio.</li>
+          <li><strong>Step 5 &mdash; Schedule:</strong> <em>On demand</em>.</li>
           <li>Revise e clique em <strong>Create crawler</strong>.</li>
-          <li>Na lista de Crawlers, selecione o crawler criado e clique em <strong>Run</strong>.</li>
-          <li>Aguarde o status mudar para <strong>Succeeded</strong>.</li>
-          <li>Verifique no Athena que uma nova tabela foi criada automaticamente pelo Crawler
-          no database <code>datalake_lab</code>.</li>
-          <li><strong>Validação:</strong> o Crawler criou a tabela com o schema correto inferido
-          automaticamente a partir dos arquivos CSV no S3.</li>
+          <li>Com o crawler criado, selecione-o e clique em <strong>Run crawler</strong>.</li>
+          <li>Aguarde de 1 a 3 minutos até o status voltar para <strong>Ready</strong>.</li>
+          <li>Vá em <strong>Tables</strong> no menu lateral. Filtre por database <code>olist_raw</code>.
+            Devem aparecer 9 tabelas com nomes como <code>orders</code>, <code>order_items</code>,
+            <code>customers</code> (ou <code>olist_orders_dataset</code> dependendo de como o Crawler
+            inferiu, isso varia).</li>
         </ol>
+
+        <div class="tip">
+          <strong>Dica:</strong> se o nome das tabelas saiu diferente do esperado, abra cada tabela,
+          clique em <strong>Edit table</strong> e renomeie. Ou, mais prático, deixe como o Crawler
+          nomeou e use esses nomes nas queries.
+        </div>
+
+        <h3>Passo 5 &mdash; Preparar o Athena</h3>
+        <ol>
+          <li>Crie o bucket de resultados se ainda não existir:
+            <code>aws s3 mb s3://&lt;aluno&gt;-athena-results --region us-east-1</code>.</li>
+          <li>Abra <strong>Amazon Athena</strong> no console.</li>
+          <li>No editor, clique em <strong>Settings</strong> (engrenagem) &rarr; <strong>Manage</strong>.</li>
+          <li>Query result location: <code>s3://&lt;aluno&gt;-athena-results/</code>.</li>
+          <li>Encryption: mantenha default (SSE-S3).</li>
+          <li>Salve.</li>
+          <li>No editor, no painel esquerdo, selecione Data source <code>AwsDataCatalog</code>
+            e Database <code>olist_raw</code>.</li>
+          <li>Você deve ver as tabelas carregadas pelo Crawler.</li>
+        </ol>
+
+        <h3>Passo 6 &mdash; Primeiras consultas SQL</h3>
+        <p>
+          Rode cada query e, após a execução, clique em <strong>Run details</strong> para ver o
+          <strong>Data scanned</strong>. Anote esse número &mdash; usaremos no Passo 8.
+          Ajuste os nomes de tabela se o Crawler gerou variações (ex.: <code>olist_orders_dataset</code>).
+        </p>
+
+<pre>-- 1. Amostra rapida dos pedidos
+SELECT *
+FROM olist_orders_dataset
+LIMIT 10;
+
+-- 2. Pedidos por status
+SELECT order_status, COUNT(*) AS total
+FROM olist_orders_dataset
+GROUP BY order_status
+ORDER BY total DESC;
+
+-- 3. Top 10 estados por receita de pedidos entregues
+SELECT c.customer_state,
+       COUNT(DISTINCT o.order_id) AS pedidos,
+       SUM(oi.price)              AS receita
+FROM olist_orders_dataset o
+JOIN olist_order_items_dataset oi USING (order_id)
+JOIN olist_customers_dataset   c  USING (customer_id)
+WHERE o.order_status = 'delivered'
+GROUP BY c.customer_state
+ORDER BY receita DESC
+LIMIT 10;
+
+-- 4. Categoria com maior ticket medio
+SELECT p.product_category_name,
+       AVG(oi.price) AS ticket_medio,
+       COUNT(*)      AS itens_vendidos
+FROM olist_order_items_dataset oi
+JOIN olist_products_dataset p USING (product_id)
+WHERE p.product_category_name IS NOT NULL
+GROUP BY p.product_category_name
+ORDER BY ticket_medio DESC
+LIMIT 10;</pre>
+
+        <h3>Passo 7 &mdash; CTAS: materializar a camada trusted em Parquet</h3>
+        <p>
+          O comando <code>CREATE TABLE AS SELECT</code> do Athena cria uma nova tabela no catálogo e,
+          simultaneamente, grava os dados no S3 no formato desejado. Vamos converter
+          <code>olist_orders_dataset</code> para Parquet particionado por ano-mês da compra.
+        </p>
+
+<pre>CREATE TABLE olist_raw.orders_parquet
+WITH (
+  format = 'PARQUET',
+  parquet_compression = 'SNAPPY',
+  external_location = 's3://&lt;aluno&gt;-trusted/olist/orders/',
+  partitioned_by = ARRAY['order_purchase_year_month']
+) AS
+SELECT
+  order_id,
+  customer_id,
+  order_status,
+  CAST(order_purchase_timestamp AS timestamp)            AS order_purchase_ts,
+  CAST(order_approved_at        AS timestamp)            AS order_approved_ts,
+  CAST(order_delivered_carrier_date AS timestamp)        AS order_delivered_carrier_ts,
+  CAST(order_delivered_customer_date AS timestamp)       AS order_delivered_customer_ts,
+  CAST(order_estimated_delivery_date AS timestamp)       AS order_estimated_delivery_ts,
+  date_format(CAST(order_purchase_timestamp AS timestamp), '%Y-%m')
+    AS order_purchase_year_month
+FROM olist_raw.olist_orders_dataset;</pre>
+
+        <p>
+          Depois do CTAS, abra o S3 em <code>s3://&lt;aluno&gt;-trusted/olist/orders/</code> e veja os
+          prefixos criados, um para cada ano-mês presente nos dados
+          (<code>order_purchase_year_month=2017-01/</code>, <code>=2017-02/</code>, etc.),
+          cada um com um arquivo Parquet.
+        </p>
+
+        <h3>Passo 8 &mdash; Comparativo: CSV bruto vs Parquet particionado</h3>
+        <p>
+          Rode as duas queries abaixo e anote o <strong>Data scanned</strong> de cada uma.
+          As duas respondem à mesma pergunta lógica.
+        </p>
+
+<pre>-- Versao CSV bruto (tabela criada pelo Crawler)
+SELECT COUNT(*) AS pedidos_entregues
+FROM olist_raw.olist_orders_dataset
+WHERE order_status = 'delivered';
+
+-- Versao Parquet particionado (tabela criada pelo CTAS)
+SELECT COUNT(*) AS pedidos_entregues
+FROM olist_raw.orders_parquet
+WHERE order_status = 'delivered'
+  AND order_purchase_year_month BETWEEN '2017-01' AND '2017-12';</pre>
+
+        <div class="tip">
+          <strong>Resultado esperado:</strong> a query CSV lê o arquivo inteiro (dezenas de MB).
+          A query Parquet lê apenas as partições de 2017 e, dentro delas, somente a coluna
+          <code>order_status</code>. A redução típica é de 80 a 95% no volume escaneado.
+          Em cargas de produção de TB, isso se traduz em reduções diretas de dezenas de dólares
+          por dia na fatura do Athena.
+        </div>
+
+        <h3>Passo 9 &mdash; Fechamento e checklist</h3>
+        <ul>
+          <li>[x] 9 CSVs do Olist em <code>s3://&lt;aluno&gt;-raw/olist/</code>.</li>
+          <li>[x] Database <code>olist_raw</code> no Glue Data Catalog.</li>
+          <li>[x] 9 tabelas criadas pelo Crawler <code>olist-raw-crawler</code>.</li>
+          <li>[x] Bucket <code>&lt;aluno&gt;-athena-results</code> configurado como query result location.</li>
+          <li>[x] Queries básicas executadas com sucesso.</li>
+          <li>[x] Tabela <code>orders_parquet</code> em <code>s3://&lt;aluno&gt;-trusted/olist/orders/</code>.</li>
+          <li>[x] Comparativo de scan anotado (CSV vs Parquet).</li>
+        </ul>
+
+        <div class="warning">
+          <strong>Housekeeping:</strong> ao final de cada sessão do Learner Lab, os dados no S3 permanecem
+          (até o fim do crédito mensal). Se precisar liberar espaço ou evitar cobranças em contas reais,
+          delete os datasets com
+          <code>aws s3 rm s3://&lt;aluno&gt;-raw/olist/ --recursive</code>.
+        </div>
       </section>
 
-      <!-- =========================================================
-           EXERCÍCIOS DE FIXAÇÃO
-      ========================================================== -->
+      <!-- ============================================================
+           EXERCICIOS DE FIXACAO
+      ============================================================= -->
       <section class="content-block">
         <h2>Exercícios de fixação</h2>
+        <p>
+          Os exercícios mesclam questões conceituais e tarefas práticas. Responda por escrito e, quando
+          indicado, execute no AWS Student e registre o resultado.
+        </p>
         <ol>
           <li>
-            <strong>Design de particionamento:</strong> uma plataforma de e-commerce captura
-            eventos de comportamento de usuários (cliques, visualizações de produto, adições
-            ao carrinho). O volume é de aproximadamente 50 milhões de eventos por dia,
-            com consultas predominantemente filtrando por data (últimos 7 dias) e tipo de evento.
-            Defina uma estratégia de particionamento para a camada Trusted com justificativa
-            para cada nível da hierarquia de prefixos. Explique também quais partições
-            você evitaria e por quê.
+            <strong>Schema-on-read vs schema-on-write:</strong> explique com suas palavras a diferença
+            entre as duas abordagens. Dê um exemplo concreto de situação em que schema-on-read é superior
+            e outro em que schema-on-write é preferível. Relacione cada caso com um serviço AWS
+            (S3+Athena para um, Redshift para o outro).
           </li>
           <li>
-            <strong>Comparativo de formatos:</strong> você tem uma tabela de transações
-            financeiras com 200 colunas armazenada em CSV, ocupando 2 TB no S3.
-            As queries analíticas típicas selecionam 8-10 colunas e filtram por data.
-            Estime a redução de custo no Athena após converter para Parquet com Snappy,
-            explicando o impacto de cada técnica (projeção de colunas, predicate pushdown,
-            compressão) separadamente.
+            <strong>Medallion na prática:</strong> considere um pipeline que recebe diariamente um
+            arquivo <code>pedidos_YYYYMMDD.csv</code> com 2 GB, contendo duplicatas ocasionais e datas
+            em formato texto. Descreva em detalhes o que vai em raw, o que vai em trusted e o que vai
+            em refined. Especifique formato, compressão e estratégia de partição em cada camada.
           </li>
           <li>
-            <strong>Política de Lifecycle:</strong> descreva uma política de ciclo de vida
-            para um bucket de Data Lake com as camadas Raw, Trusted e Refined, especificando
-            para cada camada: a classe de armazenamento inicial, as transições de classe
-            ao longo do tempo com os limiares de idade, e a justificativa de custo
-            e disponibilidade para cada decisão.
+            <strong>Comparativo Parquet vs CSV:</strong> usando o que você mediu no Passo 8 do laboratório,
+            calcule a redução percentual de Data scanned entre as duas versões da query. Extrapolando
+            a tarifa de US$ 5,00 por TB, estime a economia mensal caso essa mesma query fosse executada
+            100 vezes por dia em um dataset 1000x maior.
           </li>
           <li>
-            <strong>Diagnóstico de query cara:</strong> uma analista reclama que sua query
-            no Athena está custando US$ 8,00 por execução e levando 4 minutos.
-            A query é: <code>SELECT COUNT(*) FROM eventos WHERE tipo = 'compra'</code>
-            sobre uma tabela com 5 TB em formato CSV sem particionamento.
-            Liste todas as melhorias que você implementaria (formato, particionamento,
-            query rewrite) e estime o novo custo e tempo após cada melhoria.
+            <strong>Projeto de particionamento:</strong> uma tabela registra eventos de clickstream
+            com as colunas <code>user_id</code>, <code>event_ts</code>, <code>event_type</code>,
+            <code>page_url</code>, <code>country</code>, recebendo 50 milhões de registros por dia.
+            Proponha uma estratégia de partição justificando as escolhas. Avalie os efeitos colaterais
+            de particionar por <code>user_id</code> (spoiler: é péssima ideia; explique por quê).
           </li>
           <li>
-            <strong>Imutabilidade e reprocessamento:</strong> um bug no job de transformação
-            da camada Trusted causou cálculo incorreto do campo <code>valor_com_desconto</code>
-            por 30 dias. Explique como a arquitetura de camadas com Raw imutável permite
-            corrigir esse problema, descrevendo o fluxo de reprocessamento passo a passo,
-            sem perda de dados e sem impacto nos consumidores da camada Refined durante a correção.
+            <strong>S3 storage classes:</strong> você tem um Data Lake com: (a) logs de aplicação dos últimos
+            7 dias consultados constantemente; (b) dados operacionais dos últimos 12 meses usados
+            semanalmente; (c) backups dos últimos 7 anos que podem precisar ser restaurados em até 12h.
+            Proponha uma lifecycle rule completa atribuindo a classe ideal para cada categoria e calcule
+            a economia relativa ao S3 Standard.
+          </li>
+          <li>
+            <strong>CTAS customizado:</strong> escreva um CTAS Athena que materialize uma tabela
+            <code>olist_raw.order_items_parquet</code> em Parquet com compressão Zstd, particionada por
+            <code>product_category_name</code>, e grave no prefixo
+            <code>s3://&lt;aluno&gt;-trusted/olist/order_items/</code>. Justifique se usar
+            <code>product_category_name</code> como partição é uma boa ideia nesse dataset (considere a cardinalidade).
+          </li>
+          <li>
+            <strong>Crawler vs CREATE TABLE manual:</strong> explique em quais cenários você prefere
+            rodar um Glue Crawler e em quais prefere registrar a tabela manualmente no Glue via DDL
+            (<code>CREATE EXTERNAL TABLE</code>). Cite ao menos 2 vantagens e 2 desvantagens de cada abordagem.
+          </li>
+          <li>
+            <strong>Governança de custos no Athena:</strong> uma equipe de 10 analistas compartilha o
+            workgroup default. Alguns rodam <code>SELECT * FROM tabela_gigante</code> sem WHERE regularmente,
+            estourando a fatura. Projete uma solução usando workgroups, limites de bytes scanned por query
+            e CloudWatch Alarms que previna o problema sem bloquear queries legítimas. Descreva passo a passo
+            as configurações necessárias.
           </li>
         </ol>
       </section>
 
+      <!-- ============================================================
+           FOOTER
+      ============================================================= -->
       <footer class="actions">
         <a class="button" href="../slides/slide_aula_02_a_fundacao_do_data_lake_armazenamento_escalavel_s3_e_athena.html">Voltar ao slide</a>
         <a class="button" href="../../../index.html">Voltar ao índice</a>
