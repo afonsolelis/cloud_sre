@@ -386,7 +386,7 @@ a:focus {
   line-height: 1.5;
 }
 
-.deck-panel strong {
+.deck-panel > strong {
   display: block;
   margin-bottom: 12px;
   font-size: 1.08em;
