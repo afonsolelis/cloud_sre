@@ -87,8 +87,8 @@
             <tr><td>02</td><td>23/04</td><td>Data Lake com S3 e Athena</td><td>Olist no Raw, primeiras queries</td></tr>
             <tr><td>03</td><td>30/04</td><td>Bancos relacionais e NoSQL</td><td>Fontes conectadas ao pipeline</td></tr>
             <tr><td>04</td><td>07/05</td><td>Ingestão near real-time</td><td>Streaming com Kinesis</td></tr>
-            <tr><td>05</td><td>14/05</td><td>ETL serverless e catálogo</td><td>Glue jobs e Data Catalog</td></tr>
-            <tr><td>06</td><td>21/05</td><td>Data Warehousing com Redshift</td><td>Camada de BI</td></tr>
+            <tr><td>05</td><td>14/05</td><td>ETL com PySpark em EC2</td><td>Jobs PySpark e catálogo self-hosted</td></tr>
+            <tr><td>06</td><td>21/05</td><td>Data Warehousing com ClickHouse em EC2</td><td>Camada de BI</td></tr>
             <tr><td>07</td><td>28/05</td><td>Data Reliability e SRE</td><td>Observabilidade e SLOs</td></tr>
             <tr><td>08</td><td>11/06</td><td>Segurança, FinOps e projeto final</td><td>Entrega do pipeline ponta a ponta</td></tr>
           </tbody>
@@ -119,8 +119,8 @@
             <strong>Como ele evolui no curso</strong>
             <ul>
               <li><strong>Aula 02:</strong> entra no bucket Raw como CSV original.</li>
-              <li><strong>Aulas 03-05:</strong> vira Parquet no Trusted, catalogado no Glue.</li>
-              <li><strong>Aula 06:</strong> agregações no Refined alimentam o Redshift.</li>
+              <li><strong>Aulas 03-05:</strong> vira Parquet no Trusted, processado com PySpark em EC2.</li>
+              <li><strong>Aula 06:</strong> agregações no Refined alimentam o ClickHouse em EC2.</li>
               <li><strong>Aula 08:</strong> camada Gold consumida por dashboards e APIs.</li>
             </ul>
           </div>
@@ -231,7 +231,7 @@
             <ul>
               <li>Intermedeiam, agregam e roteiam mensagens.</li>
               <li>Garantem desacoplamento entre produtores e consumidores.</li>
-              <li>Equivalente AWS: S3, Glue Catalog, Kinesis, EventBridge.</li>
+              <li>Equivalente AWS: S3, Kinesis, EventBridge, Athena.</li>
             </ul>
           </article>
           <article class="deck-card">
@@ -321,7 +321,7 @@
               <li>Elasticidade real: picos de ingestão sem replanejar hardware.</li>
               <li>OpEx: paga-se pelo consumido, sem CapEx de data center.</li>
               <li>Tempo de provisionamento em minutos.</li>
-              <li>Serviços gerenciados (Athena, Glue) reduzem operação.</li>
+              <li>Serviços gerenciados (Athena, Lambda) reduzem operação.</li>
               <li>Acesso a tecnologias de ponta (GPUs, ML, streaming).</li>
             </ul>
           </div>
@@ -379,6 +379,9 @@
             </tr>
           </tbody>
         </table>
+        <div class="deck-callout">
+          <strong>Atenção &middot; restrição do lab:</strong> no AWS Academy Learner Lab usado na disciplina, <strong>Glue e Redshift não estão disponíveis</strong>. Quando precisarmos dessas capacidades, rodaremos alternativas em EC2: <strong>PySpark</strong> para ETL e <strong>ClickHouse</strong> para Data Warehouse.
+        </div>
       </div>
     </div>
 
@@ -402,11 +405,11 @@
             </ul>
           </div>
           <div class="deck-panel">
-            <strong>Stack AWS</strong>
+            <strong>Stack da disciplina (AWS Learner Lab)</strong>
             <ul>
               <li><strong>S3</strong> &mdash; armazenamento das 3 camadas.</li>
-              <li><strong>Glue</strong> &mdash; catalogação e ETL serverless.</li>
-              <li><strong>Athena</strong> &mdash; consultas SQL diretamente no S3.</li>
+              <li><strong>Athena</strong> &mdash; consultas SQL e catálogo de tabelas externas (substitui o Glue Catalog no lab).</li>
+              <li><strong>PySpark em EC2</strong> &mdash; ETL que promove Raw &rarr; Trusted &rarr; Refined.</li>
             </ul>
           </div>
         </div>
@@ -435,7 +438,7 @@
             <tr><td>Armazenamento</td><td>Colunar proprietário</td><td>Aberto (Parquet/ORC em S3)</td></tr>
             <tr><td>Performance</td><td>MPP, otimizado para BI</td><td>Combina DL + DW</td></tr>
             <tr><td>Formatos abertos</td><td>Não</td><td>Iceberg, Delta Lake, Hudi</td></tr>
-            <tr><td>AWS</td><td>Amazon Redshift</td><td>S3 + Glue + Athena/Spark</td></tr>
+            <tr><td>AWS</td><td>Amazon Redshift &middot; ClickHouse em EC2 no lab</td><td>S3 + Athena + PySpark em EC2</td></tr>
           </tbody>
         </table>
       </div>
@@ -554,11 +557,11 @@
           <div class="deck-panel">
             <strong>Serviços da disciplina</strong>
             <ul>
-              <li>S3, Athena, Glue</li>
+              <li>S3, Athena</li>
+              <li>EC2 (PySpark, ClickHouse)</li>
               <li>Kinesis, Lambda</li>
-              <li>RDS, DynamoDB, Redshift</li>
-              <li>IAM, Lake Formation</li>
-              <li>CloudWatch, Step Functions</li>
+              <li>RDS, DynamoDB</li>
+              <li>IAM, CloudWatch, Step Functions</li>
             </ul>
             <p style="margin:14px 0 0;"><strong>Região recomendada:</strong> us-east-1</p>
           </div>
@@ -665,7 +668,7 @@
             <h3>Roles (papéis)</h3>
             <ul>
               <li>Credenciais temporárias, rotacionadas automaticamente.</li>
-              <li>Usadas por serviços AWS (Glue, Lambda).</li>
+              <li>Usadas por serviços AWS (EC2, Lambda).</li>
               <li>Preferência sobre access keys.</li>
             </ul>
           </article>
@@ -728,7 +731,7 @@
           <div class="deck-panel">
             <strong>O que o LabRole entrega</strong>
             <ul>
-              <li>Permissões amplas em S3, Glue, Athena, Lambda, Kinesis.</li>
+              <li>Permissões amplas em EC2, S3, Athena, Lambda, Kinesis, IAM (read), CloudWatch.</li>
               <li>É passada automaticamente a serviços gerenciados no lab.</li>
               <li>Evita que você gaste tempo criando roles de serviço.</li>
             </ul>
@@ -736,6 +739,7 @@
           <div class="deck-panel">
             <strong>O que o LabRole não permite</strong>
             <ul>
+              <li>Acesso a AWS Glue e Amazon Redshift (bloqueados no Learner Lab).</li>
               <li>Criar usuários IAM persistentes entre sessões.</li>
               <li>Operações de billing e organizações.</li>
               <li>Instâncias de alta classe (GPUs, r5.24xlarge).</li>
@@ -821,13 +825,13 @@
           <ol>
             <li>Em <strong>IAM &gt; Users</strong>, observe os usuários pré-criados pelo lab.</li>
             <li>Em <strong>IAM &gt; Roles</strong>, localize a <strong>LabRole</strong> e abra a aba <em>Permissions</em>.</li>
-            <li>Anote as políticas atachadas: ela combina acessos a S3, Glue, Athena, Lambda, Kinesis e outros.</li>
+            <li>Anote as políticas atachadas: ela combina acessos a EC2, S3, Athena, Lambda, Kinesis, IAM read e CloudWatch.</li>
             <li>Abra a aba <em>Trust relationships</em> e identifique quais serviços podem assumi-la.</li>
             <li>Em <strong>IAM &gt; Policies</strong>, observe a diferença entre políticas AWS (gerenciadas) e customizadas.</li>
           </ol>
         </div>
         <div class="deck-callout">
-          <strong>Observação:</strong> o lab não permite criar usuários IAM adicionais. Usaremos a LabRole e a conta principal do Learner Lab durante toda a disciplina.
+          <strong>Observação:</strong> o lab não permite criar usuários IAM adicionais nem habilita <strong>Glue</strong> ou <strong>Redshift</strong> &mdash; por isso eles não aparecem na LabRole. Usaremos a LabRole e a conta principal do Learner Lab durante toda a disciplina.
         </div>
       </div>
     </div>
@@ -922,7 +926,7 @@
             <strong>O que vamos fazer em 23/04</strong>
             <ul>
               <li>Download do Olist (Kaggle) e upload estruturado no <strong>olist-raw</strong>.</li>
-              <li>Criação do Glue Data Catalog sobre os CSVs.</li>
+              <li>Criação de tabelas externas diretamente no Athena sobre os CSVs.</li>
               <li>Primeiras consultas SQL com <strong>Amazon Athena</strong>.</li>
               <li>Conversão seletiva Raw &rarr; Trusted em Parquet.</li>
             </ul>
@@ -996,12 +1000,12 @@
             </ul>
           </article>
           <article class="deck-card">
-            <h3>Documentação AWS</h3>
+            <h3>Documentação</h3>
             <ul>
-              <li>docs.aws.amazon.com/iam</li>
-              <li>docs.aws.amazon.com/s3</li>
+              <li>docs.aws.amazon.com/iam, /s3, /athena, /ec2</li>
               <li>Guia do AWS Academy Learner Lab</li>
-              <li>AWS re:Invent &mdash; IAM Best Practices (YouTube)</li>
+              <li>spark.apache.org &mdash; PySpark</li>
+              <li>clickhouse.com/docs</li>
             </ul>
           </article>
         </div>

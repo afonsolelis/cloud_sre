@@ -75,8 +75,8 @@
             <tr><td>02</td><td>23/04/2026</td><td>Fundação do Data Lake: S3 e Athena</td><td>Olist no Raw, catalogado, consultável em SQL</td></tr>
             <tr><td>03</td><td>30/04/2026</td><td>Fontes de dados: bancos relacionais e NoSQL</td><td>RDS e DynamoDB conectados ao pipeline</td></tr>
             <tr><td>04</td><td>07/05/2026</td><td>Ingestão e processamento near real-time (streaming)</td><td>Kinesis entregando eventos ao Raw</td></tr>
-            <tr><td>05</td><td>14/05/2026</td><td>Integração, ETL serverless e catálogo de dados</td><td>Glue jobs promovendo Raw &rarr; Trusted &rarr; Refined</td></tr>
-            <tr><td>06</td><td>21/05/2026</td><td>Data Warehousing com Redshift</td><td>Camada de BI com modelagem dimensional</td></tr>
+            <tr><td>05</td><td>14/05/2026</td><td>Integração, ETL com PySpark em EC2 e catálogo self-hosted</td><td>Jobs PySpark promovendo Raw &rarr; Trusted &rarr; Refined</td></tr>
+            <tr><td>06</td><td>21/05/2026</td><td>Data Warehousing com ClickHouse em EC2</td><td>Camada de BI com modelagem dimensional</td></tr>
             <tr><td>07</td><td>28/05/2026</td><td>Data Reliability e SRE aplicados a pipelines</td><td>Observabilidade, SLOs e alertas</td></tr>
             <tr><td>08</td><td>11/06/2026</td><td>Segurança, FinOps e projeto final</td><td>Pipeline completo Olist com custos otimizados</td></tr>
           </tbody>
@@ -85,6 +85,15 @@
           Observe que cada aula pressupõe que a anterior foi cumprida. Por isso, o laboratório da Aula 01
           precisa terminar com os buckets criados: sem eles, a Aula 02 não acontece.
         </p>
+        <div class="warning">
+          <strong>Restrição importante do AWS Academy Learner Lab:</strong> o ambiente usado na disciplina
+          <strong>não libera AWS Glue nem Amazon Redshift</strong>. Por isso, a <strong>Aula 05</strong> substitui o
+          ETL serverless do Glue por <strong>PySpark rodando em EC2</strong>, com catálogo self-hosted
+          (Hive Metastore / Iceberg em EC2), e a <strong>Aula 06</strong> substitui o Redshift por
+          <strong>ClickHouse em EC2</strong>. Glue e Redshift continuam sendo citados como serviços AWS reais no
+          panorama de mercado, mas a prática da disciplina usa as alternativas em EC2. Athena e S3 seguem
+          como espinha dorsal analítica serverless da disciplina.
+        </div>
       </section>
 
       <!-- ============================================================
@@ -104,10 +113,10 @@
           A evolução do Olist pelas camadas do Data Lake vai espelhar a evolução da disciplina:
         </p>
         <ul>
-          <li><strong>Aula 02:</strong> os CSVs brutos entram no bucket <code>olist-raw</code>, organizados por tabela e por data de ingestão. O Glue Data Catalog descobre o schema e o Athena permite as primeiras consultas.</li>
+          <li><strong>Aula 02:</strong> os CSVs brutos entram no bucket <code>olist-raw</code>, organizados por tabela e por data de ingestão. Criamos tabelas externas diretamente no Athena sobre os CSVs e executamos as primeiras consultas.</li>
           <li><strong>Aulas 03-04:</strong> simulamos fontes complementares (RDS PostgreSQL e DynamoDB com catálogo de produtos; Kinesis com eventos de clickstream sintéticos). Essas fontes também pousam no Raw.</li>
-          <li><strong>Aula 05:</strong> jobs Glue convertem CSV para Parquet, aplicam limpeza e deduplicação, e materializam o Olist no bucket <code>olist-trusted</code>.</li>
-          <li><strong>Aula 06:</strong> tabelas dimensionais e fatos alimentam o Redshift, e agregados analíticos vão para o <code>olist-refined</code>.</li>
+          <li><strong>Aula 05:</strong> jobs <strong>PySpark em EC2</strong> convertem CSV para Parquet, aplicam limpeza e deduplicação, e materializam o Olist no bucket <code>olist-trusted</code>. O catálogo é self-hosted (Hive Metastore / Iceberg) porque o lab não libera AWS Glue.</li>
+          <li><strong>Aula 06:</strong> tabelas dimensionais e fatos alimentam o <strong>ClickHouse em EC2</strong> (substituto do Redshift no lab), e agregados analíticos vão para o <code>olist-refined</code>.</li>
           <li><strong>Aula 07:</strong> monitoramos o pipeline Olist com CloudWatch e Step Functions, aplicando SLOs sobre o frescor dos dados.</li>
           <li><strong>Aula 08:</strong> revisamos custos, governança e entregamos o pipeline Olist como projeto final.</li>
         </ul>
@@ -164,7 +173,7 @@
             <tr>
               <td>B1 e B2</td>
               <td>Brokers / plataforma de integração</td>
-              <td>S3, Glue Catalog, EventBridge, Kinesis Firehose</td>
+              <td>S3, Athena, EventBridge, Kinesis Firehose</td>
             </tr>
             <tr>
               <td>A</td>
@@ -186,7 +195,7 @@
 
         <h3>Lições que a dinâmica deixa</h3>
         <ul>
-          <li><strong>Sem um broker forte, o consumidor fica órfão.</strong> Se B1 e B2 falham, A não consegue fechar a resposta. É por isso que investimos tanto em S3, Glue e Kinesis como camadas confiáveis.</li>
+          <li><strong>Sem um broker forte, o consumidor fica órfão.</strong> Se B1 e B2 falham, A não consegue fechar a resposta. É por isso que investimos tanto em S3, Athena e Kinesis como camadas confiáveis.</li>
           <li><strong>Produtores não conhecem o todo.</strong> Cada fonte conhece um pedaço da verdade. A integração é do pipeline, não das fontes.</li>
           <li><strong>Contratos precisam ser explícitos.</strong> Bilhetes ambíguos geram respostas erradas &mdash; assim como schemas mal definidos geram dados corrompidos no Lake.</li>
           <li><strong>Latência existe e é real.</strong> Enquanto os bilhetes circulam, A espera. O mesmo vale para pipelines: frescor de dado é função da arquitetura.</li>
@@ -541,7 +550,8 @@
           </li>
           <li>
             <strong>Precisa processar dados com Spark mas sem gerenciar o cluster?</strong> Use PaaS (EMR) ou
-            SaaS (Glue, que é serverless).
+            SaaS (Glue, que é serverless) no mundo real. <em>No Learner Lab da disciplina, Glue não está disponível &mdash;
+            rodaremos PySpark em EC2 na Aula 05.</em>
           </li>
           <li>
             <strong>Precisa fazer consultas SQL ad-hoc sobre dados no S3?</strong> Use SaaS (Athena).
@@ -569,7 +579,11 @@
           99,999999999% (11 noves), disponibilidade de 99,99% e custo de armazenamento extremamente baixo
           (a partir de US$ 0,023/GB/mês no tier Standard, e US$ 0,004/GB/mês no tier Glacier Instant Retrieval).
           Sobre o S3, serviços como <strong>AWS Glue</strong> (catálogo de metadados e ETL serverless) e
-          <strong>Amazon Athena</strong> (consultas SQL serverless) formam a base analítica do Lake.
+          <strong>Amazon Athena</strong> (consultas SQL serverless) formam a base analítica do Lake no mercado AWS.
+          Como o Learner Lab da disciplina <strong>não libera o Glue</strong>, nós substituímos o Glue por
+          <strong>PySpark em EC2</strong> (Aula 05) e por tabelas externas criadas diretamente no Athena
+          (a partir da Aula 02). O Athena permanece disponível e continua sendo o motor de consulta serverless
+          da disciplina.
         </p>
         <p>
           A organização canônica de um Data Lake utiliza três camadas, cada uma com propósito, formato de dados
@@ -636,7 +650,8 @@
           </li>
           <li>
             <strong>Formatos típicos:</strong> Parquet com schema rígido e bem documentado. Em alguns casos,
-            os dados são também materializados em um Data Warehouse (Redshift) para performance máxima em
+            os dados são também materializados em um Data Warehouse (Redshift no mercado AWS; <strong>ClickHouse em EC2</strong>
+            no contexto da disciplina, que não libera Redshift no Learner Lab) para performance máxima em
             consultas recorrentes.
           </li>
           <li>
@@ -661,8 +676,11 @@
           otimizar o layout físico dos dados para velocidade de leitura.
         </p>
         <p>
-          Na AWS, o <strong>Amazon Redshift</strong> é o serviço de Data Warehouse gerenciado. Suas
-          características arquiteturais incluem:
+          Na AWS, o <strong>Amazon Redshift</strong> é o serviço de Data Warehouse gerenciado. Como o
+          Learner Lab da disciplina <strong>não libera Redshift</strong>, a Aula 06 usará um
+          <strong>ClickHouse em EC2</strong> como substituto didático &mdash; um DW colunar MPP open-source que
+          reproduz as mesmas características arquiteturais descritas abaixo. Conceitualmente, o que você aprende
+          sobre Redshift vale diretamente para ClickHouse. Suas características arquiteturais incluem:
         </p>
         <ul>
           <li>
@@ -725,11 +743,17 @@
           </li>
         </ul>
         <p>
-          <strong>Implementação na AWS:</strong> dados armazenados no S3 em formato Parquet, com metadados
+          <strong>Implementação na AWS (mercado):</strong> dados armazenados no S3 em formato Parquet, com metadados
           de tabela gerenciados pelo Apache Iceberg. O AWS Glue Data Catalog serve como metastore. O Athena e
           o Redshift Spectrum consultam esses dados com suporte a transações e time travel. O resultado é uma
           plataforma que tem a flexibilidade e o custo do Data Lake com a confiabilidade e a performance do
           Data Warehouse.
+        </p>
+        <p>
+          <strong>Implementação na disciplina (Learner Lab):</strong> como Glue e Redshift não estão disponíveis,
+          usamos <strong>S3 + Athena + PySpark em EC2</strong>. O Athena oferece suporte nativo a Iceberg (engine v3)
+          e permite consultar dados no S3 com semântica de tabela. O metastore fica self-hosted em EC2 (Hive Metastore
+          ou o próprio Iceberg catalog file). Conceitualmente é equivalente à implementação de mercado.
         </p>
 
         <h4>Data Mesh</h4>
@@ -772,10 +796,12 @@
           não têm a complexidade organizacional que justifica a overhead de um Data Mesh.
         </p>
         <p>
-          <strong>Implementação na AWS:</strong> AWS Lake Formation para controle de acesso fine-grained por
+          <strong>Implementação na AWS (referência de mercado):</strong> AWS Lake Formation para controle de acesso fine-grained por
           domínio, Amazon EventBridge para integração assíncrona entre domínios, AWS Glue Data Catalog como
           catálogo federado onde cada domínio registra seus produtos de dados, e AWS RAM (Resource Access Manager)
-          para compartilhamento de recursos entre contas AWS de diferentes domínios.
+          para compartilhamento de recursos entre contas AWS de diferentes domínios. Como o Learner Lab da
+          disciplina não libera Glue nem Lake Formation, não iremos montar um Data Mesh real nas práticas &mdash;
+          mas o conceito é fundamental para o panorama de arquitetura.
         </p>
 
         <h4>Framework de decisão: quando usar qual arquitetura</h4>
@@ -934,20 +960,20 @@
               <td>Aula 03 (fontes NoSQL)</td>
             </tr>
             <tr>
-              <td>Amazon Redshift</td>
-              <td>Data Warehouse MPP colunar</td>
+              <td>ClickHouse em EC2</td>
+              <td>Data Warehouse MPP colunar (substituto do Redshift no lab)</td>
               <td>Aula 06 (DW de alta performance)</td>
             </tr>
             <tr>
               <td rowspan="2">Processamento</td>
-              <td>AWS Glue</td>
-              <td>ETL serverless + catálogo de metadados</td>
+              <td>PySpark em EC2</td>
+              <td>ETL rodando em instância EC2 (substituto do Glue no lab)</td>
               <td>Aulas 05, 07 (ETL e catálogo)</td>
             </tr>
             <tr>
               <td>Amazon EMR</td>
-              <td>Clusters Spark/Hive/Presto gerenciados</td>
-              <td>Aula 05 (processamento em escala)</td>
+              <td>Clusters Spark/Hive/Presto gerenciados (referência de mercado)</td>
+              <td>Citado em panorama &mdash; a prática usa PySpark em EC2</td>
             </tr>
             <tr>
               <td rowspan="2">Streaming</td>
@@ -957,7 +983,7 @@
             </tr>
             <tr>
               <td>Kinesis Data Firehose</td>
-              <td>Entrega de streaming para S3/Redshift</td>
+              <td>Entrega de streaming para S3</td>
               <td>Aula 04 (streaming para lake)</td>
             </tr>
             <tr>
@@ -1045,7 +1071,8 @@
           clientes for configurado com acesso público e os dados forem expostos, a responsabilidade é inteiramente
           do cliente, não da AWS. A AWS fornece as ferramentas para bloquear acesso público (S3 Block Public Access,
           bucket policies, ACLs), mas a configuração correta é responsabilidade de quem administra a conta.
-          Da mesma forma, se um job do AWS Glue usar uma role com permissões excessivas (por exemplo,
+          Da mesma forma, se um job PySpark rodando em EC2 (ou qualquer outro serviço gerenciado como Lambda)
+          usar uma role com permissões excessivas (por exemplo,
           <code>AdministratorAccess</code>) e essa role for comprometida, a responsabilidade pela escalação
           de privilégio é do cliente.
         </div>
@@ -1204,17 +1231,17 @@
             <tr>
               <td>DataEngineers</td>
               <td>Engenheiros que constroem e mantêm pipelines</td>
-              <td>S3 Full, Glue Full, Kinesis Full, CloudWatch Logs, Step Functions</td>
+              <td>S3 Full, EC2 (Spark workers), Athena Full, Kinesis Full, CloudWatch Logs, Step Functions</td>
             </tr>
             <tr>
               <td>DataScientists</td>
               <td>Cientistas que exploram dados e treinam modelos</td>
-              <td>S3 Read (Silver/Gold), Athena Full, SageMaker, Glue Catalog Read</td>
+              <td>S3 Read (Silver/Gold), Athena Full, SageMaker</td>
             </tr>
             <tr>
               <td>DataAnalysts</td>
               <td>Analistas que consultam dados e criam relatórios</td>
-              <td>Athena Full, S3 Read (Gold), Redshift Read, QuickSight</td>
+              <td>Athena Full, S3 Read (Gold), ClickHouse Read, QuickSight</td>
             </tr>
             <tr>
               <td>DataAdmins</td>
@@ -1253,11 +1280,11 @@
           <strong>Por que Roles são fundamentais para serviços AWS:</strong>
         </p>
         <p>
-          Quando um job do AWS Glue precisa ler dados de um bucket S3 e gravar resultados em outro bucket, ele precisa
-          de permissões para essas operações. A forma <strong>correta</strong> de conceder essas permissões é criar
-          uma Role com uma Trust Policy que permite ao serviço Glue assumi-la e Permission Policies que concedem
-          acesso S3. O Glue assume a role automaticamente no início da execução e as credenciais expiram quando o
-          job termina.
+          Quando uma função Lambda (ou uma instância EC2 rodando um job PySpark) precisa ler dados de um bucket S3 e
+          gravar resultados em outro bucket, ela precisa de permissões para essas operações. A forma <strong>correta</strong>
+          de conceder essas permissões é criar uma Role com uma Trust Policy que permite ao serviço (lambda.amazonaws.com
+          ou ec2.amazonaws.com) assumi-la e Permission Policies que concedem acesso S3. O serviço assume a role
+          automaticamente no início da execução e as credenciais expiram quando o job termina.
         </p>
         <p>
           A forma <strong>incorreta</strong> (e perigosa) seria criar um IAM User com access keys e configurar essas
@@ -1270,7 +1297,7 @@
           <strong>Tipos de Roles mais usados em dados:</strong>
         </p>
         <ul>
-          <li><strong>Service Role:</strong> assumida por um serviço AWS (Glue, Lambda, EMR, Step Functions).</li>
+          <li><strong>Service Role:</strong> assumida por um serviço AWS (Lambda, EC2, Kinesis Firehose, Step Functions).</li>
           <li><strong>Cross-Account Role:</strong> assumida por identidades de outra conta AWS. Usada em Data Mesh para compartilhar dados entre domínios.</li>
           <li><strong>Service-Linked Role:</strong> role pré-configurada pela AWS para um serviço específico. Criada automaticamente quando você habilita o serviço.</li>
         </ul>
@@ -1330,7 +1357,7 @@
           </li>
           <li>
             <strong>Action:</strong> lista de operações de API que a declaração cobre. Formato:
-            <code>serviço:OperaçãoDeAPI</code>. Exemplos: <code>s3:GetObject</code>, <code>glue:StartJobRun</code>,
+            <code>serviço:OperaçãoDeAPI</code>. Exemplos: <code>s3:GetObject</code>, <code>ec2:RunInstances</code>,
             <code>athena:StartQueryExecution</code>. O wildcard <code>*</code> significa "todas as ações".
           </li>
           <li>
@@ -1398,8 +1425,8 @@
         <p>
           O Princípio do Menor Privilégio (<em>Principle of Least Privilege</em>) é a pedra angular da segurança em cloud:
           <strong>conceda a cada identidade apenas as permissões estritamente necessárias para que ela realize sua
-          função, e nada além disso</strong>. Se um job do Glue precisa ler de um bucket S3 específico e gravar logs
-          no CloudWatch, a role desse job deve ter permissão apenas para essas duas operações, nesses recursos específicos.
+          função, e nada além disso</strong>. Se uma função Lambda precisa ler de um bucket S3 específico e gravar logs
+          no CloudWatch, a role dessa função deve ter permissão apenas para essas duas operações, nesses recursos específicos.
         </p>
 
         <h4>Estratégias de implementação</h4>
@@ -1448,9 +1475,9 @@
           <code>AdministratorAccess</code>.
         </p>
         <p>
-          Exemplo: um permission boundary que permite apenas acesso a S3, Glue, Athena e CloudWatch garante
+          Exemplo: um permission boundary que permite apenas acesso a S3, Athena, EC2 e CloudWatch garante
           que nenhuma role criada pela equipe de dados possa, acidentalmente ou deliberadamente, acessar
-          serviços fora do escopo do time (como IAM, EC2 ou Lambda).
+          serviços fora do escopo do time (como IAM completo ou Lambda).
         </p>
 
         <h4>Anti-padrões comuns (o que NÃO fazer)</h4>
@@ -1495,12 +1522,12 @@
         </p>
         <ul>
           <li><strong>S3:</strong> leitura e escrita em todas as camadas (Raw, Trusted, Refined). Precisa ingerir dados no Raw, transformar e gravar no Trusted, e materializar no Refined.</li>
-          <li><strong>AWS Glue:</strong> criar e executar crawlers (para descoberta de schema), criar e executar jobs ETL, gerenciar o catálogo de metadados.</li>
+          <li><strong>EC2:</strong> criar e gerenciar instâncias que rodam o PySpark para ETL e o ClickHouse para DW (substitutos de Glue e Redshift no Learner Lab).</li>
+          <li><strong>Athena:</strong> criar tabelas externas, workgroups e executar queries SQL sobre dados no S3.</li>
           <li><strong>Kinesis:</strong> criar e gerenciar streams e firehoses para ingestão em tempo real.</li>
           <li><strong>Step Functions:</strong> criar e executar state machines para orquestração de pipelines.</li>
           <li><strong>CloudWatch:</strong> visualizar logs de execução de jobs, criar métricas customizadas e alarmes.</li>
           <li><strong>Lambda:</strong> criar e executar funções serverless usadas como componentes de pipelines.</li>
-          <li><strong>EMR:</strong> criar e gerenciar clusters Spark para processamento em larga escala.</li>
           <li><strong>IAM:</strong> <strong>sem permissão</strong>. A administração de acessos é responsabilidade do DataAdmin.</li>
         </ul>
 
@@ -1513,7 +1540,7 @@
         <ul>
           <li><strong>S3:</strong> somente leitura nas camadas Trusted (Silver) e Refined (Gold). Não deve acessar a camada Raw (dados brutos não confiáveis) nem gravar em nenhuma camada.</li>
           <li><strong>Athena:</strong> executar queries SQL para exploração de dados.</li>
-          <li><strong>Glue Data Catalog:</strong> leitura do catálogo para descobrir datasets disponíveis.</li>
+          <li><strong>Catálogo de dados:</strong> leitura do catálogo (Athena/Hive Metastore self-hosted neste curso) para descobrir datasets disponíveis.</li>
           <li><strong>SageMaker:</strong> criar e executar notebooks, training jobs e endpoints de inferência.</li>
           <li><strong>ECR (Elastic Container Registry):</strong> leitura para acessar imagens Docker de modelos.</li>
         </ul>
@@ -1525,7 +1552,7 @@
         </p>
         <ul>
           <li><strong>Athena:</strong> executar queries SQL (somente leitura, sem DDL).</li>
-          <li><strong>Redshift:</strong> conexão somente leitura em schemas de reporting.</li>
+          <li><strong>ClickHouse em EC2 (DW da disciplina):</strong> conexão somente leitura em schemas de reporting.</li>
           <li><strong>QuickSight:</strong> acesso a dashboards publicados e criação de análises.</li>
           <li><strong>S3:</strong> somente leitura na camada Refined (Gold). Sem acesso a Raw ou Trusted.</li>
         </ul>
@@ -1555,10 +1582,10 @@
           </thead>
           <tbody>
             <tr>
-              <td>GlueJobRole</td>
-              <td>glue.amazonaws.com</td>
-              <td>S3 (leitura/escrita nos buckets do lake), AWSGlueServiceRole, CloudWatch Logs</td>
-              <td>Assumida por crawlers e jobs ETL do Glue</td>
+              <td>SparkEC2Role</td>
+              <td>ec2.amazonaws.com</td>
+              <td>S3 (leitura/escrita nos buckets do lake), CloudWatch Logs</td>
+              <td>Assumida por instâncias EC2 que rodam os jobs PySpark (substituto do Glue no lab)</td>
             </tr>
             <tr>
               <td>LambdaExecutionRole</td>
@@ -1569,7 +1596,7 @@
             <tr>
               <td>StepFunctionsRole</td>
               <td>states.amazonaws.com</td>
-              <td>Lambda (invocar), Glue (iniciar jobs), CloudWatch (logs e métricas)</td>
+              <td>Lambda (invocar), EC2 (iniciar/parar instâncias Spark), CloudWatch (logs e métricas)</td>
               <td>Assumida por state machines que orquestram pipelines</td>
             </tr>
             <tr>
@@ -1615,14 +1642,14 @@
               <td>Leitura</td>
             </tr>
             <tr>
-              <td>AWS Glue (Jobs/Crawlers)</td>
+              <td>EC2 (PySpark ETL)</td>
               <td>Completo</td>
               <td>Sem acesso</td>
               <td>Sem acesso</td>
               <td>Leitura</td>
             </tr>
             <tr>
-              <td>Glue Data Catalog</td>
+              <td>Catálogo de dados (Athena/Hive)</td>
               <td>Completo</td>
               <td>Leitura</td>
               <td>Leitura</td>
@@ -1636,7 +1663,7 @@
               <td>Leitura</td>
             </tr>
             <tr>
-              <td>Amazon Redshift</td>
+              <td>ClickHouse em EC2 (DW)</td>
               <td>Leitura + Escrita</td>
               <td>Leitura</td>
               <td>Leitura</td>
@@ -1674,23 +1701,26 @@
         <h2>Módulo 3 &mdash; O LabRole do AWS Academy Learner Lab</h2>
         <p>
           O ambiente que usamos nas práticas é o <strong>AWS Academy Learner Lab</strong>. Ele é uma conta AWS real,
-          com limites de tempo, créditos de consumo e um conjunto fixo de serviços habilitados. Para evitar que cada
-          aluno gaste tempo criando roles de serviço nas primeiras aulas, a AWS Academy pré-configura uma role chamada
-          <strong>LabRole</strong>, que praticamente todos os serviços usados no curso assumem automaticamente
-          (Glue, Lambda, Athena, Kinesis Firehose, SageMaker, Step Functions).
+          com limites de tempo, créditos de consumo e um conjunto <strong>restrito</strong> de serviços habilitados.
+          Para evitar que cada aluno gaste tempo criando roles de serviço nas primeiras aulas, a AWS Academy pré-configura
+          uma role chamada <strong>LabRole</strong>, que os serviços disponíveis no lab assumem automaticamente
+          (EC2, Lambda, Athena, Kinesis Firehose, SageMaker, Step Functions).
         </p>
 
         <h3>O que a LabRole permite</h3>
         <ul>
           <li>Acessos amplos a S3 (leitura, escrita, gerenciamento de buckets).</li>
-          <li>Execução e gerenciamento de jobs Glue, funções Lambda e streams Kinesis.</li>
+          <li>Criação, gerenciamento e término de instâncias <strong>EC2</strong> (essenciais para PySpark e ClickHouse na disciplina).</li>
+          <li>Execução e gerenciamento de funções Lambda e streams Kinesis.</li>
           <li>Queries Athena e gerenciamento de workgroups.</li>
           <li>Logs em CloudWatch Logs e métricas.</li>
-          <li>Trust policy configurada para múltiplos serviços (<code>glue.amazonaws.com</code>, <code>lambda.amazonaws.com</code>, <code>firehose.amazonaws.com</code> etc.).</li>
+          <li>Leitura de informações do IAM (listar users, groups, roles, policies) &mdash; mas não escrita.</li>
+          <li>Trust policy configurada para múltiplos serviços (<code>ec2.amazonaws.com</code>, <code>lambda.amazonaws.com</code>, <code>firehose.amazonaws.com</code> etc.).</li>
         </ul>
 
         <h3>O que a LabRole não permite (e por quê)</h3>
         <ul>
+          <li><strong>Acesso a AWS Glue e Amazon Redshift:</strong> esses dois serviços <strong>não estão habilitados</strong> no Learner Lab. Por esse motivo, a disciplina substitui Glue por <strong>PySpark em EC2</strong> (Aula 05) e Redshift por <strong>ClickHouse em EC2</strong> (Aula 06). Tentar chamar APIs desses serviços resulta em erro de autorização.</li>
           <li><strong>Criar usuários IAM persistentes:</strong> o ambiente é reciclado a cada sessão do lab, então não faz sentido criar usuários permanentes.</li>
           <li><strong>Alterar billing e organização:</strong> você não controla a conta raiz nem a conta do AWS Organizations da universidade.</li>
           <li><strong>Provisionar recursos de alto custo:</strong> instâncias com GPUs, clusters muito grandes e storage de tiers premium estão bloqueados.</li>
@@ -1705,10 +1735,10 @@
 
         <h3>Como a LabRole aparece no dia a dia do lab</h3>
         <p>
-          Quando você criar um job do Glue na Aula 05, por exemplo, o console perguntará qual role o job deve
-          assumir. A resposta padrão será <code>LabRole</code>. O mesmo vale para funções Lambda, crawlers do Glue
-          e entregas do Kinesis Firehose. Saber disso evita confusão quando o console pedir uma "IAM role" e a
-          lista não estiver vazia.
+          Quando você subir uma instância EC2 na Aula 05 (para rodar PySpark) ou na Aula 06 (para rodar ClickHouse),
+          por exemplo, o console perguntará qual IAM role associar à instância. A resposta padrão será
+          <code>LabRole</code>. O mesmo vale para funções Lambda e entregas do Kinesis Firehose. Saber disso
+          evita confusão quando o console pedir uma "IAM role" e a lista não estiver vazia.
         </p>
       </section>
 
@@ -1792,8 +1822,8 @@
         <ol>
           <li>No menu lateral do IAM, clique em <strong>Users</strong> e observe os usuários pré-criados pelo lab (o lab pode trazer um usuário chamado <code>vocareum</code> ou similar).</li>
           <li>Clique em <strong>Roles</strong>. Localize a role chamada <code>LabRole</code>. Ela é o coração do ambiente.</li>
-          <li>Abra a LabRole e vá na aba <strong>Permissions</strong>. Observe as políticas atachadas: verá <code>AmazonS3FullAccess</code>, <code>AWSGlueConsoleFullAccess</code>, <code>CloudWatchLogsFullAccess</code> e outras, dependendo da versão do lab.</li>
-          <li>Ainda na LabRole, abra a aba <strong>Trust relationships</strong>. Observe que ela aceita ser assumida por múltiplos serviços AWS (<code>glue.amazonaws.com</code>, <code>lambda.amazonaws.com</code>, <code>firehose.amazonaws.com</code> etc.).</li>
+          <li>Abra a LabRole e vá na aba <strong>Permissions</strong>. Observe as políticas atachadas: verá <code>AmazonS3FullAccess</code>, <code>AmazonEC2FullAccess</code>, <code>AmazonAthenaFullAccess</code>, <code>CloudWatchLogsFullAccess</code>, <code>IAMReadOnlyAccess</code> e outras, dependendo da versão do lab. Note que <strong>não há políticas de Glue nem de Redshift</strong>, pois esses serviços não estão habilitados.</li>
+          <li>Ainda na LabRole, abra a aba <strong>Trust relationships</strong>. Observe que ela aceita ser assumida por múltiplos serviços AWS (<code>ec2.amazonaws.com</code>, <code>lambda.amazonaws.com</code>, <code>firehose.amazonaws.com</code> etc.).</li>
           <li>No menu lateral, clique em <strong>Policies</strong>. Use o filtro para ver as diferenças entre "AWS managed" e "Customer managed". No Learner Lab, a maioria é AWS managed.</li>
           <li>Anote para si: "no lab, todo serviço gerenciado vai assumir a LabRole automaticamente".</li>
         </ol>
@@ -1896,7 +1926,8 @@
             as seguintes políticas (marque o checkbox de cada uma):
             <ul>
               <li><code>AmazonS3FullAccess</code> &mdash; acesso completo ao S3 (leitura, escrita, gerenciamento de buckets)</li>
-              <li><code>AWSGlueConsoleFullAccess</code> &mdash; acesso completo ao Glue via console (crawlers, jobs, catálogo)</li>
+              <li><code>AmazonEC2FullAccess</code> &mdash; acesso completo ao EC2 (instâncias para PySpark e ClickHouse)</li>
+              <li><code>AmazonAthenaFullAccess</code> &mdash; acesso completo ao Athena (queries e workgroups)</li>
               <li><code>CloudWatchLogsFullAccess</code> &mdash; acesso completo a logs do CloudWatch (ler, escrever, criar log groups)</li>
             </ul>
           </li>
@@ -1904,10 +1935,10 @@
         </ol>
         <p>
           <strong>Por que estas políticas?</strong> O engenheiro de dados precisa de acesso completo ao S3 para
-          gerenciar as camadas do Data Lake, ao Glue para criar e executar pipelines ETL, e ao CloudWatch Logs
-          para monitorar a execução dos jobs. Em um ambiente de produção, refinaríamos estas políticas para escopo
-          mais restrito (buckets específicos, log groups específicos), mas para o lab, as managed policies da AWS
-          são adequadas para aprendizado.
+          gerenciar as camadas do Data Lake, ao EC2 para subir instâncias que rodam o PySpark (ETL) e o ClickHouse (DW),
+          ao Athena para consultar dados e ao CloudWatch Logs para monitorar a execução dos jobs. Em um ambiente
+          de produção, refinaríamos estas políticas para escopo mais restrito (buckets específicos, instâncias
+          específicas, log groups específicos), mas para o lab, as managed policies da AWS são adequadas para aprendizado.
         </p>
 
         <p><strong>Grupo 2: DataAnalysts</strong></p>
@@ -1979,28 +2010,28 @@
         <!-- PASSO 7 -->
         <h3>Passo 7 &mdash; Criar roles para serviços (20 min) &middot; <em>aprofundamento</em></h3>
 
-        <p><strong>Role 1: GlueJobRole</strong></p>
+        <p><strong>Role 1: SparkEC2Role</strong> (substituto da GlueJobRole, já que o lab não libera Glue)</p>
         <ol>
           <li>No menu lateral do IAM, clique em <strong>Roles</strong> e depois em <strong>Create role</strong>.</li>
           <li>Em "Trusted entity type", selecione <strong>"AWS service"</strong>.</li>
-          <li>Em "Use case", na lista de serviços, selecione <strong>"Glue"</strong>.</li>
+          <li>Em "Use case", na lista de serviços, selecione <strong>"EC2"</strong>.</li>
           <li>Clique em <strong>Next</strong>.</li>
           <li>
             Na tela "Add permissions", busque e selecione as seguintes políticas:
             <ul>
               <li><code>AmazonS3FullAccess</code></li>
-              <li><code>AWSGlueServiceRole</code></li>
               <li><code>CloudWatchLogsFullAccess</code></li>
+              <li><code>AmazonAthenaFullAccess</code></li>
             </ul>
           </li>
           <li>Clique em <strong>Next</strong>.</li>
-          <li>No campo "Role name", insira: <code>GlueJobRole</code></li>
-          <li>Em "Description", insira: <code>Role para jobs ETL do AWS Glue - acesso a S3, Glue e CloudWatch Logs</code></li>
-          <li>Revise o resumo (Trusted entities deve mostrar "glue.amazonaws.com") e clique em <strong>Create role</strong>.</li>
+          <li>No campo "Role name", insira: <code>SparkEC2Role</code></li>
+          <li>Em "Description", insira: <code>Role para instancias EC2 que rodam PySpark (ETL) - acesso a S3, Athena e CloudWatch Logs</code></li>
+          <li>Revise o resumo (Trusted entities deve mostrar "ec2.amazonaws.com") e clique em <strong>Create role</strong>.</li>
         </ol>
         <p>
-          <strong>O que acabamos de fazer?</strong> Criamos uma role que o serviço AWS Glue pode assumir.
-          A Trust Policy (criada automaticamente ao selecionar "Glue" como trusted entity) contém:
+          <strong>O que acabamos de fazer?</strong> Criamos uma role que uma instância EC2 (rodando PySpark) pode assumir.
+          A Trust Policy (criada automaticamente ao selecionar "EC2" como trusted entity) contém:
         </p>
         <pre><code>{
   "Version": "2012-10-17",
@@ -2008,16 +2039,17 @@
     {
       "Effect": "Allow",
       "Principal": {
-        "Service": "glue.amazonaws.com"
+        "Service": "ec2.amazonaws.com"
       },
       "Action": "sts:AssumeRole"
     }
   ]
 }</code></pre>
         <p>
-          Isso significa: "o serviço AWS Glue tem permissão para chamar <code>sts:AssumeRole</code> nesta role".
-          Quando um job do Glue é executado e configurado com esta role, o Glue chama o STS, recebe credenciais
-          temporárias com as permissões da role (S3, Glue, CloudWatch) e usa essas credenciais durante a execução.
+          Isso significa: "o serviço EC2 tem permissão para chamar <code>sts:AssumeRole</code> nesta role".
+          Quando uma instância EC2 é lançada com esta role anexada (como <em>instance profile</em>), o EC2 chama o STS,
+          recebe credenciais temporárias com as permissões da role (S3, Athena, CloudWatch) e disponibiliza essas
+          credenciais ao código Python/PySpark rodando dentro da instância via metadata endpoint.
         </p>
 
         <p><strong>Role 2: LambdaExecutionRole</strong></p>
@@ -2040,15 +2072,15 @@
           <li>Clique em <strong>Create role</strong>.</li>
         </ol>
         <p>
-          <strong>Diferença de escopo:</strong> note que a GlueJobRole tem <code>AmazonS3FullAccess</code>
-          (leitura e escrita, porque o Glue precisa gravar resultados de transformação), enquanto a
-          LambdaExecutionRole tem apenas <code>AmazonS3ReadOnlyAccess</code> (porque, neste cenário, a Lambda
-          apenas lê dados para processamento leve, sem gravar no S3).
+          <strong>Diferença de escopo:</strong> note que a SparkEC2Role tem <code>AmazonS3FullAccess</code>
+          (leitura e escrita, porque o PySpark precisa gravar resultados de transformação no Trusted/Refined),
+          enquanto a LambdaExecutionRole tem apenas <code>AmazonS3ReadOnlyAccess</code> (porque, neste cenário,
+          a Lambda apenas lê dados para processamento leve, sem gravar no S3).
         </p>
         <div class="tip">
           <strong>Validação do Passo 7:</strong> na lista de Roles, ambas as roles devem ser visíveis. Clique
-          em <strong>GlueJobRole</strong>: na aba "Trust relationships", confirme que o serviço confiável é
-          <code>glue.amazonaws.com</code>; na aba "Permissions", confirme 3 políticas. Repita para
+          em <strong>SparkEC2Role</strong>: na aba "Trust relationships", confirme que o serviço confiável é
+          <code>ec2.amazonaws.com</code>; na aba "Permissions", confirme 3 políticas. Repita para
           <strong>LambdaExecutionRole</strong>: serviço confiável <code>lambda.amazonaws.com</code>, 3 políticas.
           No Learner Lab a criação de roles customizadas pode estar bloqueada; nesse caso, compare mentalmente com a
           <code>LabRole</code> já existente.
@@ -2226,7 +2258,8 @@
         <h4>Desafio A: Criar um Permission Boundary</h4>
         <ol>
           <li>Crie uma nova política customizada chamada <code>DataTeamBoundary</code> que permite apenas
-            ações nos serviços S3, Glue, Athena, CloudWatch e Lambda (negando tudo o mais).</li>
+            ações nos serviços S3, EC2, Athena, CloudWatch e Lambda (negando tudo o mais). Observe que Glue e Redshift
+            ficam fora do escopo, alinhado às restrições do Learner Lab.</li>
           <li>Vá até o usuário <code>engenheiro-dados-lab</code>, aba "Permissions boundary".</li>
           <li>Atache a política <code>DataTeamBoundary</code> como permissions boundary.</li>
           <li>Observe: mesmo que o usuário tenha <code>AmazonS3FullAccess</code>, o permissions boundary
@@ -2246,8 +2279,8 @@
         <ol>
           <li>Vá ao S3, clique no bucket <code>olist-raw-&lt;iniciais&gt;</code>.</li>
           <li>Clique na aba <strong>Permissions</strong> e depois em <strong>Bucket policy</strong> &gt; <strong>Edit</strong>.</li>
-          <li>Escreva uma bucket policy que permita apenas a role <code>GlueJobRole</code> a fazer
-            <code>s3:PutObject</code> neste bucket. Isso garante que apenas jobs do Glue podem gravar no bucket Raw.</li>
+          <li>Escreva uma bucket policy que permita apenas a role <code>SparkEC2Role</code> a fazer
+            <code>s3:PutObject</code> neste bucket. Isso garante que apenas instâncias EC2 rodando PySpark (via essa role) podem gravar no bucket Raw.</li>
           <li>Salve e teste.</li>
         </ol>
 
@@ -2291,16 +2324,16 @@
             <strong>Diagnóstico de segurança:</strong> uma startup tem a seguinte configuração AWS: (a) todos os
             10 engenheiros de dados compartilham a mesma access key; (b) o bucket S3 com dados de produção está
             público para facilitar o acesso de um parceiro externo; (c) não há roles configuradas para serviços
-            (os jobs do Glue usam access keys hardcoded); (d) a conta root é usada diariamente sem MFA;
+            (os jobs PySpark rodando em EC2 usam access keys hardcoded); (d) a conta root é usada diariamente sem MFA;
             (e) não há CloudTrail habilitado. Liste pelo menos 6 riscos concretos dessa configuração e proponha
             uma solução específica para cada um, citando o serviço ou funcionalidade AWS que resolve o problema.
           </li>
           <li>
             <strong>Usuário vs Role:</strong> um colega de equipe propõe criar um IAM User chamado
-            <code>glue-service-user</code> com access keys e configurar essas keys nas variáveis de ambiente
-            de todos os jobs do Glue. Explique detalhadamente por que essa abordagem é insegura e quais
-            problemas operacionais ela pode causar. Em seguida, descreva a solução correta usando IAM Roles,
-            explicando como funciona o mecanismo de assume role e credenciais temporárias.
+            <code>spark-service-user</code> com access keys e configurar essas keys nas variáveis de ambiente
+            de todas as instâncias EC2 que rodam PySpark. Explique detalhadamente por que essa abordagem é insegura e quais
+            problemas operacionais ela pode causar. Em seguida, descreva a solução correta usando IAM Roles e
+            <em>instance profiles</em>, explicando como funciona o mecanismo de assume role e credenciais temporárias.
           </li>
           <li>
             <strong>Modelo de responsabilidade compartilhada:</strong> uma empresa armazenou dados sensíveis
@@ -2340,7 +2373,7 @@
             O pico mensal de processamento acontece na primeira semana do mês (fechamento financeiro), quando
             o volume chega a 2 TB/dia por 5 dias. Compare os custos aproximados e as implicações operacionais
             de: (a) montar essa plataforma on-premises com servidores próprios e (b) usar serviços AWS
-            (S3, Glue, Athena). Considere utilização média de hardware, custos de equipe de operações,
+            (S3, EC2 com PySpark, Athena). Considere utilização média de hardware, custos de equipe de operações,
             tempo de provisionamento e capacidade de lidar com picos.
           </li>
         </ol>
