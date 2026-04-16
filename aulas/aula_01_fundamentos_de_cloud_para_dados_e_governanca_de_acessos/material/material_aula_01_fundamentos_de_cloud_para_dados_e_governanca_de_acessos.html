@@ -33,7 +33,7 @@
         <p class="summary">
           Este material acompanha a primeira aula da disciplina <strong>Cloud Computing e SRA &mdash; Visão Prática com AWS</strong>
           do MBA em Engenharia de Dados. Ele cobre, de forma aprofundada, todos os tópicos apresentados nos slides:
-          o mapa da disciplina e sua narrativa em torno do dataset Olist; a dinâmica do avião como metáfora de pipeline;
+          o mapa da disciplina e sua narrativa em torno do dataset Olist; a dinâmica da Central da Olist, feita ao vivo em grupos de WhatsApp, como metáfora de um pipeline com produtores, broker, consumidor e contrato;
           a definição de Cloud Computing segundo o NIST; os modelos de serviço (IaaS, PaaS, SaaS);
           as principais arquiteturas de dados na nuvem (Data Lake, Data Warehouse, Data Lakehouse e Data Mesh);
           a AWS como plataforma de dados; a governança de acessos com AWS IAM; o princípio do menor privilégio;
@@ -128,83 +128,141 @@
       </section>
 
       <!-- ============================================================
-           DINAMICA DO AVIAO
+           DINAMICA DA CENTRAL DA OLIST
       ============================================================= -->
       <section class="content-block">
-        <h2>Abertura &mdash; Dinâmica do avião</h2>
+        <h2>Abertura &mdash; Dinâmica da Central da Olist</h2>
         <p>
-          A aula começa com uma dinâmica curta (cerca de 20 minutos, incluindo reflexão guiada) cujo objetivo é
-          fazer o grupo experimentar, na prática, o que significa operar um sistema distribuído com canais de
-          comunicação restritos. Trata-se de uma adaptação didática, onde cada participante recebe uma folha com
-          alguns símbolos e um papel específico (A, B1, B2, C, D, E, F, G, H ou I). O grupo deve descobrir qual
-          símbolo aparece em todas as folhas, mas com regras estritas de comunicação.
+          A aula começa com uma dinâmica curta (cerca de 20 minutos, incluindo o debrief) que coloca a turma
+          dentro do dia a dia de uma Central de Dados fictícia da Olist. A ferramenta é o WhatsApp. A ideia é
+          simples: fazer com que os conceitos de produtor, broker, consumidor, contrato, camada e IAM apareçam
+          sozinhos, sem que ninguém precise falar essas palavras antes de vivê-las. Ao final da dinâmica, o
+          debrief conecta cada pedaço do que aconteceu em tela ao vocabulário formal da engenharia de dados.
         </p>
 
-        <h3>Regras da dinâmica</h3>
-        <ol>
-          <li>Cada pessoa recebe uma folha com quatro ou cinco símbolos e não pode mostrá-la a ninguém.</li>
-          <li>A única forma de comunicação permitida é por <strong>bilhetes manuscritos</strong> &mdash; nada de falar, gesticular ou mostrar o papel.</li>
-          <li>O participante <strong>A</strong> (o cliente final) só pode trocar bilhetes com <strong>B1</strong> e <strong>B2</strong>.</li>
-          <li>Os participantes <strong>C, D, E, F, G, H e I</strong> (as fontes) só podem trocar bilhetes com <strong>B1</strong> e <strong>B2</strong>.</li>
-          <li><strong>B1</strong> e <strong>B2</strong> coordenam o fluxo: trocam bilhetes entre si, com A e com as fontes.</li>
-          <li>O grupo vence quando A declara, com confiança, o símbolo comum a todas as folhas.</li>
-          <li>Tempo máximo: 10 minutos para a execução; 10 minutos para a reflexão.</li>
-        </ol>
-
-        <h3>Mapeando a dinâmica em um pipeline de dados</h3>
+        <h3>O enredo</h3>
         <p>
-          Terminada a execução, o debrief conecta cada elemento da dinâmica a um componente real de engenharia
-          de dados. Essa analogia vai voltar várias vezes ao longo do semestre.
+          O CEO da Olist está com pressa e manda uma pergunta urgente: quer saber qual estado brasileiro teve o
+          maior ticket médio. O problema é que a informação está espalhada entre vendedores em vários estados,
+          e o CEO não tem tempo nem paciência para falar com cada um. No meio do caminho existe a <strong>Central
+          de Dados</strong>, formada por duas pessoas, que é quem conversa com os vendedores, calcula o que precisa
+          ser calculado e entrega a resposta final. A turma vai viver essa Central por 20 minutos.
+        </p>
+
+        <h3>Papéis</h3>
+        <ul>
+          <li><strong>CEO (A)</strong> &mdash; uma pessoa. Representa o consumidor final (dashboard, relatório, API de negócio).</li>
+          <li><strong>Central de Dados (B1 e B2)</strong> &mdash; duas pessoas. São os brokers, os heróis do pipeline.</li>
+          <li><strong>Vendedores (C, D, E, F, G, H, I)</strong> &mdash; até sete pessoas. São as fontes espalhadas pelo país.</li>
+        </ul>
+        <p>
+          Para turmas menores, retire vendedores na ordem I &rarr; H &rarr; G e assim por diante. B1 e B2 ficam
+          sempre. O CEO também é sempre uma pessoa só.
+        </p>
+
+        <h3>Setup (cerca de 3 minutos)</h3>
+        <p>
+          Toda a dinâmica acontece em três grupos de WhatsApp criados ao vivo dentro da própria sala de aula. Não
+          há impressão de cards, não há pré-produção: abra o WhatsApp, crie os grupos, adicione as pessoas e siga.
+        </p>
+        <ol>
+          <li>Crie o grupo <strong>Vendedores</strong> com os 7 vendedores, B1 e B2.</li>
+          <li>Crie o grupo <strong>Central</strong> só com B1 e B2. Esse é o backstage da plataforma.</li>
+          <li>Crie o grupo <strong>Diretoria</strong> com o CEO, B1 e B2.</li>
+          <li>Por mensagem direta (DM privada), o professor envia para cada vendedor um mini-card de dado &mdash; apenas texto, nada de imagem &mdash; com um trecho fictício do Olist.</li>
+        </ol>
+        <p>Os cards usados na dinâmica são estes:</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Vendedor</th>
+              <th>Dado recebido por DM</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Vendedor C</td><td>Estado: SP | 12 pedidos | Receita: R$ 4.300</td></tr>
+            <tr><td>Vendedor D</td><td>Estado: RJ | 8 pedidos | Receita: R$ 2.100</td></tr>
+            <tr><td>Vendedor E</td><td>Estado: MG | 5 pedidos | Receita: R$ 1.800</td></tr>
+            <tr><td>Vendedor F</td><td>Estado: SP | 7 pedidos | Receita: R$ 3.500</td></tr>
+            <tr><td>Vendedor G</td><td>Estado: RJ | 4 pedidos | Receita: R$ 1.400</td></tr>
+            <tr><td>Vendedor H</td><td>Estado: BA | 3 pedidos | Receita: R$ 900</td></tr>
+            <tr><td>Vendedor I</td><td>Estado: MG | 6 pedidos | Receita: R$ 2.400</td></tr>
+          </tbody>
+        </table>
+        <p>
+          O vendedor <strong>não pode</strong> repassar o card cru. Ele lê a DM, e a partir dali só conversa com B1 e
+          B2 no grupo Vendedores, reportando o que sabe sobre o seu estado.
+        </p>
+
+        <h3>A missão (cerca de 10 minutos)</h3>
+        <p>
+          O CEO posta a pergunta-foguete no grupo <strong>Diretoria</strong>, com tom urgente e curto:
+        </p>
+        <pre>Pessoal, preciso saber qual estado teve o maior ticket médio. Urgente.</pre>
+        <p>
+          A partir daí, B1 e B2 têm que se virar. O fluxo esperado é:
+        </p>
+        <ol>
+          <li>Pedem os dados dos vendedores no grupo <strong>Vendedores</strong>.</li>
+          <li>Combinam e fazem contas no grupo <strong>Central</strong>. O CEO não precisa (nem deve) ver essa cozinha.</li>
+          <li>Entregam a resposta final ao CEO no grupo <strong>Diretoria</strong>, obedecendo a um contrato obrigatório de formato:</li>
+        </ol>
+        <pre>{"estado": "XX", "ticket_medio": 000.00, "pedidos": 0}</pre>
+        <p>
+          Se a mensagem não vier exatamente nesse formato, o CEO <strong>tem o direito de rejeitar</strong> e pedir de
+          novo. Isso é proposital: força a turma a sentir o que acontece quando um consumidor recebe dado fora do
+          schema combinado.
+        </p>
+
+        <h3>Combinados da Central</h3>
+        <p>
+          Não são regras estritas de regulamento. São combinados de como a Central trabalha:
+        </p>
+        <ul>
+          <li>O CEO <strong>nunca</strong> entra no grupo Vendedores. Mesmo que peça.</li>
+          <li>Vendedores <strong>nunca</strong> entram no grupo Diretoria.</li>
+          <li>Só B1 e B2 estão nos três grupos &mdash; é justamente isso que os torna brokers.</li>
+          <li>Tudo em texto. Nada de áudio, nada de foto do card original.</li>
+        </ul>
+
+        <h3>Debrief &mdash; traduzindo para engenharia de dados (cerca de 7 minutos)</h3>
+        <p>
+          Acabada a dinâmica, a turma olha para trás e vê que acabou de construir, sem perceber, um pipeline
+          inteiro. A tabela abaixo é o mapa de tradução entre o que aconteceu no WhatsApp e o que acontece em um
+          Data Lake AWS real.
         </p>
         <table>
           <thead>
             <tr>
-              <th>Papel na dinâmica</th>
-              <th>Equivalente em dados</th>
-              <th>Exemplo concreto no curso</th>
+              <th>Na dinâmica</th>
+              <th>Em dados</th>
+              <th>Exemplo concreto</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>C, D, E, F, G, H, I</td>
-              <td>Produtores / fontes</td>
-              <td>CSVs do Olist, RDS, DynamoDB, Kinesis streams</td>
-            </tr>
-            <tr>
-              <td>B1 e B2</td>
-              <td>Brokers / plataforma de integração</td>
-              <td>S3, Athena, EventBridge, Kinesis Firehose</td>
-            </tr>
-            <tr>
-              <td>A</td>
-              <td>Consumidor / caso de uso final</td>
-              <td>Dashboards, modelos de ML, APIs de negócio</td>
-            </tr>
-            <tr>
-              <td>Bilhetes manuscritos</td>
-              <td>Contratos de interface (schemas, ARNs, contratos de evento)</td>
-              <td>Schemas Parquet, ARN de buckets, eventos JSON</td>
-            </tr>
-            <tr>
-              <td>Proibição de falar direto</td>
-              <td>Desacoplamento produtor-consumidor</td>
-              <td>Consumidores nunca acessam fontes cruas; passam pelo Data Lake</td>
-            </tr>
+            <tr><td>Vendedores (C&ndash;I)</td><td>Produtores / fontes</td><td>RDS, CSVs do Olist, DynamoDB, APIs</td></tr>
+            <tr><td>Central (B1, B2)</td><td>Brokers / plataforma</td><td>S3, Athena, EventBridge, Firehose</td></tr>
+            <tr><td>CEO (A)</td><td>Consumidor final</td><td>Dashboards, modelos, APIs de negócio</td></tr>
+            <tr><td>Os três grupos WhatsApp</td><td>Camadas raw / curada / consumo</td><td>Buckets S3 separados por zona</td></tr>
+            <tr><td>Template JSON obrigatório</td><td>Contrato / schema</td><td>Parquet + Glue Catalog, eventos JSON</td></tr>
+            <tr><td>Quem está em qual grupo</td><td>IAM / privilégio mínimo</td><td>Policies, roles, grupos no IAM</td></tr>
+            <tr><td>Histórico do WhatsApp</td><td>Log / auditoria</td><td>CloudTrail, CloudWatch Logs</td></tr>
           </tbody>
         </table>
 
         <h3>Lições que a dinâmica deixa</h3>
         <ul>
-          <li><strong>Sem um broker forte, o consumidor fica órfão.</strong> Se B1 e B2 falham, A não consegue fechar a resposta. É por isso que investimos tanto em S3, Athena e Kinesis como camadas confiáveis.</li>
-          <li><strong>Produtores não conhecem o todo.</strong> Cada fonte conhece um pedaço da verdade. A integração é do pipeline, não das fontes.</li>
-          <li><strong>Contratos precisam ser explícitos.</strong> Bilhetes ambíguos geram respostas erradas &mdash; assim como schemas mal definidos geram dados corrompidos no Lake.</li>
-          <li><strong>Latência existe e é real.</strong> Enquanto os bilhetes circulam, A espera. O mesmo vale para pipelines: frescor de dado é função da arquitetura.</li>
-          <li><strong>Governança emerge rápido.</strong> Quem pode escrever? Quem só pode ler? Quem valida? Essas perguntas aparecem naturalmente e são o assunto do IAM.</li>
+          <li><strong>IAM ficou visível sem nem falar o nome dele.</strong> Quem está em qual grupo define o que cada um pode ver. O AWS IAM faz exatamente isso &mdash; com políticas em vez de grupos de WhatsApp.</li>
+          <li><strong>O CEO nunca tocou na fonte crua.</strong> É o coração do desacoplamento. A Central existe justamente para isolar quem consome de quem produz.</li>
+          <li><strong>Sem o template, o CEO rejeita.</strong> Schemas existem por isso. Um contrato escrito evita retrabalho, ambiguidade e quebra de integração silenciosa.</li>
+          <li><strong>Latência existe, e é real.</strong> Entre a pergunta do CEO e a resposta da Central, o tempo passou. Em pipelines, frescor de dado é função da arquitetura.</li>
+          <li><strong>O histórico do grupo é o log.</strong> Observabilidade nasce de graça quando toda comunicação é escrita. Em produção, é o CloudTrail e o CloudWatch Logs fazendo esse papel.</li>
         </ul>
         <div class="tip">
-          <strong>Registro para estudo:</strong> anote, logo após a dinâmica, quais foram as maiores dificuldades
-          vividas pelo seu grupo. Elas reaparecerão em forma de bug, latência ou incidente em algum momento do
-          semestre &mdash; e entender a raiz humana do problema ajuda a projetar a solução técnica.
+          <strong>Dica de estudo:</strong> depois da dinâmica, abra o histórico do grupo <strong>Central</strong> e
+          leia como se fosse um log de pipeline. Onde houve retrabalho? Onde alguém precisou perguntar duas vezes
+          a mesma coisa? Cada "uai, mas você não tinha mandado isso?" é um bug de contrato esperando pra
+          acontecer em produção.
         </div>
       </section>
 

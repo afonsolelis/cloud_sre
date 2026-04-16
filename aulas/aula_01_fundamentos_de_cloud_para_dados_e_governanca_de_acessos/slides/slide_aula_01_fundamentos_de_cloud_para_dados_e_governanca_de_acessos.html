@@ -42,7 +42,7 @@
             <h3>19h00 &ndash; 21h00 &middot; Teoria</h3>
             <ul>
               <li>Apresentação da disciplina e das 8 aulas</li>
-              <li>Dinâmica do avião (produtor, broker, consumidor)</li>
+              <li>Dinâmica da Central da Olist (WhatsApp)</li>
               <li>Cloud Computing para engenharia de dados</li>
               <li>Data Lake, Data Warehouse, Lakehouse, Data Mesh</li>
               <li>Panorama AWS e responsabilidade compartilhada</li>
@@ -132,130 +132,222 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 5 - DINAMICA DO AVIAO: ABERTURA                         -->
+    <!-- SLIDE 5 - CENTRAL DA OLIST: ENREDO                            -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Abertura &middot; Dinâmica do avião</span>
-          <h2 class="deck-title">Antes da teoria, um experimento</h2>
-          <p class="deck-summary">Uma dinâmica curta para sentir, na pele, o que significa construir um pipeline de dados com múltiplos atores, canais restritos e um objetivo comum.</p>
+          <span class="deck-kicker">Abertura &middot; Dinâmica da Central da Olist</span>
+          <h2 class="deck-title">O CEO está com pressa.</h2>
+          <p class="deck-summary">Ele quer uma resposta agora. O problema é que o dado está espalhado pelo Brasil inteiro, entre vendedores que ele nem conhece direito. Quem resolve isso é a Central de Dados.</p>
         </div>
-        <div class="deck-columns">
-          <div class="deck-panel">
-            <strong>Objetivo</strong>
-            <ul>
-              <li>Descobrir, em grupo, qual símbolo aparece na folha de todos os participantes.</li>
-              <li>Tempo: 10 minutos.</li>
-              <li>Reflexão guiada: 10 minutos.</li>
-            </ul>
-          </div>
-          <div class="deck-panel">
-            <strong>Personagens</strong>
-            <ul>
-              <li><strong>A</strong> &mdash; o cliente final (consumidor).</li>
-              <li><strong>B1 e B2</strong> &mdash; coordenadores (brokers).</li>
-              <li><strong>C a I</strong> &mdash; produtores de sinais (fontes de dados).</li>
-            </ul>
-          </div>
+        <div class="deck-callout">
+          Nos próximos 20 minutos, a turma vive um dia na Central. O celular de vocês é a ferramenta. O WhatsApp é o broker.
         </div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 6A - DINAMICA: SETUP                                    -->
+    <!-- SLIDE 6 - CENTRAL DA OLIST: ELENCO                            -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Dinâmica &middot; Elenco</span>
+          <h2 class="deck-title">Quem é quem nessa história</h2>
+          <p class="deck-summary">Três papéis, dez pessoas. Em turmas menores, vendedores saem na ordem I, H, G &hellip; A Central nunca sai.</p>
+        </div>
+        <div class="deck-grid">
+          <article class="deck-card">
+            <h3>CEO (A)</h3>
+            <ul>
+              <li>Uma pessoa.</li>
+              <li>Quem faz a pergunta e recebe a resposta.</li>
+              <li>Não tem paciência para detalhes.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Central de Dados (B1 e B2)</h3>
+            <ul>
+              <li>Duas pessoas.</li>
+              <li>São quem faz a mágica acontecer.</li>
+              <li>Falam com todo mundo.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Vendedores (C a I)</h3>
+            <ul>
+              <li>Até sete pessoas, espalhadas pelo país.</li>
+              <li>Cada um sabe só do próprio estado.</li>
+              <li>Nunca falam direto com o CEO.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 7 - CENTRAL DA OLIST: SETUP WHATSAPP                    -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Dinâmica &middot; Setup</span>
-          <h2 class="deck-title">Regras da dinâmica (1/2)</h2>
-          <p class="deck-summary">Cada participante tem um papel único. Comunicação só por bilhetes.</p>
+          <h2 class="deck-title">Montando os grupos no WhatsApp</h2>
+          <p class="deck-summary">Tudo acontece em três grupos criados agora, ao vivo, na própria sala.</p>
         </div>
-        <div class="deck-panel">
-          <strong>Setup e comunicação</strong>
-          <ol>
-            <li>Cada pessoa recebe uma folha com 4 ou 5 símbolos e um papel (A, B1, B2, C, D, E, F, G, H ou I).</li>
-            <li>Ninguém pode mostrar sua folha a ninguém, nem falar: a <strong>única comunicação permitida é por bilhetes manuscritos</strong>.</li>
-            <li><strong>A</strong> só se comunica com <strong>B1</strong> e <strong>B2</strong>.</li>
-          </ol>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Os três grupos</strong>
+            <ul>
+              <li><strong>Vendedores</strong> &mdash; os 7 vendedores + B1 + B2.</li>
+              <li><strong>Central</strong> &mdash; só B1 + B2 (o backstage).</li>
+              <li><strong>Diretoria</strong> &mdash; CEO + B1 + B2.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Os cards de dados</strong>
+            <ul>
+              <li>O professor manda por DM, para cada vendedor, um texto curto com o dado do seu estado.</li>
+              <li>O vendedor não repassa o card cru. Só conta para a Central o que sabe.</li>
+              <li>Nada de áudio, nada de foto do card original. Só texto.</li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 6B - DINAMICA: FLUXO E OBJETIVO                         -->
+    <!-- SLIDE 8 - CENTRAL DA OLIST: A MISSAO                          -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Dinâmica &middot; Fluxo</span>
-          <h2 class="deck-title">Regras da dinâmica (2/2)</h2>
-          <p class="deck-summary">Como a informação flui pelos brokers até chegar ao consumidor final.</p>
+          <span class="deck-kicker">Dinâmica &middot; A missão</span>
+          <h2 class="deck-title">A mensagem que cai no grupo Diretoria</h2>
+          <p class="deck-summary">O CEO posta. Todo mundo trava. A Central respira fundo e começa a trabalhar.</p>
+        </div>
+        <div class="deck-callout" style="font-size:1.35rem; line-height:1.5;">
+          <strong>CEO:</strong> Pessoal, preciso saber qual estado teve o maior ticket médio. Urgente.
         </div>
         <div class="deck-panel">
-          <strong>Fluxo e objetivo</strong>
-          <ol start="4">
-            <li><strong>C a I</strong> só se comunicam com <strong>B1</strong> e <strong>B2</strong>.</li>
-            <li><strong>B1</strong> e <strong>B2</strong> coordenam o fluxo e podem trocar bilhetes entre si e com A.</li>
-            <li>O grupo ganha quando <strong>A</strong> declara, com confiança, qual símbolo aparece em todas as folhas.</li>
+          <strong>O que a Central faz agora</strong>
+          <ol>
+            <li>Pede os dados no grupo Vendedores.</li>
+            <li>Combina e calcula no grupo Central (o CEO não precisa ver a cozinha).</li>
+            <li>Entrega a resposta no grupo Diretoria &mdash; no formato certo.</li>
           </ol>
-        </div>
-        <div class="deck-callout">
-          <strong>Restrição fundamental:</strong> A nunca fala diretamente com C-I. Toda informação passa pelos brokers.
         </div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 7 - DINAMICA DO AVIAO: DEBRIEF                          -->
+    <!-- SLIDE 9 - CENTRAL DA OLIST: COMBINADOS                        -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Dinâmica &middot; Como a Central funciona</span>
+          <h2 class="deck-title">Uns combinados simples</h2>
+          <p class="deck-summary">Não é regulamento. É só como as coisas funcionam por aqui.</p>
+        </div>
+        <div class="deck-panel">
+          <strong>Combinados</strong>
+          <ul>
+            <li>O CEO nunca entra no grupo Vendedores. Mesmo que peça.</li>
+            <li>Vendedores nunca entram no grupo Diretoria.</li>
+            <li>Só B1 e B2 estão nos três grupos &mdash; é isso que faz deles a Central.</li>
+            <li>Tudo por texto. O histórico do grupo é a memória da operação.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 10 - CENTRAL DA OLIST: O CONTRATO                       -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Dinâmica &middot; O contrato</span>
+          <h2 class="deck-title">O CEO só aceita resposta assim</h2>
+          <p class="deck-summary">Se a Central mandar em outro formato, o CEO tem o direito de rejeitar e pedir de novo.</p>
+        </div>
+        <pre style="font-size:1.35rem; background:#f6f6f6; border:1px solid #d7d7d7; padding:24px; text-align:center;">{"estado": "XX", "ticket_medio": 000.00, "pedidos": 0}</pre>
+        <div class="deck-callout">
+          Esse template chato tem nome em engenharia de dados: <strong>schema</strong>. E é por isso que ele existe.
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 11 - CENTRAL DA OLIST: DEBRIEF (MAPEAMENTO)             -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Dinâmica &middot; Debrief</span>
-          <h2 class="deck-title">O que isso tem a ver com engenharia de dados?</h2>
-          <p class="deck-summary">A dinâmica reproduz, em miniatura, a topologia de um pipeline real. Cada restrição da dinâmica vira um requisito de arquitetura.</p>
+          <h2 class="deck-title">Traduzindo o que a gente acabou de fazer</h2>
+          <p class="deck-summary">Cada pedaço da dinâmica tem um nome em engenharia de dados.</p>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr>
+              <th>Na dinâmica</th>
+              <th>Em dados</th>
+              <th>Exemplo concreto</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Vendedores (C&ndash;I)</td><td>Produtores / fontes</td><td>RDS, CSVs do Olist, DynamoDB, APIs</td></tr>
+            <tr><td>Central (B1, B2)</td><td>Brokers / plataforma</td><td>S3, Athena, EventBridge, Firehose</td></tr>
+            <tr><td>CEO (A)</td><td>Consumidor final</td><td>Dashboards, modelos, APIs de negócio</td></tr>
+            <tr><td>Os três grupos</td><td>Camadas raw / curada / consumo</td><td>Buckets S3 separados por zona</td></tr>
+            <tr><td>Template JSON obrigatório</td><td>Contrato / schema</td><td>Parquet + Glue Catalog, eventos JSON</td></tr>
+            <tr><td>Quem está em qual grupo</td><td>IAM / privilégio mínimo</td><td>Policies, roles, grupos no IAM</td></tr>
+            <tr><td>Histórico do WhatsApp</td><td>Log / auditoria</td><td>CloudTrail, CloudWatch Logs</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 12 - CENTRAL DA OLIST: LICOES                           -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Dinâmica &middot; Lições</span>
+          <h2 class="deck-title">O que a Central ensinou em 20 minutos</h2>
+          <p class="deck-summary">Cinco ideias que vão voltar ao longo de toda a disciplina.</p>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
-            <h3>Produtores (C a I)</h3>
-            <ul>
-              <li>São as fontes de dados: APIs, bancos, dispositivos IoT, arquivos.</li>
-              <li>Cada um conhece apenas seu pedaço da verdade.</li>
-              <li>Equivalente na disciplina: Olist CSV, RDS, streams Kinesis.</li>
-            </ul>
+            <h3>IAM apareceu de graça</h3>
+            <ul><li>Quem está em qual grupo define o que cada um pode ver. O AWS IAM faz isso com políticas em vez de grupos.</li></ul>
           </article>
           <article class="deck-card">
-            <h3>Brokers (B1 e B2)</h3>
-            <ul>
-              <li>Intermedeiam, agregam e roteiam mensagens.</li>
-              <li>Garantem desacoplamento entre produtores e consumidores.</li>
-              <li>Equivalente AWS: S3, Kinesis, EventBridge, Athena.</li>
-            </ul>
+            <h3>O CEO nunca tocou na fonte crua</h3>
+            <ul><li>É o coração do desacoplamento. A Central existe justamente para isolar quem consome de quem produz.</li></ul>
           </article>
           <article class="deck-card">
-            <h3>Consumidor (A)</h3>
-            <ul>
-              <li>Precisa de uma resposta agregada, não dos dados brutos.</li>
-              <li>Depende 100% da qualidade dos brokers.</li>
-              <li>Equivalente: dashboards, modelos de ML, APIs de negócio.</li>
-            </ul>
+            <h3>Sem template, o CEO rejeita</h3>
+            <ul><li>Schemas existem por isso. Contrato escrito evita retrabalho e quebra de integração.</li></ul>
           </article>
           <article class="deck-card">
-            <h3>Bilhetes manuscritos</h3>
-            <ul>
-              <li>São o contrato de interface: formato, schema, latência.</li>
-              <li>Perder ou corromper um bilhete quebra a resposta final.</li>
-              <li>Equivalente: schemas Parquet, ARN de recursos, políticas IAM.</li>
-            </ul>
+            <h3>Latência é real</h3>
+            <ul><li>Entre a pergunta e a resposta, o tempo passou. Frescor de dado depende da arquitetura.</li></ul>
+          </article>
+          <article class="deck-card">
+            <h3>O histórico é o log</h3>
+            <ul><li>Observabilidade nasce de graça quando a comunicação é escrita. No pipeline, é o CloudTrail.</li></ul>
           </article>
         </div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 8 - O QUE E CLOUD COMPUTING                             -->
+    <!-- SLIDE 13 - O QUE E CLOUD COMPUTING                            -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
@@ -278,7 +370,7 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 9 - HISTORICO E DEVOPS                                  -->
+    <!-- SLIDE 14 - HISTORICO E DEVOPS                                 -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
@@ -306,7 +398,7 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 10 - BENEFICIOS E DESAFIOS                              -->
+    <!-- SLIDE 15 - BENEFICIOS E DESAFIOS                              -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
@@ -340,7 +432,7 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 11 - MODELOS DE SERVICO                                 -->
+    <!-- SLIDE 16 - MODELOS DE SERVICO                                 -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
@@ -386,7 +478,7 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 12 - DATA LAKE                                          -->
+    <!-- SLIDE 17 - DATA LAKE                                          -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
@@ -417,7 +509,7 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 13 - DATA WAREHOUSE E LAKEHOUSE                         -->
+    <!-- SLIDE 18 - DATA WAREHOUSE E LAKEHOUSE                         -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
@@ -445,7 +537,7 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 14 - DATA MESH                                          -->
+    <!-- SLIDE 19 - DATA MESH                                          -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
@@ -476,7 +568,7 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 15 - NUVENS 1 (ARMAZENAMENTO E ETL)                     -->
+    <!-- SLIDE 20 - NUVENS 1 (ARMAZENAMENTO E ETL)                     -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
@@ -506,7 +598,7 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 16 - NUVENS 2 (BANCOS, STREAMING, CATALOGO)             -->
+    <!-- SLIDE 21 - NUVENS 2 (BANCOS, STREAMING, CATALOGO)             -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
@@ -536,7 +628,7 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 17 - AWS INFRAESTRUTURA GLOBAL                          -->
+    <!-- SLIDE 22 - AWS INFRAESTRUTURA GLOBAL                          -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
@@ -570,7 +662,7 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 18 - RESPONSABILIDADE COMPARTILHADA                     -->
+    <!-- SLIDE 23 - RESPONSABILIDADE COMPARTILHADA                     -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
@@ -603,7 +695,7 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 19 - POR QUE GOVERNANCA IMPORTA                         -->
+    <!-- SLIDE 24 - POR QUE GOVERNANCA IMPORTA                         -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
@@ -638,7 +730,7 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 20 - IAM IDENTIDADES                                    -->
+    <!-- SLIDE 25 - IAM IDENTIDADES                                    -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
@@ -685,7 +777,7 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 21 - ANATOMIA DE POLITICA IAM                           -->
+    <!-- SLIDE 26 - ANATOMIA DE POLITICA IAM                           -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
@@ -718,7 +810,7 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 22 - LABROLE DO LEARNER LAB                             -->
+    <!-- SLIDE 27 - LABROLE DO LEARNER LAB                             -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
@@ -754,7 +846,7 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 23 - LAB OVERVIEW                                       -->
+    <!-- SLIDE 28 - LAB OVERVIEW                                       -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
@@ -787,7 +879,7 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 24 - LAB PASSO 1: ACESSO E REGIAO                       -->
+    <!-- SLIDE 29 - LAB PASSO 1: ACESSO E REGIAO                       -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
@@ -811,7 +903,7 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 25 - LAB PASSO 2: RECONHECER IAM                        -->
+    <!-- SLIDE 30 - LAB PASSO 2: RECONHECER IAM                        -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
@@ -837,7 +929,7 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 26 - LAB PASSO 3: BUCKETS S3                            -->
+    <!-- SLIDE 31 - LAB PASSO 3: BUCKETS S3                            -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
@@ -863,7 +955,7 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 27 - LAB PASSO 4: UPLOAD DE TESTE                       -->
+    <!-- SLIDE 32 - LAB PASSO 4: UPLOAD DE TESTE                       -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
@@ -887,7 +979,7 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 28 - CHECKLIST DO AMBIENTE                              -->
+    <!-- SLIDE 33 - CHECKLIST DO AMBIENTE                              -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
@@ -912,7 +1004,7 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 29 - PONTE PARA AULA 02                                 -->
+    <!-- SLIDE 34 - PONTE PARA AULA 02                                 -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
@@ -945,7 +1037,7 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 30 - FECHAMENTO: RESUMO                                 -->
+    <!-- SLIDE 35 - FECHAMENTO: RESUMO                                 -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
@@ -958,7 +1050,7 @@
             <h3>O que vimos hoje</h3>
             <ul>
               <li>Mapa das 8 aulas e narrativa Olist.</li>
-              <li>Dinâmica do avião: produtor, broker, consumidor.</li>
+              <li>Dinâmica da Central: produtor, broker, consumidor e contrato.</li>
               <li>Cloud Computing (NIST) e modelos IaaS/PaaS/SaaS.</li>
               <li>Arquiteturas: Data Lake, DW, Lakehouse, Data Mesh.</li>
               <li>Panorama multi-cloud e AWS como plataforma.</li>
@@ -980,7 +1072,7 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 31 - FECHAMENTO: ESTUDO E LINKS                         -->
+    <!-- SLIDE 36 - FECHAMENTO: ESTUDO E LINKS                         -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
