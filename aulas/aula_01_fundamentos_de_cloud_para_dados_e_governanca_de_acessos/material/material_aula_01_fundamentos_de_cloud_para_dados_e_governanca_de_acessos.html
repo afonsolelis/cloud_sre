@@ -33,14 +33,16 @@
         <p class="summary">
           Este material acompanha a primeira aula da disciplina <strong>Cloud Computing e SRA &mdash; Visão Prática com AWS</strong>
           do MBA em Engenharia de Dados. Ele cobre, de forma aprofundada, todos os tópicos apresentados nos slides:
-          o mapa da disciplina e sua narrativa em torno do dataset Olist; a dinâmica da Central da Olist, feita ao vivo em grupos de WhatsApp, como metáfora de um pipeline com produtores, broker, consumidor e contrato;
+          o mapa da disciplina e sua narrativa em torno do dataset Olist; uma introdução contextual sobre o papel
+          do engenheiro de dados em 2026, a linha do tempo que vai do mainframe ao serverless, os ganhos concretos
+          da cloud para dados, casos reais de empresas brasileiras, os limites do papel profissional e um glossário inicial;
           a definição de Cloud Computing segundo o NIST; os modelos de serviço (IaaS, PaaS, SaaS);
           as principais arquiteturas de dados na nuvem (Data Lake, Data Warehouse, Data Lakehouse e Data Mesh);
           a AWS como plataforma de dados; a governança de acessos com AWS IAM; o princípio do menor privilégio;
           o mapeamento de perfis de acesso para um Data Lake corporativo; e o papel da <strong>LabRole</strong> no ambiente
           AWS Academy Learner Lab, que será usado em todas as práticas do semestre.
           A aula 01 tem dinâmica excepcional dentro do curso: as duas primeiras horas
-          (19h00 &ndash; 21h00) são dedicadas à teoria, e a última hora (21h00 &ndash; 22h00) ao laboratório
+          (19h00 &ndash; 21h00) são dedicadas à teoria expositiva, e a última hora (21h00 &ndash; 22h00) ao laboratório
           prático de configuração do ambiente AWS Student.
           O material inclui também uma seção de aprofundamento pós-aula com roles, políticas customizadas,
           Policy Simulator e desafios extras para estudo autônomo.
@@ -128,142 +130,114 @@
       </section>
 
       <!-- ============================================================
-           DINAMICA DA CENTRAL DA OLIST
+           INTRODUCAO CONTEXTUAL
       ============================================================= -->
       <section class="content-block">
-        <h2>Abertura &mdash; Dinâmica da Central da Olist</h2>
+        <h2>Introdução &mdash; contexto antes de mergulhar</h2>
         <p>
-          A aula começa com uma dinâmica curta (cerca de 20 minutos, incluindo o debrief) que coloca a turma
-          dentro do dia a dia de uma Central de Dados fictícia da Olist. A ferramenta é o WhatsApp. A ideia é
-          simples: fazer com que os conceitos de produtor, broker, consumidor, contrato, camada e IAM apareçam
-          sozinhos, sem que ninguém precise falar essas palavras antes de vivê-las. Ao final da dinâmica, o
-          debrief conecta cada pedaço do que aconteceu em tela ao vocabulário formal da engenharia de dados.
+          Antes de entrar em Cloud Computing, IAM e arquiteturas de dados, vale dedicar algum tempo a entender o
+          terreno. Engenharia de dados em 2026 é um papel que cresceu muito nos últimos anos, e a cloud é o
+          substrato por baixo desse crescimento. Os tópicos a seguir são introdutórios, expositivos, e servem de
+          pano de fundo para tudo o que virá depois nesta aula e na disciplina inteira.
         </p>
 
-        <h3>O enredo</h3>
+        <h3>Quem é o engenheiro de dados em 2026</h3>
         <p>
-          O CEO da Olist está com pressa e manda uma pergunta urgente: quer saber qual estado brasileiro teve o
-          maior ticket médio. O problema é que a informação está espalhada entre vendedores em vários estados,
-          e o CEO não tem tempo nem paciência para falar com cada um. No meio do caminho existe a <strong>Central
-          de Dados</strong>, formada por duas pessoas, que é quem conversa com os vendedores, calcula o que precisa
-          ser calculado e entrega a resposta final. A turma vai viver essa Central por 20 minutos.
-        </p>
-
-        <h3>Papéis</h3>
-        <ul>
-          <li><strong>CEO (A)</strong> &mdash; uma pessoa. Representa o consumidor final (dashboard, relatório, API de negócio).</li>
-          <li><strong>Central de Dados (B1 e B2)</strong> &mdash; duas pessoas. São os brokers, os heróis do pipeline.</li>
-          <li><strong>Vendedores (C, D, E, F, G, H, I)</strong> &mdash; até sete pessoas. São as fontes espalhadas pelo país.</li>
-        </ul>
-        <p>
-          Para turmas menores, retire vendedores na ordem I &rarr; H &rarr; G e assim por diante. B1 e B2 ficam
-          sempre. O CEO também é sempre uma pessoa só.
-        </p>
-
-        <h3>Setup (cerca de 3 minutos)</h3>
-        <p>
-          Toda a dinâmica acontece em três grupos de WhatsApp criados ao vivo dentro da própria sala de aula. Não
-          há impressão de cards, não há pré-produção: abra o WhatsApp, crie os grupos, adicione as pessoas e siga.
-        </p>
-        <ol>
-          <li>Crie o grupo <strong>Vendedores</strong> com os 7 vendedores, B1 e B2.</li>
-          <li>Crie o grupo <strong>Central</strong> só com B1 e B2. Esse é o backstage da plataforma.</li>
-          <li>Crie o grupo <strong>Diretoria</strong> com o CEO, B1 e B2.</li>
-          <li>Por mensagem direta (DM privada), o professor envia para cada vendedor um mini-card de dado &mdash; apenas texto, nada de imagem &mdash; com um trecho fictício do Olist.</li>
-        </ol>
-        <p>Os cards usados na dinâmica são estes:</p>
-        <table>
-          <thead>
-            <tr>
-              <th>Vendedor</th>
-              <th>Dado recebido por DM</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>Vendedor C</td><td>Estado: SP | 12 pedidos | Receita: R$ 4.300</td></tr>
-            <tr><td>Vendedor D</td><td>Estado: RJ | 8 pedidos | Receita: R$ 2.100</td></tr>
-            <tr><td>Vendedor E</td><td>Estado: MG | 5 pedidos | Receita: R$ 1.800</td></tr>
-            <tr><td>Vendedor F</td><td>Estado: SP | 7 pedidos | Receita: R$ 3.500</td></tr>
-            <tr><td>Vendedor G</td><td>Estado: RJ | 4 pedidos | Receita: R$ 1.400</td></tr>
-            <tr><td>Vendedor H</td><td>Estado: BA | 3 pedidos | Receita: R$ 900</td></tr>
-            <tr><td>Vendedor I</td><td>Estado: MG | 6 pedidos | Receita: R$ 2.400</td></tr>
-          </tbody>
-        </table>
-        <p>
-          O vendedor <strong>não pode</strong> repassar o card cru. Ele lê a DM, e a partir dali só conversa com B1 e
-          B2 no grupo Vendedores, reportando o que sabe sobre o seu estado.
-        </p>
-
-        <h3>A missão (cerca de 10 minutos)</h3>
-        <p>
-          O CEO posta a pergunta-foguete no grupo <strong>Diretoria</strong>, com tom urgente e curto:
-        </p>
-        <pre>Pessoal, preciso saber qual estado teve o maior ticket médio. Urgente.</pre>
-        <p>
-          A partir daí, B1 e B2 têm que se virar. O fluxo esperado é:
-        </p>
-        <ol>
-          <li>Pedem os dados dos vendedores no grupo <strong>Vendedores</strong>.</li>
-          <li>Combinam e fazem contas no grupo <strong>Central</strong>. O CEO não precisa (nem deve) ver essa cozinha.</li>
-          <li>Entregam a resposta final ao CEO no grupo <strong>Diretoria</strong>, obedecendo a um contrato obrigatório de formato:</li>
-        </ol>
-        <pre>{"estado": "XX", "ticket_medio": 000.00, "pedidos": 0}</pre>
-        <p>
-          Se a mensagem não vier exatamente nesse formato, o CEO <strong>tem o direito de rejeitar</strong> e pedir de
-          novo. Isso é proposital: força a turma a sentir o que acontece quando um consumidor recebe dado fora do
-          schema combinado.
-        </p>
-
-        <h3>Combinados da Central</h3>
-        <p>
-          Não são regras estritas de regulamento. São combinados de como a Central trabalha:
+          Em 2015 o engenheiro de dados era, em boa parte, uma evolução do DBA somada a quem escrevia jobs de ETL.
+          Em 2026 a função cobre pelo menos quatro frentes simultâneas, e entender essa expansão ajuda a calibrar
+          a carga de conhecimento que o curso pretende construir.
         </p>
         <ul>
-          <li>O CEO <strong>nunca</strong> entra no grupo Vendedores. Mesmo que peça.</li>
-          <li>Vendedores <strong>nunca</strong> entram no grupo Diretoria.</li>
-          <li>Só B1 e B2 estão nos três grupos &mdash; é justamente isso que os torna brokers.</li>
-          <li>Tudo em texto. Nada de áudio, nada de foto do card original.</li>
+          <li><strong>Pipeline.</strong> Ingerir, transformar e entregar dados com qualidade. Escolher entre batch e streaming conforme o caso de uso. Definir contratos entre produtor e consumidor e garantir que eles sejam respeitados.</li>
+          <li><strong>Governança.</strong> Catálogo, linhagem, classificação, controle de acesso por domínio e conformidade com LGPD. Dados certos, nas mãos certas, com rastreabilidade.</li>
+          <li><strong>Reliability.</strong> Definir SLOs de frescor e qualidade, instrumentar observabilidade, manter runbooks e fazer postmortems. A cultura de SRE aplicada ao mundo de dados é tema da Aula 07.</li>
+          <li><strong>Custo.</strong> Saber quanto custa cada pipeline, escolher storage class, formato e compressão, e manter a conta AWS previsível. FinOps é o que separa um pipeline saudável de uma surpresa no fim do mês.</li>
         </ul>
 
-        <h3>Debrief &mdash; traduzindo para engenharia de dados (cerca de 7 minutos)</h3>
+        <h3>Linha do tempo &mdash; do mainframe ao serverless</h3>
         <p>
-          Acabada a dinâmica, a turma olha para trás e vê que acabou de construir, sem perceber, um pipeline
-          inteiro. A tabela abaixo é o mapa de tradução entre o que aconteceu no WhatsApp e o que acontece em um
-          Data Lake AWS real.
+          A cloud não apareceu do nada. Ela é a culminação de seis décadas de mudanças graduais no modelo de
+          computação. Conhecer essa linha do tempo ajuda a entender por que a AWS ficou como ficou, e por que
+          certos padrões (como tabelas externas, schema-on-read, pay-per-query) só fazem sentido depois de
+          certos marcos.
         </p>
         <table>
           <thead>
-            <tr>
-              <th>Na dinâmica</th>
-              <th>Em dados</th>
-              <th>Exemplo concreto</th>
-            </tr>
+            <tr><th>Marco</th><th>Período</th><th>O que mudou</th></tr>
           </thead>
           <tbody>
-            <tr><td>Vendedores (C&ndash;I)</td><td>Produtores / fontes</td><td>RDS, CSVs do Olist, DynamoDB, APIs</td></tr>
-            <tr><td>Central (B1, B2)</td><td>Brokers / plataforma</td><td>S3, Athena, EventBridge, Firehose</td></tr>
-            <tr><td>CEO (A)</td><td>Consumidor final</td><td>Dashboards, modelos, APIs de negócio</td></tr>
-            <tr><td>Os três grupos WhatsApp</td><td>Camadas raw / curada / consumo</td><td>Buckets S3 separados por zona</td></tr>
-            <tr><td>Template JSON obrigatório</td><td>Contrato / schema</td><td>Parquet + Glue Catalog, eventos JSON</td></tr>
-            <tr><td>Quem está em qual grupo</td><td>IAM / privilégio mínimo</td><td>Policies, roles, grupos no IAM</td></tr>
-            <tr><td>Histórico do WhatsApp</td><td>Log / auditoria</td><td>CloudTrail, CloudWatch Logs</td></tr>
+            <tr><td>Mainframe</td><td>Anos 60</td><td>Computação centralizada, acesso por terminais, processamento em lote.</td></tr>
+            <tr><td>Cliente-servidor</td><td>Anos 80</td><td>PCs na ponta, bancos relacionais maduros, primeiros ETLs e data warehouses.</td></tr>
+            <tr><td>Virtualização</td><td>Anos 2000</td><td>Hypervisors consolidam servidores físicos e viabilizam multi-tenant real.</td></tr>
+            <tr><td>Nascimento da AWS</td><td>2006</td><td>S3 e EC2 lançam a cloud pública sob demanda com modelo pay-per-use.</td></tr>
+            <tr><td>Serverless e cloud-nativa</td><td>2015 em diante</td><td>Lambda, Athena, Kinesis, Firehose &mdash; computação granular sem gerenciar servidor.</td></tr>
           </tbody>
         </table>
 
-        <h3>Lições que a dinâmica deixa</h3>
+        <h3>Por que a cloud mudou engenharia de dados</h3>
+        <p>
+          Há quatro ganhos concretos que explicam por que, hoje, praticamente toda plataforma de dados nova nasce
+          na cloud. Não é modismo: são propriedades difíceis (ou impossíveis) de replicar em data center próprio.
+        </p>
         <ul>
-          <li><strong>IAM ficou visível sem nem falar o nome dele.</strong> Quem está em qual grupo define o que cada um pode ver. O AWS IAM faz exatamente isso &mdash; com políticas em vez de grupos de WhatsApp.</li>
-          <li><strong>O CEO nunca tocou na fonte crua.</strong> É o coração do desacoplamento. A Central existe justamente para isolar quem consome de quem produz.</li>
-          <li><strong>Sem o template, o CEO rejeita.</strong> Schemas existem por isso. Um contrato escrito evita retrabalho, ambiguidade e quebra de integração silenciosa.</li>
-          <li><strong>Latência existe, e é real.</strong> Entre a pergunta do CEO e a resposta da Central, o tempo passou. Em pipelines, frescor de dado é função da arquitetura.</li>
-          <li><strong>O histórico do grupo é o log.</strong> Observabilidade nasce de graça quando toda comunicação é escrita. Em produção, é o CloudTrail e o CloudWatch Logs fazendo esse papel.</li>
+          <li><strong>Elasticidade real.</strong> Escala para cima e para baixo sob demanda, sem comprar hardware. Na Black Friday o cluster cresce, depois encolhe, sem conversa com compras.</li>
+          <li><strong>OpEx em vez de CapEx.</strong> Paga-se pelo consumo, não por capacidade ociosa. O Athena cobra por TB escaneado, sem nenhum servidor fixo rodando no fundo.</li>
+          <li><strong>Serviços gerenciados.</strong> Menos tempo em backup, patch e tuning, mais tempo em lógica de negócio. O RDS cuida do Postgres; você cuida do dado.</li>
+          <li><strong>Time-to-market.</strong> Um MVP de pipeline sai em dias, não em meses. S3 mais Athena geram BI básico no mesmo dia em que você cria a conta.</li>
         </ul>
-        <div class="tip">
-          <strong>Dica de estudo:</strong> depois da dinâmica, abra o histórico do grupo <strong>Central</strong> e
-          leia como se fosse um log de pipeline. Onde houve retrabalho? Onde alguém precisou perguntar duas vezes
-          a mesma coisa? Cada "uai, mas você não tinha mandado isso?" é um bug de contrato esperando pra
-          acontecer em produção.
-        </div>
+
+        <h3>Casos reais brasileiros</h3>
+        <p>
+          Para aterrissar o argumento no mercado nacional, vale citar quatro empresas brasileiras que discutem
+          publicamente suas escolhas técnicas. As formulações abaixo são genéricas e verificáveis &mdash; quando algum
+          detalhe específico não for oficialmente divulgado, a frase prefere a forma prudente "é público que...".
+        </p>
+        <ul>
+          <li><strong>Nubank.</strong> É público que o banco usa Apache Kafka e Apache Spark em larga escala para processar eventos e dados analíticos. A plataforma de dados é tratada como produto interno com times dedicados.</li>
+          <li><strong>iFood.</strong> É público que a plataforma roda principalmente sobre AWS e que a empresa investe em pipelines de dados e ML para logística, recomendação e personalização.</li>
+          <li><strong>Magazine Luiza.</strong> É público que o grupo conduziu, nos últimos anos, uma migração relevante de workloads para cloud pública, como parte da estratégia de digitalização do varejo.</li>
+          <li><strong>Mercado Livre.</strong> É público que a empresa mantém uma plataforma de dados própria em cloud, que serve múltiplos produtos do grupo &mdash; marketplace, pagamentos e logística.</li>
+        </ul>
+        <p>
+          O padrão comum entre os quatro casos: stack aberta (Kafka, Spark, Parquet), cloud como base, dados
+          tratados como ativo estratégico e investimento em plataforma de dados interna. É esse o pano de fundo
+          que a disciplina assume como realidade de mercado.
+        </p>
+
+        <h3>O que NÃO é engenharia de dados</h3>
+        <p>
+          Ajuda a calibrar expectativa listar os papéis vizinhos. O engenheiro de dados conversa com todos eles e
+          toma emprestado várias práticas, mas não substitui nenhum.
+        </p>
+        <ul>
+          <li><strong>Não é DBA clássico.</strong> O DBA cuida de tuning, backup, replicação e alta disponibilidade de um banco específico. O engenheiro de dados move dado entre sistemas e prepara para análise, com menos profundidade em um banco único.</li>
+          <li><strong>Não é cientista de dados.</strong> O cientista constrói modelos, explora hipóteses e usa estatística. O engenheiro de dados entrega o dataset confiável que o cientista consome, e frequentemente também o coloca em produção.</li>
+          <li><strong>Não é analista de dados / BI.</strong> O analista responde perguntas de negócio com dashboards e relatórios. O engenheiro de dados garante que o dado chegue limpo, fresco e governado à camada de BI.</li>
+          <li><strong>Não é DevOps puro.</strong> O DevOps entrega aplicações e infraestrutura genérica. O engenheiro de dados aplica as mesmas práticas (IaC, CI/CD, observabilidade) ao mundo específico de dados e pipelines.</li>
+        </ul>
+
+        <h3>Glossário inicial</h3>
+        <p>
+          Dez termos que vão atravessar as oito aulas. Este glossário é curto de propósito: é ponto de partida, não
+          referência final. Vale voltar aqui quando um dos termos aparecer sem contexto em alguma aula mais à frente.
+        </p>
+        <table>
+          <thead>
+            <tr><th>Termo</th><th>Ideia central</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Data Lake</strong></td><td>Repositório central de dados brutos em formatos abertos, com organização por camadas.</td></tr>
+            <tr><td><strong>Data Warehouse</strong></td><td>Armazém analítico otimizado para consultas de BI, com modelagem dimensional.</td></tr>
+            <tr><td><strong>Lakehouse</strong></td><td>Data Lake com garantias de transação, schema e versionamento &mdash; melhor dos dois mundos.</td></tr>
+            <tr><td><strong>ETL vs ELT</strong></td><td>Transformar antes (ETL) ou depois (ELT) de carregar no destino. A cloud favoreceu ELT.</td></tr>
+            <tr><td><strong>Batch vs streaming</strong></td><td>Processar em lotes periódicos ou evento a evento, em tempo quase real.</td></tr>
+            <tr><td><strong>Schema</strong></td><td>Contrato formal de estrutura (colunas, tipos, constraints) entre produtor e consumidor.</td></tr>
+            <tr><td><strong>Catálogo</strong></td><td>Inventário de tabelas, colunas, donos e metadados que torna o Data Lake navegável.</td></tr>
+            <tr><td><strong>IaC (Infrastructure as Code)</strong></td><td>Infraestrutura descrita em código versionado (Terraform, CloudFormation).</td></tr>
+            <tr><td><strong>IAM</strong></td><td>Identity and Access Management: quem pode fazer o quê em qual recurso.</td></tr>
+            <tr><td><strong>FinOps</strong></td><td>Disciplina de gestão de custos em cloud, com visibilidade e responsabilização por time.</td></tr>
+          </tbody>
+        </table>
       </section>
 
       <!-- ============================================================
