@@ -357,6 +357,37 @@
     </div>
 
     <!-- ============================================================ -->
+    <!-- SLIDE 10B - 8 EIXOS DE REQUISITOS NAO FUNCIONAIS (SWEBOK)     -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Fundação &middot; SWEBOK</span>
+          <h2 class="deck-title">Os 8 eixos de requisitos não funcionais</h2>
+          <p class="deck-summary">A disciplina inteira é conduzida sob a lente do <strong>SWEBOK</strong>. Toda decisão de arquitetura, pipeline e serviço deve responder aos 8 eixos de requisitos não funcionais. Eles voltarão em cada aula como critério de avaliação.</p>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr>
+              <th>Eixo</th>
+              <th>O que significa no pipeline de dados</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>1. Desempenho</strong></td><td>Latência de leitura, throughput de ingestão, tempo de resposta de query.</td></tr>
+            <tr><td><strong>2. Confiabilidade</strong></td><td>Tolerância a falhas, retries idempotentes, garantias de entrega de dados.</td></tr>
+            <tr><td><strong>3. Disponibilidade</strong></td><td>SLA da plataforma, multi-AZ, contingência para falha regional.</td></tr>
+            <tr><td><strong>4. Escalabilidade</strong></td><td>Crescer de GB para TB sem reescrever pipeline. Elasticidade sob demanda.</td></tr>
+            <tr><td><strong>5. Segurança</strong></td><td>IAM, criptografia em repouso e em trânsito, privilégio mínimo, auditoria.</td></tr>
+            <tr><td><strong>6. Manutenibilidade</strong></td><td>Código legível, schemas evolutivos, IaC, testes automatizados.</td></tr>
+            <tr><td><strong>7. Usabilidade</strong></td><td>Dashboards claros, APIs documentadas, experiência do consumidor de dados.</td></tr>
+            <tr><td><strong>8. Portabilidade</strong></td><td>Evitar lock-in excessivo. Formatos abertos (Parquet), SQL ANSI, infra replicável.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
     <!-- SLIDE 11 - O QUE E CLOUD COMPUTING                            -->
     <!-- ============================================================ -->
     <div class="slide">
@@ -1009,6 +1040,39 @@
             <li>Block Public Access e Versioning habilitados</li>
             <li>Smoke test: upload e leitura de um arquivo pequeno</li>
           </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 31B - ROADMAP AULA 02: MODELAGEM COM IA                 -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Roadmap &middot; Aula 02</span>
+          <h2 class="deck-title">Próxima aula: modelar o sistema distribuído com IA</h2>
+          <p class="deck-summary">A Aula 02, em 23/04/2026, será inteiramente dedicada a projetar a arquitetura do sistema distribuído de dados do semestre, usando ferramentas de IA como copiloto de design e validação.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>O que vamos fazer juntos</strong>
+            <ul>
+              <li>Definir os casos de uso do pipeline Olist ponta a ponta.</li>
+              <li>Mapear componentes, responsabilidades e contratos entre camadas.</li>
+              <li>Modelar as zonas Raw, Trusted e Refined no S3.</li>
+              <li>Gerar diagramas e documentação viva da arquitetura.</li>
+              <li>Usar IA para antecipar trade-offs e revisar decisões.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Amarrar com os 8 eixos</strong>
+            <ul>
+              <li>Cada decisão de modelagem é avaliada contra os RNFs do SWEBOK.</li>
+              <li>IA como assistente para cruzar impacto entre eixos.</li>
+              <li>Entrega da Aula 02: desenho defensável que guia todas as próximas aulas.</li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
