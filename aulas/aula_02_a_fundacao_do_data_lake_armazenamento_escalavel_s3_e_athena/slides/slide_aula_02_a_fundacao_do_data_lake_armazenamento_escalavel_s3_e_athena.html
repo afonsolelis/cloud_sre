@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" />
-  <title>Aula 02 — A Fundação do Data Lake: Armazenamento Escalável com S3 e Athena</title>
+  <title>Aula 02 — Modelagem do problema SRE: SWEBOK, SEBoK e bootstrap do Spec-Driven Development</title>
   <link href="../../../assets/slides.css" rel="stylesheet">
   <style data-design-tokens>:root{--bg:#fff;--color:#000000}body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}a:hover{opacity:.8}a:focus{outline:2px solid #000000}</style>
 </head>
@@ -18,11 +18,11 @@
       <div class="deck-shell">
         <div>
           <img class="deck-logo-full" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_e4vyyw.png" alt="Universidade Presbiteriana Mackenzie" />
-          <span class="deck-kicker">Cloud Computing e SRA — MBA Engenharia de Dados</span>
-          <h1 class="deck-title">A Fundação do Data Lake: Armazenamento Escalável com S3 e Athena</h1>
+          <span class="deck-kicker">Cloud Computing e SRE — MBA Engenharia de Dados</span>
+          <h1 class="deck-title">Modelagem do problema SRE: SWEBOK, SEBoK e bootstrap do Spec-Driven Development</h1>
           <p class="deck-meta">Aula 02 &nbsp;&bull;&nbsp; 23/04/2026 &nbsp;&bull;&nbsp; 19h00 – 22h00</p>
           <p class="deck-year">2026</p>
-          <p class="deck-subtitle">Construindo a camada de armazenamento do Data Lake com Amazon S3, Glue Data Catalog e consultas SQL serverless com Athena.</p>
+          <p class="deck-subtitle">Da ferramenta ao problema — como engenheiros de dados modelam confiabilidade antes de codar.</p>
         </div>
       </div>
     </div>
@@ -40,23 +40,24 @@
           <article class="deck-card">
             <h3>19h00 – 20h30 &middot; Teoria</h3>
             <ul>
-              <li>Conceito de Data Lake e schema-on-read</li>
-              <li>Medallion architecture: raw, bronze, silver, gold</li>
-              <li>Amazon S3: buckets, objetos, classes de armazenamento</li>
-              <li>Formatos de arquivo e compressão</li>
-              <li>Particionamento e Glue Data Catalog</li>
-              <li>Athena: SQL serverless sobre S3</li>
+              <li>Recap Aula 01 e posicionamento no novo arco do curso</li>
+              <li>Por que modelar antes de codar</li>
+              <li>SWEBOK V4: Quality, Models &amp; Methods, Professional Practice</li>
+              <li>SEBoK: systems thinking e propriedades emergentes</li>
+              <li>System of Systems aplicado ao pipeline Olist</li>
+              <li>Spec-Driven Development: o loop SDD</li>
+              <li>Pesquisa em grupos sobre guias de especificação</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>20h30 – 22h00 &middot; Prática AWS Student</h3>
+            <h3>20h30 – 22h00 &middot; Prática</h3>
             <ul>
-              <li>Download do dataset Olist (Kaggle)</li>
-              <li>Upload para o bucket raw via AWS CLI</li>
-              <li>Database no Glue e execução de Crawler</li>
-              <li>Primeiras consultas SQL com Athena</li>
-              <li>CTAS: converter CSV para Parquet particionado</li>
-              <li>Comparativo de custo e performance</li>
+              <li>Bootstrap do GitHub Codespace</li>
+              <li>Instalação do OpenCode e Gemini CLI</li>
+              <li>Criação do repositório <code>olist-sre-pipeline</code></li>
+              <li>Estrutura de pastas segundo o roadmap</li>
+              <li>Primeiro commit com <code>spec/00_problem.md</code></li>
+              <li>Adoção provisória de template de spec</li>
             </ul>
           </article>
         </div>
@@ -64,32 +65,32 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 3 - RECAP AULA 01 E CONEXAO COM HOJE                   -->
+    <!-- SLIDE 3 - RECAP AULA 01                                      -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Abertura &middot; Recap</span>
-          <h2 class="deck-title">De onde viemos e para onde vamos</h2>
-          <p class="deck-summary">Na Aula 01 criamos a conta AWS Student, o grupo IAM e os três buckets do Data Lake (raw, trusted, refined). Hoje populamos o Data Lake de verdade.</p>
+          <h2 class="deck-title">De onde viemos — Aula 01</h2>
+          <p class="deck-summary">Na aula passada preparamos o terreno operacional: conta AWS Student, identidade e governança de acesso. Hoje saímos do tour de ferramentas e entramos no coração do curso.</p>
         </div>
         <div class="deck-columns">
           <div class="deck-panel">
-            <strong>O que já temos</strong>
+            <strong>O que já está no lugar</strong>
             <ul style="margin:0; padding-left:22px;">
               <li>Conta AWS Student em us-east-1</li>
-              <li>Buckets S3 vazios: raw, trusted, refined</li>
-              <li>Usuário IAM com acesso ao S3</li>
-              <li>LabRole disponível para serviços gerenciados</li>
+              <li>LabRole disponível para serviços AWS</li>
+              <li>Três buckets iniciais do projeto</li>
+              <li>Familiaridade com o console AWS</li>
             </ul>
           </div>
           <div class="deck-panel">
-            <strong>O que vamos construir hoje</strong>
+            <strong>O que muda a partir de hoje</strong>
             <ul style="margin:0; padding-left:22px;">
-              <li>Dataset Olist dentro do bucket raw</li>
-              <li>Catálogo de metadados no Glue</li>
-              <li>Primeiras queries SQL com Athena</li>
-              <li>Camada trusted em Parquet particionado</li>
+              <li>Deixamos de catalogar serviços</li>
+              <li>Entramos em engenharia de confiabilidade</li>
+              <li>Teoria vira spec executável</li>
+              <li>Spec alimenta IA que gera código</li>
             </ul>
           </div>
         </div>
@@ -97,128 +98,87 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 4 - O QUE E UM DATA LAKE                               -->
+    <!-- SLIDE 4 - O NOVO ARCO DO CURSO                               -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Teoria &middot; Conceitos</span>
-          <h2 class="deck-title">O que é um Data Lake</h2>
-          <p class="deck-summary">Repositório centralizado que armazena dados estruturados, semi-estruturados e não estruturados em seu formato original, separando armazenamento de computação.</p>
+          <span class="deck-kicker">Contexto &middot; Arco do curso</span>
+          <h2 class="deck-title">Sete aulas, uma progressão única</h2>
+          <p class="deck-summary">Cada aula produz um artefato de spec (conceitual) e um incremento do projeto (engenharia). A aula seguinte consome os dois.</p>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr>
+              <th>Aula</th>
+              <th>Tema</th>
+              <th>Framework</th>
+              <th>Artefato</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>02</td><td>Definir o problema</td><td>SWEBOK + SEBoK</td><td><code>00_problem.md</code></td></tr>
+            <tr><td>03</td><td>Contratar confiabilidade</td><td>ISO 25010 &rarr; SLI/SLO</td><td><code>01_nfr.md</code></td></tr>
+            <tr><td>04</td><td>Modelar a arquitetura</td><td>RM-ODP (5 viewpoints)</td><td><code>02_architecture.md</code></td></tr>
+            <tr><td>05</td><td>Dominar concorrência</td><td>CAP / idempotência</td><td><code>03_concurrency.md</code></td></tr>
+            <tr><td>06</td><td>Dominar escalabilidade</td><td>Little, Amdahl, USL</td><td><code>04_scalability.md</code></td></tr>
+            <tr><td>07</td><td>Simular o sistema</td><td>FMEA, chaos, gêmeos digitais</td><td><code>05_chaos.md</code></td></tr>
+            <tr><td>08</td><td>Validar por análise</td><td>ATAM</td><td><code>06_atam.md</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 5 - POR QUE MODELAR ANTES DE CODAR                     -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Tese da aula</span>
+          <h2 class="deck-title">Por que modelar antes de codar</h2>
+          <p class="deck-summary">A ferramenta já foi vista. Agora o foco é o problema. Confiabilidade não se programa depois — ela se modela antes.</p>
         </div>
         <div class="deck-callout">
-          <strong>Princípios fundamentais</strong>
+          <strong>A armadilha do código prematuro</strong>
           <ol style="margin:12px 0 0; padding-left:22px;">
-            <li><strong>Schema-on-read</strong> — o esquema é aplicado no momento da consulta, não na escrita.</li>
-            <li><strong>Formatos abertos</strong> — CSV, JSON, Parquet, ORC, Avro; sem lock-in de fornecedor.</li>
-            <li><strong>Desacoplamento</strong> — armazenamento barato (S3) separado de engines de processamento (Athena, EMR, Spark).</li>
-            <li><strong>Escala praticamente ilimitada</strong> — petabytes com custo linear e previsível.</li>
-            <li><strong>Multi-workload</strong> — BI, ciência de dados, ML e analytics ad-hoc sobre o mesmo dado.</li>
+            <li>Abrir o editor antes de entender os stakeholders leva a retrabalho sistemático.</li>
+            <li>Sem problema bem definido, nenhuma solução pode ser correta — só "funcional".</li>
+            <li>IA codifica muito rápido o problema errado. A spec é o freio de qualidade.</li>
+            <li>Confiabilidade é propriedade <strong>emergente</strong>: aparece no todo, não em componentes isolados.</li>
+            <li>Modelar é mais barato que reescrever; especificar é mais barato que depurar.</li>
           </ol>
         </div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 5 - DATA LAKE VS DATA WAREHOUSE                        -->
+    <!-- SLIDE 6 - SWEBOK VISAO GERAL                                 -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Teoria &middot; Comparativo</span>
-          <h2 class="deck-title">Data Lake vs Data Warehouse</h2>
-          <p class="deck-summary">Cada arquitetura nasceu para resolver um problema diferente. Organizações modernas combinam as duas (ou adotam Lakehouse).</p>
-        </div>
-        <table class="deck-table">
-          <thead>
-            <tr>
-              <th>Aspecto</th>
-              <th>Data Lake</th>
-              <th>Data Warehouse</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>Schema</td><td>Schema-on-read</td><td>Schema-on-write</td></tr>
-            <tr><td>Tipos de dado</td><td>Estruturado + semi + não estruturado</td><td>Estruturado tabular</td></tr>
-            <tr><td>Custo de armazenamento</td><td>Muito baixo (S3)</td><td>Alto (storage proprietário)</td></tr>
-            <tr><td>Performance analítica</td><td>Boa com Parquet + partição</td><td>Excelente (MPP colunar)</td></tr>
-            <tr><td>Workloads</td><td>ML, exploração, BI</td><td>BI e relatórios corporativos</td></tr>
-            <tr><td>Exemplo AWS</td><td>S3 + Glue + Athena</td><td>Redshift</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 6 - MEDALLION ARCHITECTURE                             -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Teoria &middot; Arquitetura</span>
-          <h2 class="deck-title">Medallion Architecture</h2>
-          <p class="deck-summary">Organização em camadas progressivas de qualidade e valor de negócio. Padrão adotado por Databricks e amplamente usado em Data Lakes modernos.</p>
-        </div>
-        <div class="deck-grid">
-          <article class="deck-card">
-            <h3>Raw / Bronze</h3>
-            <ul>
-              <li>Cópia fiel da fonte, imutável</li>
-              <li>Formato original (CSV, JSON)</li>
-              <li>Histórico completo preservado</li>
-              <li>Bucket: <code>raw</code></li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Trusted / Silver</h3>
-            <ul>
-              <li>Dados limpos e deduplicados</li>
-              <li>Parquet particionado</li>
-              <li>Schema estável e documentado</li>
-              <li>Bucket: <code>trusted</code></li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Refined / Gold</h3>
-            <ul>
-              <li>Agregações e modelos dimensionais</li>
-              <li>Pronto para consumo (BI, ML)</li>
-              <li>Alinhado a casos de uso de negócio</li>
-              <li>Bucket: <code>refined</code></li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 7 - AMAZON S3 VISAO GERAL                              -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Teoria &middot; Amazon S3</span>
-          <h2 class="deck-title">Amazon S3 — visão geral</h2>
-          <p class="deck-summary">Simple Storage Service: object storage lançado em 2006, o serviço mais antigo da AWS. É a espinha dorsal de praticamente todo Data Lake na AWS.</p>
+          <span class="deck-kicker">Teoria &middot; SWEBOK V4</span>
+          <h2 class="deck-title">Software Engineering Body of Knowledge</h2>
+          <p class="deck-summary">Guia consolidado pelo IEEE Computer Society. Define os blocos de conhecimento que um engenheiro de software competente domina. Versão 4 publicada em 2024.</p>
         </div>
         <div class="deck-columns">
           <div class="deck-panel">
-            <strong>Conceitos centrais</strong>
+            <strong>O que é o SWEBOK</strong>
             <ul style="margin:0; padding-left:22px;">
-              <li><strong>Bucket</strong> — contêiner global, nome único mundialmente.</li>
-              <li><strong>Object</strong> — arquivo + metadados + chave (key).</li>
-              <li><strong>Key</strong> — caminho lógico, ex.: <code>olist/orders/2026/04/23/file.csv</code>.</li>
-              <li><strong>Prefix</strong> — parte inicial da key; usado como pseudo-diretório.</li>
+              <li>Knowledge Areas (KAs) organizadas por ciclo de vida.</li>
+              <li>Referência para certificações e currículos.</li>
+              <li>Linguagem comum entre praticantes e academia.</li>
+              <li>Não é um método — é um inventário de conhecimentos.</li>
             </ul>
           </div>
           <div class="deck-panel">
-            <strong>Características</strong>
+            <strong>15 áreas de conhecimento (V4)</strong>
             <ul style="margin:0; padding-left:22px;">
-              <li>Durabilidade de 11 noves (99,999999999%)</li>
-              <li>Disponibilidade de 99,99%</li>
-              <li>Consistência forte read-after-write</li>
-              <li>Objetos de 0 bytes até 5 TB</li>
-              <li>Versionamento, replicação e lifecycle</li>
+              <li>Requirements, Architecture, Design, Construction, Testing</li>
+              <li>Operations, Maintenance, Configuration Management</li>
+              <li>Engineering Management, Process, <strong>Models &amp; Methods</strong></li>
+              <li><strong>Quality</strong>, Security, <strong>Professional Practice</strong>, Economics</li>
             </ul>
           </div>
         </div>
@@ -226,319 +186,197 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 8 - S3 STORAGE CLASSES                                 -->
+    <!-- SLIDE 7 - SWEBOK: SOFTWARE QUALITY                           -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Teoria &middot; Amazon S3</span>
-          <h2 class="deck-title">Classes de armazenamento do S3</h2>
-          <p class="deck-summary">A classe define custo por GB, custo por requisição e latência de acesso. Lifecycle rules movem objetos entre classes automaticamente.</p>
-        </div>
-        <table class="deck-table">
-          <thead>
-            <tr>
-              <th>Classe</th>
-              <th>Uso típico</th>
-              <th>Acesso</th>
-              <th>Custo relativo</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>S3 Standard</td><td>Dados ativos, analytics frequente</td><td>Milissegundos</td><td>Alto</td></tr>
-            <tr><td>S3 Intelligent-Tiering</td><td>Padrão de acesso desconhecido</td><td>Milissegundos</td><td>Auto-otimizado</td></tr>
-            <tr><td>S3 Standard-IA</td><td>Backup, dados acessados mensalmente</td><td>Milissegundos</td><td>Médio</td></tr>
-            <tr><td>S3 One Zone-IA</td><td>Cópias secundárias recriáveis</td><td>Milissegundos</td><td>Menor que IA</td></tr>
-            <tr><td>S3 Glacier Instant</td><td>Arquivamento com acesso imediato</td><td>Milissegundos</td><td>Baixo</td></tr>
-            <tr><td>S3 Glacier Flexible</td><td>Compliance, retenção longa</td><td>Minutos a horas</td><td>Muito baixo</td></tr>
-            <tr><td>S3 Glacier Deep Archive</td><td>Retenção regulatória (7+ anos)</td><td>Até 12 horas</td><td>Mínimo</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 9 - DURABILIDADE E CONSISTENCIA                        -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Teoria &middot; Amazon S3</span>
-          <h2 class="deck-title">Durabilidade e consistência</h2>
-          <p class="deck-summary">Dois conceitos que garantem que o Data Lake não perca dados e que pipelines não vejam estados intermediários.</p>
-        </div>
-        <div class="deck-columns">
-          <div class="deck-panel">
-            <strong>Durabilidade 99,999999999%</strong>
-            <ul style="margin:0; padding-left:22px;">
-              <li>Cada objeto replicado em múltiplas AZs dentro da região.</li>
-              <li>Perda esperada: 1 objeto em 10 milhões, a cada 10 mil anos.</li>
-              <li>Checksums verificados automaticamente em cada operação.</li>
-            </ul>
-          </div>
-          <div class="deck-panel">
-            <strong>Strong read-after-write (desde 2020)</strong>
-            <ul style="margin:0; padding-left:22px;">
-              <li>PUT de novo objeto: GET subsequente sempre retorna a versão final.</li>
-              <li>Overwrite e DELETE: consistência forte também.</li>
-              <li>LIST reflete imediatamente PUTs e DELETEs.</li>
-              <li>Elimina retries e workarounds em pipelines.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 10 - FORMATOS DE ARQUIVO                               -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Teoria &middot; Formatos</span>
-          <h2 class="deck-title">Formatos de arquivo no Data Lake</h2>
-          <p class="deck-summary">Cada formato tem um lugar. A escolha impacta custo, performance e interoperabilidade.</p>
-        </div>
-        <table class="deck-table">
-          <thead>
-            <tr>
-              <th>Formato</th>
-              <th>Tipo</th>
-              <th>Quando usar</th>
-              <th>Quando evitar</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td><strong>CSV</strong></td><td>Texto, linhas</td><td>Ingestão inicial, troca com áreas não técnicas</td><td>Analytics em larga escala</td></tr>
-            <tr><td><strong>JSON</strong></td><td>Texto, semi-estruturado</td><td>APIs, eventos, schemas aninhados</td><td>Volumes grandes sem compressão</td></tr>
-            <tr><td><strong>Avro</strong></td><td>Binário, linha</td><td>Streaming, evolução de schema</td><td>Consultas colunares</td></tr>
-            <tr><td><strong>Parquet</strong></td><td>Binário, colunar</td><td>Analytics OLAP, camadas trusted e refined</td><td>Workloads transacionais linha-a-linha</td></tr>
-            <tr><td><strong>ORC</strong></td><td>Binário, colunar</td><td>Ecossistema Hive/Hadoop on-premises</td><td>Ambientes AWS puros (prefira Parquet)</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 11 - ROW VS COLUMN E PARQUET                           -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Teoria &middot; Formatos</span>
-          <h2 class="deck-title">Row-based vs Column-based e Parquet</h2>
-          <p class="deck-summary">Consultas analíticas normalmente leem poucas colunas de muitas linhas. Formatos colunares leem só o necessário.</p>
-        </div>
-        <div class="deck-columns">
-          <div class="deck-panel">
-            <strong>Row-based (CSV, JSON, Avro)</strong>
-            <ul style="margin:0; padding-left:22px;">
-              <li>Registros armazenados em sequência completa.</li>
-              <li>Ótimo para ingestão e OLTP.</li>
-              <li>Para <code>SELECT avg(price)</code> é preciso ler o arquivo todo.</li>
-            </ul>
-          </div>
-          <div class="deck-panel">
-            <strong>Column-based (Parquet, ORC)</strong>
-            <ul style="margin:0; padding-left:22px;">
-              <li>Dados agrupados por coluna dentro de row groups.</li>
-              <li><strong>Projection pushdown</strong> — Athena lê só as colunas do SELECT.</li>
-              <li><strong>Predicate pushdown</strong> — estatísticas por row group filtram dados sem lê-los.</li>
-              <li>Compressão por coluna é muito mais eficiente.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 12 - COMPRESSAO                                        -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Teoria &middot; Otimização</span>
-          <h2 class="deck-title">Compressão: Snappy, Gzip e Zstd</h2>
-          <p class="deck-summary">Parquet suporta vários codecs. A escolha é um trade-off entre taxa de compressão, CPU e se o arquivo será splittable para paralelismo.</p>
-        </div>
-        <table class="deck-table">
-          <thead>
-            <tr>
-              <th>Codec</th>
-              <th>Taxa</th>
-              <th>CPU</th>
-              <th>Splittable</th>
-              <th>Quando usar</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>Snappy</td><td>Média</td><td>Muito baixo</td><td>Sim (Parquet)</td><td>Default para Parquet em analytics</td></tr>
-            <tr><td>Gzip</td><td>Alta</td><td>Alto</td><td>Não (CSV) / Sim (Parquet)</td><td>Arquivamento, dados frios</td></tr>
-            <tr><td>Zstd</td><td>Alta</td><td>Médio</td><td>Sim (Parquet)</td><td>Substituto moderno de Gzip</td></tr>
-            <tr><td>Sem compressão</td><td>Zero</td><td>Zero</td><td>Sim</td><td>Raramente — só debug</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 13 - PARTICIONAMENTO                                   -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Teoria &middot; Otimização</span>
-          <h2 class="deck-title">Particionamento estilo Hive</h2>
-          <p class="deck-summary">Particionar é dividir dados em subdiretórios por valor de coluna. Reduz drasticamente o volume escaneado pelo Athena.</p>
+          <span class="deck-kicker">Teoria &middot; SWEBOK KA 1</span>
+          <h2 class="deck-title">Software Quality</h2>
+          <p class="deck-summary">Qualidade não é sinônimo de "código bonito". É o grau em que o software atende requisitos declarados e expectativas implícitas de seus stakeholders.</p>
         </div>
         <div class="deck-callout">
-          <strong>Convenção de prefixo</strong>
-          <pre style="background:#111; color:#f6f6f6; padding:14px; border-radius:6px; font-size:.95rem; margin-top:10px; overflow-x:auto;">s3://aluno-trusted/olist/orders/
-  year=2026/month=04/day=23/part-00000.parquet
-  year=2026/month=04/day=24/part-00000.parquet
-  year=2026/month=05/day=01/part-00000.parquet</pre>
-        </div>
-        <div class="deck-columns">
-          <div class="deck-panel">
-            <strong>Boas práticas</strong>
-            <ul style="margin:0; padding-left:22px;">
-              <li>Particione por colunas usadas em <code>WHERE</code>.</li>
-              <li>Data é a partição mais comum.</li>
-              <li>Evite cardinalidade muito alta (ex.: user_id).</li>
-            </ul>
-          </div>
-          <div class="deck-panel">
-            <strong>Armadilhas</strong>
-            <ul style="margin:0; padding-left:22px;">
-              <li>Arquivos pequenos demais (&lt; 128 MB) degradam performance.</li>
-              <li>Partições vazias ocupam metadados sem benefício.</li>
-              <li>Nomes de partição são case-sensitive.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 14 - GLUE DATA CATALOG                                 -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Teoria &middot; Catálogo</span>
-          <h2 class="deck-title">AWS Glue Data Catalog</h2>
-          <p class="deck-summary">Metastore Hive gerenciado da AWS. Guarda a descrição dos dados (schema, localização, partições); o dado em si continua no S3.</p>
-        </div>
-        <div class="deck-columns">
-          <div class="deck-panel">
-            <strong>Objetos do catálogo</strong>
-            <ul style="margin:0; padding-left:22px;">
-              <li><strong>Database</strong> — agrupador lógico (ex.: <code>olist_raw</code>).</li>
-              <li><strong>Table</strong> — schema + localização S3 + formato.</li>
-              <li><strong>Partition</strong> — combinação de valores de partição.</li>
-              <li><strong>Crawler</strong> — inferência automática de schema.</li>
-            </ul>
-          </div>
-          <div class="deck-panel">
-            <strong>Quem consome</strong>
-            <ul style="margin:0; padding-left:22px;">
-              <li>Athena — executa SQL sobre tabelas do catálogo.</li>
-              <li>Redshift Spectrum — consulta S3 pelo catálogo.</li>
-              <li>EMR, Glue Jobs, Lake Formation, SageMaker.</li>
-              <li>Interface compatível com Apache Hive Metastore.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 15 - ATHENA                                            -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Teoria &middot; Athena</span>
-          <h2 class="deck-title">Amazon Athena</h2>
-          <p class="deck-summary">Serviço de consulta SQL serverless construído sobre Trino (antigo PrestoSQL). Sem servidores para gerenciar.</p>
-        </div>
-        <div class="deck-callout">
-          <strong>Três propriedades essenciais</strong>
+          <strong>Pilares da KA Quality no SWEBOK</strong>
           <ol style="margin:12px 0 0; padding-left:22px;">
-            <li><strong>Serverless</strong> — não há cluster para provisionar, escala automaticamente.</li>
-            <li><strong>Standard SQL</strong> — ANSI SQL com extensões Trino; joins, window functions, CTEs.</li>
-            <li><strong>Pay-per-query</strong> — cobrado pelos TBs de dados efetivamente escaneados (US$ 5,00 por TB aproximadamente).</li>
+            <li><strong>Fundamentals</strong> — cultura, ética, custo da não-qualidade.</li>
+            <li><strong>Quality Models</strong> — modelos como ISO/IEC 25010 que decompõem qualidade em atributos (reliability, performance efficiency, security, maintainability).</li>
+            <li><strong>Quality Management Processes</strong> — V&amp;V, auditoria, revisão, inspeção estática.</li>
+            <li><strong>Software Quality Tools</strong> — análise estática, testes automatizados, code review, observabilidade.</li>
+          </ol>
+        </div>
+        <p style="margin-top:14px;"><em>Liga direta com a Aula 03:</em> qualidade se concretiza em RNFs mensuráveis (SLIs/SLOs).</p>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 8 - SWEBOK: MODELS AND METHODS                         -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; SWEBOK KA 2</span>
+          <h2 class="deck-title">Software Engineering Models and Methods</h2>
+          <p class="deck-summary">Métodos dão disciplina a decisões que seriam, de outro modo, arbitrárias. Modelos reduzem a complexidade do sistema ao necessário para decidir.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Tipos de modelo</strong>
+            <ul style="margin:0; padding-left:22px;">
+              <li>Informacionais (entidades, relações, fluxos)</li>
+              <li>Comportamentais (estados, sequências)</li>
+              <li>Estruturais (componentes, conectores)</li>
+              <li>Domínio (regras de negócio)</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Métodos aplicáveis ao curso</strong>
+            <ul style="margin:0; padding-left:22px;">
+              <li>Modelos formais leves: EARS para requisitos</li>
+              <li>RM-ODP para arquitetura (Aula 04)</li>
+              <li>FMEA para falhas (Aula 07)</li>
+              <li>ATAM para validação arquitetural (Aula 08)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 9 - SWEBOK: PROFESSIONAL PRACTICE                      -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; SWEBOK KA 3</span>
+          <h2 class="deck-title">Software Engineering Professional Practice</h2>
+          <p class="deck-summary">Conhecimentos, habilidades e atitudes de um engenheiro responsável. O que o separa de alguém que apenas escreve código.</p>
+        </div>
+        <div class="deck-callout">
+          <strong>Componentes</strong>
+          <ol style="margin:12px 0 0; padding-left:22px;">
+            <li><strong>Professionalism</strong> — códigos de conduta, responsabilidade sobre impactos sistêmicos.</li>
+            <li><strong>Group dynamics &amp; psychology</strong> — colaboração, decisões por consenso, revisão de pares.</li>
+            <li><strong>Communication skills</strong> — escrever specs compreensíveis, documentar decisões, apresentar trade-offs.</li>
+          </ol>
+        </div>
+        <p style="margin-top:14px;"><em>Nesta aula:</em> a pesquisa em grupo sobre guias de spec é exercício direto de Professional Practice.</p>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 10 - SEBoK INTRO                                       -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; SEBoK</span>
+          <h2 class="deck-title">Systems Engineering Body of Knowledge</h2>
+          <p class="deck-summary">Mantido pelo BKCASE (INCOSE + IEEE-CS + Stevens Institute). Enquanto o SWEBOK olha o software, o SEBoK olha o sistema — o todo do qual o software é parte.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Por que engenheiros de dados precisam disso</strong>
+            <ul style="margin:0; padding-left:22px;">
+              <li>Pipeline de dados é um sistema composto (ETL + DB + obs + rede).</li>
+              <li>Cada parte pode estar correta e o todo falhar mesmo assim.</li>
+              <li>Reliability, availability e performance são <strong>propriedades do sistema</strong>, não de módulos.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Conceitos centrais que vamos usar</strong>
+            <ul style="margin:0; padding-left:22px;">
+              <li>Systems thinking</li>
+              <li>Propriedades emergentes</li>
+              <li>System of Systems (SoS)</li>
+              <li>Interfaces e fronteiras</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 11 - SYSTEMS THINKING                                  -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; SEBoK</span>
+          <h2 class="deck-title">Systems thinking — partes vs todo</h2>
+          <p class="deck-summary">Pensamento sistêmico: olhar para as relações e feedbacks entre componentes, não apenas para os componentes em si.</p>
+        </div>
+        <div class="deck-callout">
+          <strong>Cinco movimentos do raciocínio sistêmico</strong>
+          <ol style="margin:12px 0 0; padding-left:22px;">
+            <li><strong>Identificar o sistema de interesse</strong> — onde começam e terminam suas fronteiras?</li>
+            <li><strong>Mapear os componentes e suas interfaces</strong> — o que passa entre eles?</li>
+            <li><strong>Rastrear fluxos</strong> — de dados, de controle, de valor, de falha.</li>
+            <li><strong>Detectar loops de feedback</strong> — onde o sistema se auto-regula ou se auto-amplifica?</li>
+            <li><strong>Observar o comportamento emergente</strong> — o que o todo faz que nenhuma parte faz sozinha?</li>
           </ol>
         </div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 16 - ATHENA: OTIMIZACAO DE CUSTO                       -->
+    <!-- SLIDE 12 - PROPRIEDADES EMERGENTES                           -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Teoria &middot; Athena</span>
-          <h2 class="deck-title">Como reduzir a conta do Athena</h2>
-          <p class="deck-summary">Três alavancas combinadas reduzem o custo em 90% ou mais sem trocar o engine.</p>
+          <span class="deck-kicker">Teoria &middot; SEBoK</span>
+          <h2 class="deck-title">Propriedades emergentes</h2>
+          <p class="deck-summary">Propriedade emergente é aquela que existe no sistema e não em nenhum de seus componentes isolados. É o coração da Engenharia de Confiabilidade.</p>
         </div>
-        <div class="deck-grid">
-          <article class="deck-card">
-            <h3>1. Parquet + compressão</h3>
-            <ul>
-              <li>Formato colunar lê só as colunas do SELECT.</li>
-              <li>Snappy reduz volume em 2–5x.</li>
-              <li>CSV 1 GB vira Parquet de 200–300 MB.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>2. Particionamento</h3>
-            <ul>
-              <li>Filtro por partição evita scan de dados irrelevantes.</li>
-              <li><code>WHERE year=2026 AND month=04</code> lê só o subdiretório.</li>
-              <li>Complementa projection pushdown.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>3. Colunas explícitas</h3>
-            <ul>
-              <li>Sempre liste colunas — evite <code>SELECT *</code>.</li>
-              <li>Cada coluna não lida é economia direta.</li>
-              <li>Impacto amplificado em Parquet.</li>
-            </ul>
-          </article>
-        </div>
+        <table class="deck-table">
+          <thead>
+            <tr>
+              <th>Propriedade</th>
+              <th>Do componente isolado?</th>
+              <th>Do sistema?</th>
+              <th>Como surge</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Reliability</td><td>Não tem sentido</td><td>Sim</td><td>Da composição correta, redundância, tratamento de falhas</td></tr>
+            <tr><td>Availability</td><td>Limitada</td><td>Sim</td><td>Da topologia, do failover, do MTTR</td></tr>
+            <tr><td>Performance</td><td>Parcial</td><td>Sim</td><td>Da coordenação, do caminho crítico, dos gargalos</td></tr>
+            <tr><td>Segurança</td><td>Parcial</td><td>Sim</td><td>Do controle nas fronteiras e entre componentes</td></tr>
+            <tr><td>Escalabilidade</td><td>Raramente</td><td>Sim</td><td>Das decisões de concorrência, sharding, estado</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 17 - WORKGROUPS E LIMITES                              -->
+    <!-- SLIDE 13 - SYSTEM OF SYSTEMS                                 -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Teoria &middot; Athena</span>
-          <h2 class="deck-title">Workgroups, result location e guardrails</h2>
-          <p class="deck-summary">Workgroups isolam usuários, queries e custos. Antes de rodar a primeira query é obrigatório configurar a pasta de resultados.</p>
+          <span class="deck-kicker">Teoria &middot; SEBoK</span>
+          <h2 class="deck-title">System of Systems aplicado ao Olist ETL</h2>
+          <p class="deck-summary">Um pipeline moderno não é um sistema — é um sistema de sistemas. Cada subsistema tem seu próprio ciclo de vida, governança e falhas independentes.</p>
         </div>
         <div class="deck-columns">
           <div class="deck-panel">
-            <strong>Workgroup</strong>
+            <strong>Subsistemas do Olist Pipeline</strong>
             <ul style="margin:0; padding-left:22px;">
-              <li>Grupo lógico de queries e usuários.</li>
-              <li>Isola histórico, métricas e settings.</li>
-              <li>Permite configurar limite máximo de TB por query.</li>
-              <li>Emite alarmes CloudWatch por uso.</li>
+              <li>Fonte de dados (Kaggle / CSVs)</li>
+              <li>Codespace (dev + IA)</li>
+              <li>GitHub (repo, CI)</li>
+              <li>AWS (EC2 app, EC2 data, rede)</li>
+              <li>Observabilidade (CloudWatch, Grafana)</li>
             </ul>
           </div>
           <div class="deck-panel">
-            <strong>Query result location</strong>
+            <strong>Características de um SoS</strong>
             <ul style="margin:0; padding-left:22px;">
-              <li>Bucket S3 onde o Athena grava resultados e manifests.</li>
-              <li>Exemplo: <code>s3://aluno-athena-results/</code>.</li>
-              <li>Obrigatório antes de rodar a primeira query.</li>
-              <li>Crie lifecycle rule para apagar resultados antigos.</li>
+              <li>Independência operacional de cada parte</li>
+              <li>Independência gerencial (times/fornecedores distintos)</li>
+              <li>Distribuição geográfica</li>
+              <li>Evolução assíncrona</li>
+              <li>Comportamento emergente no todo</li>
             </ul>
           </div>
         </div>
@@ -546,295 +384,393 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 18 - TRANSICAO PARA A PRATICA                          -->
+    <!-- SLIDE 14 - APLICANDO AO OLIST                                -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Aplicação</span>
+          <h2 class="deck-title">Do genérico ao concreto — problema SRE do Olist</h2>
+          <p class="deck-summary">A aula agora aterrissa no projeto real. Vamos modelar o problema antes de escrever uma linha de código.</p>
+        </div>
+        <div class="deck-callout">
+          <strong>Contexto do problema</strong>
+          <p style="margin:10px 0 0;">O negócio Olist precisa processar ~100 mil pedidos do marketplace, carregar em um banco analítico e gerar dashboards diários. O ETL deve ser <em>confiável</em>: idempotente, observável e resiliente a falhas parciais. Não podemos perder dados, nem duplicá-los, nem sofrer silenciosamente.</p>
+        </div>
+        <p style="margin-top:14px;"><em>Pergunta orientadora:</em> <strong>o que o sistema precisa garantir para que o negócio confie nos números do dashboard?</strong></p>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 15 - CANVAS DE MODELAGEM                               -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Aplicação &middot; Canvas</span>
+          <h2 class="deck-title">Canvas de modelagem do problema</h2>
+          <p class="deck-summary">Estrutura mínima para produzir a primeira versão de <code>spec/00_problem.md</code>. Preenchido em grupo durante a aula.</p>
+        </div>
+        <div class="deck-grid">
+          <article class="deck-card">
+            <h3>1. Stakeholders</h3>
+            <ul>
+              <li>Operação Olist (negócio)</li>
+              <li>Time de dados</li>
+              <li>Clientes internos do dashboard</li>
+              <li>Plataforma / SRE</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>2. Fluxos críticos</h3>
+            <ul>
+              <li>Ingestão diária CSV &rarr; Postgres</li>
+              <li>Consulta de dashboards Grafana</li>
+              <li>Observação de SLA</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>3. Modos de falha</h3>
+            <ul>
+              <li>Arquivo corrompido ou parcial</li>
+              <li>Reprocesso duplicando linhas</li>
+              <li>Queda de EC2 durante o run</li>
+              <li>Banco indisponível</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>4. Riscos sistêmicos</h3>
+            <ul>
+              <li>Perda silenciosa de linhas</li>
+              <li>Dashboard mostrando dado stale</li>
+              <li>Custo AWS explodindo</li>
+              <li>Dívida técnica de IA mal revisada</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 16 - POR QUE SPEC                                      -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; SDD</span>
+          <h2 class="deck-title">Spec-Driven Development — por que especificar é o novo "codar"</h2>
+          <p class="deck-summary">IAs generativas invertem o custo relativo das atividades: escrever código ficou barato; escrever o <em>problema certo</em> virou o gargalo.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Antes das IAs</strong>
+            <ul style="margin:0; padding-left:22px;">
+              <li>Codificar era lento e caro</li>
+              <li>Spec era documento burocrático</li>
+              <li>Revisão focava no código</li>
+              <li>Dívida nascia no teclado</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Com IAs produtivas</strong>
+            <ul style="margin:0; padding-left:22px;">
+              <li>Código é commodity barata</li>
+              <li>Spec vira contrato e input primário</li>
+              <li>Revisão foca na intenção e no <em>fit</em></li>
+              <li>Dívida nasce em specs ruins</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 17 - O LOOP SDD                                        -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; SDD</span>
+          <h2 class="deck-title">O loop Spec-Driven Development</h2>
+          <p class="deck-summary">Este loop se repete em cada aula do curso. A qualidade da spec é a qualidade do sistema.</p>
+        </div>
+        <div class="deck-callout">
+          <pre style="background:#111; color:#f6f6f6; padding:14px; border-radius:6px; font-size:.95rem; margin-top:10px; overflow-x:auto;">  1. Conceito     (framework da aula)
+        &darr;
+  2. Spec        (spec/XX_*.md)
+        &darr;
+  3. Geração     (OpenCode / Gemini CLI leem a spec)
+        &darr;
+  4. Revisão     (aluno critica a saída)
+        &darr;
+  5. Testes      (pytest local e no Codespace)
+        &darr;
+  6. Deploy      (CloudFormation / SSM / scp)
+        &darr;
+  7. Observação  (Grafana + CloudWatch)
+        &uarr;&mdash;&mdash;&mdash;&mdash; realimenta a próxima spec</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 18 - PESQUISA DE GUIAS DE SPEC                         -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Atividade em grupo</span>
+          <h2 class="deck-title">Pesquisa de guias de especificação</h2>
+          <p class="deck-summary">A turma não recebe um template pronto — pesquisa, apresenta e decide. É exercício de Professional Practice (SWEBOK).</p>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr>
+              <th>Guia</th>
+              <th>Origem</th>
+              <th>Foco</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>IEEE 830 / ISO 29148</td><td>IEEE</td><td>Requisitos clássicos (SRS)</td></tr>
+            <tr><td>Volere</td><td>Robertson &amp; Robertson</td><td>Template de requisitos com atomicidade e rationale</td></tr>
+            <tr><td>EARS</td><td>Alistair Mavin / Rolls-Royce</td><td>Sintaxe pragmática de requisitos em linguagem natural controlada</td></tr>
+            <tr><td>Gherkin / BDD</td><td>Cucumber</td><td>Cenários Given-When-Then</td></tr>
+            <tr><td>ARC42</td><td>Starke &amp; Hruschka</td><td>Template de arquitetura</td></tr>
+            <tr><td>GitHub Spec Kit / Kiro</td><td>GitHub / AWS</td><td>Spec orientada a geração por IA</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 19 - REGRAS DA PESQUISA                                -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Atividade em grupo</span>
+          <h2 class="deck-title">Regras da pesquisa</h2>
+          <p class="deck-summary">Entrega até o fim da aula. Na Aula 03 cada grupo apresenta e a turma consolida o template definitivo.</p>
+        </div>
+        <div class="deck-panel">
+          <strong>Formato</strong>
+          <ol style="margin:0; padding-left:22px;">
+            <li>Grupos de 3 a 4 pessoas.</li>
+            <li>Cada grupo sorteia um guia da lista do slide anterior.</li>
+            <li>Produzir uma ficha curta (1 página) respondendo: origem, quando usar, estrutura proposta, prós, contras, exemplo mínimo.</li>
+            <li>Avaliar explicitamente a adequação à geração por IA.</li>
+            <li>Comitar a ficha em <code>spec/research/&lt;nome-do-guia&gt;.md</code>.</li>
+            <li>Na Aula 03, cada grupo apresenta em 5 minutos; a turma vota o template adotado.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 20 - TRANSICAO PARA A PRATICA                          -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Prática &middot; 20h30 – 22h00</span>
           <h2 class="deck-title">Da teoria para o laboratório</h2>
-          <p class="deck-summary">Agora vamos popular o Data Lake com o dataset Olist Brazilian E-commerce e rodar as primeiras consultas.</p>
+          <p class="deck-summary">Hoje a prática é leve de infraestrutura e pesada de fundação. Montamos o ambiente de desenvolvimento que acompanhará o resto do curso.</p>
         </div>
         <div class="deck-panel">
           <strong>Fluxo do laboratório</strong>
           <ol style="margin:0; padding-left:22px;">
-            <li>Baixar dataset Olist do Kaggle.</li>
-            <li>Subir CSVs para <code>s3://&lt;aluno&gt;-raw/olist/</code>.</li>
-            <li>Criar database <code>olist_raw</code> no Glue.</li>
-            <li>Executar um Crawler sobre os dados.</li>
-            <li>Rodar SELECTs e JOINs no Athena.</li>
-            <li>CTAS para Parquet particionado em <code>trusted/</code>.</li>
-            <li>Comparar volume escaneado antes e depois.</li>
+            <li>Abrir um GitHub Codespace a partir de repositório vazio.</li>
+            <li>Instalar OpenCode e Gemini CLI.</li>
+            <li>Autenticar cada CLI com seu modelo gratuito.</li>
+            <li>Criar a estrutura de pastas do projeto segundo o roadmap.</li>
+            <li>Escrever a primeira versão do <code>spec/00_problem.md</code>.</li>
+            <li>Comitar e subir para o GitHub.</li>
+            <li>Validar que as IAs leem a spec e respondem no terminal.</li>
           </ol>
         </div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 19 - DATASET OLIST                                     -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Prática &middot; Dataset</span>
-          <h2 class="deck-title">Olist Brazilian E-commerce</h2>
-          <p class="deck-summary">Dataset público da Olist, marketplace brasileiro, com cerca de 100 mil pedidos realizados entre 2016 e 2018. Publicado no Kaggle em 2018.</p>
-        </div>
-        <div class="deck-columns">
-          <div class="deck-panel">
-            <strong>Tabelas principais (9 CSVs)</strong>
-            <ul style="margin:0; padding-left:22px;">
-              <li><code>olist_orders_dataset</code> — pedidos e datas.</li>
-              <li><code>olist_order_items_dataset</code> — itens de cada pedido.</li>
-              <li><code>olist_customers_dataset</code> — clientes e localização.</li>
-              <li><code>olist_products_dataset</code> — catálogo de produtos.</li>
-              <li><code>olist_sellers_dataset</code> — vendedores.</li>
-              <li><code>olist_order_payments_dataset</code> — pagamentos.</li>
-              <li><code>olist_order_reviews_dataset</code> — avaliações.</li>
-              <li><code>olist_geolocation_dataset</code> — geolocalização por CEP.</li>
-              <li><code>product_category_name_translation</code> — categorias.</li>
-            </ul>
-          </div>
-          <div class="deck-panel">
-            <strong>Link e licença</strong>
-            <ul style="margin:0; padding-left:22px;">
-              <li>Kaggle: <code>olistbr/brazilian-ecommerce</code>.</li>
-              <li>Licença CC BY-NC-SA 4.0.</li>
-              <li>Aproximadamente 45 MB compactados.</li>
-              <li>Dataset-âncora para todo o curso.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 20 - PASSO 1 DOWNLOAD                                  -->
+    <!-- SLIDE 21 - PASSO 1 CODESPACE                                 -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Prática &middot; Passo 1</span>
-          <h2 class="deck-title">Baixar o dataset Olist</h2>
-          <p class="deck-summary">Duas opções: download direto via navegador ou via API do Kaggle. Em aula, usamos o download direto.</p>
+          <h2 class="deck-title">Bootstrap do GitHub Codespace</h2>
+          <p class="deck-summary">Codespace é o ambiente oficial da turma. Mesmo quem tem máquina potente usa o Codespace para garantir paridade entre alunos.</p>
         </div>
         <div class="deck-panel">
           <strong>Passo a passo</strong>
           <ol style="margin:0; padding-left:22px;">
-            <li>Acesse <code>https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce</code>.</li>
-            <li>Clique em <strong>Download</strong> (requer conta Kaggle gratuita).</li>
-            <li>Extraia o ZIP em uma pasta local <code>~/olist/</code>.</li>
-            <li>Confirme 9 arquivos CSV na pasta.</li>
-            <li>Abra um terminal nessa pasta: <code>cd ~/olist</code>.</li>
+            <li>Entrar em <code>github.com</code> e criar um novo repositório: <code>olist-sre-pipeline</code>, privado, com README.</li>
+            <li>Na página do repo: <strong>Code &rarr; Codespaces &rarr; Create codespace on main</strong>.</li>
+            <li>Aguardar o container subir (imagem default Ubuntu 22.04 com Node 20).</li>
+            <li>No terminal do Codespace, validar as versões instaladas: <code>node -v</code>, <code>npm -v</code>, <code>git --version</code>.</li>
+            <li>Configurar identidade git: <code>git config --global user.email "..."</code> e <code>user.name "..."</code>.</li>
           </ol>
         </div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 21 - PASSO 2 UPLOAD PARA S3                            -->
+    <!-- SLIDE 22 - PASSO 2 INSTALAR AS IAS                           -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Prática &middot; Passo 2</span>
-          <h2 class="deck-title">Upload para o bucket raw via AWS CLI</h2>
-          <p class="deck-summary">Organização por tabela dentro do prefixo <code>olist/</code> — cada CSV em seu próprio subprefixo, preparando o Crawler.</p>
+          <h2 class="deck-title">Instalar OpenCode e Gemini CLI</h2>
+          <p class="deck-summary">Dois agentes gratuitos para o terminal. O aluno comparará saídas entre eles ao longo do curso.</p>
         </div>
         <div class="deck-callout">
-          <strong>Comando — ajuste <code>&lt;aluno&gt;</code> pelo seu identificador</strong>
-          <pre style="background:#111; color:#f6f6f6; padding:14px; border-radius:6px; font-size:.92rem; margin-top:10px; overflow-x:auto;">aws s3 cp olist_orders_dataset.csv \
-  s3://&lt;aluno&gt;-raw/olist/orders/olist_orders_dataset.csv
+          <strong>Comandos no terminal do Codespace</strong>
+          <pre style="background:#111; color:#f6f6f6; padding:14px; border-radius:6px; font-size:.92rem; margin-top:10px; overflow-x:auto;"># OpenCode (agente CLI open-source)
+npm i -g opencode-ai@latest
+opencode --version
 
-aws s3 cp olist_order_items_dataset.csv \
-  s3://&lt;aluno&gt;-raw/olist/order_items/olist_order_items_dataset.csv
+# Gemini CLI oficial do Google
+npm i -g @google/gemini-cli
+gemini --version
 
-aws s3 cp olist_customers_dataset.csv \
-  s3://&lt;aluno&gt;-raw/olist/customers/olist_customers_dataset.csv
-
-# repetir para os demais CSVs em products/, sellers/,
-# payments/, reviews/, geolocation/, category_translation/
-
-aws s3 ls s3://&lt;aluno&gt;-raw/olist/ --recursive --summarize</pre>
+# Primeira execução pede autenticação via navegador
+opencode
+gemini</pre>
         </div>
+        <p style="margin-top:14px;"><em>Ambos suportam o modelo gratuito padrão. Copilot é opcional se o aluno já tiver acesso.</em></p>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 22 - PASSO 3 DATABASE GLUE                             -->
+    <!-- SLIDE 23 - PASSO 3 ESTRUTURA DE PASTAS                       -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Prática &middot; Passo 3</span>
-          <h2 class="deck-title">Criar o database olist_raw no Glue</h2>
-          <p class="deck-summary">Database é o agrupador lógico no Glue Data Catalog. Cada camada do Data Lake terá seu próprio database.</p>
+          <h2 class="deck-title">Criar a estrutura de pastas do projeto</h2>
+          <p class="deck-summary">A estrutura segue o roadmap e será preenchida aula a aula. Esqueletos vazios já no commit inicial.</p>
         </div>
-        <div class="deck-panel">
-          <strong>Console</strong>
-          <ol style="margin:0; padding-left:22px;">
-            <li>Abra o console AWS e procure por <strong>AWS Glue</strong>.</li>
-            <li>Menu lateral: <strong>Data Catalog &rarr; Databases</strong>.</li>
-            <li>Clique em <strong>Add database</strong>.</li>
-            <li>Nome: <code>olist_raw</code>.</li>
-            <li>Location (opcional): <code>s3://&lt;aluno&gt;-raw/olist/</code>.</li>
-            <li>Clique em <strong>Create database</strong>.</li>
-          </ol>
+        <div class="deck-callout">
+          <pre style="background:#111; color:#f6f6f6; padding:14px; border-radius:6px; font-size:.9rem; margin-top:10px; overflow-x:auto;">mkdir -p spec spec/research iac src src/etl src/tests \
+  observability observability/grafana/dashboards \
+  observability/cloudwatch chaos chaos/experiments reports
+
+touch spec/00_problem.md
+touch spec/research/.gitkeep
+touch iac/.gitkeep src/etl/.gitkeep src/tests/.gitkeep
+touch observability/grafana/dashboards/.gitkeep
+touch observability/cloudwatch/.gitkeep
+touch chaos/experiments/.gitkeep reports/.gitkeep
+
+tree -L 2</pre>
         </div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 23 - PASSO 4 CRAWLER                                   -->
+    <!-- SLIDE 24 - PASSO 4 PRIMEIRA SPEC                             -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Prática &middot; Passo 4</span>
-          <h2 class="deck-title">Configurar e executar um Glue Crawler</h2>
-          <p class="deck-summary">O Crawler lê amostras dos arquivos em S3, infere o schema e cria/atualiza tabelas no Glue Data Catalog.</p>
+          <h2 class="deck-title">Rascunho do <code>spec/00_problem.md</code></h2>
+          <p class="deck-summary">Primeira versão preenchida em aula, com base no canvas. Vai ser refinada nas próximas semanas.</p>
         </div>
-        <div class="deck-panel">
-          <strong>Passo a passo</strong>
-          <ol style="margin:0; padding-left:22px;">
-            <li>Glue &rarr; <strong>Crawlers</strong> &rarr; <strong>Create crawler</strong>.</li>
-            <li>Nome: <code>olist-raw-crawler</code>.</li>
-            <li>Data source: <strong>S3</strong>, path <code>s3://&lt;aluno&gt;-raw/olist/</code>.</li>
-            <li>IAM role: selecione <strong>LabRole</strong>.</li>
-            <li>Target database: <code>olist_raw</code>.</li>
-            <li>Schedule: <strong>On demand</strong>.</li>
-            <li>Clique em <strong>Create crawler</strong> e depois em <strong>Run crawler</strong>.</li>
-            <li>Aguarde status <strong>Ready</strong>. Devem aparecer 9 tabelas.</li>
-          </ol>
+        <div class="deck-callout">
+          <pre style="background:#111; color:#f6f6f6; padding:14px; border-radius:6px; font-size:.88rem; margin-top:10px; overflow-x:auto;"># Problema — Olist SRE Pipeline
+
+## Contexto
+Marketplace Olist precisa de ETL diário confiavel para ~100k pedidos.
+
+## Stakeholders
+- Operação Olist (negócio)
+- Time de dados
+- Consumidores dos dashboards
+- Plataforma / SRE
+
+## Fluxos críticos
+1. Ingestão CSV -&gt; transformação -&gt; Postgres
+2. Atualização de dashboards Grafana
+3. Observação contínua de SLA
+
+## Modos de falha conhecidos
+- Arquivo parcial / corrompido
+- Reprocesso duplicando linhas
+- EC2 derrubada durante run
+- Banco indisponível
+
+## Propriedades emergentes alvo
+- Reliability, Availability, Observabilidade
+
+## Fora de escopo (hoje)
+- RNFs mensuráveis (Aula 03)
+- Arquitetura concreta (Aula 04)</pre>
         </div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 24 - PASSO 5 ATHENA RESULT LOCATION                    -->
+    <!-- SLIDE 25 - PASSO 5 PRIMEIRO COMMIT                           -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Prática &middot; Passo 5</span>
-          <h2 class="deck-title">Preparar o Athena para rodar queries</h2>
-          <p class="deck-summary">Antes da primeira query, o Athena exige uma localização S3 para gravar resultados. Esse passo é esquecido com frequência.</p>
+          <h2 class="deck-title">Primeiro commit e push</h2>
+          <p class="deck-summary">Registra o marco zero do projeto. A partir daqui toda decisão vira diff revisável.</p>
+        </div>
+        <div class="deck-callout">
+          <pre style="background:#111; color:#f6f6f6; padding:14px; border-radius:6px; font-size:.92rem; margin-top:10px; overflow-x:auto;">git add .
+git status
+
+git commit -m "chore: bootstrap olist-sre-pipeline com spec 00_problem"
+
+git push origin main</pre>
         </div>
         <div class="deck-panel">
-          <strong>Configuração</strong>
-          <ol style="margin:0; padding-left:22px;">
-            <li>Console: abra <strong>Amazon Athena</strong>.</li>
-            <li>Query editor &rarr; <strong>Settings</strong> &rarr; <strong>Manage</strong>.</li>
-            <li>Query result location: <code>s3://&lt;aluno&gt;-athena-results/</code>.</li>
-            <li>Se o bucket não existir: <code>aws s3 mb s3://&lt;aluno&gt;-athena-results</code>.</li>
-            <li>Salve as configurações.</li>
-            <li>No editor, selecione database <code>olist_raw</code>.</li>
-          </ol>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 25 - PASSO 6 PRIMEIRAS QUERIES                         -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Prática &middot; Passo 6</span>
-          <h2 class="deck-title">Primeiras consultas SQL no Athena</h2>
-          <p class="deck-summary">Rode as consultas no editor e observe em <strong>Run details</strong> o volume escaneado (em MB) para cada uma.</p>
-        </div>
-        <div class="deck-callout">
-          <strong>Queries de exploração</strong>
-          <pre style="background:#111; color:#f6f6f6; padding:14px; border-radius:6px; font-size:.9rem; margin-top:10px; overflow-x:auto;">-- 1. Espiar o dataset de pedidos
-SELECT * FROM olist_orders_dataset LIMIT 10;
-
--- 2. Pedidos por status
-SELECT order_status, COUNT(*) AS total
-FROM olist_orders_dataset
-GROUP BY order_status
-ORDER BY total DESC;
-
--- 3. JOIN pedidos x itens x clientes
-SELECT c.customer_state,
-       COUNT(DISTINCT o.order_id) AS pedidos,
-       SUM(oi.price)              AS receita
-FROM olist_orders_dataset o
-JOIN olist_order_items_dataset oi USING (order_id)
-JOIN olist_customers_dataset c    USING (customer_id)
-WHERE o.order_status = 'delivered'
-GROUP BY c.customer_state
-ORDER BY receita DESC;</pre>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 26 - PASSO 7 CTAS PARA PARQUET                         -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Prática &middot; Passo 7</span>
-          <h2 class="deck-title">CTAS — converter CSV em Parquet particionado</h2>
-          <p class="deck-summary"><code>CREATE TABLE AS SELECT</code> materializa o resultado em S3 no formato desejado e registra a tabela no Catalog.</p>
-        </div>
-        <div class="deck-callout">
-          <strong>CTAS no Athena</strong>
-          <pre style="background:#111; color:#f6f6f6; padding:14px; border-radius:6px; font-size:.88rem; margin-top:10px; overflow-x:auto;">CREATE TABLE olist_raw.orders_parquet
-WITH (
-  format = 'PARQUET',
-  parquet_compression = 'SNAPPY',
-  external_location = 's3://&lt;aluno&gt;-trusted/olist/orders/',
-  partitioned_by = ARRAY['order_purchase_year_month']
-) AS
-SELECT
-  order_id,
-  customer_id,
-  order_status,
-  CAST(order_purchase_timestamp AS timestamp) AS order_purchase_ts,
-  order_delivered_customer_date,
-  date_format(CAST(order_purchase_timestamp AS timestamp), '%Y-%m')
-    AS order_purchase_year_month
-FROM olist_raw.olist_orders_dataset;</pre>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 27 - PASSO 8 COMPARATIVO DE CUSTO                      -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Prática &middot; Passo 8</span>
-          <h2 class="deck-title">Comparativo: CSV bruto vs Parquet particionado</h2>
-          <p class="deck-summary">A mesma consulta lógica em duas tabelas — observe o campo <strong>Data scanned</strong> em Run details.</p>
-        </div>
-        <div class="deck-callout">
-          <strong>Duas versões da mesma pergunta</strong>
-          <pre style="background:#111; color:#f6f6f6; padding:14px; border-radius:6px; font-size:.9rem; margin-top:10px; overflow-x:auto;">-- Sobre CSV bruto
-SELECT COUNT(*) FROM olist_raw.olist_orders_dataset
-WHERE order_status = 'delivered';
-
--- Sobre Parquet particionado por ano-mes
-SELECT COUNT(*) FROM olist_raw.orders_parquet
-WHERE order_status = 'delivered'
-  AND order_purchase_year_month BETWEEN '2017-01' AND '2017-12';</pre>
-        </div>
-        <div class="deck-panel">
-          <strong>Expectativa</strong>
+          <strong>Critério de pronto</strong>
           <ul style="margin:0; padding-left:22px;">
-            <li>CSV: scan do arquivo completo (dezenas de MB).</li>
-            <li>Parquet + partição: scan de poucos MB da coluna <code>order_status</code>.</li>
-            <li>Redução típica de 80–95% em volume escaneado.</li>
+            <li>Repositório aparece no GitHub com a árvore de pastas.</li>
+            <li><code>spec/00_problem.md</code> preenchido e versionado.</li>
+            <li>OpenCode e Gemini respondem no terminal.</li>
+            <li>Aluno consegue pedir à IA para "ler <code>spec/00_problem.md</code> e resumir".</li>
           </ul>
         </div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 28 - FECHAMENTO RESUMO                                 -->
+    <!-- SLIDE 26 - VALIDACAO COM IA                                  -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; Passo 6</span>
+          <h2 class="deck-title">Validar que a IA consome a spec</h2>
+          <p class="deck-summary">Exercício de fechamento: a IA precisa ser capaz de ler a spec e propor questionamentos. Isso já é o início da revisão.</p>
+        </div>
+        <div class="deck-callout">
+          <strong>Prompt de validação</strong>
+          <pre style="background:#111; color:#f6f6f6; padding:14px; border-radius:6px; font-size:.9rem; margin-top:10px; overflow-x:auto;">opencode
+
+&gt; Leia spec/00_problem.md e liste:
+&gt; 1) três riscos que eu não mencionei
+&gt; 2) duas propriedades emergentes que deveriam ser
+&gt;    tornadas mensuráveis na Aula 03
+&gt; 3) uma ambiguidade no texto
+
+# repetir com gemini para comparar saídas
+gemini</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 27 - RESUMO                                            -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
@@ -844,23 +780,22 @@ WHERE order_status = 'delivered'
         </div>
         <div class="deck-grid">
           <article class="deck-card">
-            <h3>O que vimos hoje</h3>
+            <h3>Teoria</h3>
             <ul>
-              <li>Data Lake, schema-on-read e medallion.</li>
-              <li>S3: classes, durabilidade, consistência.</li>
-              <li>Parquet, compressão e particionamento.</li>
-              <li>Glue Data Catalog e Crawlers.</li>
-              <li>Athena: SQL serverless com custo por TB.</li>
+              <li>SWEBOK V4: Quality, Models &amp; Methods, Professional Practice.</li>
+              <li>SEBoK: systems thinking, propriedades emergentes, SoS.</li>
+              <li>Confiabilidade como propriedade do sistema.</li>
+              <li>SDD como loop recorrente do curso.</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>O que ficou pronto no lab</h3>
+            <h3>Prática</h3>
             <ul>
-              <li>Dataset Olist em <code>raw/olist/</code>.</li>
-              <li>Database <code>olist_raw</code> no Glue.</li>
-              <li>9 tabelas catalogadas pelo Crawler.</li>
-              <li>Tabela <code>orders_parquet</code> em <code>trusted/</code>.</li>
-              <li>Comparativo de scan CSV vs Parquet.</li>
+              <li>Codespace funcionando.</li>
+              <li>OpenCode e Gemini autenticados.</li>
+              <li>Repo <code>olist-sre-pipeline</code> criado.</li>
+              <li>Spec <code>00_problem.md</code> comitada.</li>
+              <li>Pesquisa de guia de spec em andamento.</li>
             </ul>
           </article>
         </div>
@@ -868,33 +803,64 @@ WHERE order_status = 'delivered'
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 29 - FECHAMENTO PROXIMOS PASSOS                        -->
+    <!-- SLIDE 28 - PROXIMA AULA                                      -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Fechamento &middot; 2/2</span>
-          <h2 class="deck-title">Próximos passos e estudo</h2>
+          <h2 class="deck-title">Próxima aula — 30/04/2026</h2>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
-            <h3>Próxima aula — 30/04/2026</h3>
+            <h3>Aula 03 — RNFs como contrato</h3>
             <ul>
-              <li>Fontes de dados: relacionais e NoSQL.</li>
-              <li>Amazon RDS e DynamoDB.</li>
-              <li>Integração com o Data Lake via ingestão.</li>
-              <li>Modelagem tabular vs chave-valor.</li>
+              <li>ISO/IEC 25010 e qualidade mensurável.</li>
+              <li>SLI / SLO / SLA e error budget.</li>
+              <li>Utility tree priorizada para o Olist.</li>
+              <li>IA gera esqueleto de testes de SLO.</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>Estudo complementar</h3>
+            <h3>Tarefa até lá</h3>
             <ul>
-              <li>AWS Well-Architected — Analytics Lens.</li>
-              <li>Documentação S3: docs.aws.amazon.com/s3.</li>
-              <li>Apache Parquet whitepaper.</li>
-              <li>Athena Performance Tuning Guide.</li>
+              <li>Concluir a pesquisa do guia de spec.</li>
+              <li>Subir a ficha em <code>spec/research/</code>.</li>
+              <li>Ler um survey curto sobre ISO 25010.</li>
+              <li>Preparar 5 minutos de apresentação em grupo.</li>
             </ul>
           </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 29 - REFERENCIAS                                       -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Bibliografia</span>
+          <h2 class="deck-title">Referências e leituras</h2>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Primárias</strong>
+            <ul style="margin:0; padding-left:22px;">
+              <li>IEEE Computer Society. <em>SWEBOK V4</em> (2024).</li>
+              <li>BKCASE. <em>SEBoK — Guide to the Systems Engineering Body of Knowledge</em> (versão vigente).</li>
+              <li>GitHub. <em>Spec Kit</em> — repositório público de templates para SDD.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Complementares</strong>
+            <ul style="margin:0; padding-left:22px;">
+              <li>Mavin, A. <em>EARS — Easy Approach to Requirements Syntax</em>.</li>
+              <li>Robertson &amp; Robertson. <em>Mastering the Requirements Process</em>.</li>
+              <li>Beyer et al. <em>Site Reliability Engineering</em>, Google.</li>
+              <li>Starke &amp; Hruschka. <em>ARC42</em> (arc42.org).</li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
