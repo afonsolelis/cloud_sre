@@ -106,16 +106,15 @@ async function validateMaterial(browser) {
   const report = await page.evaluate(() => {
     const title = document.querySelector('h1')?.textContent.trim() || '(sem h1)';
     const sections = document.querySelectorAll('section.content-block').length;
-    const hasExercicios = /Exerc[ií]cios de fixa[çc][ãa]o/i.test(document.body.textContent);
     const links = Array.from(document.querySelectorAll('a')).map(a => ({ text: a.textContent.trim().slice(0, 40), href: a.getAttribute('href') }));
-    return { title, sections, hasExercicios, links, totalHeight: document.body.scrollHeight };
+    return { title, sections, links, totalHeight: document.body.scrollHeight };
   });
 
   const screenshotPath = path.join(OUT_DIR, 'material_full.png');
   await page.screenshot({ path: screenshotPath, fullPage: true });
   report.screenshot = path.relative(REPO, screenshotPath);
   report.consoleErrors = consoleErrors;
-  log(`Material: "${report.title}" | sections=${report.sections} | hasExerciciosFixacao=${report.hasExercicios} | totalHeight=${report.totalHeight}px`);
+  log(`Material: "${report.title}" | sections=${report.sections} | totalHeight=${report.totalHeight}px`);
   await page.close();
   return report;
 }
@@ -142,6 +141,5 @@ async function validateMaterial(browser) {
   log(`\nConsole errors in slides: ${slides.consoleErrors.length}`);
   slides.consoleErrors.forEach(e => log('  ', e));
   log(`Console errors in material: ${material.consoleErrors.length}`);
-  log(`Material has "Exercicios de fixacao" section: ${material.hasExercicios}`);
   log(`Material content blocks: ${material.sections}`);
 })().catch(e => { console.error(e); process.exit(1); });

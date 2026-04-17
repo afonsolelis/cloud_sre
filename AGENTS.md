@@ -19,7 +19,7 @@ This project has no build pipeline yet. Use simple local preview and validation 
 - `python3 -m http.server 8000`: serve the repository locally
 - `xdg-open http://localhost:8000/index.html` or open it manually in a browser
 - `rg --files aulas specs assets`: inspect repository files quickly
-- `rg -n "reveal.js|AWS Student|Exercícios de fixação|index.html" aulas`: verify required patterns
+- `rg -n "AWS Student|index.html" aulas`: verify required patterns
 
 ## Coding Style & Naming Conventions
 
@@ -29,7 +29,7 @@ Use HTML/CSS with 2-space indentation. Prefer ASCII unless the file already uses
 - Slides: `slide_aula_01_nome_da_aula.html`
 - Materials: `material_aula_01_nome_da_aula.html`
 
-Slides must use `reveal.js` and include: cover, `2026`, agenda, placeholder, material link, and index link. Materials must mirror slide topics, expand them with detailed explanation, include longer reflective text, provide step-by-step guidance where relevant, and end with `Exercícios de fixação`.
+Slides must use the HTML-native slide system and include: cover, `2026`, agenda, placeholder, material link, and index link. Materials must mirror slide topics, expand them with detailed explanation, include longer reflective text, provide step-by-step guidance where relevant, and close with instructions for the in-class hands-on activity. The course is 100% practical — no written exercises section.
 
 Every lesson runs from `19h00` to `22h00`: an initial theory block, then two practical hours using `AWS Student`.
 

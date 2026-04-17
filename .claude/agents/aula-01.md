@@ -43,5 +43,5 @@ Nesta aula apenas criamos a estrutura vazia de camadas. O dataset Olist entra na
 - Sistema de slides HTML nativo (`.slide-container`, `.slide`, `.deck-shell`)
 - Stylesheet: `../../../assets/slides.css` para slides, `../../../assets/styles.css` para material
 - Links de navegação obrigatórios em ambos os arquivos
-- Material obrigatoriamente termina com `Exercícios de fixação` (8 questões)
+- Material fecha com orientação para atividade prática em sala (curso 100% hands-on, sem exercícios escritos)
 - PT-BR com acentos corretos

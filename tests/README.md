@@ -67,7 +67,6 @@ npm run test:report
 - ✅ Slides usam reveal.js
 - ✅ Slides têm capa e agenda
 - ✅ Materiais têm título, data, resumo
-- ✅ Materiais têm seção "Exercícios de fixação"
 - ✅ Materiais têm link para slide e index
 - ✅ Nomes sem espaços ou hífens
 

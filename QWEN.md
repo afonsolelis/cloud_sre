@@ -88,7 +88,7 @@ Define regras de conteúdo e navegação obrigatória.
 - Devem espelhar tópicos do slide correspondente
 - Textos mais longos para reflexão e contextualização
 - Passo a passo para laboratórios e processos práticos
-- Seção obrigatória: "Exercícios de fixação"
+- Fechamento com orientação para atividade hands-on em sala (curso 100% prático, sem exercícios escritos)
 - Links obrigatórios: slide da aula + index.html
 
 ## Cronograma das Aulas
@@ -155,12 +155,12 @@ Agente, aplique o design system de specs/design_system.md neste componente
 
 ### Agente de Conteúdo de Aula (`repositorio_de_aulas.md`)
 
-**Quando acionar:** Para criação de slides, materiais de aula, conteúdo de laboratório, exercícios de fixação ou navegação entre páginas.
+**Quando acionar:** Para criação de slides, materiais de aula, conteúdo de laboratório ou navegação entre páginas.
 
 **Responsabilidades:**
-- Criar slides com estrutura reveal.js (capa, agenda, placeholder)
+- Criar slides com estrutura HTML nativa (capa, agenda, placeholder)
 - Desenvolver materiais com texto expandido e passo a passo de labs
-- Incluir seção "Exercícios de fixação" em todos os materiais
+- Fechar materiais com orientação para atividade hands-on em sala (curso 100% prático, sem exercícios escritos)
 - Adicionar links de navegação obrigatórios (slide ↔ material ↔ index)
 - Garantir que material espelhe e expanda o conteúdo do slide
 
@@ -188,7 +188,7 @@ Agente, crie o slide e material para a aula X conforme specs/repositorio_de_aula
 | `tests/specs/estrutura_curso.spec.ts` | `estrutura_curso.md` | Pastas (aula_, snake_case, 2 dígitos), Arquivos (slide_, material_, snake_case), Estrutura (slides/, material/), Estilo (fundo branco, texto preto) |
 | `tests/specs/design_system.spec.ts` | `design_system.md` | Cores (contraste, destaque), Tipografia (hierarquia, legibilidade), Espaçamento (padding uniforme), Bordas (máx 16px), Sombras (sutis), Navegação (hover, focus), Responsividade (viewport, mobile) |
 | `tests/specs/repositorio_de_aulas.spec.ts` | `repositorio_de_aulas.md` | **Slides:** reveal.js, capa (título+2026), agenda, placeholder, links (material, index), foco único, sem poluição |
-| | | **Materiais:** título, data, resumo, Exercícios de fixação, links (slide, index), passo a passo, textos longos |
+| | | **Materiais:** título, data, resumo, orientação hands-on, links (slide, index), passo a passo, textos longos |
 
 **Comandos disponíveis:**
 ```bash

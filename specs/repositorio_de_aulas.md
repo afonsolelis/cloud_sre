@@ -47,7 +47,6 @@ Organizar o conteúdo da disciplina em um repositório estático com uma página
   - título da aula;
   - data da aula;
   - resumo do conteúdo;
-  - seção final `Exercícios de fixação`;
   - link para o slide;
   - link de volta para `index.html`.
 
@@ -92,7 +91,7 @@ Organizar o conteúdo da disciplina em um repositório estático com uma página
 - Todo material deve conter link explícito para o slide da mesma aula.
 - Todo material deve conter link explícito de volta para `index.html`.
 - Esses links de navegação são obrigatórios e não devem ser omitidos em nenhuma aula.
-- A seção `Exercícios de fixação` continua obrigatória ao final do material.
+- O fechamento do material é orientação para a atividade prática em sala (Codespace, IA, AWS Student Lab). O curso é 100% prático — não há seção de exercícios escritos.
 
 ## Regras visuais iniciais
 

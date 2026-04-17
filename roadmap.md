@@ -212,7 +212,7 @@ Este loop é a tese do curso: **a qualidade da spec é a qualidade do sistema**.
 - Slides em `aulas/aula_xx_*/slides/`, materiais em `aulas/aula_xx_*/material/`.
 - Sistema de slides HTML-nativo (`assets/slides.css`).
 - Todo slide-deck tem capa + agenda + placeholder inicial + links para material e `index.html`.
-- Todo material termina em `Exercícios de fixação`.
+- Todo material encerra com orientação para a atividade hands-on em sala — o curso é 100% prático, não há seção de exercícios escritos.
 - Design system: fundo branco, texto preto, alta densidade, cantos retos, responsivo.
 
 As pastas de aula **não serão renomeadas** — o nome da pasta fica por conta da estrutura original; o conteúdo interno é que muda de foco.

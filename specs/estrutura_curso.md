@@ -88,13 +88,13 @@ ccsre_pratica/
 - Todo material deve conter link explícito para o slide da mesma aula.
 - Todo material deve conter link explícito de volta para `index.html`.
 - Os links de navegação do material são obrigatórios em todas as aulas.
-- A seção `Exercícios de fixação` ao final do material é obrigatória.
+- O curso é 100% prático — o material encerra com orientação para a atividade hands-on da aula (Codespace, IA, AWS Student Lab), não com exercícios escritos.
 
 ## Regras de Conteúdo
 
 - `index.html` deve listar todas as aulas com links para slide e material.
 - Cada slide deve conter título, data, resumo, link para o material e retorno ao índice.
-- Cada material deve conter título, data, resumo, link para o slide, retorno ao índice e a seção `Exercícios de fixação`.
+- Cada material deve conter título, data, resumo, link para o slide e retorno ao índice.
 
 ## Dinâmica obrigatória da aula
 

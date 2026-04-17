@@ -520,23 +520,6 @@ test.describe('Repositório de Aulas Spec', () => {
       }
     });
 
-    test('materiais devem ter seção Exercícios de fixação', async ({ aulasDir }) => {
-      const materialFiles = fsHelpers.getAllFiles(aulasDir).filter(f => f.includes('/material/'));
-      
-      for (const materialFile of materialFiles) {
-        const content = fsHelpers.readFileSync(materialFile);
-        const hasExercises = 
-          content.toLowerCase().includes('exercícios de fixação') ||
-          content.toLowerCase().includes('exercicios de fixação') ||
-          content.toLowerCase().includes('exercícios') ||
-          content.toLowerCase().includes('exercicios') ||
-          content.toLowerCase().includes('atividade') ||
-          content.toLowerCase().includes('prática');
-        
-        expect(hasExercises).toBeTruthy();
-      }
-    });
-
     test('materiais devem ter link para o slide da mesma aula', async ({ aulasDir }) => {
       const materialFiles = fsHelpers.getAllFiles(aulasDir).filter(f => f.includes('/material/'));
       

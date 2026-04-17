@@ -179,13 +179,6 @@ export const specValidators = {
       results.push({ pass: true, message: 'Has link to slide' });
     }
     
-    // Check for exercises section
-    if (!htmlHelpers.hasText(html, /Exercícios? de fixação/i)) {
-      results.push({ pass: false, message: 'Missing "Exercícios de fixação" section' });
-    } else {
-      results.push({ pass: true, message: 'Has "Exercícios de fixação" section' });
-    }
-    
     return results;
   },
 

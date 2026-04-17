@@ -47,7 +47,7 @@ Sempre consulte a pasta `specs/` como fonte da verdade:
 **Materiais de Apoio:**
 - Extensão, detalhamento e reflexão do conteúdo abordado no slide correspondente.
 - Passo a passo completo para os laboratórios/hands-on da AWS.
-- OBRIGATÓRIO contar com a seção `Exercícios de fixação` no final.
+- Fechamento com orientação para a atividade hands-on em sala (curso 100% prático, sem exercícios escritos).
 - Links explícitos obrigatórios: P/ `slide_aula_XX.html` e P/ `index.html`.
 
 ## Regras Visuais (Design System)

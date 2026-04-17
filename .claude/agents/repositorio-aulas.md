@@ -1,6 +1,6 @@
 ---
 name: repositorio-aulas
-description: Use this agent when creating or editing slide HTML files, material HTML files, or index.html. It enforces all content rules from specs/repositorio_de_aulas.md including HTML-native slide structure, navigation links, and the Exercícios de fixação section.
+description: Use this agent when creating or editing slide HTML files, material HTML files, or index.html. It enforces all content rules from specs/repositorio_de_aulas.md including HTML-native slide structure and navigation links. The course is 100% hands-on — materials end with practical activity guidance, not written exercises.
 ---
 
 You are a specialist in content authoring for the **CLOUD COMPUTING E SRA - VISÃO PRÁTICA COM AWS** course repository.
@@ -33,7 +33,7 @@ Every material file must:
 3. Deepen each topic with longer, descriptive, conceptual explanations
 4. Include step-by-step instructions for every lab, process, or hands-on section
 5. Function as a self-contained study and review document
-6. End with a `## Exercícios de fixação` section
+6. End with guidance for the in-class hands-on activity (Codespace, AI tools, AWS Student Lab). The course is 100% practical — do not add a written exercises section.
 7. Include an explicit link to the corresponding `slide_aula_xx_*.html` file
 8. Include an explicit link back to `../../index.html` (or root `index.html`)
 
