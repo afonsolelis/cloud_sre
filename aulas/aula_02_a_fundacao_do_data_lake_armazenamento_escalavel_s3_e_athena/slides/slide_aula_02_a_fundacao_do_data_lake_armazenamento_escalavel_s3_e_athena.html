@@ -770,72 +770,43 @@ gemini</pre>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 27 - RESUMO                                            -->
+    <!-- SLIDE 27 - RESUMO E PROXIMA AULA                             -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Fechamento &middot; 1/2</span>
-          <h2 class="deck-title">Resumo da aula</h2>
+          <span class="deck-kicker">Fechamento</span>
+          <h2 class="deck-title">Resumo e ponte para a Aula 03</h2>
+          <p class="deck-summary">O que levamos desta aula e o que precisa estar pronto em 30/04/2026.</p>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
-            <h3>Teoria</h3>
+            <h3>O que fica desta aula</h3>
             <ul>
               <li>SWEBOK V4: Quality, Models &amp; Methods, Professional Practice.</li>
               <li>SEBoK: systems thinking, propriedades emergentes, SoS.</li>
               <li>Confiabilidade como propriedade do sistema.</li>
-              <li>SDD como loop recorrente do curso.</li>
+              <li>Loop SDD instalado como rotina semanal.</li>
+              <li>Codespace com OpenCode e Gemini CLI operando.</li>
+              <li>Repo <code>olist-sre-pipeline</code> com <code>spec/00_problem.md</code> comitado.</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>Prática</h3>
-            <ul>
-              <li>Codespace funcionando.</li>
-              <li>OpenCode e Gemini autenticados.</li>
-              <li>Repo <code>olist-sre-pipeline</code> criado.</li>
-              <li>Spec <code>00_problem.md</code> comitada.</li>
-              <li>Pesquisa de guia de spec em andamento.</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 28 - PROXIMA AULA                                      -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Fechamento &middot; 2/2</span>
-          <h2 class="deck-title">Próxima aula — 30/04/2026</h2>
-        </div>
-        <div class="deck-grid">
-          <article class="deck-card">
-            <h3>Aula 03 — RNFs como contrato</h3>
+            <h3>Aula 03 — 30/04/2026 — RNFs como contrato</h3>
             <ul>
               <li>ISO/IEC 25010 e qualidade mensurável.</li>
               <li>SLI / SLO / SLA e error budget.</li>
               <li>Utility tree priorizada para o Olist.</li>
               <li>IA gera esqueleto de testes de SLO.</li>
             </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Tarefa até lá</h3>
-            <ul>
-              <li>Concluir a pesquisa do guia de spec.</li>
-              <li>Subir a ficha em <code>spec/research/</code>.</li>
-              <li>Ler um survey curto sobre ISO 25010.</li>
-              <li>Preparar 5 minutos de apresentação em grupo.</li>
-            </ul>
+            <p style="margin-top:10px;"><strong>Tarefa até lá:</strong> concluir a ficha em <code>spec/research/</code>, preparar 5 minutos de apresentação e ler survey curto sobre ISO 25010.</p>
           </article>
         </div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 29 - REFERENCIAS                                       -->
+    <!-- SLIDE 28 - REFERENCIAS                                       -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
@@ -860,6 +831,86 @@ gemini</pre>
               <li>Beyer et al. <em>Site Reliability Engineering</em>, Google.</li>
               <li>Starke &amp; Hruschka. <em>ARC42</em> (arc42.org).</li>
             </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 29 - HANDS-ON: ABRA O CODESPACE E INSTALE AS IAS       -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Hands-on em sala &middot; Agora</span>
+          <h2 class="deck-title">Abra o Codespace e instale as IAs</h2>
+          <p class="deck-summary">Agora é com vocês. Dez minutos para toda a turma estar com as duas IAs rodando no terminal.</p>
+        </div>
+        <div class="deck-callout">
+          <strong>Os três passos, em ordem</strong>
+          <pre style="background:#111; color:#f6f6f6; padding:18px; border-radius:6px; font-size:1.05rem; line-height:1.6; margin-top:12px; overflow-x:auto;"># 1) Abrir Codespace no repo olist-sre-pipeline
+#    github.com &rarr; repo &rarr; Code &rarr; Codespaces &rarr;
+#    Create codespace on main
+
+# 2) Instalar o OpenCode
+npm i -g opencode-ai@latest
+
+# 3) Instalar o Gemini CLI
+npm i -g @google/gemini-cli
+
+# Validar que as duas IAs estão vivas
+opencode --version
+gemini  --version
+
+# Abrir sessão interativa (autentica via OAuth no navegador)
+opencode
+gemini</pre>
+        </div>
+        <div class="deck-panel" style="margin-top:14px;">
+          <strong>Critério de pronto &middot; 10 min</strong>
+          <ul style="margin:0; padding-left:22px;">
+            <li>Codespace ativo e terminal aberto.</li>
+            <li><code>opencode</code> e <code>gemini</code> respondem a um <em>hello</em> curto.</li>
+            <li>Professor circula na sala para destravar autenticação.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 30 - HANDS-ON: BRAINSTORMING DO PROBLEMA OLIST COM IA  -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Hands-on em sala &middot; Fechamento</span>
+          <h2 class="deck-title">Brainstorming e modelagem do problema Olist com IA</h2>
+          <p class="deck-summary">Objetivo: cada grupo sai da aula com a primeira versão de <code>spec/00_problem.md</code> comitada no repo — construída em diálogo com as duas IAs.</p>
+        </div>
+        <div class="deck-callout">
+          <strong>Prompt inicial sugerido (adapte com sua voz)</strong>
+          <pre style="background:#111; color:#f6f6f6; padding:14px; border-radius:6px; font-size:.92rem; margin-top:10px; overflow-x:auto;">&gt; Estou modelando o problema de confiabilidade de um ETL
+&gt; Python que processa o dataset Olist Brazilian E-commerce.
+&gt; Me ajude a listar stakeholders, fluxos críticos, modos de
+&gt; falha e riscos emergentes usando a ótica do SEBoK
+&gt; (systems thinking + propriedades emergentes + SoS).
+&gt; Em seguida, critique sua própria resposta: o que ficou
+&gt; ambíguo? o que está faltando?</pre>
+        </div>
+        <div class="deck-columns" style="margin-top:12px;">
+          <div class="deck-panel">
+            <strong>Roteiro da atividade</strong>
+            <ol style="margin:0; padding-left:22px;">
+              <li>Rodar o prompt inicial no <code>opencode</code>.</li>
+              <li>Iterar: questionar suposições e pedir autocrítica.</li>
+              <li>Repetir o mesmo prompt no <code>gemini</code>.</li>
+              <li>Comparar divergências entre as duas saídas.</li>
+              <li>Consolidar em <code>spec/00_problem.md</code> e commitar.</li>
+            </ol>
+          </div>
+          <div class="deck-panel">
+            <strong>Regra de ouro do SDD</strong>
+            <p style="margin:8px 0 0;">A IA é ferramenta; o responsável pela qualidade da spec é você. Se algo soar certo demais, desconfie. Se algo soar vago, reescreva. A spec é contrato.</p>
           </div>
         </div>
       </div>
