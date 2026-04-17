@@ -464,6 +464,106 @@
       </section>
 
       <!-- ============================================================
+           O CASE DO CURSO — DASHBOARD ANALITICO DO OLIST
+      ============================================================= -->
+      <section class="content-block">
+        <h2>O case do curso &mdash; dashboard analítico do Olist</h2>
+        <p>
+          Antes de entrar no laboratório é preciso deixar explícito <em>para que</em> estamos modelando este pipeline.
+          A diretoria da Olist precisa tomar decisões de growth e operação baseadas em dados confiáveis. Hoje esses
+          dados existem, mas vivem espalhados em CSVs, em relatórios ad-hoc e em planilhas que ninguém assina. O
+          time de dados recebeu a missão de construir, ao longo das próximas sete aulas, um <strong>dashboard
+          analítico de referência</strong> &mdash; o entregável que a diretoria abre na segunda-feira de manhã
+          para decidir sobre preço, regiões de foco, qualidade de vendedores e campanhas de recompra.
+        </p>
+        <p>
+          O dashboard é o produto visível. Mas o que torna esse dashboard <strong>digno de produção</strong> é a
+          engenharia de confiabilidade que vive por trás dele. Um dashboard que às vezes está certo, que às vezes
+          está stale, que às vezes mostra receita duplicada por causa de um reprocesso mal feito &mdash; esse
+          dashboard vale menos que nenhum dashboard. A diretoria para de olhar, e a cadeia de decisão volta para
+          a planilha. O curso existe para evitar esse final.
+        </p>
+
+        <h3>Arquitetura conceitual do produto</h3>
+        <p>
+          A cadeia de valor é simples de descrever e, como todo sistema real, cheia de sutilezas quando se olha
+          de perto. Em texto:
+        </p>
+        <blockquote class="tip">
+          <strong>CSV Olist &rarr; ETL Python &rarr; Postgres &rarr; Grafana &rarr; Diretoria.</strong>
+        </blockquote>
+        <ul>
+          <li><strong>CSV Olist</strong> &mdash; dataset Brazilian E-commerce da Olist, cerca de 100 mil pedidos
+            históricos entre 2016 e 2018, distribuídos em nove arquivos. Fonte fora do nosso controle; precisa
+            ser tratada como entrada não confiável.</li>
+          <li><strong>ETL Python</strong> &mdash; pipeline que extrai, valida, transforma e carrega os dados. Deve
+            ser idempotente (reexecução não duplica), observável (toda execução emite métricas e logs) e resiliente
+            (falha transitória da fonte não derruba o ciclo).</li>
+          <li><strong>Postgres</strong> &mdash; banco analítico que guarda o modelo dimensional mínimo consumido
+            pelo dashboard. Contrato de dados estável; breaking changes exigem versionamento explícito.</li>
+          <li><strong>Grafana</strong> &mdash; camada de apresentação. É o que a diretoria enxerga, e portanto
+            onde os SLOs de disponibilidade e frescor se materializam.</li>
+          <li><strong>Diretoria</strong> &mdash; consumidor final. É a stakeholder cuja confiança o sistema precisa
+            ganhar e manter.</li>
+        </ul>
+
+        <h3>Perguntas que o dashboard precisa responder</h3>
+        <p>
+          A diretoria não quer "um dashboard". Ela quer respostas para perguntas específicas de negócio. Cada uma
+          delas é, simultaneamente, um requisito funcional do produto e um driver de decisão de modelagem de dados.
+          Sua spec deve começar por aqui:
+        </p>
+        <table>
+          <thead>
+            <tr><th>#</th><th>Pergunta de negócio</th><th>Eixo de decisão</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>Receita mensal e sua tendência &mdash; total, por estado, por categoria, por vendedor.</td><td>Growth e forecasting</td></tr>
+            <tr><td>2</td><td>Volume de pedidos por status (delivered, shipped, canceled, unavailable).</td><td>Operação</td></tr>
+            <tr><td>3</td><td>Tempo médio de entrega versus SLA prometido &mdash; onde estamos atrasando?</td><td>Logística e SLA</td></tr>
+            <tr><td>4</td><td>Score de avaliação por vendedor e por categoria &mdash; quem está arrastando o NPS?</td><td>Qualidade de marketplace</td></tr>
+            <tr><td>5</td><td>Top produtos e top categorias por receita e por volume.</td><td>Portfólio e sortimento</td></tr>
+            <tr><td>6</td><td>Análise geográfica: concentração por estado, cobertura por CEP.</td><td>Expansão regional</td></tr>
+            <tr><td>7</td><td>Métodos de pagamento e taxa de parcelamento.</td><td>Financeiro e crédito</td></tr>
+            <tr><td>8</td><td>Taxa de recompra e comportamento de clientes.</td><td>Retenção e CRM</td></tr>
+          </tbody>
+        </table>
+
+        <h3>O ângulo SRE &mdash; quatro SLOs informais</h3>
+        <p>
+          O que torna este case um exercício de SRE, e não apenas de BI, é o compromisso com propriedades
+          sistêmicas declaradas. Este curso adota, desde já, quatro SLOs informais que serão refinados e
+          formalizados na Aula 03.
+        </p>
+        <div class="tip">
+          <strong>SLOs informais do produto</strong>
+          <ul>
+            <li><strong>Frescor:</strong> os dados do dia anterior estão no dashboard até as 06h00 de todo dia útil.</li>
+            <li><strong>Disponibilidade:</strong> o dashboard Grafana responde corretamente durante o horário comercial
+              (08h00 &ndash; 20h00).</li>
+            <li><strong>Completude e unicidade:</strong> zero duplicatas e zero gaps entre execuções &mdash; cada
+              pedido da fonte aparece exatamente uma vez na base.</li>
+            <li><strong>MTTR:</strong> o pipeline se recupera sozinho de falhas transitórias da fonte de dados, sem
+              intervenção humana, dentro de uma janela aceitável.</li>
+          </ul>
+        </div>
+
+        <h3>Fechamento &mdash; este case é o input da modelagem com IA</h3>
+        <p>
+          Este case é o <strong>norte</strong> do curso. Ao final da Aula 08, o dashboard está no ar, com SLOs
+          declarados, testado sob chaos e defendido via ATAM. Toda decisão de modelagem que você tomar em diálogo
+          com as IAs (OpenCode e Gemini) nesta aula &mdash; e em todas as aulas seguintes &mdash; deve ser
+          rastreada até as oito perguntas de negócio acima e até os quatro SLOs deste bloco.
+        </p>
+        <p>
+          A primeira versão de <code>spec/00_problem.md</code> que você escreverá no laboratório de hoje deve
+          refletir a sua compreensão deste case &mdash; não um recorte genérico de "pipeline de dados". Stakeholders,
+          fluxos críticos, modos de falha e propriedades emergentes alvo só fazem sentido quando ancorados no
+          produto concreto que vocês vão entregar para a diretoria da Olist.
+        </p>
+      </section>
+
+      <!-- ============================================================
            MODULO 6 — LABORATORIO
       ============================================================= -->
       <section class="content-block">

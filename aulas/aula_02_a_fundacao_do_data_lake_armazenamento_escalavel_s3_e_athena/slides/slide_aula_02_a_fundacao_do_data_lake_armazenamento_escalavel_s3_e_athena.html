@@ -568,6 +568,96 @@
     </div>
 
     <!-- ============================================================ -->
+    <!-- SLIDE NOVO A - O CASE: DASHBOARD ANALITICO DO OLIST          -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Case do curso</span>
+          <h2 class="deck-title">O que vamos construir juntos até a Aula 08</h2>
+          <p class="deck-summary">A diretoria da Olist precisa tomar decisões de growth e operação baseadas em dados confiáveis. Ao longo das aulas 02 &ndash; 08, a turma entrega um dashboard Grafana alimentado por um pipeline Python. SRE é o que torna isso digno de produção.</p>
+        </div>
+        <div class="deck-grid" style="grid-template-columns: repeat(4, 1fr); gap:10px;">
+          <article class="deck-card">
+            <h3>1. CSV Olist</h3>
+            <ul>
+              <li>Dataset Brazilian E-commerce</li>
+              <li>~100k pedidos históricos</li>
+              <li>Fonte fora do nosso controle</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>2. ETL Python</h3>
+            <ul>
+              <li>Extração, transformação, carga</li>
+              <li>Idempotente e observável</li>
+              <li>Orquestrado em EC2</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>3. Postgres</h3>
+            <ul>
+              <li>Banco analítico</li>
+              <li>Modelo dimensional mínimo</li>
+              <li>Contrato de dados estável</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>4. Grafana &rarr; Diretoria</h3>
+            <ul>
+              <li>Entregável visível ao negócio</li>
+              <li>KPIs de growth e operação</li>
+              <li>SLOs de frescor e disponibilidade</li>
+            </ul>
+          </article>
+        </div>
+        <div class="deck-panel" style="margin-top:14px;">
+          <strong>O ângulo SRE &mdash; por que isso é mais do que BI</strong>
+          <ul style="margin:6px 0 0; padding-left:22px;">
+            <li><strong>Frescor:</strong> dados prontos todo dia às 06h (SLO de frescor).</li>
+            <li><strong>Disponibilidade:</strong> dashboard no ar durante o horário comercial.</li>
+            <li><strong>Completude/Unicidade:</strong> zero duplicatas e zero gaps entre execuções.</li>
+            <li><strong>MTTR:</strong> pipeline se recupera sozinho de falhas transitórias da fonte.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE NOVO B - PERGUNTAS QUE O DASHBOARD PRECISA RESPONDER   -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Case do curso</span>
+          <h2 class="deck-title">O que a diretoria quer ver</h2>
+          <p class="deck-summary">O dashboard Grafana precisa responder a estas perguntas de negócio. Elas são o input do problema e, portanto, o input da modelagem com IA.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Growth e receita</strong>
+            <ul style="margin:0; padding-left:22px;">
+              <li>Receita mensal e tendência &mdash; total, por estado, por categoria, por vendedor.</li>
+              <li>Top produtos e categorias por receita e volume.</li>
+              <li>Métodos de pagamento e taxa de parcelamento.</li>
+              <li>Taxa de recompra e comportamento de clientes.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Operação e qualidade</strong>
+            <ul style="margin:0; padding-left:22px;">
+              <li>Volume de pedidos por status (delivered, shipped, canceled, unavailable).</li>
+              <li>Tempo médio de entrega vs SLA prometido &mdash; onde estamos atrasando?</li>
+              <li>Score de avaliação por vendedor e categoria &mdash; quem está arrastando o NPS?</li>
+              <li>Análise geográfica: concentração por estado, cobertura por CEP.</li>
+            </ul>
+          </div>
+        </div>
+        <p style="margin-top:14px;"><em>Suas decisões de modelagem na IA devem começar aqui. O problema tem forma porque o produto tem forma.</em></p>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
     <!-- SLIDE 20 - TRANSICAO PARA A PRATICA                          -->
     <!-- ============================================================ -->
     <div class="slide">
