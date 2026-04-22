@@ -4,57 +4,55 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" />
-  <title>Aula 08 &mdash; Seguranca de Dados, FinOps e Projeto Final Integrado</title>
+  <title>Aula 08 — Segurança de dados, FinOps e projeto final integrado</title>
   <link href="../../../assets/slides.css" rel="stylesheet">
-  <style data-design-tokens>:root{--bg:#fff;--color:#000000}body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}a:hover{opacity:.8}a:focus{outline:2px solid #000000}</style>
 </head>
 <body>
   <div class="slide-container">
 
     <!-- ============================================================ -->
-    <!-- SLIDE 1 - CAPA                                                -->
+    <!-- SLIDE 1 - CAPA                                               -->
     <!-- ============================================================ -->
     <div class="slide">
-      <div class="deck-shell">
+      <div class="deck-shell" data-aula-number="08">
         <div>
           <img class="deck-logo-full" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_e4vyyw.png" alt="Universidade Presbiteriana Mackenzie" />
-          <span class="deck-kicker">Cloud Computing e SRA &mdash; MBA Engenharia de Dados</span>
-          <h1 class="deck-title">Seguranca de Dados, FinOps e Projeto Final Integrado</h1>
+          <span class="deck-kicker">Cloud Computing e SRE &middot; MBA Engenharia de Dados</span>
+          <h1 class="deck-title">Segurança de dados, FinOps e projeto final integrado</h1>
           <p class="deck-meta">Aula 08 &nbsp;&bull;&nbsp; 11/06/2026 &nbsp;&bull;&nbsp; 19h00 &ndash; 22h00</p>
           <p class="deck-year">2026</p>
-          <p class="deck-subtitle">Fechamento do semestre: proteger o pipeline Olist, otimizar custos e entregar o projeto final integrado.</p>
+          <p class="deck-subtitle">Fechamento: criptografia, privilégio mínimo, previsibilidade de custo e defesa do projeto integrado Olist.</p>
         </div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 2 - AGENDA                                              -->
+    <!-- SLIDE 2 - AGENDA                                             -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Agenda</span>
-          <h2 class="deck-title">O que vai acontecer na ultima aula</h2>
+          <h2 class="deck-title">O que vai acontecer nesta aula</h2>
+          <p class="deck-summary">Conteúdo em construção. Esta seção será refinada antes de 11/06/2026.</p>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
             <h3>19h00 &ndash; 20h30 &middot; Teoria</h3>
             <ul>
-              <li>Recap do pipeline Olist (Aulas 02 a 07).</li>
-              <li>Seguranca: responsabilidade compartilhada, KMS, TLS, IAM, bucket policies.</li>
-              <li>LGPD, PII, Macie, mascaramento e classificacao de sensibilidade.</li>
-              <li>FinOps: 3 principios, storage classes, lifecycle, tags e Budgets.</li>
-              <li>5 Rs aplicados a plataforma analitica, OKRs de dados e CAPEX&rarr;OPEX.</li>
+              <li>TODO &mdash; segurança de dados: criptografia, IAM e LGPD.</li>
+              <li>TODO &mdash; FinOps aplicado a plataformas analíticas.</li>
+              <li>TODO &mdash; 5 Rs reinterpretados para dados.</li>
+              <li>TODO &mdash; OKRs e KPIs de uma plataforma de dados.</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>20h30 &ndash; 22h00 &middot; Pratica + Projeto</h3>
+            <h3>20h30 &ndash; 22h00 &middot; Prática</h3>
             <ul>
-              <li>Bucket policy TLS-only e SSE-KMS no bucket refined.</li>
-              <li>S3 Lifecycle para a camada raw de streaming.</li>
-              <li>Cost allocation tags e estimativa no Pricing Calculator.</li>
-              <li>Apresentacao do Projeto Final Integrado (duplas).</li>
-              <li>Cleanup dos recursos do Learner Lab e encerramento.</li>
+              <li>TODO &mdash; hardening do bucket Refined com SSE-KMS e TLS.</li>
+              <li>TODO &mdash; lifecycle S3 e tags de alocação de custo.</li>
+              <li>TODO &mdash; Cost Explorer e Pricing Calculator.</li>
+              <li>TODO &mdash; apresentação do projeto final integrado Olist.</li>
             </ul>
           </article>
         </div>
@@ -62,279 +60,94 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 3 - PLACEHOLDER / ONDE ESTAMOS                          -->
+    <!-- SLIDE 3 - EM CONSTRUCAO                                      -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Ponto de partida</span>
-          <h2 class="deck-title">Onde estamos no curso</h2>
-          <p class="deck-summary">Esta e a oitava e ultima aula. Ja construimos o pipeline Olist ponta a ponta. Hoje fechamos com seguranca, custo e entrega do projeto final.</p>
-        </div>
-        <div class="deck-placeholder">
-          <div class="deck-panel">
-            <strong>Objetivos de aprendizagem</strong>
-            <ul>
-              <li>Aplicar criptografia at-rest e in-transit em um Data Lake.</li>
-              <li>Reduzir custo com storage classes, lifecycle e tags.</li>
-              <li>Mapear a plataforma analitica aos 5 Rs de migracao.</li>
-              <li>Traduzir decisoes tecnicas em OKRs de dados.</li>
-              <li>Apresentar o Projeto Final Integrado em dupla.</li>
-            </ul>
-          </div>
-          <div class="deck-panel">
-            <strong>Entregaveis de hoje</strong>
-            <ul>
-              <li>Bucket refined TLS-only com SSE-KMS.</li>
-              <li>Lifecycle rule ativa em raw/streaming/.</li>
-              <li>Tag Project=Olist aplicada aos recursos.</li>
-              <li>Estimativa mensal no Pricing Calculator.</li>
-              <li>Dashboard ou notebook com 6 KPIs Olist.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 4 - RECAP DO SEMESTRE                                   -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Recap &middot; Semestre inteiro</span>
-          <h2 class="deck-title">O pipeline Olist de ponta a ponta</h2>
-          <p class="deck-summary">Em 8 aulas, construimos uma plataforma analitica completa sobre AWS. Cada aula adicionou uma camada; hoje envolvemos tudo em seguranca e FinOps.</p>
-        </div>
-        <table class="deck-table">
-          <thead>
-            <tr><th>Aula</th><th>Tema</th><th>Servico AWS central</th><th>Camada Olist</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>01</td><td>Fundamentos + IAM</td><td>IAM, S3</td><td>Conta, grupos, buckets</td></tr>
-            <tr><td>02</td><td>Data Lake serverless</td><td>S3, Athena</td><td>raw / trusted / refined</td></tr>
-            <tr><td>03</td><td>Fontes relacionais e NoSQL</td><td>RDS, DynamoDB</td><td>orders, customers, reviews</td></tr>
-            <tr><td>04</td><td>Streaming near real-time</td><td>Kinesis, Lambda</td><td>raw/streaming/</td></tr>
-            <tr><td>05</td><td>ETL serverless + catalogo</td><td>Glue, Step Functions</td><td>trusted particionado</td></tr>
-            <tr><td>06</td><td>Data Warehouse analitico</td><td>Redshift / Athena + Iceberg</td><td>refined modelado</td></tr>
-            <tr><td>07</td><td>Data Reliability e SRE</td><td>CloudWatch, SLO, DQ</td><td>qualidade e observabilidade</td></tr>
-            <tr><td>08</td><td>Seguranca + FinOps + Projeto</td><td>KMS, Macie, Cost Explorer</td><td>plataforma protegida</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 5 - RESPONSABILIDADE COMPARTILHADA                      -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Bloco 1 &middot; Seguranca</span>
-          <h2 class="deck-title">Modelo de responsabilidade compartilhada</h2>
-          <p class="deck-summary">A AWS protege a nuvem. Voce protege o que coloca nela. Em plataforma de dados isso significa: classificacao, chaves, permissoes, redes e monitoramento.</p>
-        </div>
-        <div class="deck-columns">
-          <div class="deck-panel">
-            <strong>AWS (security OF the cloud)</strong>
-            <ul>
-              <li>Datacenters, hardware e virtualizacao.</li>
-              <li>Rede fisica, energia e resiliencia regional.</li>
-              <li>Servicos gerenciados ate o plano de controle.</li>
-              <li>Patches de hypervisor e firmware.</li>
-            </ul>
-          </div>
-          <div class="deck-panel">
-            <strong>Voce (security IN the cloud)</strong>
-            <ul>
-              <li>Classificacao e criptografia dos dados.</li>
-              <li>IAM users, groups, roles e policies.</li>
-              <li>Configuracao de S3, Glue, Redshift, VPC.</li>
-              <li>Logs, CloudTrail, monitoria e resposta a incidente.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 6 - CRIPTOGRAFIA AT-REST: OPCOES                        -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Seguranca &middot; Criptografia at-rest</span>
-          <h2 class="deck-title">SSE-S3 vs SSE-KMS vs SSE-C</h2>
-          <p class="deck-summary">Todo bucket novo ja vem com criptografia. A questao e quem controla a chave e qual o nivel de auditoria.</p>
-        </div>
-        <table class="deck-table">
-          <thead>
-            <tr><th>Opcao</th><th>Quem gerencia a chave</th><th>Auditoria</th><th>Custo</th><th>Quando usar</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>SSE-S3</td><td>AWS (AES-256 interno)</td><td>Baixa</td><td>Incluso</td><td>Dados publicos ou pouco sensiveis</td></tr>
-            <tr><td>SSE-KMS (aws/s3)</td><td>AWS managed no KMS</td><td>CloudTrail + KMS</td><td>USD 0,03/10k requisicoes</td><td>Padrao corporativo recomendado</td></tr>
-            <tr><td>SSE-KMS (CMK)</td><td>Voce (Customer Managed Key)</td><td>Total + politica de chave</td><td>USD 1/mes por chave + API</td><td>Dados sensiveis, LGPD, isolamento multi-conta</td></tr>
-            <tr><td>SSE-C</td><td>Voce fornece a chave em cada request</td><td>Voce</td><td>Incluso</td><td>Raro: compliance que proibe chave na AWS</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 7 - AWS KMS: ENVELOPE ENCRYPTION                        -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Seguranca &middot; KMS</span>
-          <h2 class="deck-title">AWS KMS e envelope encryption</h2>
-          <p class="deck-summary">A CMK nunca sai do modulo HSM. Ela criptografa uma chave de dados (DEK) que criptografa o objeto. Assim escala para bilhoes de objetos.</p>
+          <span class="deck-kicker">Status &middot; Placeholder</span>
+          <h2 class="deck-title">Aula em construção</h2>
+          <p class="deck-summary">Este deck é um esqueleto no novo design system. O conteúdo será preenchido incrementalmente nas próximas semanas.</p>
         </div>
         <div class="deck-callout">
-          <strong>Fluxo resumido</strong>
-          <ol style="margin:12px 0 0; padding-left:22px;">
-            <li>S3 pede a KMS uma Data Encryption Key (DEK) nova.</li>
-            <li>KMS retorna a DEK em claro + DEK criptografada pela CMK.</li>
-            <li>S3 criptografa o objeto com a DEK em claro e descarta a DEK.</li>
-            <li>A DEK criptografada e guardada junto ao objeto.</li>
-            <li>Para ler, S3 chama kms:Decrypt e recebe a DEK de volta.</li>
-          </ol>
-        </div>
-        <div class="deck-columns">
-          <div class="deck-panel">
-            <strong>Boas praticas</strong>
-            <ul>
-              <li>Rotacao automatica anual na CMK.</li>
-              <li>Key policy + IAM policy + (opcional) grants.</li>
-              <li>Alias descritivo: alias/olist-refined.</li>
-            </ul>
-          </div>
-          <div class="deck-panel">
-            <strong>Cuidados</strong>
-            <ul>
-              <li>Deletar CMK = perder os dados. Use pending deletion 30 dias.</li>
-              <li>CloudTrail Data Events para operacoes KMS.</li>
-              <li>Cross-account: chave explicita na key policy.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 8 - CRIPTOGRAFIA IN-TRANSIT                             -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Seguranca &middot; Em transito</span>
-          <h2 class="deck-title">TLS 1.2+ e VPC endpoints</h2>
-          <p class="deck-summary">Dado em repouso criptografado nao adianta se trafega em HTTP. A politica do bucket deve forcar TLS.</p>
-        </div>
-        <div class="deck-columns">
-          <div class="deck-panel">
-            <strong>TLS em todo acesso</strong>
-            <ul>
-              <li>Condicao aws:SecureTransport=false &rarr; Deny.</li>
-              <li>Endpoints S3 so aceitam TLS 1.2+ desde 2023.</li>
-              <li>Clientes antigos: atualizar SDK.</li>
-            </ul>
-          </div>
-          <div class="deck-panel">
-            <strong>VPC endpoints (gateway / interface)</strong>
-            <ul>
-              <li>Trafego S3 sem sair da rede AWS.</li>
-              <li>Reduz custo de NAT e de egress.</li>
-              <li>Policy de endpoint limita quais buckets.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 9 - IAM BEST PRACTICES                                  -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Seguranca &middot; IAM</span>
-          <h2 class="deck-title">Menor privilegio e permission boundaries</h2>
-          <p class="deck-summary">O erro mais comum em Data Lake corporativo e IAM permissivo demais. Regras simples evitam 80% dos incidentes.</p>
-        </div>
-        <div class="deck-grid">
-          <article class="deck-card">
-            <h3>Principios</h3>
-            <ul>
-              <li>Nunca usar root para tarefa do dia.</li>
-              <li>Um role por servico (Glue, Lambda, EMR).</li>
-              <li>Nada de access keys em codigo.</li>
-              <li>MFA em usuarios humanos.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Ferramentas</h3>
-            <ul>
-              <li>Permission boundary limita o teto do role.</li>
-              <li>SCPs no Organizations definem politicas globais.</li>
-              <li>IAM Access Analyzer identifica excessos.</li>
-              <li>Credential Report auditivel.</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 10 - BUCKET POLICY E BLOCK PUBLIC ACCESS                -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Seguranca &middot; S3</span>
-          <h2 class="deck-title">Bucket policy e Block Public Access</h2>
-          <p class="deck-summary">A politica do bucket e a ultima linha de defesa. Combinada com Block Public Access (nivel conta) elimina a classe de incidente de bucket aberto.</p>
-        </div>
-        <div class="deck-callout">
-          <strong>Padrao para o bucket refined do Olist</strong>
-          <ul style="margin:10px 0 0; padding-left:22px;">
-            <li>Deny de qualquer acao com aws:SecureTransport=false.</li>
-            <li>Deny de PutObject sem SSE-KMS.</li>
-            <li>Permitir so principals da conta e roles nomeados.</li>
-            <li>Block Public Access ligado em conta e em bucket.</li>
+          <strong>O que já está definido</strong>
+          <ul>
+            <li>Tema central: entregar o pipeline Olist com segurança, previsibilidade de custo e KPIs de negócio.</li>
+            <li>Datas e duração: 11/06/2026, 19h00 &ndash; 22h00.</li>
+            <li>Posição no arco do curso: Aula 08 de 8 &mdash; última aula.</li>
+            <li>Pré-requisitos: pipeline completo construído ao longo das Aulas 01 a 07.</li>
           </ul>
         </div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 11 - MASKING, TOKENIZACAO E MACIE                       -->
+    <!-- SLIDE 4 - PLACEHOLDER TEORIA (TABELA)                        -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Seguranca &middot; PII</span>
-          <h2 class="deck-title">Mascaramento, tokenizacao e AWS Macie</h2>
-          <p class="deck-summary">O dataset Olist contem CPF, CEP e nomes. Proteger PII nao e opcional: LGPD trata isso como obrigacao legal.</p>
+          <span class="deck-kicker">Teoria &middot; Placeholder</span>
+          <h2 class="deck-title">Checklist de segurança do pipeline em uma tabela</h2>
+          <p class="deck-summary">Estrutura de tabela editorial que será preenchida com controles, serviços e evidências.</p>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr>
+              <th>Camada</th>
+              <th>Controle</th>
+              <th>Serviço AWS</th>
+              <th>Evidência esperada</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Identidade</td><td>TODO</td><td>TODO</td><td>TODO</td></tr>
+            <tr><td>Rede</td><td>TODO</td><td>TODO</td><td>TODO</td></tr>
+            <tr><td>Criptografia at-rest</td><td>TODO</td><td>TODO</td><td>TODO</td></tr>
+            <tr><td>Criptografia in-transit</td><td>TODO</td><td>TODO</td><td>TODO</td></tr>
+            <tr><td>Classificação &amp; LGPD</td><td>TODO</td><td>TODO</td><td>TODO</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 5 - PLACEHOLDER TEORIA (GRID DE CARDS)                 -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Placeholder</span>
+          <h2 class="deck-title">Quatro práticas FinOps essenciais</h2>
+          <p class="deck-summary">Grid de cards que será preenchido com exemplos reais aplicados ao pipeline Olist.</p>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
-            <h3>Tecnicas</h3>
+            <h3>Inform</h3>
             <ul>
-              <li><strong>Masking:</strong> substitui por asterisco. Irreversivel.</li>
-              <li><strong>Tokenizacao:</strong> substitui por token mapeado em cofre.</li>
-              <li><strong>Hash:</strong> SHA-256 com salt para chaves.</li>
-              <li><strong>Redaction:</strong> remove completamente o campo.</li>
+              <li>TODO &mdash; visibilidade de custo por serviço e tag.</li>
+              <li>TODO &mdash; Cost Explorer e Budgets.</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>AWS Macie</h3>
+            <h3>Optimize</h3>
             <ul>
-              <li>Escaneia buckets S3 por PII automaticamente.</li>
-              <li>ML identifica CPF, cartao, nome, email.</li>
-              <li>Gera findings via EventBridge.</li>
-              <li>Custo por GB escaneado: planejar por amostragem.</li>
+              <li>TODO &mdash; storage classes e lifecycle S3.</li>
+              <li>TODO &mdash; particionamento e compressão no Athena.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Operate</h3>
+            <ul>
+              <li>TODO &mdash; ritual de revisão de custo.</li>
+              <li>TODO &mdash; alertas e budgets automáticos.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>5 Rs para dados</h3>
+            <ul>
+              <li>TODO &mdash; rehost, refactor, rearchitect.</li>
+              <li>TODO &mdash; rebuild e replace no contexto analítico.</li>
             </ul>
           </article>
         </div>
@@ -342,33 +155,30 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 12 - LGPD: PRINCIPIOS                                   -->
+    <!-- SLIDE 6 - PLACEHOLDER TEORIA (2 COLUNAS)                     -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Seguranca &middot; LGPD</span>
-          <h2 class="deck-title">LGPD: principios e bases legais</h2>
-          <p class="deck-summary">Lei 13.709/2018. Regula o tratamento de dados pessoais no Brasil. Engenheiro de dados e parte do operador.</p>
+          <span class="deck-kicker">Teoria &middot; Placeholder</span>
+          <h2 class="deck-title">Prevenção vs detecção &mdash; onde investir</h2>
+          <p class="deck-summary">Duas colunas comparando controles preventivos e detectivos no pipeline de dados.</p>
         </div>
         <div class="deck-columns">
           <div class="deck-panel">
-            <strong>10 principios do Art. 6</strong>
+            <strong>Prevenção</strong>
             <ul>
-              <li>Finalidade, adequacao, necessidade.</li>
-              <li>Livre acesso, qualidade, transparencia.</li>
-              <li>Seguranca, prevencao, nao discriminacao.</li>
-              <li>Responsabilizacao e prestacao de contas.</li>
+              <li>TODO &mdash; IAM com menor privilégio e permission boundaries.</li>
+              <li>TODO &mdash; bucket policies, Block Public Access, SCPs.</li>
+              <li>TODO &mdash; criptografia obrigatória (SSE-KMS, TLS).</li>
             </ul>
           </div>
           <div class="deck-panel">
-            <strong>Bases legais (Art. 7)</strong>
+            <strong>Detecção</strong>
             <ul>
-              <li>Consentimento do titular.</li>
-              <li>Cumprimento de obrigacao legal.</li>
-              <li>Execucao de contrato.</li>
-              <li>Legitimo interesse (com teste).</li>
-              <li>Protecao ao credito.</li>
+              <li>TODO &mdash; CloudTrail, GuardDuty, Config.</li>
+              <li>TODO &mdash; Macie para PII no Data Lake.</li>
+              <li>TODO &mdash; alertas de custo e de comportamento anômalo.</li>
             </ul>
           </div>
         </div>
@@ -376,729 +186,56 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 13 - LGPD NO PIPELINE                                   -->
+    <!-- SLIDE 7 - PLACEHOLDER PRATICA                                -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Seguranca &middot; LGPD operacional</span>
-          <h2 class="deck-title">Impactos da LGPD no pipeline Olist</h2>
-          <p class="deck-summary">Direito ao esquecimento, portabilidade e revogacao do consentimento forcam o pipeline a ser reversivel e rastreavel.</p>
-        </div>
-        <table class="deck-table">
-          <thead>
-            <tr><th>Direito do titular</th><th>Impacto tecnico</th><th>Como o pipeline atende</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Confirmacao e acesso</td><td>Localizar registros de um titular</td><td>Tabela indice por hash(cpf) no catalogo</td></tr>
-            <tr><td>Correcao</td><td>Atualizar em todas as camadas</td><td>Reprocessar trusted e refined a partir de raw</td></tr>
-            <tr><td>Anonimizacao / eliminacao</td><td>Apagar em raw, trusted e refined</td><td>Job Glue com lista de IDs, Iceberg facilita</td></tr>
-            <tr><td>Portabilidade</td><td>Exportar em formato aberto</td><td>Export CSV/Parquet assinado em S3 temporario</td></tr>
-            <tr><td>Revogacao de consentimento</td><td>Flag na fonte se propaga</td><td>CDC + filtro consent_flag=true em todo SQL</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 14 - CATALOGO COM CLASSIFICACAO                         -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Seguranca &middot; Governanca</span>
-          <h2 class="deck-title">Catalogo com classificacao de sensibilidade</h2>
-          <p class="deck-summary">O Glue Data Catalog aceita tags e descricoes por coluna. Classificar e pre-requisito para controlar acesso por dado.</p>
-        </div>
-        <table class="deck-table">
-          <thead>
-            <tr><th>Nivel</th><th>Exemplos no Olist</th><th>Controle</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Publico</td><td>product_category, state</td><td>Read amplo via Athena</td></tr>
-            <tr><td>Interno</td><td>price, freight_value</td><td>Role analytics-read</td></tr>
-            <tr><td>Confidencial</td><td>seller_id, review_comment</td><td>Lake Formation column-level</td></tr>
-            <tr><td>Restrito (PII)</td><td>customer_zip_prefix, customer_unique_id</td><td>Mascarado ou hashed</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 15 - FINOPS: 3 PRINCIPIOS                               -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Bloco 2 &middot; FinOps</span>
-          <h2 class="deck-title">Os 3 principios do FinOps</h2>
-          <p class="deck-summary">FinOps Foundation: cultura operacional de co-responsabilidade financeira entre Engenharia, Financeiro e Negocio.</p>
-        </div>
-        <div class="deck-grid">
-          <article class="deck-card">
-            <h3>1. Inform</h3>
-            <ul>
-              <li>Visibilidade de custo por time, produto, ambiente.</li>
-              <li>Cost allocation tags + Cost Explorer.</li>
-              <li>Showback e chargeback.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>2. Optimize</h3>
-            <ul>
-              <li>Right-sizing de Redshift, RDS, Glue DPUs.</li>
-              <li>Lifecycle em S3, compressao Parquet.</li>
-              <li>Savings Plans e Reserved Capacity.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>3. Operate</h3>
-            <ul>
-              <li>Budgets com alerta em 50/80/100%.</li>
-              <li>Revisao mensal de anomalias.</li>
-              <li>Cultura de custo como metrica de engenharia.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Anti-padroes</h3>
-            <ul>
-              <li>Cluster Redshift sempre ligado em dev.</li>
-              <li>Athena sobre CSV sem particionamento.</li>
-              <li>Buckets sem lifecycle acumulando raw eterno.</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 16 - CUSTO POR SERVICO                                  -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">FinOps &middot; Unidades de custo</span>
-          <h2 class="deck-title">Como cada servico cobra</h2>
-          <p class="deck-summary">Conhecer a unidade (TB, DPU, ms-GB, GB-mes) muda decisoes de arquitetura.</p>
-        </div>
-        <table class="deck-table">
-          <thead>
-            <tr><th>Servico</th><th>Unidade</th><th>Ordem de grandeza (us-east-1)</th><th>Alavanca principal</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>S3 Standard</td><td>GB-mes</td><td>USD 0,023/GB</td><td>Storage class + lifecycle</td></tr>
-            <tr><td>Athena</td><td>USD/TB escaneado</td><td>USD 5 por TB</td><td>Parquet + particao + compressao</td></tr>
-            <tr><td>Glue job</td><td>DPU-hora</td><td>USD 0,44/DPU-hora</td><td>Reduzir DPUs e tempo de job</td></tr>
-            <tr><td>Lambda</td><td>ms-GB + requests</td><td>USD 0,0000166667/GB-s</td><td>Menos memoria, menos tempo</td></tr>
-            <tr><td>Kinesis Data Streams</td><td>Shard-hora + PUT</td><td>USD 0,015/shard-hora</td><td>Certo numero de shards</td></tr>
-            <tr><td>Redshift Serverless</td><td>RPU-hora</td><td>USD 0,375/RPU-hora</td><td>Desligar em horario ocioso</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 17 - S3 STORAGE CLASSES                                 -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">FinOps &middot; S3</span>
-          <h2 class="deck-title">Storage classes do S3</h2>
-          <p class="deck-summary">Escolher a classe certa pode cortar o custo do Data Lake em 60% ou mais sem mudar codigo.</p>
-        </div>
-        <table class="deck-table">
-          <thead>
-            <tr><th>Classe</th><th>Custo relativo</th><th>Latencia de leitura</th><th>Quando usar</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Standard</td><td>1,00x</td><td>ms</td><td>Dados quentes e refined</td></tr>
-            <tr><td>Intelligent-Tiering</td><td>~1,0x (+ USD/1k obj)</td><td>ms</td><td>Padrao desconhecido</td></tr>
-            <tr><td>Standard-IA</td><td>~0,55x</td><td>ms</td><td>raw 30-90 dias</td></tr>
-            <tr><td>One Zone-IA</td><td>~0,44x</td><td>ms</td><td>Dado reproduzivel</td></tr>
-            <tr><td>Glacier Instant Retrieval</td><td>~0,22x</td><td>ms</td><td>Arquivo acessado raro</td></tr>
-            <tr><td>Glacier Flexible Retrieval</td><td>~0,15x</td><td>min-horas</td><td>Compliance, 1 acesso/trimestre</td></tr>
-            <tr><td>Glacier Deep Archive</td><td>~0,04x</td><td>12h</td><td>Arquivo legal 7+ anos</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 18 - LIFECYCLE RULES                                    -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">FinOps &middot; S3 Lifecycle</span>
-          <h2 class="deck-title">Lifecycle no bucket raw do Olist</h2>
-          <p class="deck-summary">Dados brutos ficam importantes por poucas semanas. Depois viram historico. Lifecycle automatiza essa transicao.</p>
-        </div>
-        <div class="deck-callout">
-          <strong>Regra proposta para raw/streaming/</strong>
-          <ol style="margin:12px 0 0; padding-left:22px;">
-            <li>0 a 30 dias: Standard (hot).</li>
-            <li>30 a 90 dias: Standard-IA.</li>
-            <li>90 a 365 dias: Glacier Flexible Retrieval.</li>
-            <li>&gt; 365 dias: expiration (apaga).</li>
-            <li>Versoes antigas: expire em 30 dias.</li>
-          </ol>
+          <span class="deck-kicker">Prática &middot; 20h30 &ndash; 22h00</span>
+          <h2 class="deck-title">Apresentação do projeto final integrado</h2>
+          <p class="deck-summary">O roteiro prático será detalhado com o hardening de segurança, os relatórios de custo e a defesa dos KPIs Olist.</p>
         </div>
         <div class="deck-panel">
-          <strong>Atencao</strong>
-          <ul>
-            <li>Transicao so compensa para objetos &gt; 128 KB.</li>
-            <li>Glacier cobra 90 dias minimos; 40 dias em IA.</li>
-            <li>Testar com um prefixo antes de aplicar amplo.</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 19 - COST ALLOCATION TAGS                               -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">FinOps &middot; Visibilidade</span>
-          <h2 class="deck-title">Cost allocation tags</h2>
-          <p class="deck-summary">Sem tag consistente nao existe FinOps. Tag e o chave-valor que liga servico ao dono e ao produto.</p>
-        </div>
-        <div class="deck-columns">
-          <div class="deck-panel">
-            <strong>Padrao minimo de tags</strong>
-            <ul>
-              <li><code>Project</code> (ex.: Olist)</li>
-              <li><code>Environment</code> (dev / prod)</li>
-              <li><code>Owner</code> (email do time)</li>
-              <li><code>CostCenter</code> (codigo contabil)</li>
-              <li><code>DataClassification</code> (publico / restrito)</li>
-            </ul>
-          </div>
-          <div class="deck-panel">
-            <strong>Ativacao</strong>
-            <ul>
-              <li>Billing &rarr; Cost allocation tags &rarr; activate.</li>
-              <li>Aparece no Cost Explorer em ate 24h.</li>
-              <li>Tag policy no Organizations garante padronizacao.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 20 - COST EXPLORER E BUDGETS                            -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">FinOps &middot; Ferramentas</span>
-          <h2 class="deck-title">Cost Explorer, Budgets e Anomaly Detection</h2>
-          <p class="deck-summary">Inform + Operate na pratica. Sao gratuitos (ou quase) e deveriam estar ligados em toda conta corporativa.</p>
-        </div>
-        <div class="deck-grid">
-          <article class="deck-card">
-            <h3>Cost Explorer</h3>
-            <ul>
-              <li>Relatorio historico por tag, servico, conta.</li>
-              <li>Forecast dos proximos 30 dias.</li>
-              <li>CSV para planilha e BI.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>AWS Budgets</h3>
-            <ul>
-              <li>Alerta por email/SNS em 50/80/100%.</li>
-              <li>Budget por tag, conta ou servico.</li>
-              <li>Actions: parar EC2 automaticamente.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Cost Anomaly Detection</h3>
-            <ul>
-              <li>ML detecta picos inesperados.</li>
-              <li>Alerta em dias, nao em mes fechado.</li>
-              <li>Gratuito.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Cost &amp; Usage Report</h3>
-            <ul>
-              <li>Granularidade por hora.</li>
-              <li>Parquet em S3, query com Athena.</li>
-              <li>Base para dashboard proprio.</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 21 - 5 Rs PARA PLATAFORMA ANALITICA                     -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">FinOps &middot; Estrategia</span>
-          <h2 class="deck-title">5 Rs reinterpretados para plataforma analitica</h2>
-          <p class="deck-summary">Os 5 Rs classicos de migracao aplicados ao contexto de Data Platform. Cada R tem perfil de custo e risco diferente.</p>
-        </div>
-        <table class="deck-table">
-          <thead>
-            <tr><th>R</th><th>Traducao analitica</th><th>Exemplo</th><th>Custo inicial / recorrente</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Rehost</td><td>Lift-and-shift do DW on-prem</td><td>SQL Server &rarr; RDS SQL Server ou Redshift</td><td>Baixo / alto</td></tr>
-            <tr><td>Refactor</td><td>Pipeline Airflow on-prem vira serverless</td><td>Airflow &rarr; Glue + Step Functions</td><td>Medio / medio</td></tr>
-            <tr><td>Rearchitect</td><td>DW monolitico &rarr; lakehouse multi-camada</td><td>Oracle DW &rarr; S3 + Iceberg + Athena</td><td>Alto / baixo</td></tr>
-            <tr><td>Rebuild</td><td>Plataforma cloud-native do zero</td><td>Olist (nosso projeto)</td><td>Alto / baixo</td></tr>
-            <tr><td>Replace</td><td>SaaS analytics</td><td>QuickSight, Snowflake, Databricks</td><td>Baixo / variavel</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 22 - OKRs DE DADOS                                      -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">FinOps &middot; Medir o valor</span>
-          <h2 class="deck-title">OKRs de uma plataforma de dados</h2>
-          <p class="deck-summary">Custo sozinho nao conta a historia. OKRs amarram custo, qualidade e adocao.</p>
-        </div>
-        <div class="deck-grid">
-          <article class="deck-card">
-            <h3>Objetivo: plataforma confiavel</h3>
-            <ul>
-              <li>KR1: freshness &lt; 30 min em trusted.</li>
-              <li>KR2: taxa de falha de job &lt; 2%.</li>
-              <li>KR3: 100% dos datasets criticos com DQ check.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Objetivo: custo sob controle</h3>
-            <ul>
-              <li>KR1: custo/TB escaneado &lt; USD 2.</li>
-              <li>KR2: 70% de raw em IA ou Glacier apos 30 dias.</li>
-              <li>KR3: 100% dos recursos com tag Project.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Objetivo: adocao pelo negocio</h3>
-            <ul>
-              <li>KR1: 80% das areas com dashboard ativo.</li>
-              <li>KR2: NPS de dados &gt;= 40.</li>
-              <li>KR3: 5 casos de uso auto-servico/trimestre.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Objetivo: conformidade</h3>
-            <ul>
-              <li>KR1: 100% de buckets com SSE-KMS.</li>
-              <li>KR2: 0 findings criticos no Macie por mes.</li>
-              <li>KR3: SLA de 15 dias para direito do titular.</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 23 - CAPEX PARA OPEX                                    -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">FinOps &middot; Modelo financeiro</span>
-          <h2 class="deck-title">De CAPEX para OPEX</h2>
-          <p class="deck-summary">Migrar para cloud nao e so mudar de maquina. E mudar a forma como a empresa compra capacidade de processar dados.</p>
-        </div>
-        <div class="deck-columns">
-          <div class="deck-panel">
-            <strong>CAPEX (datacenter proprio)</strong>
-            <ul>
-              <li>Compra de servidores com 3 a 5 anos de depreciacao.</li>
-              <li>Dimensionamento para o pico.</li>
-              <li>Ocioso = perda pura.</li>
-              <li>Ciclo de compra anual rigido.</li>
-            </ul>
-          </div>
-          <div class="deck-panel">
-            <strong>OPEX (cloud)</strong>
-            <ul>
-              <li>Paga so o que usou no mes.</li>
-              <li>Elasticidade real: pico temporario nao e problema.</li>
-              <li>Tributacao muda (despesa no mes vs ativo imobilizado).</li>
-              <li>Exige disciplina de FinOps para nao descontrolar.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 24 - PROJETO FINAL: VISAO GERAL                         -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Bloco 3 &middot; Projeto final</span>
-          <h2 class="deck-title">Projeto Final Integrado</h2>
-          <p class="deck-summary">Cada dupla entrega uma analise ponta a ponta do dataset Olist, usando tudo o que foi construido nas 8 aulas.</p>
-        </div>
-        <div class="deck-columns">
-          <div class="deck-panel">
-            <strong>Entregaveis</strong>
-            <ul>
-              <li>Dashboard no QuickSight OU notebook Python respondendo 6 KPIs.</li>
-              <li>Diagrama do pipeline (Aulas 02 a 07).</li>
-              <li>Reflexao escrita: decisoes de custo vs confiabilidade.</li>
-            </ul>
-          </div>
-          <div class="deck-panel">
-            <strong>Apresentacao</strong>
-            <ul>
-              <li>10 minutos por dupla.</li>
-              <li>Live demo do dashboard ou notebook.</li>
-              <li>Perguntas da turma e do professor.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 25 - KPIs DO PROJETO                                    -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Projeto final &middot; KPIs</span>
-          <h2 class="deck-title">Os 6 KPIs Olist</h2>
-          <p class="deck-summary">Todos consumem o refined construido ao longo do semestre. Nenhum exige ingestao nova.</p>
-        </div>
-        <div class="deck-grid">
-          <article class="deck-card">
-            <h3>1. Receita top 10 categorias</h3>
-            <ul><li>SUM(price) agrupado por product_category.</li></ul>
-          </article>
-          <article class="deck-card">
-            <h3>2. Ticket medio por estado</h3>
-            <ul><li>AVG(order_value) por customer_state.</li></ul>
-          </article>
-          <article class="deck-card">
-            <h3>3. Lead time de entrega</h3>
-            <ul><li>AVG(delivered_date - purchase_date) em dias.</li></ul>
-          </article>
-          <article class="deck-card">
-            <h3>4. Taxa de cancelamento</h3>
-            <ul><li>Pedidos canceled / pedidos totais por mes.</li></ul>
-          </article>
-          <article class="deck-card">
-            <h3>5. Top 20 vendedores</h3>
-            <ul><li>SUM(price) por seller_id.</li></ul>
-          </article>
-          <article class="deck-card">
-            <h3>6. Distribuicao de reviews</h3>
-            <ul><li>Percentual de 1 a 5 estrelas por categoria.</li></ul>
-          </article>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 26 - RUBRICA DE AVALIACAO                               -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Projeto final &middot; Avaliacao</span>
-          <h2 class="deck-title">Rubrica</h2>
-          <p class="deck-summary">Nota final = soma ponderada. Todas as dimensoes contam.</p>
-        </div>
-        <table class="deck-table">
-          <thead>
-            <tr><th>Dimensao</th><th>Peso</th><th>O que avalia</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Arquitetura</td><td>20%</td><td>Coerencia do pipeline, uso das camadas, escolha de servicos</td></tr>
-            <tr><td>Qualidade do dado</td><td>15%</td><td>Checks de DQ, deduplicacao, tratamento de nulos</td></tr>
-            <tr><td>Analise / KPIs</td><td>25%</td><td>Respostas corretas aos 6 KPIs com insight</td></tr>
-            <tr><td>Seguranca</td><td>15%</td><td>SSE, TLS, IAM minimo, classificacao</td></tr>
-            <tr><td>FinOps</td><td>10%</td><td>Tags, lifecycle, estimativa de custo</td></tr>
-            <tr><td>Apresentacao</td><td>15%</td><td>Clareza, demo, reflexao critica</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 27 - PRATICA: ROTEIRO                                   -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Pratica &middot; 20h30 &ndash; 22h00</span>
-          <h2 class="deck-title">Roteiro do laboratorio</h2>
-        </div>
-        <div class="deck-grid">
-          <article class="deck-card">
-            <h3>Seguranca</h3>
-            <ul>
-              <li>Bucket policy TLS-only no refined.</li>
-              <li>SSE-KMS (aws/s3) no refined.</li>
-              <li>Block Public Access em conta.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>FinOps</h3>
-            <ul>
-              <li>Lifecycle em raw/streaming/.</li>
-              <li>Tag Project=Olist nos recursos.</li>
-              <li>Estimativa no Pricing Calculator.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Projeto final</h3>
-            <ul>
-              <li>Demo dos 6 KPIs.</li>
-              <li>Diagrama do pipeline.</li>
-              <li>Reflexao de 1 pagina.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Encerramento</h3>
-            <ul>
-              <li>Cleanup dos recursos.</li>
-              <li>Apagar stacks, buckets, RDS.</li>
-              <li>Feedback da disciplina.</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 28 - PRATICA: BUCKET POLICY                             -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Pratica &middot; Passo 1</span>
-          <h2 class="deck-title">Bucket policy TLS-only e SSE-KMS obrigatorio</h2>
-          <p class="deck-summary">Aplique ao bucket &lt;aluno&gt;-refined. A politica faz Deny de qualquer PutObject sem SSE-KMS e de qualquer request sem TLS.</p>
-        </div>
-        <div class="deck-callout">
-          <strong>Passos no console</strong>
-          <ol style="margin:12px 0 0; padding-left:22px;">
-            <li>S3 &rarr; bucket &lt;aluno&gt;-refined &rarr; Permissions.</li>
-            <li>Block public access: ligar tudo.</li>
-            <li>Bucket policy: colar o JSON do material (Deny no-TLS + Deny sem KMS).</li>
-            <li>Properties &rarr; Default encryption &rarr; SSE-KMS &rarr; aws/s3.</li>
-            <li>Teste: aws s3 cp com --no-sign-request deve falhar.</li>
+          <strong>Esqueleto dos passos</strong>
+          <ol>
+            <li>TODO &mdash; aplicar bucket policy (TLS obrigatório) e SSE-KMS no Refined.</li>
+            <li>TODO &mdash; criar regra de lifecycle movendo Raw para Glacier após 90 dias.</li>
+            <li>TODO &mdash; aplicar tag Project=Olist e validar no Cost Explorer.</li>
+            <li>TODO &mdash; estimar custo mensal do pipeline no Pricing Calculator.</li>
+            <li>TODO &mdash; cada dupla apresenta notebook ou dashboard com os 6 KPIs.</li>
+            <li>TODO &mdash; reflexão final: decisões de design para custo e confiabilidade.</li>
           </ol>
         </div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 29 - PRATICA: LIFECYCLE                                 -->
+    <!-- SLIDE 8 - FECHAMENTO DO CURSO                                -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Pratica &middot; Passo 2</span>
-          <h2 class="deck-title">Lifecycle rule em raw/streaming/</h2>
-        </div>
-        <div class="deck-callout">
-          <strong>Configuracao</strong>
-          <ol style="margin:12px 0 0; padding-left:22px;">
-            <li>S3 &rarr; bucket &lt;aluno&gt;-raw &rarr; Management &rarr; Create lifecycle rule.</li>
-            <li>Nome: <code>olist-streaming-tiering</code>. Prefixo: <code>streaming/</code>.</li>
-            <li>Transitions: 30 dias &rarr; Standard-IA; 90 dias &rarr; Glacier Flexible Retrieval.</li>
-            <li>Expiration: 365 dias.</li>
-            <li>Noncurrent versions: expire em 30 dias.</li>
-            <li>Salvar e inspecionar a regra gerada.</li>
-          </ol>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 30 - PRATICA: TAGS                                      -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Pratica &middot; Passo 3</span>
-          <h2 class="deck-title">Cost allocation tags em massa</h2>
-          <p class="deck-summary">Use o Resource Groups Tagging API via CLI. Em Learner Lab a ativacao da tag no Billing pode estar restrita; o importante e aplicar.</p>
-        </div>
-        <div class="deck-callout">
-          <strong>Comando CLI</strong>
-          <pre style="background:#0f0f0f;color:#fff;padding:14px;border-radius:6px;overflow-x:auto;font-size:0.72em;margin:8px 0 0;">aws resourcegroupstaggingapi tag-resources \
-  --resource-arn-list \
-    arn:aws:s3:::&lt;aluno&gt;-raw \
-    arn:aws:s3:::&lt;aluno&gt;-trusted \
-    arn:aws:s3:::&lt;aluno&gt;-refined \
-  --tags Project=Olist,Environment=lab,Owner=&lt;email&gt;</pre>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 31 - PRATICA: PRICING CALCULATOR                        -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Pratica &middot; Passo 4</span>
-          <h2 class="deck-title">Estimativa mensal no Pricing Calculator</h2>
-          <p class="deck-summary">Monte uma estimativa realista do pipeline Olist em calculator.aws.</p>
-        </div>
-        <table class="deck-table">
-          <thead>
-            <tr><th>Servico</th><th>Premissa</th><th>Custo mensal aprox.</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>S3 Standard</td><td>100 GB armazenados + 50 GB transfer</td><td>USD 3,00</td></tr>
-            <tr><td>Glue</td><td>10 DPU-hora/mes</td><td>USD 4,40</td></tr>
-            <tr><td>Athena</td><td>50 GB escaneado/mes</td><td>USD 0,25</td></tr>
-            <tr><td>Lambda</td><td>1M invocacoes, 256 MB, 500 ms</td><td>USD 2,30</td></tr>
-            <tr><td>RDS db.t3.micro</td><td>8h/dia, 30 dias</td><td>USD 4,20</td></tr>
-            <tr><td>Kinesis</td><td>1 shard 24/7</td><td>USD 10,80</td></tr>
-            <tr><td><strong>Total estimado</strong></td><td>&mdash;</td><td><strong>~ USD 25</strong></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 32 - CLEANUP                                            -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Pratica &middot; Passo 5</span>
-          <h2 class="deck-title">Cleanup do Learner Lab</h2>
-          <p class="deck-summary">Ao fim da aula: apagar recursos. Learner Lab expira, mas apagar manualmente libera limite de orcamento imediatamente.</p>
+          <span class="deck-kicker">Fechamento &middot; Placeholder</span>
+          <h2 class="deck-title">O que levamos e o encerramento do curso</h2>
+          <p class="deck-summary">Síntese das oito aulas e próximos passos após a defesa do projeto final integrado Olist.</p>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
-            <h3>Checklist</h3>
+            <h3>O que fica desta aula</h3>
             <ul>
-              <li>Parar e apagar RDS instance.</li>
-              <li>Apagar streams Kinesis.</li>
-              <li>Esvaziar e apagar buckets S3.</li>
-              <li>Apagar jobs e crawlers Glue.</li>
-              <li>Apagar roles temporarios criados.</li>
+              <li>TODO &mdash; pipeline entregue com criptografia e IAM mínimo.</li>
+              <li>TODO &mdash; custo medido, previsível e alocado por tag.</li>
+              <li>TODO &mdash; KPIs de negócio do Olist respondidos ponta a ponta.</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>Evitar armadilhas</h3>
+            <h3>Encerramento do curso</h3>
             <ul>
-              <li>Bucket com versionamento exige delete marker cleanup.</li>
-              <li>NAT Gateway esquecido gera USD 1/dia.</li>
-              <li>CloudWatch Logs retem ate voce deletar.</li>
-              <li>Snapshots RDS continuam cobrando.</li>
+              <li>TODO &mdash; entrega final (notebook ou dashboard QuickSight).</li>
+              <li>TODO &mdash; defesa oral e diagrama consolidado do pipeline.</li>
+              <li>TODO &mdash; feedback da disciplina e agradecimentos.</li>
             </ul>
           </article>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 33 - RESUMO                                             -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Fechamento &middot; 1/3</span>
-          <h2 class="deck-title">Resumo da aula</h2>
-        </div>
-        <div class="deck-grid">
-          <article class="deck-card">
-            <h3>O que vimos hoje</h3>
-            <ul>
-              <li>Seguranca: shared responsibility, KMS, TLS, bucket policy.</li>
-              <li>LGPD e PII aplicadas ao pipeline Olist.</li>
-              <li>FinOps: 3 principios, storage classes, lifecycle, tags.</li>
-              <li>5 Rs analiticos, OKRs de dados e CAPEX&rarr;OPEX.</li>
-              <li>Projeto final integrado com 6 KPIs.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>O que ficou pronto no lab</h3>
-            <ul>
-              <li>Refined TLS-only com SSE-KMS.</li>
-              <li>Lifecycle em raw/streaming/.</li>
-              <li>Tag Project=Olist aplicada.</li>
-              <li>Estimativa no Pricing Calculator.</li>
-              <li>Dashboards / notebooks apresentados.</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 34 - RETROSPECTIVA DO SEMESTRE                          -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Fechamento &middot; 2/3</span>
-          <h2 class="deck-title">Retrospectiva do semestre</h2>
-          <p class="deck-summary">Em 24 horas de aula, construimos uma plataforma analitica moderna. O mesmo pipeline roda em conta corporativa com ajustes de escala.</p>
-        </div>
-        <div class="deck-columns">
-          <div class="deck-panel">
-            <strong>Voce sabe agora</strong>
-            <ul>
-              <li>Desenhar um Data Lake em 3 camadas sobre S3.</li>
-              <li>Ingerir de RDS, DynamoDB e Kinesis.</li>
-              <li>Catalogar e transformar com Glue.</li>
-              <li>Consultar com Athena e modelar em DW.</li>
-              <li>Aplicar SRE ao pipeline e proteger o dado.</li>
-            </ul>
-          </div>
-          <div class="deck-panel">
-            <strong>Caminhos para continuar</strong>
-            <ul>
-              <li>AWS Data Engineer Associate (DEA-C01).</li>
-              <li>AWS Solutions Architect Associate.</li>
-              <li>Databricks / Snowflake para comparar.</li>
-              <li>Apache Iceberg e lakehouse aberto.</li>
-              <li>MLOps sobre a mesma plataforma.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 35 - AGRADECIMENTOS                                     -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <img class="deck-logo-full" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_e4vyyw.png" alt="Universidade Presbiteriana Mackenzie" />
-          <span class="deck-kicker">Fechamento &middot; 3/3</span>
-          <h1 class="deck-title">Obrigado!</h1>
-          <p class="deck-summary">Cloud Computing e SRA &mdash; Visao Pratica com AWS. MBA em Engenharia de Dados. Turma 2026.</p>
-        </div>
-        <div class="deck-callout">
-          <strong>Proximos passos para voce</strong>
-          <ul style="margin:10px 0 0; padding-left:22px;">
-            <li>Entregue o projeto final no prazo combinado.</li>
-            <li>Pratique em conta AWS propria (free tier).</li>
-            <li>Faca uma certificacao AWS nos proximos 6 meses.</li>
-            <li>Compartilhe o que aprendeu com seu time.</li>
-          </ul>
         </div>
       </div>
     </div>
@@ -1111,13 +248,13 @@
   <!-- GLOBAL navigation footer -->
   <div class="slide-footer">
     <div class="footer-links">
-      <a href="../../../index.html" class="back-home">Indice</a>
+      <a href="../../../index.html" class="back-home">Índice</a>
       <a href="../material/material_aula_08_seguranca_de_dados_finops_e_projeto_final_integrado.html" class="material-link">Material</a>
     </div>
     <div class="nav-wrapper">
       <div class="nav-buttons"><button id="prev-btn" onclick="previousSlide()">&#8592; Anterior</button></div>
       <div class="slide-counter"><span id="current-slide">1</span> / <span id="total-slides">1</span></div>
-      <div class="nav-buttons"><button id="next-btn" onclick="nextSlide()">Proximo &#8594;</button></div>
+      <div class="nav-buttons"><button id="next-btn" onclick="nextSlide()">Próximo &#8594;</button></div>
     </div>
     <button class="fullscreen-btn" onclick="toggleFullScreen()" title="Tela cheia">&#9974;</button>
   </div>

@@ -4,9 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" />
-  <title>Aula 07 — Data Reliability e SRE Aplicados a Pipelines de Dados</title>
+  <title>Aula 07 — Data Reliability e SRE aplicados a pipelines de dados</title>
   <link href="../../../assets/slides.css" rel="stylesheet">
-  <style data-design-tokens>:root{--bg:#fff;--color:#000000}body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}a:hover{opacity:.8}a:focus{outline:2px solid #000000}</style>
 </head>
 <body>
   <div class="slide-container">
@@ -15,14 +14,14 @@
     <!-- SLIDE 1 - CAPA                                               -->
     <!-- ============================================================ -->
     <div class="slide">
-      <div class="deck-shell">
+      <div class="deck-shell" data-aula-number="07">
         <div>
           <img class="deck-logo-full" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_e4vyyw.png" alt="Universidade Presbiteriana Mackenzie" />
-          <span class="deck-kicker">Cloud Computing e SRA &mdash; MBA Engenharia de Dados</span>
-          <h1 class="deck-title">Data Reliability e SRE Aplicados a Pipelines de Dados</h1>
+          <span class="deck-kicker">Cloud Computing e SRE &middot; MBA Engenharia de Dados</span>
+          <h1 class="deck-title">Data Reliability e SRE aplicados a pipelines de dados</h1>
           <p class="deck-meta">Aula 07 &nbsp;&bull;&nbsp; 28/05/2026 &nbsp;&bull;&nbsp; 19h00 &ndash; 22h00</p>
           <p class="deck-year">2026</p>
-          <p class="deck-subtitle">Do pipeline que &ldquo;funciona&rdquo; ao pipeline confi&aacute;vel: SLIs, SLOs, error budget, data quality e orquestra&ccedil;&atilde;o resiliente com AWS Step Functions, CloudWatch e Glue Data Quality.</p>
+          <p class="deck-subtitle">SLI, SLO, error budget e chaos engineering aplicados ao pipeline Olist &mdash; confiabilidade como propriedade do sistema.</p>
         </div>
       </div>
     </div>
@@ -35,30 +34,25 @@
         <div>
           <span class="deck-kicker">Agenda</span>
           <h2 class="deck-title">O que vai acontecer nesta aula</h2>
+          <p class="deck-summary">Conteúdo em construção. Esta seção será refinada antes de 28/05/2026.</p>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
             <h3>19h00 &ndash; 20h30 &middot; Teoria</h3>
             <ul>
-              <li>SRE do Google aplicado a dados (DataOps + DMBOK).</li>
-              <li>SLI, SLO, SLA e error budget.</li>
-              <li>SLIs de pipeline: freshness, completeness, accuracy, consistency, availability.</li>
-              <li>Observabilidade: logs, m&eacute;tricas e traces.</li>
-              <li>Data Quality: Great Expectations, Deequ, dbt, Glue DQ (DQDL).</li>
-              <li>Resili&ecirc;ncia: retry, backoff, circuit breaker, DLQ, idempot&ecirc;ncia.</li>
-              <li>Orquestra&ccedil;&atilde;o com AWS Step Functions.</li>
-              <li>Runbook e postmortem blameless.</li>
+              <li>TODO &mdash; SRE aplicado a dados: DataOps e DORA metrics.</li>
+              <li>TODO &mdash; SLI, SLO, SLA e error budget para pipelines.</li>
+              <li>TODO &mdash; observabilidade: logs, métricas e traces.</li>
+              <li>TODO &mdash; padrões de resiliência e orquestração.</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>20h30 &ndash; 22h00 &middot; Pr&aacute;tica AWS Student</h3>
+            <h3>20h30 &ndash; 22h00 &middot; Prática</h3>
             <ul>
-              <li>CloudWatch Alarm em m&eacute;tricas do Glue Job.</li>
-              <li>SNS topic <code>data-pipeline-alerts</code>.</li>
-              <li>SQS + DLQ no Lambda consumer da Aula 04.</li>
-              <li>Step Functions <code>olist-pipeline</code> com Retry e Catch.</li>
-              <li>Glue Data Quality check com DQDL.</li>
-              <li>Inje&ccedil;&atilde;o de falha e observa&ccedil;&atilde;o do comportamento.</li>
+              <li>TODO &mdash; CloudWatch Alarms sobre métricas do Glue Job.</li>
+              <li>TODO &mdash; DLQ e retries na Lambda consumer de streaming.</li>
+              <li>TODO &mdash; Step Functions orquestrando o pipeline com retry.</li>
+              <li>TODO &mdash; injetar falha e observar o comportamento.</li>
             </ul>
           </article>
         </div>
@@ -66,415 +60,94 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 3 - PLACEHOLDER / RECAP                                -->
+    <!-- SLIDE 3 - EM CONSTRUCAO                                      -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Recap das aulas anteriores</span>
-          <h2 class="deck-title">O pipeline Olist at&eacute; aqui</h2>
-          <p class="deck-summary">Aulas 01 a 06 constru&iacute;ram um pipeline end-to-end funcional. Hoje vamos transform&aacute;-lo em um pipeline <strong>confi&aacute;vel</strong>.</p>
-        </div>
-        <div class="deck-placeholder">
-          <strong>Linha do tempo do pipeline Olist</strong>
-          <ol>
-            <li>Aula 01 &mdash; Fundamentos de cloud, IAM e buckets raw/trusted/refined.</li>
-            <li>Aula 02 &mdash; Data Lake: S3 + Athena sobre a camada raw.</li>
-            <li>Aula 03 &mdash; Fontes: RDS (relacional) e DynamoDB (NoSQL).</li>
-            <li>Aula 04 &mdash; Streaming: Kinesis + Lambda consumer.</li>
-            <li>Aula 05 &mdash; Glue Jobs raw&rarr;silver&rarr;gold + Data Catalog.</li>
-            <li>Aula 06 &mdash; Redshift/Athena para analytics em alta performance.</li>
-            <li><strong>Aula 07 (hoje)</strong> &mdash; o pipeline passa a ter SLO, alarme, DLQ, retry e DQ.</li>
-          </ol>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 4 - PROBLEMA                                           -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Contexto</span>
-          <h2 class="deck-title">O pipeline funciona&hellip; at&eacute; n&atilde;o funcionar</h2>
-          <p class="deck-summary">Pipelines em produ&ccedil;&atilde;o falham silenciosamente. O time descobre pelo usu&aacute;rio de neg&oacute;cio &mdash; n&atilde;o pelo monitoramento.</p>
-        </div>
-        <div class="deck-columns">
-          <div class="deck-panel">
-            <strong>Sintomas t&iacute;picos</strong>
-            <ul>
-              <li>Dashboard com dados de ontem.</li>
-              <li>Tabela Gold com metade das linhas.</li>
-              <li>Job verde no orquestrador, dado errado no Athena.</li>
-              <li>Alerta que ningu&eacute;m sabe resolver &agrave;s 03h da manh&atilde;.</li>
-            </ul>
-          </div>
-          <div class="deck-panel">
-            <strong>Raiz do problema</strong>
-            <ul>
-              <li>Sem SLO &mdash; ningu&eacute;m sabe o que &eacute; &ldquo;bom o suficiente&rdquo;.</li>
-              <li>Sem SLI &mdash; n&atilde;o medimos a sa&uacute;de real do dado.</li>
-              <li>Sem retry/DLQ &mdash; falha transit&oacute;ria vira incidente.</li>
-              <li>Sem runbook &mdash; cada incidente &eacute; resolvido do zero.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 5 - SRE ORIGEM                                         -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">SRE &middot; Origem</span>
-          <h2 class="deck-title">Site Reliability Engineering (Google, 2003)</h2>
-          <p class="deck-summary">Ben Treynor criou a disciplina de SRE no Google: &ldquo;o que acontece quando voc&ecirc; pede a um engenheiro de software para projetar uma equipe de opera&ccedil;&otilde;es&rdquo;.</p>
+          <span class="deck-kicker">Status &middot; Placeholder</span>
+          <h2 class="deck-title">Aula em construção</h2>
+          <p class="deck-summary">Este deck é um esqueleto no novo design system. O conteúdo será preenchido incrementalmente nas próximas semanas.</p>
         </div>
         <div class="deck-callout">
-          <strong>Princ&iacute;pios fundadores</strong>
-          <ol style="margin:12px 0 0; padding-left:22px;">
-            <li><strong>Embrace risk</strong> &mdash; 100% de disponibilidade n&atilde;o &eacute; meta, &eacute; desperd&iacute;cio.</li>
-            <li><strong>Service Level Objectives</strong> &mdash; metas mensur&aacute;veis negociadas com o neg&oacute;cio.</li>
-            <li><strong>Eliminate toil</strong> &mdash; automatizar trabalho manual e repetitivo.</li>
-            <li><strong>Monitoring</strong> &mdash; logs, m&eacute;tricas e traces como base da opera&ccedil;&atilde;o.</li>
-            <li><strong>Release engineering</strong> &mdash; deploys seguros, graduais e revers&iacute;veis.</li>
-            <li><strong>Blameless postmortem</strong> &mdash; aprender com falhas sem culpar pessoas.</li>
-          </ol>
+          <strong>O que já está definido</strong>
+          <ul>
+            <li>Tema central: confiabilidade e SRE aplicados ao pipeline Olist.</li>
+            <li>Datas e duração: 28/05/2026, 19h00 &ndash; 22h00.</li>
+            <li>Posição no arco do curso: Aula 07 de 8.</li>
+            <li>Pré-requisitos: pipeline funcional das Aulas 04, 05 e 06 (streaming, ETL serverless e Data Warehouse).</li>
+          </ul>
         </div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 6 - SRE PARA DADOS                                     -->
+    <!-- SLIDE 4 - PLACEHOLDER TEORIA (TABELA)                        -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">SRE para dados</span>
-          <h2 class="deck-title">Data Reliability Engineering</h2>
-          <p class="deck-summary">SRE tradicional foca em <em>servi&ccedil;os online</em>. Em dados, o produto &eacute; o <em>dataset</em>. Precisamos adaptar.</p>
+          <span class="deck-kicker">Teoria &middot; Placeholder</span>
+          <h2 class="deck-title">SLI, SLO, SLA e error budget em uma tabela</h2>
+          <p class="deck-summary">Estrutura de tabela editorial que será preenchida com definições, exemplos aplicados ao pipeline Olist e consequências operacionais.</p>
         </div>
         <table class="deck-table">
           <thead>
-            <tr><th>Dimens&atilde;o</th><th>SRE cl&aacute;ssico (servi&ccedil;o)</th><th>SRE de dados (dataset)</th></tr>
+            <tr>
+              <th>Conceito</th>
+              <th>Definição</th>
+              <th>Exemplo no pipeline Olist</th>
+              <th>Quem consome</th>
+            </tr>
           </thead>
           <tbody>
-            <tr><td>Unidade de valor</td><td>Request HTTP</td><td>Linha/registro em tabela</td></tr>
-            <tr><td>Disponibilidade</td><td>% de requests com 2xx</td><td>Pipeline rodou dentro da janela?</td></tr>
-            <tr><td>Lat&ecirc;ncia</td><td>p95, p99 da resposta</td><td>Freshness do dataset</td></tr>
-            <tr><td>Corretude</td><td>Resposta v&aacute;lida</td><td>Completeness + accuracy do dado</td></tr>
-            <tr><td>Refer&ecirc;ncias</td><td>Google SRE book</td><td>DataOps + DMBOK + DORA</td></tr>
+            <tr><td>SLI</td><td>TODO</td><td>TODO</td><td>TODO</td></tr>
+            <tr><td>SLO</td><td>TODO</td><td>TODO</td><td>TODO</td></tr>
+            <tr><td>SLA</td><td>TODO</td><td>TODO</td><td>TODO</td></tr>
+            <tr><td>Error budget</td><td>TODO</td><td>TODO</td><td>TODO</td></tr>
+            <tr><td>Burn rate</td><td>TODO</td><td>TODO</td><td>TODO</td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 7 - SLI                                                -->
+    <!-- SLIDE 5 - PLACEHOLDER TEORIA (GRID DE CARDS)                 -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Pilar 1 &middot; SLI</span>
-          <h2 class="deck-title">Service Level Indicator</h2>
-          <p class="deck-summary">M&eacute;trica quantitativa de um aspecto do servi&ccedil;o. Sempre uma <strong>raz&atilde;o</strong> entre eventos bons e eventos totais.</p>
-        </div>
-        <div class="deck-callout">
-          <strong>F&oacute;rmula can&ocirc;nica</strong>
-          <pre style="background:#f6f6f6; padding:14px; margin:12px 0 0;"><code>SLI = eventos_bons / eventos_v&aacute;lidos_totais</code></pre>
-          <ul style="margin:12px 0 0; padding-left:22px;">
-            <li>Exemplo web: <code>% requests com status &lt; 500 em 5xx+2xx</code>.</li>
-            <li>Exemplo dados: <code>% execu&ccedil;&otilde;es do job que terminaram antes das 06h</code>.</li>
-            <li>Exemplo dados: <code>% linhas com order_id n&atilde;o nulo</code>.</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 8 - SLO                                                -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Pilar 2 &middot; SLO</span>
-          <h2 class="deck-title">Service Level Objective</h2>
-          <p class="deck-summary">Meta interna sobre um SLI, em uma janela de tempo. Negociada entre engenharia e produto.</p>
-        </div>
-        <div class="deck-columns">
-          <div class="deck-panel">
-            <strong>Anatomia de um SLO</strong>
-            <ul>
-              <li><strong>SLI</strong>: a m&eacute;trica observada.</li>
-              <li><strong>Alvo</strong>: 99%, 99.9%, 99.95%&hellip;</li>
-              <li><strong>Janela</strong>: 30 dias corridos, trimestre.</li>
-              <li><strong>Escopo</strong>: qual dataset ou pipeline.</li>
-            </ul>
-          </div>
-          <div class="deck-panel">
-            <strong>Exemplos pipeline Olist</strong>
-            <ul>
-              <li>99% das execu&ccedil;&otilde;es do silver_to_gold terminam antes das 06h00.</li>
-              <li>99.5% das linhas na gold.orders t&ecirc;m order_id n&atilde;o nulo.</li>
-              <li>95% dos eventos Kinesis s&atilde;o processados em &lt; 60s.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 9 - SLA                                                -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Pilar 3 &middot; SLA</span>
-          <h2 class="deck-title">Service Level Agreement</h2>
-          <p class="deck-summary">Contrato com o cliente/neg&oacute;cio. Tem <strong>consequ&ecirc;ncia financeira ou contratual</strong> em caso de quebra.</p>
-        </div>
-        <table class="deck-table">
-          <thead>
-            <tr><th>Conceito</th><th>SLI</th><th>SLO</th><th>SLA</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>O que &eacute;</td><td>M&eacute;trica</td><td>Meta interna</td><td>Contrato externo</td></tr>
-            <tr><td>P&uacute;blico</td><td>Engenharia</td><td>Engenharia + Produto</td><td>Cliente/neg&oacute;cio</td></tr>
-            <tr><td>Quebra</td><td>N&atilde;o aplica</td><td>Alerta, error budget queima</td><td>Cr&eacute;dito, multa, CSAT</td></tr>
-            <tr><td>Rigor</td><td>Observa&ccedil;&atilde;o</td><td>Tens&atilde;o saud&aacute;vel</td><td>Sempre mais folgado que o SLO</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 10 - ERROR BUDGET                                      -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Error Budget</span>
-          <h2 class="deck-title">O or&ccedil;amento de falhas</h2>
-          <p class="deck-summary">Se o SLO &eacute; 99%, existem 1% de falhas aceit&aacute;veis. Esse 1% &eacute; o <strong>error budget</strong> &mdash; e pode ser gasto.</p>
-        </div>
-        <div class="deck-callout">
-          <strong>Como usar na opera&ccedil;&atilde;o</strong>
-          <ul style="margin:12px 0 0; padding-left:22px;">
-            <li><strong>Budget sobrando</strong> &rarr; libera deploy, experimenta&ccedil;&atilde;o, refactor agressivo.</li>
-            <li><strong>Budget queimando r&aacute;pido</strong> &rarr; congela features, foca em estabilidade.</li>
-            <li><strong>Budget zerado</strong> &rarr; freeze total at&eacute; recuperar o SLO.</li>
-            <li>Budget mensal de 30d com SLO 99% = <code>0.01 &times; 30d = 7.2 horas</code> de indisponibilidade.</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 11 - SLIS DE DADOS: FRESHNESS                          -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">SLIs de pipeline &middot; 1/5</span>
-          <h2 class="deck-title">Freshness &mdash; o dado est&aacute; atual?</h2>
-          <p class="deck-summary">Tempo decorrido desde a &uacute;ltima atualiza&ccedil;&atilde;o bem-sucedida do dataset.</p>
-        </div>
-        <div class="deck-columns">
-          <div class="deck-panel">
-            <strong>Como medir</strong>
-            <ul>
-              <li><code>NOW() - MAX(updated_at)</code> no dataset.</li>
-              <li>Timestamp da &uacute;ltima execu&ccedil;&atilde;o de sucesso do job.</li>
-              <li>Metadados do Glue Catalog ou Iceberg.</li>
-            </ul>
-          </div>
-          <div class="deck-panel">
-            <strong>Exemplo Olist</strong>
-            <ul>
-              <li>SLO: 99% dos dias a gold.orders est&aacute; atualizada antes das 07h.</li>
-              <li>Alarme: freshness &gt; 8h dispara SNS.</li>
-              <li>Dashboard mostra hora da &uacute;ltima atualiza&ccedil;&atilde;o.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 12 - COMPLETENESS                                      -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">SLIs de pipeline &middot; 2/5</span>
-          <h2 class="deck-title">Completeness &mdash; tudo chegou?</h2>
-          <p class="deck-summary">Raz&atilde;o entre linhas recebidas e linhas esperadas. Detecta perda silenciosa de dados.</p>
-        </div>
-        <div class="deck-callout">
-          <strong>Estrat&eacute;gias</strong>
-          <ul style="margin:12px 0 0; padding-left:22px;">
-            <li><strong>Volume esperado</strong>: compara contagem com m&eacute;dia dos &uacute;ltimos 7 dias (&plusmn;20%).</li>
-            <li><strong>Reconcilia&ccedil;&atilde;o de fonte</strong>: <code>COUNT(raw) = COUNT(silver) = COUNT(gold)</code>.</li>
-            <li><strong>Nulos em chave</strong>: <code>% order_id IS NULL</code> deve ser 0.</li>
-            <li><strong>Particionamento</strong>: toda parti&ccedil;&atilde;o de hora/dia existe?</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 13 - ACCURACY                                          -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">SLIs de pipeline &middot; 3/5</span>
-          <h2 class="deck-title">Accuracy &mdash; os valores fazem sentido?</h2>
-          <p class="deck-summary">Percentual de valores que passam em regras de valida&ccedil;&atilde;o de neg&oacute;cio.</p>
-        </div>
-        <div class="deck-columns">
-          <div class="deck-panel">
-            <strong>Regras t&iacute;picas</strong>
-            <ul>
-              <li><code>price &gt; 0</code> e <code>price &lt; 100_000</code>.</li>
-              <li><code>order_status IN ('created','paid','shipped',...)</code>.</li>
-              <li><code>customer_city</code> em lista de munic&iacute;pios v&aacute;lidos.</li>
-              <li>Timestamps no futuro = inv&aacute;lidos.</li>
-            </ul>
-          </div>
-          <div class="deck-panel">
-            <strong>Onde checar</strong>
-            <ul>
-              <li>Em cada job silver &rarr; gold.</li>
-              <li>Via Glue Data Quality (DQDL).</li>
-              <li>Via Great Expectations expectations.</li>
-              <li>Via dbt tests (unique, not_null, accepted_values).</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 14 - CONSISTENCY                                       -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">SLIs de pipeline &middot; 4/5</span>
-          <h2 class="deck-title">Consistency &mdash; reconcilia&ccedil;&atilde;o entre fontes</h2>
-          <p class="deck-summary">O dado em sistemas diferentes conta a mesma hist&oacute;ria?</p>
-        </div>
-        <div class="deck-callout">
-          <strong>Exemplos pr&aacute;ticos</strong>
-          <ul style="margin:12px 0 0; padding-left:22px;">
-            <li><code>SUM(gold.orders.price) == SUM(raw.orders.price)</code> para o mesmo dia.</li>
-            <li><code>COUNT(DISTINCT customer_id)</code> em CRM = em DW (toler&acirc;ncia &lt; 0.1%).</li>
-            <li>Receita no Redshift bate com extrato no sistema transacional.</li>
-            <li>Cardinalidade entre tabelas fato e dimens&atilde;o.</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 15 - AVAILABILITY                                      -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">SLIs de pipeline &middot; 5/5</span>
-          <h2 class="deck-title">Availability &mdash; o pipeline rodou?</h2>
-          <p class="deck-summary">Percentual de janelas agendadas em que o pipeline produziu resultado dentro do prazo.</p>
-        </div>
-        <div class="deck-columns">
-          <div class="deck-panel">
-            <strong>M&eacute;trica</strong>
-            <ul>
-              <li><code>execu&ccedil;&otilde;es_no_prazo / execu&ccedil;&otilde;es_agendadas</code>.</li>
-              <li>&ldquo;No prazo&rdquo; = sucesso antes do deadline do SLO.</li>
-              <li>Considera retries: se retry passou, conta como sucesso.</li>
-            </ul>
-          </div>
-          <div class="deck-panel">
-            <strong>Fonte no AWS</strong>
-            <ul>
-              <li>Step Functions execution status.</li>
-              <li>EventBridge scheduled rule.</li>
-              <li>CloudWatch Logs do Glue Job.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 16 - OBSERVABILIDADE                                   -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Observabilidade</span>
-          <h2 class="deck-title">Os 3 pilares</h2>
-          <p class="deck-summary">Monitoring responde &ldquo;est&aacute; quebrado?&rdquo;. Observability responde &ldquo;por qu&ecirc; est&aacute; quebrado?&rdquo;.</p>
-        </div>
-        <table class="deck-table">
-          <thead>
-            <tr><th>Pilar</th><th>O que &eacute;</th><th>Servi&ccedil;o AWS</th></tr>
-          </thead>
-          <tbody>
-            <tr><td><strong>Logs</strong></td><td>Eventos textuais com contexto</td><td>CloudWatch Logs, Logs Insights</td></tr>
-            <tr><td><strong>Metrics</strong></td><td>S&eacute;ries temporais agregadas</td><td>CloudWatch Metrics, Dashboards</td></tr>
-            <tr><td><strong>Traces</strong></td><td>Caminho de uma execu&ccedil;&atilde;o atrav&eacute;s de servi&ccedil;os</td><td>X-Ray, OpenTelemetry</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 17 - DATA QUALITY FRAMEWORKS                           -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Data Quality</span>
-          <h2 class="deck-title">Frameworks mais usados</h2>
-          <p class="deck-summary">Express&atilde;o declarativa de expectativas sobre o dado, com relat&oacute;rio de viola&ccedil;&otilde;es.</p>
+          <span class="deck-kicker">Teoria &middot; Placeholder</span>
+          <h2 class="deck-title">Quatro pilares da observabilidade</h2>
+          <p class="deck-summary">Grid de cards que será preenchido com definições, serviços AWS correspondentes e exemplos aplicados a pipelines de dados.</p>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
-            <h3>Great Expectations</h3>
+            <h3>Logs</h3>
             <ul>
-              <li>Python, open-source, Data Docs.</li>
-              <li>Expectations em JSON/YAML.</li>
-              <li>Integra com Airflow, dbt, Spark.</li>
+              <li>TODO &mdash; definição e casos de uso.</li>
+              <li>TODO &mdash; serviço AWS correspondente.</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>Deequ / PyDeequ</h3>
+            <h3>Métricas</h3>
             <ul>
-              <li>Biblioteca da AWS sobre Spark.</li>
-              <li>Constraints e metrics repositories.</li>
-              <li>Escala para TB/PB.</li>
+              <li>TODO &mdash; definição e casos de uso.</li>
+              <li>TODO &mdash; serviço AWS correspondente.</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>dbt tests</h3>
+            <h3>Traces</h3>
             <ul>
-              <li>Nativo no dbt (SQL).</li>
-              <li><code>unique</code>, <code>not_null</code>, <code>relationships</code>.</li>
-              <li>Testes customizados via macros.</li>
+              <li>TODO &mdash; definição e casos de uso.</li>
+              <li>TODO &mdash; serviço AWS correspondente.</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>AWS Glue Data Quality</h3>
+            <h3>Linhagem de dados</h3>
             <ul>
-              <li>Servi&ccedil;o gerenciado (2023+).</li>
-              <li>DSL pr&oacute;pria: DQDL.</li>
-              <li>Roda dentro de jobs Glue e no Catalog.</li>
+              <li>TODO &mdash; definição e casos de uso.</li>
+              <li>TODO &mdash; serviço AWS correspondente.</li>
             </ul>
           </article>
         </div>
@@ -482,55 +155,30 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 18 - DQDL                                              -->
+    <!-- SLIDE 6 - PLACEHOLDER TEORIA (2 COLUNAS)                     -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">AWS Glue Data Quality</span>
-          <h2 class="deck-title">DQDL &mdash; Data Quality Definition Language</h2>
-          <p class="deck-summary">Linguagem declarativa para escrever rulesets. Roda como transform no Glue ETL ou como evaluator no Catalog.</p>
-        </div>
-        <pre style="background:#f6f6f6; padding:14px; font-size:.88rem; overflow:auto;"><code>Rules = [
-  RowCount between 1000 and 5000000,
-  IsPrimaryKey "order_id",
-  IsComplete "order_id",
-  IsComplete "customer_id",
-  IsUnique "order_id",
-  ColumnValues "order_status" in ["created","paid","shipped","delivered","canceled"],
-  ColumnValues "price" &gt; 0,
-  ColumnValues "price" &lt; 100000,
-  Completeness "customer_city" &gt; 0.98,
-  ColumnCorrelation "price" "freight_value" &gt; 0.1
-]</code></pre>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 19 - LINHAGEM                                          -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Linhagem de dados</span>
-          <h2 class="deck-title">De onde veio? Para onde foi?</h2>
-          <p class="deck-summary">Rastrear a origem e o destino de cada campo. Essencial para auditoria, LGPD e root cause analysis.</p>
+          <span class="deck-kicker">Teoria &middot; Placeholder</span>
+          <h2 class="deck-title">Reativo vs proativo &mdash; MTTR vs MTBF</h2>
+          <p class="deck-summary">Duas colunas comparando posturas de operação e como cada uma se manifesta em um pipeline de dados.</p>
         </div>
         <div class="deck-columns">
           <div class="deck-panel">
-            <strong>OpenLineage</strong>
+            <strong>Reativo &middot; foco em MTTR</strong>
             <ul>
-              <li>Padr&atilde;o aberto (Linux Foundation).</li>
-              <li>Integra Spark, Airflow, dbt.</li>
-              <li>Backend: Marquez, DataHub, OpenMetadata.</li>
+              <li>TODO &mdash; o que significa minimizar tempo de recuperação.</li>
+              <li>TODO &mdash; papel de runbooks e postmortem blameless.</li>
+              <li>TODO &mdash; ferramentas AWS para reagir rápido.</li>
             </ul>
           </div>
           <div class="deck-panel">
-            <strong>AWS nativo</strong>
+            <strong>Proativo &middot; foco em MTBF</strong>
             <ul>
-              <li>Glue Lineage (visual no Catalog).</li>
-              <li>Lake Formation (permiss&otilde;es e fluxo).</li>
-              <li>DataZone (cat&aacute;logo corporativo).</li>
+              <li>TODO &mdash; o que significa maximizar tempo entre falhas.</li>
+              <li>TODO &mdash; padrões de resiliência aplicados ao pipeline.</li>
+              <li>TODO &mdash; data quality como prevenção (DQDL, Great Expectations).</li>
             </ul>
           </div>
         </div>
@@ -538,484 +186,54 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 20 - PADROES DE RESILIENCIA                            -->
+    <!-- SLIDE 7 - PLACEHOLDER PRATICA                                -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Resili&ecirc;ncia</span>
-          <h2 class="deck-title">Padr&otilde;es essenciais</h2>
-          <p class="deck-summary">Falhas transit&oacute;rias n&atilde;o devem virar incidentes. Desenhe o pipeline para absorver falha.</p>
-        </div>
-        <div class="deck-grid">
-          <article class="deck-card">
-            <h3>Retry + Backoff</h3>
-            <ul>
-              <li>Tentar de novo com espera crescente.</li>
-              <li>Exponencial: 1s &rarr; 2s &rarr; 4s &rarr; 8s.</li>
-              <li>Com jitter para evitar thundering herd.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Circuit Breaker</h3>
-            <ul>
-              <li>Se 5 falhas em 30s, abre o circuito.</li>
-              <li>Rejeita chamadas por N segundos.</li>
-              <li>Tenta half-open para recuperar.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Dead Letter Queue (DLQ)</h3>
-            <ul>
-              <li>Mensagens que falham N vezes v&atilde;o para uma fila separada.</li>
-              <li>Evita reprocessamento infinito.</li>
-              <li>Alvo de an&aacute;lise manual / reprocesso assistido.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Idempot&ecirc;ncia + Checkpoint</h3>
-            <ul>
-              <li>Executar 2x produz o mesmo resultado.</li>
-              <li>Chave idempotente por registro.</li>
-              <li>Checkpoint de progresso para retomar.</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 21 - ORQUESTRACAO                                      -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Orquestra&ccedil;&atilde;o</span>
-          <h2 class="deck-title">DAG com pol&iacute;ticas de resili&ecirc;ncia</h2>
-          <p class="deck-summary">O orquestrador define a ordem, mas tamb&eacute;m o que fazer quando um passo falha.</p>
-        </div>
-        <div class="deck-callout">
-          <strong>Decis&otilde;es por tarefa</strong>
-          <ul style="margin:12px 0 0; padding-left:22px;">
-            <li><strong>Retry policy</strong>: quantas vezes e com qual intervalo.</li>
-            <li><strong>Timeout</strong>: quando desistir de uma execu&ccedil;&atilde;o travada.</li>
-            <li><strong>On failure</strong>: notificar? pular? abortar? fallback?</li>
-            <li><strong>On success</strong>: qual caminho seguir na DAG.</li>
-            <li><strong>Idempot&ecirc;ncia</strong>: retry n&atilde;o pode duplicar escrita.</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 22 - STEP FUNCTIONS ESTADOS                            -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">AWS Step Functions</span>
-          <h2 class="deck-title">Estados principais</h2>
-          <p class="deck-summary">Linguagem ASL (Amazon States Language) &mdash; JSON declarativo para m&aacute;quinas de estado.</p>
-        </div>
-        <table class="deck-table">
-          <thead>
-            <tr><th>Estado</th><th>Uso</th></tr>
-          </thead>
-          <tbody>
-            <tr><td><code>Task</code></td><td>Executa uma a&ccedil;&atilde;o (Lambda, Glue Job, Crawler, DynamoDB&hellip;)</td></tr>
-            <tr><td><code>Choice</code></td><td>Ramifica fluxo com base em condi&ccedil;&atilde;o.</td></tr>
-            <tr><td><code>Parallel</code></td><td>Executa branches simultaneamente.</td></tr>
-            <tr><td><code>Map</code></td><td>Itera sobre cole&ccedil;&atilde;o (ex.: por parti&ccedil;&atilde;o).</td></tr>
-            <tr><td><code>Wait</code></td><td>Pausa por tempo fixo ou timestamp.</td></tr>
-            <tr><td><code>Retry</code></td><td>Pol&iacute;tica de tentativa em erro (MaxAttempts, BackoffRate).</td></tr>
-            <tr><td><code>Catch</code></td><td>Desvia para um estado alternativo em erro.</td></tr>
-            <tr><td><code>Pass / Succeed / Fail</code></td><td>Estados de controle e termina&ccedil;&atilde;o.</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 23 - CLOUDWATCH                                        -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Observabilidade na AWS</span>
-          <h2 class="deck-title">CloudWatch</h2>
-          <p class="deck-summary">Ferramenta central de m&eacute;tricas, logs e alarmes dos servi&ccedil;os AWS.</p>
-        </div>
-        <div class="deck-grid">
-          <article class="deck-card">
-            <h3>Alarms</h3>
-            <ul>
-              <li>Threshold ou anomaly detection.</li>
-              <li>Estado: OK, ALARM, INSUFFICIENT_DATA.</li>
-              <li>A&ccedil;&atilde;o: SNS, Auto Scaling, Lambda.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Dashboards</h3>
-            <ul>
-              <li>Painel visual de m&eacute;tricas.</li>
-              <li>Widgets: linha, n&uacute;mero, log table.</li>
-              <li>Compart&iacute;vel entre contas.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Logs Insights</h3>
-            <ul>
-              <li>Query language sobre CloudWatch Logs.</li>
-              <li>Filtros, agrega&ccedil;&otilde;es, visualiza&ccedil;&otilde;es.</li>
-              <li><code>fields @timestamp, @message | filter @message like /ERROR/</code>.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>M&eacute;tricas do Glue</h3>
-            <ul>
-              <li><code>glue.driver.aggregate.elapsedTime</code></li>
-              <li><code>glue.driver.aggregate.numFailedTasks</code></li>
-              <li><code>glue.driver.BlockManager.disk.diskSpaceUsed_MB</code></li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 24 - RUNBOOK                                           -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Cultura SRE</span>
-          <h2 class="deck-title">Runbook e postmortem blameless</h2>
-          <p class="deck-summary">Falhas s&atilde;o inevit&aacute;veis. Aprender com elas &eacute; o que diferencia o time.</p>
-        </div>
-        <div class="deck-columns">
-          <div class="deck-panel">
-            <strong>Runbook</strong>
-            <ul>
-              <li>Passo a passo para tratar um alerta espec&iacute;fico.</li>
-              <li>Comandos prontos, links para dashboards, dono.</li>
-              <li>Testado em simula&ccedil;&otilde;es (game day).</li>
-            </ul>
-          </div>
-          <div class="deck-panel">
-            <strong>Postmortem blameless</strong>
-            <ul>
-              <li>Timeline do incidente.</li>
-              <li>Root cause (5 whys).</li>
-              <li>A&ccedil;&otilde;es corretivas com dono e prazo.</li>
-              <li>Foco em <em>sistema</em>, n&atilde;o em pessoas.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 25 - TRANSICAO PRATICA                                 -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Transi&ccedil;&atilde;o</span>
-          <h2 class="deck-title">20h30 &ndash; 22h00 &middot; M&atilde;os ao lab</h2>
-          <p class="deck-summary">Vamos aplicar SLO, DQ e resili&ecirc;ncia no pipeline Olist. Abra o AWS Student Lab em <code>us-east-1</code>.</p>
-        </div>
-        <div class="deck-callout">
-          <strong>Roteiro da pr&aacute;tica</strong>
-          <ol style="margin:12px 0 0; padding-left:22px;">
-            <li>Criar SNS <code>data-pipeline-alerts</code> e confirmar e-mail.</li>
-            <li>Criar CloudWatch Alarms em m&eacute;tricas do Glue Job da Aula 05.</li>
-            <li>Adicionar SQS + DLQ no Lambda consumer da Aula 04.</li>
-            <li>Criar ruleset DQDL no Glue Data Quality.</li>
-            <li>Montar Step Functions <code>olist-pipeline</code> com Retry/Catch.</li>
-            <li>Injetar falha e observar o comportamento.</li>
-          </ol>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 26 - LAB 1 SNS                                         -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Lab 1 &middot; SNS</span>
-          <h2 class="deck-title">T&oacute;pico <code>data-pipeline-alerts</code></h2>
+          <span class="deck-kicker">Prática &middot; 20h30 &ndash; 22h00</span>
+          <h2 class="deck-title">Laboratório: injetar falha e observar o pipeline</h2>
+          <p class="deck-summary">O roteiro prático será detalhado com comandos AWS CLI, prints do console e definições de DQDL antes da aula.</p>
         </div>
         <div class="deck-panel">
-          <strong>Passo a passo</strong>
+          <strong>Esqueleto dos passos</strong>
           <ol>
-            <li>Console AWS &rarr; <strong>Simple Notification Service</strong> &rarr; <em>Create topic</em>.</li>
-            <li>Type: <strong>Standard</strong>. Name: <code>data-pipeline-alerts</code>. Create.</li>
-            <li>Na tela do t&oacute;pico &rarr; <em>Create subscription</em>.</li>
-            <li>Protocol: <strong>Email</strong>. Endpoint: seu e-mail real (o AWS Student pode limitar e-mails n&atilde;o confirmados).</li>
-            <li>Abra o e-mail e clique em <strong>Confirm subscription</strong>.</li>
-            <li>No console, publique uma mensagem de teste para validar a recep&ccedil;&atilde;o.</li>
-            <li>Copie o <strong>Topic ARN</strong>: ser&aacute; usado nos alarmes e no Step Functions.</li>
+            <li>TODO &mdash; configurar CloudWatch Alarm sobre métricas do Glue Job (tempo decorrido e tasks falhas) com notificação via SNS.</li>
+            <li>TODO &mdash; adicionar DLQ na Lambda consumer da Aula 04 e testar mensagens com payload inválido.</li>
+            <li>TODO &mdash; criar workflow Step Functions orquestrando crawler, Glue raw&rarr;silver, silver&rarr;gold e Data Quality check.</li>
+            <li>TODO &mdash; configurar retry com backoff exponencial e Catch states para cada task.</li>
+            <li>TODO &mdash; induzir falha proposital (schema quebrado, role sem permissão) e observar retries no console.</li>
+            <li>TODO &mdash; registrar incidente no DynamoDB e redigir postmortem blameless curto.</li>
           </ol>
         </div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 27 - LAB 2 CLOUDWATCH ALARMS                           -->
+    <!-- SLIDE 8 - FECHAMENTO E PONTE PARA AULA 08                    -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Lab 2 &middot; CloudWatch Alarms</span>
-          <h2 class="deck-title">Alarmes no Glue Job da Aula 05</h2>
+          <span class="deck-kicker">Fechamento &middot; Placeholder</span>
+          <h2 class="deck-title">O que levamos e o que vem</h2>
+          <p class="deck-summary">Resumo e ponte para a Aula 08 (Segurança de dados, FinOps e projeto final integrado), em 11/06/2026.</p>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
-            <h3>Alarm A &mdash; job lento</h3>
+            <h3>O que fica desta aula</h3>
             <ul>
-              <li>M&eacute;trica: <code>glue.driver.aggregate.elapsedTime</code>.</li>
-              <li>Namespace: <strong>AWS/Glue</strong>.</li>
-              <li>Statistic: Maximum, period 1 min.</li>
-              <li>Threshold: <code>&gt; 600000</code> ms (10 min).</li>
-              <li>A&ccedil;&atilde;o: notify <code>data-pipeline-alerts</code>.</li>
+              <li>TODO &mdash; pipeline Olist com SLOs declarados e error budget visível.</li>
+              <li>TODO &mdash; alarmes, DLQ e retries cobrindo os pontos críticos.</li>
+              <li>TODO &mdash; data quality automatizado e postmortem como prática.</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>Alarm B &mdash; task falhou</h3>
+            <h3>Aula 08 &middot; 11/06/2026</h3>
             <ul>
-              <li>M&eacute;trica: <code>glue.driver.aggregate.numFailedTasks</code>.</li>
-              <li>Statistic: Sum, period 1 min.</li>
-              <li>Threshold: <code>&gt; 0</code>.</li>
-              <li>Datapoints: 1/1.</li>
-              <li>A&ccedil;&atilde;o: notify <code>data-pipeline-alerts</code>.</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 28 - LAB 3 SQS DLQ                                     -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Lab 3 &middot; SQS + DLQ</span>
-          <h2 class="deck-title">Refor&ccedil;ando o consumer da Aula 04</h2>
-        </div>
-        <div class="deck-panel">
-          <strong>Passo a passo</strong>
-          <ol>
-            <li>Console &rarr; <strong>SQS</strong> &rarr; <em>Create queue</em>. Name: <code>olist-events-dlq</code>. Type: Standard.</li>
-            <li>Criar outra fila: <code>olist-events-queue</code>. Em <em>Dead-letter queue</em>, habilite e selecione <code>olist-events-dlq</code>.</li>
-            <li>Defina <strong>Maximum receives = 3</strong> (redrive policy).</li>
-            <li>Lambda da Aula 04 &rarr; <em>Configuration</em> &rarr; <em>Triggers</em> &rarr; Add: <strong>SQS &mdash; olist-events-queue</strong>.</li>
-            <li>Ajuste a fun&ccedil;&atilde;o para fazer <code>raise</code> quando o payload for inv&aacute;lido (simula falha).</li>
-            <li>Envie 10 mensagens na <code>olist-events-queue</code>, sendo 2 inv&aacute;lidas.</li>
-            <li>Ap&oacute;s 3 tentativas, as 2 inv&aacute;lidas aparecem em <code>olist-events-dlq</code>.</li>
-          </ol>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 29 - LAB 4 DQDL                                        -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Lab 4 &middot; Glue Data Quality</span>
-          <h2 class="deck-title">Ruleset DQDL para a tabela gold.orders</h2>
-        </div>
-        <pre style="background:#f6f6f6; padding:14px; font-size:.88rem; overflow:auto;"><code>Rules = [
-  RowCount &gt; 100,
-  IsComplete "order_id",
-  IsUnique "order_id",
-  IsComplete "customer_id",
-  ColumnValues "order_status" in [
-    "created","paid","shipped","delivered","canceled"
-  ],
-  ColumnValues "price" &gt; 0,
-  ColumnValues "price" &lt; 100000,
-  Completeness "customer_city" &gt; 0.98
-]</code></pre>
-        <p class="deck-note">Console &rarr; AWS Glue &rarr; Data quality &rarr; Create ruleset. Alvo: tabela <code>olist_gold.orders</code>. Nome: <code>rs_olist_gold_orders</code>.</p>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 30 - LAB 5 STEP FUNCTIONS ESTRUTURA                    -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Lab 5 &middot; Step Functions</span>
-          <h2 class="deck-title">Workflow <code>olist-pipeline</code></h2>
-          <p class="deck-summary">Orquestra Crawler, jobs Glue e check de DQ. Retry e Catch em cada Task cr&iacute;tica.</p>
-        </div>
-        <div class="deck-callout">
-          <strong>Fluxo de estados</strong>
-          <ol style="margin:12px 0 0; padding-left:22px;">
-            <li><code>StartCrawler</code> &mdash; Crawler <code>olist_raw</code>.</li>
-            <li><code>RunRawToSilver</code> &mdash; Glue Job, Retry 3&times; backoff 2.</li>
-            <li><code>RunSilverToGold</code> &mdash; Glue Job, Retry 3&times; backoff 2.</li>
-            <li><code>CheckDataQuality</code> &mdash; Evaluate Glue DQ ruleset.</li>
-            <li><code>Choice</code> &mdash; DQ pass &rarr; <code>NotifySuccess</code>. DQ fail &rarr; <code>LogIncident</code> + <code>NotifyFailure</code>.</li>
-          </ol>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 31 - LAB 5 ASL SNIPPET                                 -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Lab 5 &middot; ASL</span>
-          <h2 class="deck-title">Retry e Catch em JSON</h2>
-        </div>
-        <pre style="background:#f6f6f6; padding:14px; font-size:.82rem; overflow:auto;"><code>"RunRawToSilver": {
-  "Type": "Task",
-  "Resource": "arn:aws:states:::glue:startJobRun.sync",
-  "Parameters": { "JobName": "olist_raw_to_silver" },
-  "Retry": [{
-    "ErrorEquals": [
-      "Glue.ConcurrentRunsExceededException",
-      "States.TaskFailed"
-    ],
-    "IntervalSeconds": 10,
-    "MaxAttempts": 3,
-    "BackoffRate": 2.0
-  }],
-  "Catch": [{
-    "ErrorEquals": ["States.ALL"],
-    "Next": "NotifyFailure",
-    "ResultPath": "$.error"
-  }],
-  "Next": "RunSilverToGold"
-}</code></pre>
-        <p class="deck-note">ASL completo est&aacute; no material desta aula, com todos os estados do <code>olist-pipeline</code>.</p>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 32 - LAB 5 INJECAO DE FALHA                            -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Lab 5 &middot; Inje&ccedil;&atilde;o de falha</span>
-          <h2 class="deck-title">Ver o pipeline reagir</h2>
-        </div>
-        <div class="deck-columns">
-          <div class="deck-panel">
-            <strong>Cen&aacute;rio 1 &mdash; Retry do Glue Job</strong>
-            <ul>
-              <li>Temporariamente remover permiss&atilde;o S3 do LabRole.</li>
-              <li>Iniciar execu&ccedil;&atilde;o do Step Functions.</li>
-              <li>Observar 3 tentativas com espera crescente no timeline.</li>
-              <li>Restaurar permiss&atilde;o &mdash; r&eacute;plica do cen&aacute;rio de falha transit&oacute;ria.</li>
-            </ul>
-          </div>
-          <div class="deck-panel">
-            <strong>Cen&aacute;rio 2 &mdash; DQ falhando</strong>
-            <ul>
-              <li>Dropar uma coluna no job silver_to_gold.</li>
-              <li>Rodar pipeline at&eacute; <code>CheckDataQuality</code>.</li>
-              <li>Ruleset reprova (Completeness).</li>
-              <li>Choice desvia para <code>NotifyFailure</code> e e-mail &eacute; enviado.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 33 - LAB 6 DASHBOARD                                   -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Lab 6 &middot; Visualiza&ccedil;&atilde;o</span>
-          <h2 class="deck-title">Dashboard CloudWatch do pipeline</h2>
-        </div>
-        <div class="deck-panel">
-          <strong>Widgets sugeridos</strong>
-          <ol>
-            <li>Line &mdash; <code>elapsedTime</code> dos jobs Glue (7 dias).</li>
-            <li>Number &mdash; <code>numFailedTasks</code> nas &uacute;ltimas 24h.</li>
-            <li>Number &mdash; execu&ccedil;&otilde;es do Step Functions: Succeeded vs Failed.</li>
-            <li>Log table &mdash; Logs Insights sobre <code>/aws-glue/jobs/output</code> filtrando <code>ERROR</code>.</li>
-            <li>Number &mdash; mensagens em <code>olist-events-dlq</code> (ApproximateNumberOfMessages).</li>
-            <li>Text &mdash; link para o runbook do pipeline.</li>
-          </ol>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 34 - FECHAMENTO RESUMO                                 -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Fechamento &middot; 1/2</span>
-          <h2 class="deck-title">Resumo da aula</h2>
-        </div>
-        <div class="deck-grid">
-          <article class="deck-card">
-            <h3>O que vimos hoje</h3>
-            <ul>
-              <li>SRE, SLI, SLO, SLA e error budget aplicados a dados.</li>
-              <li>SLIs de pipeline: freshness, completeness, accuracy, consistency, availability.</li>
-              <li>Data quality com Glue DQ (DQDL) e alternativas open-source.</li>
-              <li>Padr&otilde;es de resili&ecirc;ncia: retry, backoff, DLQ, idempot&ecirc;ncia.</li>
-              <li>Observabilidade com CloudWatch e orquestra&ccedil;&atilde;o com Step Functions.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>O que ficou pronto no lab</h3>
-            <ul>
-              <li>SNS <code>data-pipeline-alerts</code> com e-mail confirmado.</li>
-              <li>CloudWatch Alarms sobre m&eacute;tricas do Glue Job.</li>
-              <li>SQS + DLQ no Lambda consumer.</li>
-              <li>Ruleset DQDL aprovado no Glue Data Quality.</li>
-              <li>Step Functions <code>olist-pipeline</code> com Retry e Catch.</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 35 - FECHAMENTO PROXIMOS PASSOS                        -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Fechamento &middot; 2/2</span>
-          <h2 class="deck-title">Pr&oacute;ximos passos e estudo</h2>
-        </div>
-        <div class="deck-grid">
-          <article class="deck-card">
-            <h3>Pr&oacute;xima aula &mdash; 11/06/2026</h3>
-            <ul>
-              <li>Seguran&ccedil;a de dados, FinOps e projeto final integrado.</li>
-              <li>Criptografia, KMS, classifica&ccedil;&atilde;o de dados.</li>
-              <li>Cost Explorer, budgets, tagging estrat&eacute;gico.</li>
-              <li>Apresenta&ccedil;&atilde;o do projeto final.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Estudo complementar</h3>
-            <ul>
-              <li>Google SRE Book (cap&iacute;tulos 3 e 4 &mdash; SLOs).</li>
-              <li>Docs AWS Step Functions &mdash; error handling.</li>
-              <li>Docs AWS Glue Data Quality &mdash; DQDL reference.</li>
-              <li>OpenLineage spec.</li>
+              <li>Segurança de dados, FinOps e projeto final integrado.</li>
+              <li>TODO &mdash; expectativas de governança e custo sobre o Olist.</li>
+              <li>TODO &mdash; entregável final do curso.</li>
             </ul>
           </article>
         </div>
@@ -1030,13 +248,13 @@
   <!-- GLOBAL navigation footer -->
   <div class="slide-footer">
     <div class="footer-links">
-      <a href="../../../index.html" class="back-home">&Iacute;ndice</a>
+      <a href="../../../index.html" class="back-home">Índice</a>
       <a href="../material/material_aula_07_data_reliability_e_sre_aplicados_a_pipelines_de_dados.html" class="material-link">Material</a>
     </div>
     <div class="nav-wrapper">
       <div class="nav-buttons"><button id="prev-btn" onclick="previousSlide()">&#8592; Anterior</button></div>
       <div class="slide-counter"><span id="current-slide">1</span> / <span id="total-slides">1</span></div>
-      <div class="nav-buttons"><button id="next-btn" onclick="nextSlide()">Pr&oacute;ximo &#8594;</button></div>
+      <div class="nav-buttons"><button id="next-btn" onclick="nextSlide()">Próximo &#8594;</button></div>
     </div>
     <button class="fullscreen-btn" onclick="toggleFullScreen()" title="Tela cheia">&#9974;</button>
   </div>

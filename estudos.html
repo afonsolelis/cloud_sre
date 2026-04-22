@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" />
+    <title>Estudos &mdash; Cloud Computing e SRE</title>
+    <link rel="stylesheet" href="assets/styles.css" />
+    <style data-estudos-local>
+      /* Estudos-page-specific tweaks: resource cards show a compact meta line and type tag */
+      .card .res-type {
+        display: inline-block;
+        margin-bottom: 8px;
+        padding: 3px 8px;
+        border: 1px solid var(--line);
+        border-radius: 3px;
+        font-family: var(--font-mono);
+        font-size: 0.68em;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .card .res-type.book    { border-color: #0f0f0f; color: #0f0f0f; }
+      .card .res-type.doc     { border-color: #3a6fa1; color: #3a6fa1; }
+      .card .res-type.article { border-color: #2a7a2a; color: #2a7a2a; }
+      .card .res-type.video   { border-color: #a14a3a; color: #a14a3a; }
+      .card .res-type.site    { border-color: #6b3a9e; color: #6b3a9e; }
+
+      .card .res-author {
+        font-family: var(--font-mono);
+        font-size: 0.75em;
+        letter-spacing: 0.04em;
+        color: var(--muted);
+        margin: 0 0 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+
+      <section class="hero" data-year="∞">
+        <img class="logo-full" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_e4vyyw.png" alt="Universidade Presbiteriana Mackenzie" />
+        <span class="kicker">Autoestudo &middot; Complementar ao curso</span>
+        <h1>Estudos</h1>
+        <p>
+          Recursos curados para aprofundar cada tema da disciplina entre as aulas. Livros canônicos,
+          papers fundadores, documentação oficial e conteúdos em vídeo. Escolha um por semana e
+          vá no ritmo que couber.
+        </p>
+        <p class="meta">8 temas &middot; ~40 referências &middot; atualizado continuamente</p>
+      </section>
+
+      <!-- =============================================================
+           01 · FUNDAMENTOS DE CLOUD
+      ============================================================== -->
+      <h3 class="section-heading">01 &middot; Fundamentos de Cloud para dados</h3>
+      <section class="lesson-grid">
+        <article class="card">
+          <span class="res-type doc">Paper</span>
+          <h2>NIST SP 800-145</h2>
+          <p class="res-author">Peter Mell &middot; Tim Grance &middot; NIST</p>
+          <p>A definição canônica de Cloud Computing: cinco características essenciais, três modelos de serviço, quatro de deployment. Leitura obrigatória de 7 páginas.</p>
+          <div class="actions">
+            <a class="button" href="https://csrc.nist.gov/publications/detail/sp/800-145/final" target="_blank" rel="noopener">Ler PDF</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="res-type doc">Doc</span>
+          <h2>AWS Well-Architected Framework</h2>
+          <p class="res-author">Amazon Web Services</p>
+          <p>Seis pilares (Operational Excellence, Security, Reliability, Performance, Cost, Sustainability) com perguntas de revisão. Reference book vivo da AWS.</p>
+          <div class="actions">
+            <a class="button" href="https://aws.amazon.com/architecture/well-architected/" target="_blank" rel="noopener">Abrir</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="res-type book">Livro</span>
+          <h2>Designing Data-Intensive Applications</h2>
+          <p class="res-author">Martin Kleppmann &middot; O'Reilly, 2017</p>
+          <p>A bíblia de engenharia de dados. Capítulos 1, 10 e 11 são leitura obrigatória para o curso. Cobre storage, consistência e processamento distribuído.</p>
+          <div class="actions">
+            <a class="button" href="https://dataintensive.net/" target="_blank" rel="noopener">Site oficial</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="res-type video">Curso</span>
+          <h2>AWS Cloud Practitioner Essentials</h2>
+          <p class="res-author">AWS Skill Builder &middot; gratuito</p>
+          <p>Curso oficial AWS, ~6 horas. Panorama de serviços, modelo de responsabilidade compartilhada e precificação. Útil para quem quer certificação CLF-C02 depois.</p>
+          <div class="actions">
+            <a class="button" href="https://explore.skillbuilder.aws/learn/course/external/view/elearning/134/aws-cloud-practitioner-essentials" target="_blank" rel="noopener">Matricular</a>
+          </div>
+        </article>
+      </section>
+
+      <!-- =============================================================
+           02 · SWEBOK, SEBoK, SDD
+      ============================================================== -->
+      <h3 class="section-heading">02 &middot; SWEBOK, SEBoK e Spec-Driven Development</h3>
+      <section class="lesson-grid">
+        <article class="card">
+          <span class="res-type book">Guia</span>
+          <h2>SWEBOK V4 (2024)</h2>
+          <p class="res-author">IEEE Computer Society</p>
+          <p>Software Engineering Body of Knowledge, versão 4. Quinze áreas de conhecimento. Leitura focada: Quality, Models &amp; Methods, Professional Practice.</p>
+          <div class="actions">
+            <a class="button" href="https://www.computer.org/education/bodies-of-knowledge/software-engineering" target="_blank" rel="noopener">Abrir</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="res-type site">Wiki</span>
+          <h2>SEBoK</h2>
+          <p class="res-author">BKCASE &middot; INCOSE / IEEE-CS / Stevens</p>
+          <p>Systems Engineering Body of Knowledge. Referência viva em wiki. Comece pelas seções "Systems Thinking" e "Emergence".</p>
+          <div class="actions">
+            <a class="button" href="https://sebokwiki.org/" target="_blank" rel="noopener">Abrir wiki</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="res-type article">Paper</span>
+          <h2>EARS &mdash; Easy Approach to Requirements Syntax</h2>
+          <p class="res-author">Alistair Mavin &middot; Rolls-Royce</p>
+          <p>Sintaxe controlada de linguagem natural para requisitos. Cinco templates (ubiquitous, event, state, unwanted, optional). Legível por humano e IA.</p>
+          <div class="actions">
+            <a class="button" href="https://alistairmavin.com/ears/" target="_blank" rel="noopener">Ler</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="res-type doc">Repo</span>
+          <h2>GitHub Spec Kit</h2>
+          <p class="res-author">GitHub</p>
+          <p>Templates oficiais do GitHub para Spec-Driven Development com IA. Prompts, checklists e exemplos aplicáveis ao projeto Olist.</p>
+          <div class="actions">
+            <a class="button" href="https://github.com/github/spec-kit" target="_blank" rel="noopener">Ver repo</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="res-type site">Template</span>
+          <h2>ARC42</h2>
+          <p class="res-author">Starke &amp; Hruschka</p>
+          <p>Template clássico para documentação de arquitetura de software. 12 seções pré-definidas que cobrem contexto, visão, decisões e riscos.</p>
+          <div class="actions">
+            <a class="button" href="https://arc42.org/" target="_blank" rel="noopener">Abrir site</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="res-type book">Livro</span>
+          <h2>Mastering the Requirements Process</h2>
+          <p class="res-author">Robertson &amp; Robertson &middot; Addison-Wesley</p>
+          <p>Template Volere de requisitos com rationale por requisito. Referência para engenharia de requisitos formal em projetos de dados.</p>
+          <div class="actions">
+            <a class="button" href="https://www.volere.org/" target="_blank" rel="noopener">Site Volere</a>
+          </div>
+        </article>
+      </section>
+
+      <!-- =============================================================
+           03 · FONTES DE DADOS
+      ============================================================== -->
+      <h3 class="section-heading">03 &middot; Bancos relacionais e NoSQL</h3>
+      <section class="lesson-grid">
+        <article class="card">
+          <span class="res-type site">Tutorial</span>
+          <h2>Use The Index, Luke</h2>
+          <p class="res-author">Markus Winand</p>
+          <p>Tudo que um engenheiro precisa saber sobre índices SQL. Exemplos práticos em Postgres, MySQL, Oracle, SQL Server. Gratuito e didático.</p>
+          <div class="actions">
+            <a class="button" href="https://use-the-index-luke.com/" target="_blank" rel="noopener">Abrir site</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="res-type doc">Doc</span>
+          <h2>Amazon DynamoDB Developer Guide</h2>
+          <p class="res-author">AWS</p>
+          <p>Guia oficial. Cubra: modelo de dados, chaves primárias, índices secundários, transações e <em>single-table design</em>.</p>
+          <div class="actions">
+            <a class="button" href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/" target="_blank" rel="noopener">Abrir docs</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="res-type video">Vídeo</span>
+          <h2>DynamoDB Deep Dive (re:Invent)</h2>
+          <p class="res-author">Rick Houlihan &middot; AWS re:Invent</p>
+          <p>Clássico absoluto do YouTube sobre modelagem NoSQL em DynamoDB. Uma hora que resume anos de experiência com single-table design.</p>
+          <div class="actions">
+            <a class="button" href="https://www.youtube.com/watch?v=HaEPXoXVf2k" target="_blank" rel="noopener">Assistir</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="res-type article">Artigo</span>
+          <h2>CAP Twelve Years Later</h2>
+          <p class="res-author">Eric Brewer &middot; InfoQ</p>
+          <p>O próprio autor do teorema CAP revisita as nuances doze anos depois. Essencial para entender trade-offs de consistência em sistemas distribuídos.</p>
+          <div class="actions">
+            <a class="button" href="https://www.infoq.com/articles/cap-twelve-years-later-how-the-rules-have-changed/" target="_blank" rel="noopener">Ler</a>
+          </div>
+        </article>
+      </section>
+
+      <!-- =============================================================
+           04 · STREAMING
+      ============================================================== -->
+      <h3 class="section-heading">04 &middot; Ingestão e processamento near real-time</h3>
+      <section class="lesson-grid">
+        <article class="card">
+          <span class="res-type book">E-book</span>
+          <h2>Designing Event-Driven Systems</h2>
+          <p class="res-author">Ben Stopford &middot; Confluent (gratuito)</p>
+          <p>E-book completo da O'Reilly disponível gratuitamente via Confluent. Cobre event sourcing, CDC, exactly-once e streaming analytics.</p>
+          <div class="actions">
+            <a class="button" href="https://www.confluent.io/designing-event-driven-systems/" target="_blank" rel="noopener">Baixar</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="res-type article">Série</span>
+          <h2>The World Beyond Batch: Streaming 101/102</h2>
+          <p class="res-author">Tyler Akidau &middot; O'Reilly Radar</p>
+          <p>Dois artigos longos que definiram o vocabulário moderno de streaming: tempo de evento vs tempo de processamento, janelas, watermarks e triggers.</p>
+          <div class="actions">
+            <a class="button" href="https://www.oreilly.com/radar/the-world-beyond-batch-streaming-101/" target="_blank" rel="noopener">Ler 101</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="res-type doc">Doc</span>
+          <h2>Amazon Kinesis Data Streams</h2>
+          <p class="res-author">AWS</p>
+          <p>Documentação oficial. Foque em shards, partition keys, consumers (fan-out vs classic) e integração com Lambda e Firehose.</p>
+          <div class="actions">
+            <a class="button" href="https://docs.aws.amazon.com/kinesis/" target="_blank" rel="noopener">Abrir docs</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="res-type book">Livro</span>
+          <h2>Kafka: The Definitive Guide</h2>
+          <p class="res-author">Narkhede, Shapira, Palino &middot; Confluent (gratuito)</p>
+          <p>Referência completa de Apache Kafka. Disponível gratuitamente pela Confluent. Topicos 1-4 cobrem o suficiente para o curso.</p>
+          <div class="actions">
+            <a class="button" href="https://www.confluent.io/resources/kafka-the-definitive-guide/" target="_blank" rel="noopener">Baixar</a>
+          </div>
+        </article>
+      </section>
+
+      <!-- =============================================================
+           05 · ETL SERVERLESS E CATÁLOGO
+      ============================================================== -->
+      <h3 class="section-heading">05 &middot; Integração, ETL serverless e catálogo</h3>
+      <section class="lesson-grid">
+        <article class="card">
+          <span class="res-type book">Livro</span>
+          <h2>Fundamentals of Data Engineering</h2>
+          <p class="res-author">Joe Reis &amp; Matt Housley &middot; O'Reilly, 2022</p>
+          <p>O livro-texto moderno da profissão. Ciclo de vida do dado (generation, storage, ingestion, transformation, serving) + correntes transversais (segurança, DataOps, arquitetura, orquestração).</p>
+          <div class="actions">
+            <a class="button" href="https://www.oreilly.com/library/view/fundamentals-of-data/9781098108298/" target="_blank" rel="noopener">Ver livro</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="res-type doc">Doc</span>
+          <h2>AWS Glue Developer Guide</h2>
+          <p class="res-author">AWS</p>
+          <p>Documentação completa do Glue. Crawlers, Data Catalog, jobs PySpark, workflows. Cobre o equivalente serverless ao que faremos em EC2.</p>
+          <div class="actions">
+            <a class="button" href="https://docs.aws.amazon.com/glue/" target="_blank" rel="noopener">Abrir docs</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="res-type site">Curso</span>
+          <h2>dbt Fundamentals</h2>
+          <p class="res-author">dbt Labs &middot; gratuito</p>
+          <p>Curso oficial de dbt (data build tool). SQL versionado, testes de qualidade, linhagem automática. Padrão de mercado para transformações analíticas.</p>
+          <div class="actions">
+            <a class="button" href="https://learn.getdbt.com/courses/dbt-fundamentals" target="_blank" rel="noopener">Matricular</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="res-type article">Artigo</span>
+          <h2>How to Move Beyond a Monolithic Data Lake (Data Mesh)</h2>
+          <p class="res-author">Zhamak Dehghani &middot; martinfowler.com</p>
+          <p>O paper fundador do Data Mesh. Quatro princípios: domain ownership, data as product, self-serve platform, federated governance.</p>
+          <div class="actions">
+            <a class="button" href="https://martinfowler.com/articles/data-mesh-principles.html" target="_blank" rel="noopener">Ler</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="res-type doc">Spec</span>
+          <h2>Apache Iceberg</h2>
+          <p class="res-author">Apache Software Foundation</p>
+          <p>Formato de tabela aberto para data lakes. Schema evolution, time travel, partition evolution. Base do lakehouse moderno.</p>
+          <div class="actions">
+            <a class="button" href="https://iceberg.apache.org/docs/latest/" target="_blank" rel="noopener">Abrir docs</a>
+          </div>
+        </article>
+      </section>
+
+      <!-- =============================================================
+           06 · DATA WAREHOUSING
+      ============================================================== -->
+      <h3 class="section-heading">06 &middot; Data warehousing de alta performance</h3>
+      <section class="lesson-grid">
+        <article class="card">
+          <span class="res-type book">Livro</span>
+          <h2>The Data Warehouse Toolkit</h2>
+          <p class="res-author">Ralph Kimball &amp; Margy Ross &middot; Wiley, 3rd ed.</p>
+          <p>A referência absoluta de modelagem dimensional. Star schema, fact/dimension, slowly changing dimensions. Caps 1-5 e 6 são suficientes para o curso.</p>
+          <div class="actions">
+            <a class="button" href="https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/books/data-warehouse-dw-toolkit/" target="_blank" rel="noopener">Ver livro</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="res-type site">Blog</span>
+          <h2>Kimball Group Techniques</h2>
+          <p class="res-author">The Kimball Group</p>
+          <p>Artigos curtos do Kimball Group. Cada "design tip" resolve um padrão clássico de DW. Acervo navegável por dimensão / fato / ETL.</p>
+          <div class="actions">
+            <a class="button" href="https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/kimball-techniques/" target="_blank" rel="noopener">Navegar</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="res-type doc">Doc</span>
+          <h2>ClickHouse Documentation</h2>
+          <p class="res-author">ClickHouse Inc.</p>
+          <p>Warehouse colunar open-source usado no curso. Sintaxe SQL próxima ao Postgres. Foque em MergeTree engines, partições e ordens de chave.</p>
+          <div class="actions">
+            <a class="button" href="https://clickhouse.com/docs" target="_blank" rel="noopener">Abrir docs</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="res-type article">Artigo</span>
+          <h2>Column-Oriented Database Systems</h2>
+          <p class="res-author">Stonebraker et al. &middot; Foundations &amp; Trends</p>
+          <p>Paper seminal sobre colunar vs row-based. Por que analítica é colunar e OLTP é row. Base para entender qualquer DW moderno.</p>
+          <div class="actions">
+            <a class="button" href="https://nms.csail.mit.edu/~stavros/pubs/CIDR07P23.PDF" target="_blank" rel="noopener">Ler PDF</a>
+          </div>
+        </article>
+      </section>
+
+      <!-- =============================================================
+           07 · DATA RELIABILITY / SRE
+      ============================================================== -->
+      <h3 class="section-heading">07 &middot; Data Reliability e SRE</h3>
+      <section class="lesson-grid">
+        <article class="card">
+          <span class="res-type book">Livro</span>
+          <h2>Site Reliability Engineering</h2>
+          <p class="res-author">Beyer, Jones, Petoff, Murphy &middot; Google (gratuito)</p>
+          <p>O livro fundador. Disponível gratuitamente no site do Google. Leitura obrigatória: Parte II (SLIs, SLOs, error budgets) e Capítulo 11 (eliminating toil).</p>
+          <div class="actions">
+            <a class="button" href="https://sre.google/sre-book/table-of-contents/" target="_blank" rel="noopener">Ler online</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="res-type book">Livro</span>
+          <h2>The Site Reliability Workbook</h2>
+          <p class="res-author">Beyer, Murphy, Rensin, Kawahara, Thorne &middot; Google</p>
+          <p>Companion prático do SRE Book, também gratuito. Exemplos reais de SLOs, alertas e gestão de incidentes. Mais aplicado que o primeiro.</p>
+          <div class="actions">
+            <a class="button" href="https://sre.google/workbook/table-of-contents/" target="_blank" rel="noopener">Ler online</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="res-type book">Livro</span>
+          <h2>Observability Engineering</h2>
+          <p class="res-author">Majors, Fong-Jones, Miranda &middot; O'Reilly</p>
+          <p>Das autoras da Honeycomb. Eventos de alta cardinalidade, distributed tracing, diferença entre monitoring e observability.</p>
+          <div class="actions">
+            <a class="button" href="https://www.oreilly.com/library/view/observability-engineering/9781492076438/" target="_blank" rel="noopener">Ver livro</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="res-type site">Site</span>
+          <h2>Principles of Chaos Engineering</h2>
+          <p class="res-author">principlesofchaos.org</p>
+          <p>Manifesto curto e canônico dos princípios de chaos engineering. Hipóteses, blast radius, continuous verification.</p>
+          <div class="actions">
+            <a class="button" href="https://principlesofchaos.org/" target="_blank" rel="noopener">Abrir</a>
+          </div>
+        </article>
+      </section>
+
+      <!-- =============================================================
+           08 · SEGURANÇA E FINOPS
+      ============================================================== -->
+      <h3 class="section-heading">08 &middot; Segurança de dados e FinOps</h3>
+      <section class="lesson-grid">
+        <article class="card">
+          <span class="res-type doc">Doc</span>
+          <h2>AWS Security Pillar</h2>
+          <p class="res-author">AWS Well-Architected</p>
+          <p>Pilar de segurança do Well-Architected, leitura completa. Identity, detective controls, infra protection, data protection, incident response.</p>
+          <div class="actions">
+            <a class="button" href="https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/welcome.html" target="_blank" rel="noopener">Abrir</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="res-type site">Site</span>
+          <h2>FinOps Foundation</h2>
+          <p class="res-author">finops.org &middot; Linux Foundation</p>
+          <p>Framework aberto de FinOps: Inform, Optimize, Operate. Capabilities, personas, certificação FOCUS. Comunidade ativa.</p>
+          <div class="actions">
+            <a class="button" href="https://www.finops.org/framework/" target="_blank" rel="noopener">Abrir framework</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="res-type doc">Doc</span>
+          <h2>AWS Cost Optimization</h2>
+          <p class="res-author">AWS</p>
+          <p>Guia oficial de otimização de custos. Right-sizing, reserved instances, Savings Plans, tagging, orçamento e alertas.</p>
+          <div class="actions">
+            <a class="button" href="https://aws.amazon.com/aws-cost-management/aws-cost-optimization/" target="_blank" rel="noopener">Abrir</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="res-type doc">Regulação</span>
+          <h2>LGPD &mdash; Guia ANPD</h2>
+          <p class="res-author">Autoridade Nacional de Proteção de Dados</p>
+          <p>Guia oficial brasileiro da Lei Geral de Proteção de Dados. Direitos do titular, bases legais, encarregado, incidentes.</p>
+          <div class="actions">
+            <a class="button" href="https://www.gov.br/anpd/pt-br" target="_blank" rel="noopener">Abrir ANPD</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="res-type book">Livro</span>
+          <h2>Cloud FinOps</h2>
+          <p class="res-author">J.R. Storment &amp; Mike Fuller &middot; O'Reilly, 2nd ed.</p>
+          <p>O livro canônico de FinOps. Cultura, fases, relatórios, automação. Referência leve e prática para fechar o curso.</p>
+          <div class="actions">
+            <a class="button" href="https://www.oreilly.com/library/view/cloud-finops-2nd/9781492083504/" target="_blank" rel="noopener">Ver livro</a>
+          </div>
+        </article>
+      </section>
+
+    </main>
+
+    <!-- Floating navigation back to index (reuses material-nav styles) -->
+    <nav class="material-nav">
+      <a href="index.html">&larr; Voltar ao índice</a>
+    </nav>
+  </body>
+</html>

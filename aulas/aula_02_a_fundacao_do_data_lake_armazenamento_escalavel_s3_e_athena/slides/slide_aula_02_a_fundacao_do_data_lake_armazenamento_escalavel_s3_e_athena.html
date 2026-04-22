@@ -6,7 +6,84 @@
   <link rel="icon" type="image/png" href="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" />
   <title>Aula 02 — Modelagem do problema SRE: SWEBOK, SEBoK e bootstrap do Spec-Driven Development</title>
   <link href="../../../assets/slides.css" rel="stylesheet">
-  <style data-design-tokens>:root{--bg:#fff;--color:#000000}body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}a:hover{opacity:.8}a:focus{outline:2px solid #000000}</style>
+  <style data-aula02-local>
+    /* ============================================================
+       Aula 02 - estilos scoped: apenas o diagrama do SDD Loop.
+       Tokens e design system base vem de assets/slides.css.
+       ============================================================ */
+
+    /* --- SDD Loop (slide 17) -------------------------------- */
+    .sdd-loop {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      margin-top: 4px;
+    }
+    .sdd-loop-svg {
+      width: 100%;
+      max-width: 780px;
+      height: auto;
+      display: block;
+      overflow: visible;
+    }
+    .sdd-loop-track { stroke-linecap: round; }
+    .sdd-node circle {
+      fill: #ffffff;
+      stroke: #0f0f0f;
+      stroke-width: 1.5;
+      filter: drop-shadow(0 2px 6px rgba(15,15,15,0.08));
+    }
+    .sdd-node text {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      fill: #0f0f0f;
+      pointer-events: none;
+    }
+    .sdd-node-label .label-main {
+      font-family: var(--font-sans);
+      font-size: 16px;
+      font-weight: 700;
+      fill: #0f0f0f;
+    }
+    .sdd-node-label .label-sub {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      fill: #5c5c5c;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .sdd-loop-center-title {
+      font-family: var(--font-mono);
+      font-size: 44px;
+      font-weight: 800;
+      fill: #0f0f0f;
+      letter-spacing: -0.02em;
+    }
+    .sdd-loop-center-sub {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      fill: #5c5c5c;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+    .sdd-loop-comet {
+      filter: drop-shadow(0 0 8px rgba(15,15,15,0.45));
+    }
+    .sdd-node.is-hot circle {
+      fill: #0f0f0f;
+      stroke: #0f0f0f;
+    }
+    .sdd-node.is-hot text { fill: #ffffff; }
+
+    /* --- Responsivo (apenas SDD) ---------------------------- */
+    @media (max-width: 900px) {
+      .sdd-node-label .label-main { font-size: 13px; }
+      .sdd-node-label .label-sub  { font-size: 9.5px; }
+      .sdd-loop-center-title { font-size: 34px; }
+    }
+  </style>
 </head>
 <body>
   <div class="slide-container">
@@ -15,7 +92,7 @@
     <!-- SLIDE 1 - CAPA                                               -->
     <!-- ============================================================ -->
     <div class="slide">
-      <div class="deck-shell">
+      <div class="deck-shell" data-aula-number="02">
         <div>
           <img class="deck-logo-full" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_e4vyyw.png" alt="Universidade Presbiteriana Mackenzie" />
           <span class="deck-kicker">Cloud Computing e SRE — MBA Engenharia de Dados</span>
@@ -487,28 +564,27 @@
     <!-- ============================================================ -->
     <!-- SLIDE 17 - O LOOP SDD                                        -->
     <!-- ============================================================ -->
-    <div class="slide">
+    <div class="slide" data-slide="sdd-loop">
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Teoria &middot; SDD</span>
           <h2 class="deck-title">O loop Spec-Driven Development</h2>
-          <p class="deck-summary">Este loop se repete em cada aula do curso. A qualidade da spec é a qualidade do sistema.</p>
+          <p class="deck-summary">Este loop se repete em cada aula do curso. A qualidade da spec é a qualidade do sistema &mdash; o comet orbita porque cada iteração realimenta a próxima.</p>
         </div>
-        <div class="deck-callout">
-          <pre style="background:#111; color:#f6f6f6; padding:14px; border-radius:6px; font-size:.95rem; margin-top:10px; overflow-x:auto;">  1. Conceito     (framework da aula)
-        &darr;
-  2. Spec        (spec/XX_*.md)
-        &darr;
-  3. Geração     (OpenCode / Gemini CLI leem a spec)
-        &darr;
-  4. Revisão     (aluno critica a saída)
-        &darr;
-  5. Testes      (pytest local e no Codespace)
-        &darr;
-  6. Deploy      (CloudFormation / SSM / scp)
-        &darr;
-  7. Observação  (Grafana + CloudWatch)
-        &uarr;&mdash;&mdash;&mdash;&mdash; realimenta a próxima spec</pre>
+        <div class="sdd-loop">
+          <svg class="sdd-loop-svg" viewBox="0 0 820 600" role="img" aria-labelledby="sdd-loop-title">
+            <title id="sdd-loop-title">Loop Spec-Driven Development</title>
+            <path id="sdd-loop-path" class="sdd-loop-track"
+                  d="M 410,100 A 200,200 0 1,1 410,500 A 200,200 0 1,1 410,100 Z"
+                  fill="none" stroke="#d6d6d1" stroke-width="1.5" stroke-dasharray="4 8"/>
+            <g class="sdd-loop-center">
+              <text x="410" y="292" text-anchor="middle" class="sdd-loop-center-title">SDD</text>
+              <text x="410" y="320" text-anchor="middle" class="sdd-loop-center-sub">LOOP SEMANAL</text>
+            </g>
+            <circle class="sdd-loop-comet" cx="0" cy="0" r="8" fill="#0f0f0f"/>
+            <g class="sdd-loop-nodes"></g>
+            <g class="sdd-loop-labels"></g>
+          </svg>
         </div>
       </div>
     </div>
@@ -1037,6 +1113,155 @@ gemini</pre>
     function toggleFullScreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
     document.addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); } else if (e.key === 'ArrowLeft') { e.preventDefault(); previousSlide(); } else if (e.key.toLowerCase() === 'f') toggleFullScreen(); });
     showSlide(0);
+  </script>
+
+  <!-- ============================================================ -->
+  <!-- Anime.js v4 - SDD loop diagram (slide 17)                    -->
+  <!-- ============================================================ -->
+  <script type="module">
+    import {
+      animate,
+      stagger,
+      createTimeline,
+      createMotionPath,
+      utils
+    } from 'https://cdn.jsdelivr.net/npm/animejs@4/+esm';
+
+    const stages = [
+      { n: '01', label: 'Conceito',   sub: 'framework da aula' },
+      { n: '02', label: 'Spec',       sub: 'spec/XX_*.md' },
+      { n: '03', label: 'Geracao',    sub: 'OpenCode / Gemini' },
+      { n: '04', label: 'Revisao',    sub: 'aluno critica' },
+      { n: '05', label: 'Testes',     sub: 'pytest' },
+      { n: '06', label: 'Deploy',     sub: 'CloudFormation / SSM' },
+      { n: '07', label: 'Observacao', sub: 'Grafana / CloudWatch' }
+    ];
+
+    const CX = 410, CY = 300, R = 200;
+    const N  = stages.length;
+    const NS = 'http://www.w3.org/2000/svg';
+
+    const nodesG  = document.querySelector('.sdd-loop-nodes');
+    const labelsG = document.querySelector('.sdd-loop-labels');
+    const slide   = document.querySelector('[data-slide="sdd-loop"]');
+
+    if (nodesG && labelsG && slide) {
+      // ---- Build nodes + labels on the circle -----------------
+      // IMPORTANT: outer <g> holds the SVG transform attribute (positioning).
+      // Inner <g> is what anime.js animates via CSS transforms (scale/translate).
+      // Mixing the two on the same element collapses everything to (0,0).
+      stages.forEach((s, i) => {
+        const a = -Math.PI / 2 + i * (2 * Math.PI / N);
+        const x = CX + R * Math.cos(a);
+        const y = CY + R * Math.sin(a);
+
+        // Node: outer positions, inner animates
+        const g = document.createElementNS(NS, 'g');
+        g.classList.add('sdd-node');
+        g.setAttribute('data-i', i);
+        g.setAttribute('transform', `translate(${x},${y})`);
+        const inner = document.createElementNS(NS, 'g');
+        inner.classList.add('sdd-node-anim');
+        inner.innerHTML =
+          `<circle r="26"/>` +
+          `<text text-anchor="middle" dominant-baseline="central" dy="1">${s.n}</text>`;
+        g.appendChild(inner);
+        nodesG.appendChild(g);
+
+        // Label: outer positions, inner animates
+        const LR = R + 62;
+        const lx = CX + LR * Math.cos(a);
+        const ly = CY + LR * Math.sin(a);
+        const vy = Math.sin(a);
+        const mainDy = vy < -0.5 ? -8 : (vy > 0.5 ? 16 : 4);
+
+        const lg = document.createElementNS(NS, 'g');
+        lg.classList.add('sdd-node-label');
+        lg.setAttribute('data-i', i);
+        lg.setAttribute('transform', `translate(${lx},${ly})`);
+        const linner = document.createElementNS(NS, 'g');
+        linner.classList.add('sdd-node-label-anim');
+        linner.innerHTML =
+          `<text class="label-main" text-anchor="middle" dy="${mainDy}">${s.label}</text>` +
+          `<text class="label-sub"  text-anchor="middle" dy="${mainDy + 16}">${s.sub}</text>`;
+        lg.appendChild(linner);
+        labelsG.appendChild(lg);
+      });
+
+      // ---- Initial hidden state (target the -anim inner groups) ----
+      utils.set('.sdd-loop-track',        { opacity: 0 });
+      utils.set('.sdd-node-anim',         { opacity: 0, scale: 0 });
+      utils.set('.sdd-node-label-anim',   { opacity: 0, translateY: 6 });
+      utils.set('.sdd-loop-center text',  { opacity: 0 });
+      utils.set('.sdd-loop-comet',        { opacity: 0 });
+
+      let orbitStarted = false;
+
+      function playEntry() {
+        utils.set('.sdd-node-anim',        { opacity: 0, scale: 0 });
+        utils.set('.sdd-node-label-anim',  { opacity: 0, translateY: 6 });
+        utils.set('.sdd-loop-track',       { opacity: 0 });
+        utils.set('.sdd-loop-center text', { opacity: 0 });
+
+        const tl = createTimeline();
+        tl.add('.sdd-loop-track', {
+          opacity: [0, 1],
+          duration: 500,
+          ease: 'outQuad'
+        })
+        .add('.sdd-node-anim', {
+          opacity: [0, 1],
+          scale:   [0, 1],
+          duration: 520,
+          ease: 'outBack(1.6)',
+          delay: stagger(80)
+        }, '-=300')
+        .add('.sdd-node-label-anim', {
+          opacity:    [0, 1],
+          translateY: [6, 0],
+          duration: 400,
+          delay: stagger(80)
+        }, '-=520')
+        .add('.sdd-loop-center text', {
+          opacity: [0, 1],
+          duration: 500
+        }, '-=300');
+
+        if (!orbitStarted) {
+          orbitStarted = true;
+          const path = createMotionPath('#sdd-loop-path');
+          utils.set('.sdd-loop-comet', { opacity: 1 });
+          animate('.sdd-loop-comet', {
+            ...path,
+            duration: 7000,
+            loop: true,
+            ease: 'linear'
+          });
+
+          // Pulse each node's inner group in phase with the comet
+          stages.forEach((_, i) => {
+            const phase = (i / N) * 7000;
+            setTimeout(() => {
+              animate(`.sdd-node[data-i="${i}"] .sdd-node-anim`, {
+                scale: [
+                  { to: 1.18, duration: 220, ease: 'outQuad' },
+                  { to: 1,    duration: 320, ease: 'outQuad' }
+                ],
+                loop: true,
+                loopDelay: 7000 - 540
+              });
+            }, phase);
+          });
+        }
+      }
+
+      // ---- Trigger when slide becomes active ------------------
+      const obs = new MutationObserver(() => {
+        if (slide.classList.contains('active')) playEntry();
+      });
+      obs.observe(slide, { attributes: true, attributeFilter: ['class'] });
+      if (slide.classList.contains('active')) playEntry();
+    }
   </script>
 </body>
 </html>

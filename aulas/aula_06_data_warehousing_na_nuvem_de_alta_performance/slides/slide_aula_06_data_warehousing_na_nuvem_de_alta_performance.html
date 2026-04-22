@@ -4,9 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" />
-  <title>Aula 06 — Data Warehousing na Nuvem de Alta Performance</title>
+  <title>Aula 06 — Data warehousing na nuvem de alta performance</title>
   <link href="../../../assets/slides.css" rel="stylesheet">
-  <style data-design-tokens>:root{--bg:#fff;--color:#000000}body{background:#fff;color:#000000;font-family:sans-serif;padding:0;margin:0}a:hover{opacity:.8}a:focus{outline:2px solid #000000}pre{background:#f3f4f6;border:2px solid #111;border-radius:6px;padding:14px;overflow-x:auto;font-size:.78em;line-height:1.45;margin:0}code{font-family:"Courier New",Courier,monospace}</style>
 </head>
 <body>
   <div class="slide-container">
@@ -15,14 +14,14 @@
     <!-- SLIDE 1 - CAPA                                               -->
     <!-- ============================================================ -->
     <div class="slide">
-      <div class="deck-shell">
+      <div class="deck-shell" data-aula-number="06">
         <div>
           <img class="deck-logo-full" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_e4vyyw.png" alt="Universidade Presbiteriana Mackenzie" />
-          <span class="deck-kicker">Cloud Computing e SRA &mdash; MBA Engenharia de Dados</span>
-          <h1 class="deck-title">Data Warehousing na Nuvem de Alta Performance</h1>
+          <span class="deck-kicker">Cloud Computing e SRE &middot; MBA Engenharia de Dados</span>
+          <h1 class="deck-title">Data warehousing na nuvem de alta performance</h1>
           <p class="deck-meta">Aula 06 &nbsp;&bull;&nbsp; 21/05/2026 &nbsp;&bull;&nbsp; 19h00 &ndash; 22h00</p>
           <p class="deck-year">2026</p>
-          <p class="deck-subtitle">Do gold do data lake &agrave; entrega anal&iacute;tica: Redshift, modelagem dimensional e o caminho lakehouse com Iceberg.</p>
+          <p class="deck-subtitle">Do Data Lake ao warehouse colunar: modelagem dimensional, performance e consultas analíticas em escala.</p>
         </div>
       </div>
     </div>
@@ -35,27 +34,25 @@
         <div>
           <span class="deck-kicker">Agenda</span>
           <h2 class="deck-title">O que vai acontecer nesta aula</h2>
+          <p class="deck-summary">Conteúdo em construção. Esta seção será refinada antes de 21/05/2026.</p>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
             <h3>19h00 &ndash; 20h30 &middot; Teoria</h3>
             <ul>
-              <li>Data Warehouse: hist&oacute;ria, Kimball vs Inmon.</li>
-              <li>MPP, armazenamento colunar e zone maps.</li>
-              <li>Modelagem dimensional: fato, dimens&atilde;o, SCD.</li>
-              <li>Amazon Redshift: cluster e Serverless.</li>
-              <li>Distribution styles e sort keys.</li>
-              <li>Redshift Spectrum e alternativa lakehouse Iceberg.</li>
+              <li>TODO &mdash; fundamentos de Data Warehouse e evolução (Kimball vs Inmon).</li>
+              <li>TODO &mdash; MPP, armazenamento colunar e zone maps.</li>
+              <li>TODO &mdash; modelagem dimensional: star, snowflake, SCDs, surrogate keys.</li>
+              <li>TODO &mdash; Redshift Serverless e alternativa lakehouse com Iceberg.</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>20h30 &ndash; 22h00 &middot; Pr&aacute;tica AWS Student</h3>
+            <h3>20h30 &ndash; 22h00 &middot; Prática</h3>
             <ul>
-              <li>Plano A &mdash; Redshift Serverless + COPY do gold.</li>
-              <li>Plano B &mdash; Athena + Apache Iceberg.</li>
-              <li>Queries anal&iacute;ticas sobre o gold Olist.</li>
-              <li>Time travel, MERGE INTO e schema evolution.</li>
-              <li>Crit&eacute;rio de decis&atilde;o e fallback garantido.</li>
+              <li>TODO &mdash; plano A: provisionar Redshift Serverless.</li>
+              <li>TODO &mdash; COPY do Gold em Parquet para o warehouse.</li>
+              <li>TODO &mdash; plano B: Athena + Apache Iceberg como fallback.</li>
+              <li>TODO &mdash; consultas analíticas e comparação de performance.</li>
             </ul>
           </article>
         </div>
@@ -63,153 +60,94 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 3 - PLACEHOLDER / CONTEXTO                             -->
+    <!-- SLIDE 3 - EM CONSTRUCAO                                      -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Contexto &middot; Onde estamos</span>
-          <h2 class="deck-title">O gold est&aacute; pronto. Agora precisamos entregar an&aacute;lise.</h2>
-          <p class="deck-summary">Aula 01 construiu a governan&ccedil;a. Aula 02 criou o data lake. Aula 03 trouxe dados transacionais. Aula 04 tratou streaming. Aula 05 orquestrou ETL serverless at&eacute; o gold. A aula 06 transforma esse gold em resposta anal&iacute;tica r&aacute;pida.</p>
+          <span class="deck-kicker">Status &middot; Placeholder</span>
+          <h2 class="deck-title">Aula em construção</h2>
+          <p class="deck-summary">Este deck é um esqueleto no novo design system. O conteúdo será preenchido incrementalmente nas próximas semanas.</p>
         </div>
         <div class="deck-callout">
-          <strong>Pergunta central</strong>
-          <p style="margin:8px 0 0;">Como dar ao analista um SQL que volta em segundos sobre bilh&otilde;es de linhas? Duas respostas complementares: um Data Warehouse em nuvem (Redshift) ou um lakehouse com tabelas transacionais (Athena + Iceberg).</p>
+          <strong>O que já está definido</strong>
+          <ul>
+            <li>Tema central: transformar o Gold do Olist em um warehouse colunar de alta performance.</li>
+            <li>Datas e duração: 21/05/2026, 19h00 &ndash; 22h00.</li>
+            <li>Posição no arco do curso: Aula 06 de 8.</li>
+            <li>Pré-requisitos: Trusted e Refined já populados pela Aula 05 (ETL serverless e catálogo).</li>
+          </ul>
         </div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 4 - DATA WAREHOUSE DEFINICAO                           -->
+    <!-- SLIDE 4 - PLACEHOLDER TEORIA (TABELA)                        -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Teoria &middot; 19h00 &ndash; 20h30</span>
-          <h2 class="deck-title">O que &eacute; um Data Warehouse?</h2>
-          <p class="deck-summary">Reposit&oacute;rio central, orientado a assuntos, integrado, n&atilde;o vol&aacute;til e hist&oacute;rico, otimizado para consultas anal&iacute;ticas &mdash; n&atilde;o para transa&ccedil;&otilde;es.</p>
-        </div>
-        <div class="deck-callout">
-          <strong>Quatro caracter&iacute;sticas cl&aacute;ssicas (Bill Inmon)</strong>
-          <ol style="margin:12px 0 0; padding-left:22px;">
-            <li><strong>Subject-oriented</strong> &mdash; organizado por dom&iacute;nio de neg&oacute;cio (vendas, clientes, produtos).</li>
-            <li><strong>Integrado</strong> &mdash; dados padronizados a partir de m&uacute;ltiplas fontes.</li>
-            <li><strong>Non-volatile</strong> &mdash; dados n&atilde;o s&atilde;o atualizados no lugar; s&oacute; lidos e acrescentados.</li>
-            <li><strong>Time-variant</strong> &mdash; guarda hist&oacute;rico ao longo do tempo, n&atilde;o s&oacute; o estado atual.</li>
-          </ol>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 5 - KIMBALL VS INMON                                   -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Teoria &middot; Filosofias</span>
-          <h2 class="deck-title">Kimball vs Inmon</h2>
+          <span class="deck-kicker">Teoria &middot; Placeholder</span>
+          <h2 class="deck-title">Row-store vs column-store em uma tabela</h2>
+          <p class="deck-summary">Estrutura de tabela editorial que será preenchida com os critérios de decisão entre armazenamento por linha e por coluna.</p>
         </div>
         <table class="deck-table">
           <thead>
             <tr>
-              <th>Aspecto</th>
-              <th>Kimball (bottom-up)</th>
-              <th>Inmon (top-down)</th>
+              <th>Dimensão</th>
+              <th>Row-store (OLTP)</th>
+              <th>Column-store (OLAP)</th>
+              <th>Escolha quando</th>
             </tr>
           </thead>
           <tbody>
-            <tr><td>Unidade inicial</td><td>Data marts dimensionais</td><td>DW corporativo normalizado (3NF)</td></tr>
-            <tr><td>Modelagem</td><td>Star schema direto</td><td>3NF e depois marts dimensionais</td></tr>
-            <tr><td>Tempo de entrega</td><td>R&aacute;pido, incremental</td><td>Longo, planejado</td></tr>
-            <tr><td>Governan&ccedil;a</td><td>Conformed dimensions</td><td>Modelo corporativo &uacute;nico</td></tr>
-            <tr><td>Quando usar</td><td>Produto anal&iacute;tico por dom&iacute;nio</td><td>Grandes empresas com forte TI central</td></tr>
+            <tr><td>Padrão de acesso</td><td>TODO</td><td>TODO</td><td>TODO</td></tr>
+            <tr><td>Compressão</td><td>TODO</td><td>TODO</td><td>TODO</td></tr>
+            <tr><td>Escrita vs leitura</td><td>TODO</td><td>TODO</td><td>TODO</td></tr>
+            <tr><td>Agregações</td><td>TODO</td><td>TODO</td><td>TODO</td></tr>
+            <tr><td>Custo na AWS</td><td>TODO</td><td>TODO</td><td>TODO</td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 6 - OLAP CUBES VS DW MODERNO                           -->
+    <!-- SLIDE 5 - PLACEHOLDER TEORIA (GRID DE CARDS)                 -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Teoria &middot; Evolu&ccedil;&atilde;o</span>
-          <h2 class="deck-title">OLAP cubes vs DW moderno em nuvem</h2>
-        </div>
-        <div class="deck-columns">
-          <div class="deck-panel">
-            <strong>OLAP tradicional (anos 1990-2000)</strong>
-            <ul style="margin:0; padding-left:22px;">
-              <li>Cubos MOLAP pr&eacute;-agregados (Essbase, SSAS).</li>
-              <li>Dimens&otilde;es e medidas fixas.</li>
-              <li>Processamento batch noturno.</li>
-              <li>Pouca flexibilidade para ad&ndash;hoc.</li>
-            </ul>
-          </div>
-          <div class="deck-panel">
-            <strong>DW moderno em nuvem</strong>
-            <ul style="margin:0; padding-left:22px;">
-              <li>SQL direto sobre grandes volumes.</li>
-              <li>MPP + armazenamento colunar.</li>
-              <li>Separa&ccedil;&atilde;o de compute e storage.</li>
-              <li>Elasticidade sob demanda (Serverless).</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 7 - MPP LEADER / COMPUTE                               -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Teoria &middot; Arquitetura</span>
-          <h2 class="deck-title">MPP: Massively Parallel Processing</h2>
-          <p class="deck-summary">Arquitetura distribu&iacute;da com um n&oacute; coordenador e m&uacute;ltiplos n&oacute;s de c&aacute;lculo trabalhando em paralelo sobre parti&ccedil;&otilde;es diferentes dos dados.</p>
-        </div>
-        <div class="deck-callout">
-          <strong>Fluxo de uma query MPP</strong>
-          <ol style="margin:12px 0 0; padding-left:22px;">
-            <li>Leader recebe o SQL, valida e gera o plano de execu&ccedil;&atilde;o.</li>
-            <li>Leader distribui fragmentos para os compute nodes.</li>
-            <li>Cada compute node processa sua fatia local (slices).</li>
-            <li>Resultados intermedi&aacute;rios s&atilde;o trocados quando necess&aacute;rio (redistribution/broadcast).</li>
-            <li>Leader consolida o resultado final e devolve ao cliente.</li>
-          </ol>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 8 - COLUNAR E COMPRESSAO                               -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Teoria &middot; Armazenamento</span>
-          <h2 class="deck-title">Armazenamento colunar e compress&atilde;o por coluna</h2>
-          <p class="deck-summary">DW anal&iacute;ticos armazenam dados por coluna, n&atilde;o por linha. Consultas anal&iacute;ticas leem poucas colunas de muitas linhas &mdash; o oposto de OLTP.</p>
+          <span class="deck-kicker">Teoria &middot; Placeholder</span>
+          <h2 class="deck-title">Quatro técnicas de modelagem dimensional</h2>
+          <p class="deck-summary">Grid de cards que será preenchido com definições, exemplos no Olist e quando aplicar cada técnica.</p>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
-            <h3>Vantagens colunares</h3>
+            <h3>Fato e dimensão</h3>
             <ul>
-              <li>L&ecirc; s&oacute; as colunas usadas (menos IO).</li>
-              <li>Compress&atilde;o espec&iacute;fica por tipo de dado.</li>
-              <li>Vetoriza&ccedil;&atilde;o de opera&ccedil;&otilde;es agregadas.</li>
+              <li>TODO &mdash; grain do fato e chaves.</li>
+              <li>TODO &mdash; exemplo no pipeline Olist.</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>Codifica&ccedil;&otilde;es t&iacute;picas</h3>
+            <h3>Star schema</h3>
             <ul>
-              <li><strong>AZ64</strong> &mdash; padr&atilde;o do Redshift para num&eacute;ricos e datas.</li>
-              <li><strong>ZSTD</strong> &mdash; forte em strings.</li>
-              <li><strong>RUNLENGTH</strong> &mdash; colunas com poucos valores repetidos.</li>
-              <li><strong>DELTA</strong> &mdash; sequ&ecirc;ncias ordenadas.</li>
+              <li>TODO &mdash; definição e casos de uso.</li>
+              <li>TODO &mdash; exemplo no pipeline Olist.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Snowflake</h3>
+            <ul>
+              <li>TODO &mdash; quando normalizar dimensões.</li>
+              <li>TODO &mdash; exemplo no pipeline Olist.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Slow Changing Dimensions</h3>
+            <ul>
+              <li>TODO &mdash; tipos 0, 1, 2 e 3.</li>
+              <li>TODO &mdash; surrogate keys e histórico.</li>
             </ul>
           </article>
         </div>
@@ -217,710 +155,85 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 9 - ZONE MAPS                                          -->
+    <!-- SLIDE 6 - PLACEHOLDER TEORIA (2 COLUNAS)                     -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Teoria &middot; Otimiza&ccedil;&atilde;o</span>
-          <h2 class="deck-title">Zone maps / block min-max</h2>
-          <p class="deck-summary">Cada bloco de 1 MB de dados guarda, em metadados, o valor m&iacute;nimo e m&aacute;ximo de cada coluna. O planejador pula blocos inteiros que n&atilde;o atendem ao filtro.</p>
-        </div>
-        <div class="deck-callout">
-          <strong>Exemplo pr&aacute;tico</strong>
-          <p style="margin:8px 0 0;">Uma tabela <code>fato_vendas</code> ordenada por <code>data_pedido</code> e filtrada por <code>WHERE data_pedido BETWEEN '2018-01-01' AND '2018-01-31'</code> pode descartar 95% dos blocos antes mesmo de l&ecirc;-los. Sem ordena&ccedil;&atilde;o coerente com o filtro, zone maps perdem efetividade.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 10 - MODELAGEM DIMENSIONAL                             -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Teoria &middot; Modelagem dimensional</span>
-          <h2 class="deck-title">Star schema vs snowflake</h2>
+          <span class="deck-kicker">Teoria &middot; Placeholder</span>
+          <h2 class="deck-title">Star schema vs Snowflake &mdash; trade-offs</h2>
+          <p class="deck-summary">Duas colunas comparando a simplicidade desnormalizada do star com a economia de storage e complexidade do snowflake.</p>
         </div>
         <div class="deck-columns">
           <div class="deck-panel">
             <strong>Star schema</strong>
-            <ul style="margin:0; padding-left:22px;">
-              <li>Fato no centro, dimens&otilde;es ao redor.</li>
-              <li>Dimens&otilde;es desnormalizadas (1 tabela por dimens&atilde;o).</li>
-              <li>Menos joins, queries mais r&aacute;pidas.</li>
-              <li>Padr&atilde;o em DWs anal&iacute;ticos.</li>
+            <ul>
+              <li>TODO &mdash; quando priorizar simplicidade de consulta.</li>
+              <li>TODO &mdash; impacto em performance e storage.</li>
+              <li>TODO &mdash; aplicação no Gold do Olist.</li>
             </ul>
           </div>
           <div class="deck-panel">
             <strong>Snowflake</strong>
-            <ul style="margin:0; padding-left:22px;">
-              <li>Dimens&otilde;es normalizadas (hier&aacute;rquicas).</li>
-              <li>Economiza armazenamento.</li>
-              <li>Mais joins, mais complexidade.</li>
-              <li>Justific&aacute;vel quando dimens&atilde;o &eacute; enorme.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 11 - FATO                                              -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Teoria &middot; Modelagem dimensional</span>
-          <h2 class="deck-title">Tabela fato: grain e tipos</h2>
-          <p class="deck-summary">A primeira decis&atilde;o da modelagem &eacute; declarar o <strong>grain</strong>: o n&iacute;vel de detalhe de uma linha da fato. Sem grain claro, o modelo colapsa.</p>
-        </div>
-        <table class="deck-table">
-          <thead>
-            <tr><th>Tipo de fato</th><th>Descri&ccedil;&atilde;o</th><th>Exemplo Olist</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Transactional</td><td>Uma linha por evento no momento em que ocorre.</td><td>1 linha por item de pedido.</td></tr>
-            <tr><td>Periodic snapshot</td><td>Estado em um intervalo fixo de tempo.</td><td>Estoque por SKU no fim do dia.</td></tr>
-            <tr><td>Accumulating snapshot</td><td>Ciclo de vida de um processo, atualizado conforme avan&ccedil;a.</td><td>Pedido: criado &rarr; pago &rarr; enviado &rarr; entregue.</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 12 - SCD TIPOS                                         -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Teoria &middot; Dimens&otilde;es</span>
-          <h2 class="deck-title">Slow Changing Dimensions (SCD)</h2>
-          <p class="deck-summary">O mundo muda: clientes trocam endere&ccedil;o, produtos mudam de categoria. O DW precisa decidir como guardar essa hist&oacute;ria.</p>
-        </div>
-        <table class="deck-table">
-          <thead><tr><th>Tipo</th><th>Comportamento</th><th>Quando usar</th></tr></thead>
-          <tbody>
-            <tr><td>SCD 0</td><td>Nunca muda.</td><td>Atributos imut&aacute;veis (data de nascimento).</td></tr>
-            <tr><td>SCD 1</td><td>Sobrescreve o valor antigo.</td><td>Corre&ccedil;&otilde;es, sem necessidade hist&oacute;rica.</td></tr>
-            <tr><td>SCD 2</td><td>Cria nova linha versionada (valid_from/valid_to).</td><td>Hist&oacute;rico completo (padr&atilde;o).</td></tr>
-            <tr><td>SCD 3</td><td>Mant&eacute;m colunas current_value e previous_value.</td><td>S&oacute; uma mudan&ccedil;a recente importa.</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 13 - SURROGATE KEYS                                    -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Teoria &middot; Chaves</span>
-          <h2 class="deck-title">Surrogate keys vs natural keys</h2>
-        </div>
-        <div class="deck-columns">
-          <div class="deck-panel">
-            <strong>Natural key</strong>
-            <ul style="margin:0; padding-left:22px;">
-              <li>Identificador do sistema de origem (CPF, email, SKU).</li>
-              <li>Muda quando a fonte muda.</li>
-              <li>Dif&iacute;cil de unificar entre sistemas.</li>
-            </ul>
-          </div>
-          <div class="deck-panel">
-            <strong>Surrogate key</strong>
-            <ul style="margin:0; padding-left:22px;">
-              <li>Inteiro sequencial gerado pelo DW.</li>
-              <li>Est&aacute;vel, imune a mudan&ccedil;as de origem.</li>
-              <li>Essencial para SCD 2 (uma linha por vers&atilde;o).</li>
-              <li>Chave de join leve e r&aacute;pida.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 14 - REDSHIFT CLUSTER VS SERVERLESS                    -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Teoria &middot; Amazon Redshift</span>
-          <h2 class="deck-title">Redshift Cluster vs Redshift Serverless</h2>
-        </div>
-        <table class="deck-table">
-          <thead><tr><th>Aspecto</th><th>Cluster tradicional</th><th>Serverless</th></tr></thead>
-          <tbody>
-            <tr><td>Provisionamento</td><td>N&oacute;s fixos (ra3, dc2)</td><td>Capacidade em RPUs sob demanda</td></tr>
-            <tr><td>Cobran&ccedil;a</td><td>Por hora de n&oacute;</td><td>Por RPU-hora consumida</td></tr>
-            <tr><td>Escala</td><td>Manual ou elastic resize</td><td>Autom&aacute;tica</td></tr>
-            <tr><td>Quando usar</td><td>Carga previs&iacute;vel 24x7</td><td>Workload intermitente, POC, dev</td></tr>
-            <tr><td>No lab</td><td>Bloqueado</td><td>Frequentemente dispon&iacute;vel</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 15 - DISTRIBUTION STYLES                               -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Teoria &middot; Redshift interno</span>
-          <h2 class="deck-title">Distribution styles</h2>
-          <p class="deck-summary">Como as linhas de uma tabela s&atilde;o espalhadas entre os n&oacute;s de compute. Escolher errado custa shuffle pesado em todo join.</p>
-        </div>
-        <table class="deck-table">
-          <thead><tr><th>Estilo</th><th>Comportamento</th><th>Quando usar</th></tr></thead>
-          <tbody>
-            <tr><td>KEY</td><td>Hash de uma coluna distribui a linha.</td><td>Fato grande com join frequente em mesma chave.</td></tr>
-            <tr><td>ALL</td><td>C&oacute;pia completa em todos os n&oacute;s.</td><td>Dimens&atilde;o pequena usada em quase toda query.</td></tr>
-            <tr><td>EVEN</td><td>Round-robin uniforme.</td><td>Tabela sem chave de join dominante.</td></tr>
-            <tr><td>AUTO</td><td>Redshift decide e evolui.</td><td>Default recomendado para in&iacute;cio.</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 16 - SORT KEYS                                         -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Teoria &middot; Redshift interno</span>
-          <h2 class="deck-title">Sort keys: compound vs interleaved</h2>
-          <p class="deck-summary">Sort key define a ordem f&iacute;sica dos blocos. Ela ativa zone maps e pode transformar um full scan em leitura pontual.</p>
-        </div>
-        <div class="deck-columns">
-          <div class="deck-panel">
-            <strong>Compound</strong>
-            <ul style="margin:0; padding-left:22px;">
-              <li>Ordena pela sequ&ecirc;ncia declarada (col1, col2, col3).</li>
-              <li>Excelente quando o filtro usa as primeiras colunas.</li>
-              <li>Padr&atilde;o para filtros temporais.</li>
-            </ul>
-          </div>
-          <div class="deck-panel">
-            <strong>Interleaved</strong>
-            <ul style="margin:0; padding-left:22px;">
-              <li>Peso equivalente para todas as colunas.</li>
-              <li>Bom quando filtros variam entre colunas diferentes.</li>
-              <li>VACUUM mais caro; cair em desuso na maioria dos casos.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 17 - COPY DO S3                                        -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Teoria &middot; Carga</span>
-          <h2 class="deck-title">COPY: ingestar do S3 para Redshift</h2>
-          <p class="deck-summary">COPY &eacute; a forma canonical de carregar dados. Usa os n&oacute;s de compute em paralelo, l&ecirc; direto do S3 e aplica compress&atilde;o autom&aacute;tica.</p>
-        </div>
-        <pre><code>COPY fato_vendas
-FROM 's3://aluno-refined/olist/gold/fato_vendas/'
-IAM_ROLE 'arn:aws:iam::&lt;account&gt;:role/LabRole'
-FORMAT AS PARQUET;</code></pre>
-        <div class="deck-callout">
-          <strong>Dicas operacionais</strong>
-          <ul style="margin:8px 0 0; padding-left:22px;">
-            <li>Use arquivos de 100 MB a 1 GB e m&uacute;ltiplos arquivos para paralelismo.</li>
-            <li>Prefira Parquet ao CSV: tipos, compress&atilde;o e menor custo de parse.</li>
-            <li>Use <code>MANIFEST</code> para controlar exatamente quais arquivos entram.</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 18 - REDSHIFT SPECTRUM                                 -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Teoria &middot; Lakehouse leve</span>
-          <h2 class="deck-title">Redshift Spectrum</h2>
-          <p class="deck-summary">Consulta SQL direto em arquivos no S3 sem carregar. Usa o Glue Data Catalog como metastore. Ideal para dados frios ou para juntar gold do DL com fatos no DW.</p>
-        </div>
-        <pre><code>CREATE EXTERNAL SCHEMA olist_ext
-FROM DATA CATALOG
-DATABASE 'olist_gold'
-IAM_ROLE 'arn:aws:iam::&lt;account&gt;:role/LabRole'
-REGION 'us-east-1';
-
-SELECT categoria, SUM(receita_total)
-FROM olist_ext.fato_vendas
-GROUP BY categoria;</code></pre>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 19 - ICEBERG LAKEHOUSE                                 -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Teoria &middot; Alternativa lakehouse</span>
-          <h2 class="deck-title">Athena + Apache Iceberg</h2>
-          <p class="deck-summary">Iceberg &eacute; um formato de tabela aberto sobre Parquet no S3. Traz ACID, snapshots, time travel e evolu&ccedil;&atilde;o de schema &mdash; sem precisar de um DW tradicional.</p>
-        </div>
-        <div class="deck-grid">
-          <article class="deck-card">
-            <h3>Por que Iceberg</h3>
             <ul>
-              <li>Transa&ccedil;&otilde;es ACID sobre o data lake.</li>
-              <li>UPSERT e DELETE via <code>MERGE INTO</code>.</li>
-              <li>Time travel por snapshot id.</li>
-              <li>Schema evolution sem reescrever arquivos.</li>
+              <li>TODO &mdash; quando normalizar dimensões vale a pena.</li>
+              <li>TODO &mdash; impacto em joins e manutenção.</li>
+              <li>TODO &mdash; aplicação no Gold do Olist.</li>
             </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Como roda na AWS</h3>
-            <ul>
-              <li>Athena engine v3 com suporte nativo.</li>
-              <li>Metadata manifesto em <code>s3://.../iceberg/...</code>.</li>
-              <li>Glue Catalog como cat&aacute;logo.</li>
-              <li>Sem cluster dedicado.</li>
-            </ul>
-          </article>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 20 - REDSHIFT VS ICEBERG                               -->
+    <!-- SLIDE 7 - PLACEHOLDER PRATICA                                -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Teoria &middot; Decis&atilde;o arquitetural</span>
-          <h2 class="deck-title">Redshift vs Athena + Iceberg</h2>
+          <span class="deck-kicker">Prática &middot; 20h30 &ndash; 22h00</span>
+          <h2 class="deck-title">Laboratório: carga do Refined no warehouse colunar</h2>
+          <p class="deck-summary">O roteiro prático será detalhado com comandos SQL, COPY a partir do S3 e fallback via Athena + Iceberg antes da aula.</p>
         </div>
-        <table class="deck-table">
-          <thead><tr><th>Aspecto</th><th>Redshift</th><th>Athena + Iceberg</th></tr></thead>
-          <tbody>
-            <tr><td>Formato</td><td>Colunar propriet&aacute;rio</td><td>Parquet aberto</td></tr>
-            <tr><td>Compute</td><td>MPP dedicado</td><td>Serverless por query</td></tr>
-            <tr><td>Custo base</td><td>Por RPU ou por n&oacute;</td><td>Por TB escaneado</td></tr>
-            <tr><td>Lat&ecirc;ncia p/ BI pesado</td><td>Muito baixa</td><td>Boa, com parti&ccedil;&atilde;o adequada</td></tr>
-            <tr><td>ACID</td><td>Nativo</td><td>Iceberg</td></tr>
-            <tr><td>Lock-in</td><td>Maior</td><td>Baixo (dados abertos no S3)</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 21 - INTERVALO / TRANSICAO                             -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Transi&ccedil;&atilde;o &middot; 20h30</span>
-          <h2 class="deck-title">Vamos para a pr&aacute;tica</h2>
-          <p class="deck-summary">A partir daqui, vamos tentar subir um Redshift Serverless. Se o AWS Learner Lab bloquear, migramos para o Plano B (Athena + Iceberg) sem perder o fio da aula.</p>
-        </div>
-        <div class="deck-callout">
-          <strong>Crit&eacute;rio de decis&atilde;o</strong>
-          <ol style="margin:12px 0 0; padding-left:22px;">
-            <li>Tentar criar namespace Redshift Serverless na regi&atilde;o us-east-1.</li>
-            <li>Se der erro de permiss&atilde;o ou quota &rarr; Plano B imediatamente.</li>
-            <li>Se subir, seguimos no Plano A e o Plano B fica como leitura do material.</li>
+        <div class="deck-panel">
+          <strong>Esqueleto dos passos</strong>
+          <ol>
+            <li>TODO &mdash; provisionar Redshift Serverless (namespace + workgroup).</li>
+            <li>TODO &mdash; conectar via Query Editor v2 associando LabRole.</li>
+            <li>TODO &mdash; criar dimensões e fato com distribution style e sort key adequados.</li>
+            <li>TODO &mdash; executar COPY do Gold em Parquet para a fato.</li>
+            <li>TODO &mdash; plano B: criar tabela Iceberg no Athena e demonstrar MERGE INTO + time travel.</li>
+            <li>TODO &mdash; rodar consultas analíticas e comparar tempo Redshift vs Athena.</li>
           </ol>
         </div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 22 - PLANO A OVERVIEW                                  -->
+    <!-- SLIDE 8 - FECHAMENTO E PONTE PARA AULA 07                    -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Pr&aacute;tica &middot; Plano A</span>
-          <h2 class="deck-title">Plano A &mdash; Redshift Serverless</h2>
+          <span class="deck-kicker">Fechamento &middot; Placeholder</span>
+          <h2 class="deck-title">O que levamos e o que vem</h2>
+          <p class="deck-summary">Resumo e ponte para a Aula 07 (Data Reliability e SRE aplicados a pipelines de dados), em 28/05/2026.</p>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
-            <h3>Passos no console</h3>
-            <ol>
-              <li>Redshift &rarr; Serverless dashboard.</li>
-              <li>Criar namespace <code>olist-dw</code>.</li>
-              <li>Criar workgroup <code>olist-wg</code> (base RPU = 8).</li>
-              <li>Associar <code>LabRole</code> ao namespace.</li>
-              <li>Abrir <code>Query Editor v2</code>.</li>
-            </ol>
-          </article>
-          <article class="deck-card">
-            <h3>O que vamos construir</h3>
+            <h3>O que fica desta aula</h3>
             <ul>
-              <li>Schema <code>olist</code> interno.</li>
-              <li>External schema apontando ao Glue Catalog.</li>
-              <li>Fato e dimens&otilde;es carregadas via COPY do gold.</li>
-              <li>Queries anal&iacute;ticas comparadas ao Athena.</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 23 - PLANO A DDL DIMENSOES                             -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Pr&aacute;tica &middot; Plano A &middot; DDL</span>
-          <h2 class="deck-title">Criar schema e dimens&otilde;es</h2>
-        </div>
-        <pre><code>CREATE SCHEMA IF NOT EXISTS olist;
-
-CREATE TABLE olist.dim_cliente (
-  sk_cliente      BIGINT IDENTITY(1,1),
-  customer_id     VARCHAR(64) NOT NULL,
-  cidade          VARCHAR(120),
-  uf              CHAR(2),
-  valid_from      TIMESTAMP,
-  valid_to        TIMESTAMP,
-  is_current      BOOLEAN
-) DISTSTYLE ALL;
-
-CREATE TABLE olist.dim_produto (
-  sk_produto      BIGINT IDENTITY(1,1),
-  product_id      VARCHAR(64) NOT NULL,
-  categoria       VARCHAR(120)
-) DISTSTYLE ALL;
-
-CREATE TABLE olist.dim_tempo (
-  sk_tempo        INTEGER NOT NULL,
-  data            DATE,
-  ano             SMALLINT,
-  mes             SMALLINT,
-  dia             SMALLINT
-) DISTSTYLE ALL;</code></pre>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 24 - PLANO A DDL FATO                                  -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Pr&aacute;tica &middot; Plano A &middot; DDL</span>
-          <h2 class="deck-title">Criar tabela fato</h2>
-        </div>
-        <pre><code>CREATE TABLE olist.fato_vendas (
-  sk_cliente      BIGINT,
-  sk_produto      BIGINT,
-  sk_tempo        INTEGER,
-  order_id        VARCHAR(64),
-  price           DECIMAL(12,2),
-  freight_value   DECIMAL(12,2),
-  receita_total   DECIMAL(12,2),
-  data_pedido     TIMESTAMP
-)
-DISTSTYLE KEY
-DISTKEY (sk_cliente)
-COMPOUND SORTKEY (data_pedido, sk_produto);</code></pre>
-        <div class="deck-callout">
-          <strong>Por que essas escolhas</strong>
-          <ul style="margin:8px 0 0; padding-left:22px;">
-            <li>DISTKEY em <code>sk_cliente</code>: joins frequentes com <code>dim_cliente</code>.</li>
-            <li>Dimens&otilde;es pequenas com <code>DISTSTYLE ALL</code>: sem shuffle nos joins.</li>
-            <li>SORTKEY compound em <code>data_pedido</code>: acelera filtros temporais via zone maps.</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 25 - PLANO A COPY E QUERIES                            -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Pr&aacute;tica &middot; Plano A &middot; Carga</span>
-          <h2 class="deck-title">COPY do gold e primeira consulta</h2>
-        </div>
-        <pre><code>COPY olist.fato_vendas
-FROM 's3://&lt;aluno&gt;-refined/olist/gold/fato_vendas/'
-IAM_ROLE 'arn:aws:iam::&lt;account&gt;:role/LabRole'
-FORMAT AS PARQUET;
-
-SELECT p.categoria,
-       DATE_TRUNC('month', f.data_pedido) AS mes,
-       SUM(f.receita_total)               AS receita
-FROM   olist.fato_vendas f
-JOIN   olist.dim_produto p USING (sk_produto)
-GROUP  BY 1,2
-ORDER  BY mes, receita DESC;</code></pre>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 26 - PLANO A ANALISE                                   -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Pr&aacute;tica &middot; Plano A &middot; An&aacute;lise</span>
-          <h2 class="deck-title">Queries anal&iacute;ticas e compara&ccedil;&atilde;o</h2>
-        </div>
-        <div class="deck-grid">
-          <article class="deck-card">
-            <h3>Perguntas para o Olist</h3>
-            <ul>
-              <li>Top 10 categorias por receita acumulada.</li>
-              <li>Top 20 clientes por ticket m&eacute;dio.</li>
-              <li>Raz&atilde;o frete/pre&ccedil;o por estado.</li>
-              <li>Meses com maior crescimento m&ecirc;s a m&ecirc;s.</li>
+              <li>TODO &mdash; decisão clara entre Redshift e Athena + Iceberg por caso de uso.</li>
+              <li>TODO &mdash; modelagem dimensional aplicada ao Gold do Olist.</li>
+              <li>TODO &mdash; warehouse consultável com performance analítica.</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>Compara&ccedil;&atilde;o com Athena</h3>
+            <h3>Aula 07 &middot; 28/05/2026</h3>
             <ul>
-              <li>Rodar a mesma query no Athena sobre o gold.</li>
-              <li>Anotar tempo de execu&ccedil;&atilde;o e dados escaneados.</li>
-              <li>Discutir trade-off: lat&ecirc;ncia vs custo por query.</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 27 - PLANO B OVERVIEW                                  -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Pr&aacute;tica &middot; Plano B (fallback)</span>
-          <h2 class="deck-title">Plano B &mdash; Athena + Apache Iceberg</h2>
-          <p class="deck-summary">Se o Redshift Serverless estiver bloqueado, subimos um lakehouse funcional s&oacute; com Athena engine v3 sobre o S3.</p>
-        </div>
-        <div class="deck-callout">
-          <strong>Checklist inicial</strong>
-          <ol style="margin:12px 0 0; padding-left:22px;">
-            <li>Abrir Athena Query Editor na regi&atilde;o us-east-1.</li>
-            <li>Database <code>olist_gold</code> j&aacute; existe desde a aula 05.</li>
-            <li>Criar database novo <code>olist_iceberg</code> para isolar as tabelas transacionais.</li>
-            <li>Confirmar que o workgroup est&aacute; em engine v3.</li>
-          </ol>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 28 - PLANO B DDL ICEBERG                               -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Pr&aacute;tica &middot; Plano B &middot; DDL</span>
-          <h2 class="deck-title">Criar tabela Iceberg</h2>
-        </div>
-        <pre><code>CREATE TABLE olist_iceberg.fato_vendas (
-  order_id        string,
-  customer_id     string,
-  product_id      string,
-  price           decimal(12,2),
-  freight_value   decimal(12,2),
-  receita_total   decimal(12,2),
-  data_pedido     timestamp
-)
-PARTITIONED BY (month(data_pedido))
-LOCATION 's3://&lt;aluno&gt;-refined/olist/iceberg/fato_vendas/'
-TBLPROPERTIES (
-  'table_type'='ICEBERG',
-  'format'='parquet'
-);</code></pre>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 29 - PLANO B INSERT E MERGE                            -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Pr&aacute;tica &middot; Plano B &middot; DML</span>
-          <h2 class="deck-title">INSERT e MERGE INTO</h2>
-        </div>
-        <pre><code>INSERT INTO olist_iceberg.fato_vendas
-SELECT order_id, customer_id, product_id,
-       price, freight_value,
-       price + freight_value AS receita_total,
-       data_pedido
-FROM   olist_gold.fato_vendas;
-
-MERGE INTO olist_iceberg.fato_vendas t
-USING atualizacoes_vendas u
-ON    t.order_id = u.order_id
-WHEN MATCHED THEN UPDATE SET
-      price = u.price,
-      freight_value = u.freight_value,
-      receita_total = u.price + u.freight_value
-WHEN NOT MATCHED THEN INSERT VALUES (
-      u.order_id, u.customer_id, u.product_id,
-      u.price, u.freight_value,
-      u.price + u.freight_value, u.data_pedido
-);</code></pre>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 30 - PLANO B TIME TRAVEL                               -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Pr&aacute;tica &middot; Plano B &middot; Features</span>
-          <h2 class="deck-title">Time travel e schema evolution</h2>
-        </div>
-        <pre><code>-- Descobrir os snapshots
-SELECT snapshot_id, committed_at
-FROM   "olist_iceberg"."fato_vendas$snapshots"
-ORDER  BY committed_at DESC;
-
--- Consultar estado anterior
-SELECT COUNT(*) FROM olist_iceberg.fato_vendas
-FOR VERSION AS OF 1234567890123456789;
-
--- Evoluir o schema sem reescrever arquivos
-ALTER TABLE olist_iceberg.fato_vendas
-  ADD COLUMN canal_origem string;</code></pre>
-        <div class="deck-callout">
-          <strong>O que demonstrar em sala</strong>
-          <ul style="margin:8px 0 0; padding-left:22px;">
-            <li>Antes e depois de um MERGE: mesma tabela, dois snapshots.</li>
-            <li>Contagem diferente com <code>FOR VERSION AS OF</code>.</li>
-            <li>Nova coluna aparece sem quebrar queries existentes.</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 31 - COMPARACAO FINAL                                  -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Pr&aacute;tica &middot; Reflex&atilde;o</span>
-          <h2 class="deck-title">Iceberg vs Parquet puro vs Redshift</h2>
-        </div>
-        <table class="deck-table">
-          <thead><tr><th>Cen&aacute;rio</th><th>Recomenda&ccedil;&atilde;o</th></tr></thead>
-          <tbody>
-            <tr><td>BI interno pesado, 24x7, SLAs apertados</td><td>Redshift</td></tr>
-            <tr><td>Lakehouse multi-tool (Athena, Spark, EMR)</td><td>Iceberg</td></tr>
-            <tr><td>Consultas espor&aacute;dicas em dados frios</td><td>Athena em Parquet puro</td></tr>
-            <tr><td>Upsert/delete conforme LGPD no lake</td><td>Iceberg</td></tr>
-            <tr><td>POC r&aacute;pido com baixo lock-in</td><td>Iceberg</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 32 - LIMPEZA                                           -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Pr&aacute;tica &middot; Housekeeping</span>
-          <h2 class="deck-title">Antes de encerrar o lab</h2>
-        </div>
-        <div class="deck-grid">
-          <article class="deck-card">
-            <h3>Se usou Plano A</h3>
-            <ul>
-              <li>Parar o workgroup <code>olist-wg</code>.</li>
-              <li>Deletar o namespace <code>olist-dw</code> se o lab for reiniciado.</li>
-              <li>Confirmar que n&atilde;o ficou RPU consumindo.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Se usou Plano B</h3>
-            <ul>
-              <li>Manter tabelas Iceberg para a aula 07.</li>
-              <li>Revisar <code>s3://&lt;aluno&gt;-refined/olist/iceberg/</code>.</li>
-              <li>Checar que o Glue Catalog registrou <code>olist_iceberg</code>.</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 33 - RESUMO                                            -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Fechamento &middot; 1/2</span>
-          <h2 class="deck-title">Resumo da aula</h2>
-        </div>
-        <div class="deck-grid">
-          <article class="deck-card">
-            <h3>O que vimos hoje</h3>
-            <ul>
-              <li>DW: Kimball vs Inmon, MPP, colunar, zone maps.</li>
-              <li>Modelagem dimensional: star, SCD, surrogate keys.</li>
-              <li>Redshift: distribution styles, sort keys, COPY, Spectrum.</li>
-              <li>Lakehouse: Athena + Iceberg, ACID, time travel.</li>
-              <li>Crit&eacute;rios para escolher uma ou outra rota.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>O que ficou pronto no lab</h3>
-            <ul>
-              <li>Tabelas fato e dimens&atilde;o no Redshift ou Iceberg.</li>
-              <li>Gold carregado em formato anal&iacute;tico.</li>
-              <li>Queries anal&iacute;ticas respondendo perguntas de neg&oacute;cio.</li>
-              <li>Demonstra&ccedil;&atilde;o de time travel (se Plano B).</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 34 - PROXIMA AULA                                      -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Fechamento &middot; 2/2</span>
-          <h2 class="deck-title">Pr&oacute;ximos passos e estudo</h2>
-        </div>
-        <div class="deck-grid">
-          <article class="deck-card">
-            <h3>Pr&oacute;xima aula &mdash; 28/05/2026</h3>
-            <ul>
-              <li>Data Reliability e SRE aplicados a pipelines.</li>
-              <li>SLOs, SLIs e error budgets em dados.</li>
-              <li>Data quality gates no gold.</li>
-              <li>Observabilidade com CloudWatch.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Estudo complementar</h3>
-            <ul>
-              <li>Kimball: <em>The Data Warehouse Toolkit</em>.</li>
-              <li>AWS docs &mdash; Redshift Best Practices.</li>
-              <li>Apache Iceberg spec (v2 tables).</li>
-              <li>re:Invent: ANT302 &mdash; Redshift deep dive.</li>
+              <li>Data Reliability e SRE aplicados a pipelines de dados.</li>
+              <li>TODO &mdash; expectativas de SLO/SLI sobre o pipeline Olist.</li>
+              <li>TODO &mdash; entregável da Aula 07.</li>
             </ul>
           </article>
         </div>
@@ -935,13 +248,13 @@ ALTER TABLE olist_iceberg.fato_vendas
   <!-- GLOBAL navigation footer -->
   <div class="slide-footer">
     <div class="footer-links">
-      <a href="../../../index.html" class="back-home">&Iacute;ndice</a>
+      <a href="../../../index.html" class="back-home">Índice</a>
       <a href="../material/material_aula_06_data_warehousing_na_nuvem_de_alta_performance.html" class="material-link">Material</a>
     </div>
     <div class="nav-wrapper">
       <div class="nav-buttons"><button id="prev-btn" onclick="previousSlide()">&#8592; Anterior</button></div>
       <div class="slide-counter"><span id="current-slide">1</span> / <span id="total-slides">1</span></div>
-      <div class="nav-buttons"><button id="next-btn" onclick="nextSlide()">Pr&oacute;ximo &#8594;</button></div>
+      <div class="nav-buttons"><button id="next-btn" onclick="nextSlide()">Próximo &#8594;</button></div>
     </div>
     <button class="fullscreen-btn" onclick="toggleFullScreen()" title="Tela cheia">&#9974;</button>
   </div>

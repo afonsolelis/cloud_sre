@@ -1,55 +1,70 @@
 /* ==========================================================================
-   slides.css — HTML-native slide system for Mackenzie course decks
-   Replaces reveal_custom.css (no reveal.js dependency)
-   Design system: Mackenzie (white bg, black text, high contrast, square)
+   slides.css  -  Mackenzie course deck design system
+   Editorial / technical. High contrast, square-leaning, responsive.
+   Used by every lecture slide deck. Content-specific animation and diagram
+   styles (e.g. Aula 02 SDD loop) live inside the aula HTML file itself.
    ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   0. Typography imports
+   -------------------------------------------------------------------------- */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 /* --------------------------------------------------------------------------
    1. Design tokens
    -------------------------------------------------------------------------- */
 
 :root {
-  --deck-bg: #ffffff;
-  --deck-surface: #f3f4f6;
-  --deck-panel: #ffffff;
-  --deck-border: #111111;
-  --deck-text: #111111;
-  --deck-muted: #555555;
-  --deck-accent: #111111;
+  /* Surfaces */
+  --deck-bg:        #fafaf7;   /* warm off-white page */
+  --deck-surface:   #f2f2ee;   /* subtle paper fill for cards */
+  --deck-surface-2: #e9e9e3;
+  --deck-panel:     #ffffff;   /* clean white for main shell + panels */
+  --deck-line:      #d6d6d1;   /* neutral 1px rule */
+  --deck-line-soft: #e7e7e2;   /* even softer rule (table body) */
+
+  /* Ink */
+  --deck-border:    #0f0f0f;
+  --deck-text:      #0f0f0f;
+  --deck-muted:     #5c5c5c;
+  --deck-accent:    #0f0f0f;
+
+  /* Code */
+  --deck-code-bg:   #0d1117;
+  --deck-code-fg:   #e6edf3;
+  --deck-code-dim:  #8b949e;
+
+  /* Typography */
+  --font-sans: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 /* --------------------------------------------------------------------------
    2. Base reset & body
    -------------------------------------------------------------------------- */
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
+*, *::before, *::after { box-sizing: border-box; }
 
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
   overflow: hidden;
-  background: linear-gradient(180deg, #ffffff 0%, #f7f7f7 100%);
+  background: var(--deck-bg);
   color: var(--deck-text);
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 20px;
   line-height: 1.55;
+  letter-spacing: -0.005em;
+  font-feature-settings: 'ss01', 'cv02', 'cv11';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  color: var(--deck-accent);
-}
-
-a:focus {
-  outline: 2px solid var(--deck-accent);
-  outline-offset: 2px;
-}
+a         { color: var(--deck-accent); }
+a:hover   { opacity: 0.8; }
+a:focus   { outline: 2px solid var(--deck-accent); outline-offset: 2px; }
 
 /* --------------------------------------------------------------------------
    3. Slide container & navigation system
@@ -71,23 +86,17 @@ a:focus {
   left: 0;
   flex-direction: column;
   overflow-y: auto;
-  padding-bottom: 64px; /* space for fixed footer */
+  padding-bottom: 72px; /* space for fixed footer */
 }
 
 .slide.active {
   display: flex;
-  animation: slideIn 0.35s ease-in-out;
+  animation: slideIn 0.45s cubic-bezier(.22, .61, .36, 1);
 }
 
 @keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(18px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* --------------------------------------------------------------------------
@@ -103,9 +112,11 @@ a:focus {
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  padding: 10px 20px;
-  background: var(--deck-bg);
-  border-top: 2px solid var(--deck-border);
+  padding: 12px 24px;
+  background: rgba(250, 250, 247, 0.96);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-top: 1px solid var(--deck-line);
   z-index: 100;
   flex-wrap: wrap;
 }
@@ -126,40 +137,30 @@ a:focus {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 38px;
-  height: 34px;
+  min-width: 36px;
+  height: 32px;
   padding: 0 12px;
-  border: 2px solid var(--deck-border);
-  border-radius: 6px;
+  border: 1px solid var(--deck-accent);
+  border-radius: 4px;
   background: var(--deck-accent);
   color: #ffffff;
-  font-family: inherit;
-  font-size: 0.82em;
-  font-weight: 700;
+  font-family: var(--font-mono);
+  font-size: 0.72em;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   cursor: pointer;
-  transition: background 0.15s ease, box-shadow 0.15s ease;
+  transition: background 0.15s ease;
 }
 
-.nav-buttons button:hover {
-  background: #333333;
-  box-shadow: 3px 3px 0 rgba(17, 17, 17, 0.12);
-}
-
-.nav-buttons button:active {
-  background: #000000;
-  box-shadow: none;
-}
-
-.nav-buttons button:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-  box-shadow: none;
-}
+.nav-buttons button:hover    { background: #2a2a2a; }
+.nav-buttons button:active   { background: #000000; }
+.nav-buttons button:disabled { opacity: 0.3; cursor: not-allowed; }
 
 .slide-counter {
-  font-size: 0.85em;
-  font-weight: 700;
-  color: var(--deck-text);
+  font-family: var(--font-mono);
+  font-size: 0.78em;
+  font-weight: 500;
+  color: var(--deck-muted);
   white-space: nowrap;
   user-select: none;
 }
@@ -168,21 +169,19 @@ a:focus {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   padding: 0;
-  border: 2px solid var(--deck-border);
-  border-radius: 6px;
-  background: var(--deck-surface);
+  border: 1px solid var(--deck-line);
+  border-radius: 4px;
+  background: var(--deck-panel);
   color: var(--deck-text);
   font-size: 0.9em;
   cursor: pointer;
   transition: background 0.15s ease;
 }
 
-.fullscreen-btn:hover {
-  background: #e5e5e5;
-}
+.fullscreen-btn:hover { background: var(--deck-surface); }
 
 .footer-links {
   display: flex;
@@ -190,42 +189,34 @@ a:focus {
   flex-wrap: wrap;
 }
 
-.back-home {
+.back-home, .material-link {
   display: inline-block;
-  padding: 6px 14px;
-  border: 2px solid var(--deck-border);
-  border-radius: 6px;
-  background: var(--deck-surface);
+  padding: 7px 14px;
+  border: 1px solid var(--deck-line);
+  border-radius: 4px;
+  background: var(--deck-panel);
   color: var(--deck-text);
   text-decoration: none;
-  font-size: 0.78em;
-  font-weight: 700;
+  font-family: var(--font-mono);
+  font-size: 0.72em;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   transition: background 0.15s ease;
 }
 
-.back-home:hover {
-  background: #e0e0e0;
-}
+.back-home:hover     { background: var(--deck-surface); }
 
 .material-link {
-  display: inline-block;
-  padding: 6px 14px;
-  border: 2px solid var(--deck-border);
-  border-radius: 6px;
-  background: #333333;
+  background: var(--deck-accent);
+  border-color: var(--deck-accent);
   color: #ffffff;
-  text-decoration: none;
-  font-size: 0.78em;
-  font-weight: 700;
-  transition: background 0.15s ease;
 }
 
-.material-link:hover {
-  background: #555555;
-}
+.material-link:hover { background: #2a2a2a; }
 
 /* --------------------------------------------------------------------------
-   5. Internal slide layout — .deck-shell (main content wrapper)
+   5. Internal slide layout  -  .deck-shell (main content wrapper)
    -------------------------------------------------------------------------- */
 
 .deck-shell {
@@ -234,28 +225,73 @@ a:focus {
   flex-direction: column;
   justify-content: space-between;
   gap: 24px;
-  padding: 28px 34px;
+  padding: 44px 52px;
   background: var(--deck-panel);
-  border: 2px solid var(--deck-border);
-  border-radius: 8px;
-  box-shadow: 18px 18px 0 rgba(17, 17, 17, 0.08);
-  margin: 18px;
+  border: 1px solid var(--deck-line);
+  border-radius: 4px;
+  box-shadow:
+    0 1px 2px rgba(15, 15, 15, 0.04),
+    0 10px 28px rgba(15, 15, 15, 0.06);
+  margin: 22px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Thin editorial accent in top-left of every shell */
+.deck-shell::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 140px;
+  background: var(--deck-accent);
+}
+
+/* Decorative giant numeral on cover slides.
+   Opt-in by placing data-aula-number="01" on the shell in slide 1. */
+.deck-shell[data-aula-number]::after {
+  content: attr(data-aula-number);
+  position: absolute;
+  bottom: -70px;
+  right: -30px;
+  font-family: var(--font-mono);
+  font-size: 22em;
+  font-weight: 800;
+  color: var(--deck-accent);
+  opacity: 0.045;
+  letter-spacing: -0.05em;
+  line-height: 0.8;
+  pointer-events: none;
+  user-select: none;
 }
 
 /* --------------------------------------------------------------------------
-   6. Kicker (label / badge)
+   6. Kicker  -  editorial mono label with short rule
    -------------------------------------------------------------------------- */
 
 .deck-kicker {
-  display: inline-block;
-  padding: 8px 14px;
-  border: 2px solid var(--deck-border);
-  border-radius: 6px;
-  font-size: 0.8em;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: 0.72em;
+  font-weight: 600;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  background: #fff;
+  color: var(--deck-muted);
+  margin-bottom: 18px;
+}
+
+.deck-kicker::before {
+  content: '';
+  width: 28px;
+  height: 1px;
+  background: var(--deck-accent);
+  display: inline-block;
 }
 
 /* --------------------------------------------------------------------------
@@ -263,31 +299,52 @@ a:focus {
    -------------------------------------------------------------------------- */
 
 .deck-title {
-  margin: 14px 0 14px;
-  font-size: 2.1em;
-  line-height: 1.08;
+  margin: 0 0 18px;
+  font-size: 2.55em;
+  line-height: 1.04;
   font-weight: 800;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.025em;
+  max-width: 28ch;
 }
 
 .deck-year {
   margin: 0;
-  font-size: 3.2em;
-  font-weight: 800;
-  letter-spacing: -0.04em;
+  font-family: var(--font-mono);
+  font-size: 4em;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  color: var(--deck-accent);
 }
 
-.deck-subtitle,
-.deck-meta,
-.deck-summary,
-.deck-note {
+.deck-meta {
+  margin: 10px 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.82em;
   color: var(--deck-muted);
-  font-size: 1.02em;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.deck-subtitle {
+  margin-top: 28px;
+  max-width: 52ch;
+  font-size: 1.15em;
   line-height: 1.5;
+  font-weight: 400;
+  color: var(--deck-text);
 }
 
 .deck-summary {
+  max-width: 62ch;
   font-size: 1.08em;
+  line-height: 1.55;
+  color: #2e2e2e;
+}
+
+.deck-note {
+  color: var(--deck-muted);
+  font-size: 1em;
+  line-height: 1.5;
 }
 
 /* --------------------------------------------------------------------------
@@ -297,58 +354,92 @@ a:focus {
 .deck-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  gap: 20px;
 }
 
 .deck-card {
-  padding: 18px;
-  border: 2px solid var(--deck-border);
-  border-radius: 6px;
+  padding: 24px 26px;
   background: var(--deck-surface);
+  border: 1px solid var(--deck-line);
+  border-radius: 4px;
+  transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+}
+
+.deck-card:hover {
+  transform: translateY(-2px);
+  border-color: #bcbcb5;
+  box-shadow: 0 6px 16px rgba(15, 15, 15, 0.08);
 }
 
 .deck-card h3 {
-  margin-top: 0;
-  margin-bottom: 14px;
-  font-size: 1.1em;
+  margin: 0 0 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--deck-line);
+  font-family: var(--font-mono);
+  font-size: 0.78em;
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  color: var(--deck-text);
 }
 
-.deck-card ul,
-.deck-card ol {
+.deck-card ul, .deck-card ol {
   margin: 0;
-  padding-left: 22px;
-  font-size: 1em;
+  padding-left: 18px;
+  font-size: 0.96em;
 }
 
 .deck-card li {
-  margin-bottom: 10px;
-  line-height: 1.5;
+  margin-bottom: 8px;
+  line-height: 1.45;
+  color: #2a2a2a;
 }
 
 /* --------------------------------------------------------------------------
-   9. Table
+   9. Table  -  editorial, two heavy rules, soft body rules
    -------------------------------------------------------------------------- */
 
 .deck-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9em;
+  font-size: 0.92em;
   line-height: 1.45;
 }
 
 .deck-table th,
 .deck-table td {
+  border: 0;
+  border-bottom: 1px solid var(--deck-line-soft);
   padding: 14px 16px;
-  border: 2px solid var(--deck-border);
   text-align: left;
   vertical-align: top;
 }
 
-.deck-table th {
+.deck-table thead th {
+  border-top: 2px solid var(--deck-accent);
+  border-bottom: 2px solid var(--deck-accent);
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: 0.78em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--deck-muted);
+}
+
+.deck-table tbody tr:last-child td {
+  border-bottom: 2px solid var(--deck-accent);
+}
+
+.deck-table tbody tr { transition: background .15s ease; }
+.deck-table tbody tr:hover td { background: var(--deck-surface); }
+
+.deck-table code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
   background: var(--deck-surface);
-  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 3px;
 }
 
 /* --------------------------------------------------------------------------
@@ -358,30 +449,40 @@ a:focus {
 .deck-columns {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
+  gap: 20px;
 }
 
 /* --------------------------------------------------------------------------
-   11. Callout (left-bordered highlight block)
+   11. Callout  -  bordered highlight with left accent
    -------------------------------------------------------------------------- */
 
 .deck-callout {
-  padding: 18px 20px;
-  border-left: 6px solid var(--deck-border);
+  padding: 22px 28px;
+  border: 1px solid var(--deck-line);
+  border-left: 3px solid var(--deck-accent);
+  border-radius: 4px;
   background: var(--deck-surface);
   font-size: 1em;
   line-height: 1.5;
 }
 
+.deck-callout strong:first-child {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 1.05em;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
 /* --------------------------------------------------------------------------
-   12. Panel (bordered box)
+   12. Panel  -  plain bordered box
    -------------------------------------------------------------------------- */
 
 .deck-panel {
-  padding: 20px;
-  border: 2px solid var(--deck-border);
-  border-radius: 6px;
-  background: #fff;
+  padding: 24px 26px;
+  border: 1px solid var(--deck-line);
+  border-radius: 4px;
+  background: var(--deck-panel);
   font-size: 1em;
   line-height: 1.5;
 }
@@ -389,18 +490,17 @@ a:focus {
 .deck-panel > strong {
   display: block;
   margin-bottom: 12px;
-  font-size: 1.08em;
+  font-size: 1.04em;
+  font-weight: 700;
+  letter-spacing: -0.005em;
 }
 
-.deck-panel ul,
-.deck-panel ol {
+.deck-panel ul, .deck-panel ol {
   margin: 0;
   padding-left: 22px;
 }
 
-.deck-panel li {
-  margin-bottom: 8px;
-}
+.deck-panel li { margin-bottom: 8px; }
 
 /* --------------------------------------------------------------------------
    13. Placeholder (asymmetric 2-column layout)
@@ -409,7 +509,7 @@ a:focus {
 .deck-placeholder {
   display: grid;
   grid-template-columns: 1.4fr 1fr;
-  gap: 18px;
+  gap: 20px;
 }
 
 /* --------------------------------------------------------------------------
@@ -418,25 +518,24 @@ a:focus {
 
 .deck-logo-full {
   display: block;
-  height: 54px;
+  height: 44px;
   width: auto;
-  margin-bottom: 10px;
+  margin-bottom: 26px;
 }
 
 .slide-logo-mini {
   position: fixed;
-  bottom: 70px; /* raised above the navigation footer */
+  bottom: 72px; /* above the navigation footer */
   left: 14px;
   height: 28px;
   width: auto;
-  opacity: 0.6;
+  opacity: 0.45;
   z-index: 99;
   pointer-events: none;
 }
 
 /* --------------------------------------------------------------------------
-   15. deck-footer — in-slide bottom info bar (inside .deck-shell)
-       NOT the navigation footer (.slide-footer)
+   15. deck-footer  -  in-slide bottom info bar (distinct from .slide-footer)
    -------------------------------------------------------------------------- */
 
 .deck-footer {
@@ -444,9 +543,13 @@ a:focus {
   justify-content: space-between;
   align-items: center;
   gap: 16px;
-  font-size: 0.72em;
   padding-top: 12px;
-  border-top: 2px solid var(--deck-border);
+  border-top: 1px solid var(--deck-line);
+  font-family: var(--font-mono);
+  font-size: 0.72em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--deck-muted);
 }
 
 .deck-links {
@@ -458,27 +561,74 @@ a:focus {
 .deck-link {
   display: inline-block;
   padding: 8px 12px;
-  border: 2px solid var(--deck-border);
-  border-radius: 6px;
-  background: #fff;
+  border: 1px solid var(--deck-line);
+  border-radius: 4px;
+  background: var(--deck-panel);
   color: var(--deck-accent);
   text-decoration: none;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .deck-link:hover,
-.deck-link:focus {
-  background: #efefef;
+.deck-link:focus { background: var(--deck-surface); }
+
+/* --------------------------------------------------------------------------
+   16. Code  -  dark editorial block with subtle "terminal chrome"
+   -------------------------------------------------------------------------- */
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  background: var(--deck-surface);
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid var(--deck-line-soft);
+}
+
+pre {
+  position: relative;
+  margin: 14px 0 0;
+  padding: 28px 24px 22px !important;
+  border: 1px solid #1f242d;
+  border-radius: 6px !important;
+  background: var(--deck-code-bg) !important;
+  color: var(--deck-code-fg) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 0.88em !important;
+  line-height: 1.65 !important;
+  overflow-x: auto;
+  box-shadow: 0 10px 24px rgba(13, 17, 23, 0.18);
+}
+
+pre::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 14px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #3b424d;
+  box-shadow: 12px 0 0 #3b424d, 24px 0 0 #3b424d;
+}
+
+pre code {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
 }
 
 /* --------------------------------------------------------------------------
-   16. Utility: keyboard hint
+   17. Utility: keyboard hint
    -------------------------------------------------------------------------- */
 
 .keyboard-hint {
   position: fixed;
   bottom: 62px;
   right: 20px;
+  font-family: var(--font-mono);
   font-size: 0.65em;
   color: var(--deck-muted);
   opacity: 0.7;
@@ -487,15 +637,13 @@ a:focus {
 }
 
 /* --------------------------------------------------------------------------
-   17. Print styles
+   18. Print styles
    -------------------------------------------------------------------------- */
 
 @media print {
   .slide-footer,
   .slide-logo-mini,
-  .keyboard-hint {
-    display: none !important;
-  }
+  .keyboard-hint { display: none !important; }
 
   .slide {
     display: flex !important;
@@ -510,113 +658,64 @@ a:focus {
     overflow: visible !important;
     height: auto !important;
   }
+
+  .deck-shell {
+    box-shadow: none !important;
+  }
 }
 
 /* --------------------------------------------------------------------------
-   18. Responsive — mobile / small screens
+   19. Responsive  -  mobile / small screens
    -------------------------------------------------------------------------- */
 
 @media (max-width: 900px) {
-  html, body {
-    font-size: 17px;
-  }
+  html, body { font-size: 17px; }
 
   .deck-grid,
   .deck-placeholder,
-  .deck-columns {
-    grid-template-columns: 1fr;
-  }
+  .deck-columns { grid-template-columns: 1fr; }
 
   .deck-shell {
     min-height: auto;
-    padding: 18px 16px;
-    margin: 10px;
-    box-shadow: 8px 8px 0 rgba(17, 17, 17, 0.06);
+    padding: 26px 22px;
+    margin: 12px;
+    box-shadow: 0 1px 2px rgba(15,15,15,.04), 0 6px 16px rgba(15,15,15,.05);
   }
 
-  .deck-title {
-    font-size: 1.7em;
-  }
+  .deck-title { font-size: 1.8em; }
+  .deck-year  { font-size: 2.8em; }
 
-  .deck-year {
-    font-size: 2.6em;
-  }
+  .deck-table    { font-size: 0.84em; }
+  .deck-callout  { font-size: 0.94em; padding: 18px 22px; }
 
-  .deck-table {
-    font-size: 0.82em;
-  }
+  pre { padding: 22px 16px 16px !important; font-size: 0.8em !important; }
 
-  .deck-callout {
-    font-size: 0.92em;
-  }
-
-  /* Footer wraps gracefully */
-  .slide-footer {
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 8px 12px;
-  }
-
-  .nav-wrapper {
-    gap: 8px;
-  }
-
-  .nav-buttons button {
-    min-width: 32px;
-    height: 30px;
-    padding: 0 8px;
-    font-size: 0.75em;
-  }
-
-  .slide-counter {
-    font-size: 0.75em;
-  }
-
-  .footer-links {
-    gap: 6px;
-  }
+  .slide-footer  { flex-wrap: wrap; gap: 8px; padding: 8px 12px; }
+  .nav-wrapper   { gap: 8px; }
+  .nav-buttons button { min-width: 30px; height: 28px; padding: 0 8px; font-size: 0.68em; }
+  .slide-counter { font-size: 0.72em; }
+  .footer-links  { gap: 6px; }
 
   .back-home,
-  .material-link {
-    padding: 5px 10px;
-    font-size: 0.7em;
-  }
+  .material-link { padding: 5px 10px; font-size: 0.66em; }
 
-  .slide-logo-mini {
-    height: 22px;
-    bottom: 58px;
-  }
+  .slide-logo-mini { height: 22px; bottom: 58px; }
+  .slide { padding-bottom: 56px; }
 
-  .slide {
-    padding-bottom: 56px;
+  .deck-shell[data-aula-number]::after {
+    font-size: 14em;
+    bottom: -40px;
+    right: -20px;
   }
 }
 
 @media (max-width: 480px) {
-  html, body {
-    font-size: 15px;
-  }
+  html, body { font-size: 15px; }
 
-  .deck-shell {
-    padding: 14px 12px;
-    margin: 6px;
-    gap: 16px;
-  }
+  .deck-shell { padding: 16px 14px; margin: 6px; gap: 16px; }
+  .deck-title { font-size: 1.45em; }
+  .deck-year  { font-size: 2.2em; }
+  .deck-kicker { font-size: 0.68em; }
 
-  .deck-title {
-    font-size: 1.4em;
-  }
-
-  .deck-year {
-    font-size: 2em;
-  }
-
-  .deck-kicker {
-    font-size: 0.7em;
-    padding: 6px 10px;
-  }
-
-  .slide-footer {
-    padding: 6px 8px;
-  }
+  .slide-footer { padding: 6px 8px; }
 }
