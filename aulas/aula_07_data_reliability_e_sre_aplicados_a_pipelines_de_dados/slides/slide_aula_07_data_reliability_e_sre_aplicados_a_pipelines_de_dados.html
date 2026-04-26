@@ -127,7 +127,7 @@
           <img class="deck-logo-full" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_e4vyyw.png" alt="Universidade Presbiteriana Mackenzie" />
           <span class="deck-kicker">Cloud Computing e SRE &middot; MBA Engenharia de Dados</span>
           <h1 class="deck-title">SRE aplicado: observabilidade, runbooks automatizados e gestão distribuída via CloudFormation</h1>
-          <p class="deck-meta">Aula 07 &nbsp;&bull;&nbsp; 28/05/2026 &nbsp;&bull;&nbsp; 19h00 &ndash; 22h00</p>
+          <p class="deck-meta">Aula 07 &nbsp;&bull;&nbsp; 28/05/2026</p>
           <p class="deck-year">2026</p>
           <p class="deck-subtitle">O pipeline ganha olhos e mãos &mdash; CloudWatch enxerga, EventBridge + SSM agem. Closed loops desenhados na Aula 03 saem do markdown e viram código.</p>
         </div>
@@ -142,11 +142,11 @@
         <div>
           <span class="deck-kicker">Agenda</span>
           <h2 class="deck-title">O que vai acontecer nesta aula</h2>
-          <p class="deck-summary">Duas horas de teoria sobre SRE em produção e uma hora de prática guiada criando observability stack via IaC, EMF no ETL e runbook automatizado para o closed loop alarm &rarr; EventBridge &rarr; SSM.</p>
+          <p class="deck-summary">Bloco teórico sobre SRE em produção e prática guiada criando observability stack via IaC, EMF no ETL e runbook automatizado para o closed loop alarm &rarr; EventBridge &rarr; SSM.</p>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
-            <h3>19h00 &ndash; 21h00 &middot; Teoria</h3>
+            <h3>Bloco teórico</h3>
             <ul>
               <li>Recap Aulas 03 a 06 e o que ainda falta</li>
               <li>Pilares SRE: SLI/SLO/SLA, error budget, toil, IR, postmortem</li>
@@ -158,13 +158,12 @@
             </ul>
           </article>
           <article class="deck-card">
-            <h3>21h00 &ndash; 22h00 &middot; Prática guiada</h3>
+            <h3>Prática guiada</h3>
             <ul>
-              <li>Renovar session token e criar skill nova</li>
-              <li>Gerar <code>iac/cloudformation/observability.yaml</code></li>
-              <li>EMF no <code>src/etl/main.py</code> e canário Synthetics</li>
-              <li>Runbook <code>RetryEtlOnce</code> com dry-run</li>
-              <li>Simulação de incidente e postmortem</li>
+              <li>Bloco 1 &middot; Observability stack &mdash; token, skill, deploy</li>
+              <li>Bloco 2 &middot; Closed loop &mdash; EMF, Synthetics, runbook</li>
+              <li>Bloco 3 &middot; Incidente &amp; postmortem &mdash; chaos, doc, commit</li>
+              <li>Saída: <code>iac/</code>, <code>runbooks/</code>, <code>documents/17_postmortems/</code></li>
               <li>Tag <code>aula-07</code> no repo</li>
             </ul>
           </article>
@@ -1029,22 +1028,52 @@ flowchart LR
     <div class="slide">
       <div class="deck-shell a07-compact">
         <div>
-          <span class="deck-kicker">Prática &middot; 21h00 &ndash; 22h00</span>
+          <span class="deck-kicker">Prática &middot; Abertura</span>
           <h2 class="deck-title">Da teoria para o laboratório</h2>
-          <p class="deck-summary">Próxima hora guiada. Toda a turma sai com dashboard CW vivo, alarms ligados a SLOs, 1 runbook executado em dry-run e 1 postmortem fechado.</p>
+          <p class="deck-summary">Prática guiada em três blocos. Toda a turma sai com dashboard CW vivo, alarms ligados a SLOs, 1 runbook executado em dry-run e 1 postmortem fechado.</p>
         </div>
         <div class="deck-panel">
-          <strong>Sequência da prática</strong>
+          <strong>Sequência da prática &mdash; três blocos</strong>
           <ol>
-            <li>Renovar session token do Learner Lab.</li>
-            <li>Skill nova <code>gen_observability_stack</code> &mdash; agente DevOps escreve <code>iac/cloudformation/observability.yaml</code>.</li>
-            <li><code>aws cloudformation deploy</code> da stack <code>olist-observability</code>.</li>
-            <li>Skill <code>wire_emf_logging</code> &mdash; instrumenta <code>src/etl/main.py</code> com EMF.</li>
-            <li>Canário Synthetics no Grafana via CFN.</li>
-            <li>Runbook <code>RetryEtlOnce</code> &mdash; <em>dry-run</em> e log no CW.</li>
-            <li>Simulação de incidente: chaos da Aula 06 + alarm + runbook.</li>
-            <li>Postmortem em <code>documents/17_postmortems/</code>; tag <code>aula-07</code>.</li>
+            <li><strong>Bloco 1 &middot; Observability stack</strong> &mdash; renovar token, skill <code>gen_observability_stack</code>, deploy CFN + validação CLI.</li>
+            <li><strong>Bloco 2 &middot; Closed loop</strong> &mdash; EMF no ETL, canário Synthetics, runbook <code>RetryEtlOnce</code> + dry-run.</li>
+            <li><strong>Bloco 3 &middot; Incidente &amp; postmortem</strong> &mdash; simular incidente de latência, postmortem blameless, critério de pronto + commit.</li>
           </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE - ABERTURA BLOCO 1 - OBSERVABILITY STACK               -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a07-compact">
+        <div>
+          <span class="deck-kicker">Prática &middot; Bloco 1 &middot; Observability stack</span>
+          <h2 class="deck-title">Bloco 1 &mdash; observability stack</h2>
+          <p class="deck-summary">Objetivo: nascer o sistema nervoso do pipeline &mdash; CFN da observability stack deployada e validada pela CLI, sem clique no console.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Entregáveis</strong>
+            <ul>
+              <li>Session token do Learner Lab válido em <code>~/.aws/credentials</code>.</li>
+              <li>Skill <code>gen_observability_stack</code> registrada em <code>agents/skills/</code>.</li>
+              <li><code>iac/cloudformation/observability.yaml</code> gerado e revisado em diff.</li>
+              <li>Stack <code>olist-observability</code> em <code>CREATE_COMPLETE</code>.</li>
+              <li>Log groups, dashboard, 5 alarms, EventBridge rule e SSM Document criados.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Critério parcial</strong>
+            <ul>
+              <li><code>aws sts get-caller-identity</code> retorna a conta do lab.</li>
+              <li><code>aws cloudformation describe-stacks</code> mostra status verde.</li>
+              <li><code>describe-alarms</code> lista os 5 alarms <code>OlistETL-*</code>.</li>
+              <li><code>list-dashboards</code> mostra <code>olist-sre</code>.</li>
+              <li>Diff do <code>observability.yaml</code> revisado por humano antes do deploy.</li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
@@ -1055,7 +1084,7 @@ flowchart LR
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; Passo 1</span>
+          <span class="deck-kicker">Prática &middot; Bloco 1 &middot; Passo 1</span>
           <h2 class="deck-title">Renovar session token e validar handshake</h2>
           <p class="deck-summary">O token expira a cada ~3h. Sempre o primeiro passo de qualquer prática &mdash; senão o <code>cloudformation deploy</code> falha calado.</p>
         </div>
@@ -1082,7 +1111,7 @@ aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE UPDATE_COMP
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; Passo 2</span>
+          <span class="deck-kicker">Prática &middot; Bloco 1 &middot; Passo 2</span>
           <h2 class="deck-title">Skill <code>gen_observability_stack</code></h2>
           <p class="deck-summary">A skill lê os SLOs do <code>02_non_functional_requirements.md</code> e gera o template CFN. Saída revisável em diff &mdash; nunca colada cega.</p>
         </div>
@@ -1122,7 +1151,7 @@ Quando o usuario pedir para gerar/atualizar a observability stack.
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; Passo 3</span>
+          <span class="deck-kicker">Prática &middot; Bloco 1 &middot; Passo 3</span>
           <h2 class="deck-title">Deploy da stack e validação CLI</h2>
           <p class="deck-summary">Sem console. Tudo via <code>aws</code>. Se algo falhar, o CFN dá rollback &mdash; revisamos diff e tentamos de novo.</p>
         </div>
@@ -1152,12 +1181,48 @@ aws ssm list-documents \
     </div>
 
     <!-- ============================================================ -->
+    <!-- SLIDE - ABERTURA BLOCO 2 - CLOSED LOOP                       -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a07-compact">
+        <div>
+          <span class="deck-kicker">Prática &middot; Bloco 2 &middot; Closed loop</span>
+          <h2 class="deck-title">Bloco 2 &mdash; closed loop</h2>
+          <p class="deck-summary">Objetivo: fechar a malha alarm &rarr; EventBridge &rarr; SSM &mdash; o pipeline passa a se observar (EMF, Synthetics) e a se reparar (runbook idempotente com dry-run).</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Entregáveis</strong>
+            <ul>
+              <li><code>src/etl/main.py</code> emitindo EMF para namespace <code>OlistETL</code>.</li>
+              <li>Skill <code>wire_emf_logging</code> registrada em <code>agents/skills/</code>.</li>
+              <li>Canário <code>olist-grafana-heartbeat</code> (Synthetics) <em>RUNNING</em>.</li>
+              <li>SSM Document <code>RetryEtlOnce</code> publicado e versionado.</li>
+              <li>1 dry-run do runbook com <code>Status=Success</code> em <code>/olist/runbooks</code>.</li>
+              <li>EventBridge rule <code>olist-alarm-retry-etl</code> em <code>ENABLED</code>.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Critério parcial</strong>
+            <ul>
+              <li>Métricas <code>RowsProcessed</code>, <code>Latency</code>, <code>InvalidRows</code> aparecem no namespace <code>OlistETL</code>.</li>
+              <li>Canário verde por 2 datapoints consecutivos (10 min).</li>
+              <li><code>aws ssm get-command-invocation</code> retorna <code>Status: Success</code>.</li>
+              <li><code>aws events list-rules</code> mostra a regra com <code>State=ENABLED</code>.</li>
+              <li>Sem auto-remediation cega &mdash; dry-run executado <em>antes</em> do enable.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
     <!-- SLIDE 31 - PASSO 4 EMF NO ETL                                -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; Passo 4</span>
+          <span class="deck-kicker">Prática &middot; Bloco 2 &middot; Passo 4</span>
           <h2 class="deck-title">Skill <code>wire_emf_logging</code> &mdash; EMF no ETL</h2>
           <p class="deck-summary">O ETL para de emitir log de texto solto. Passa a emitir EMF JSON. CW reconhece e publica métricas <em>sem</em> PutMetricData. RowsProcessed, Latency e InvalidRows ganham vida.</p>
         </div>
@@ -1193,7 +1258,7 @@ def emit_emf(stage: str, rows: int, latency_s: float, invalid: int, run_id: str)
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; Passo 5</span>
+          <span class="deck-kicker">Prática &middot; Bloco 2 &middot; Passo 5</span>
           <h2 class="deck-title">Canário Synthetics via CFN</h2>
           <p class="deck-summary">Heartbeat de 5 min no Grafana. Falhar 2 datapoints &rarr; alarm <code>ALARM-06 SyntheticsDown</code>. Primeiro SLI black box do dashboard.</p>
         </div>
@@ -1227,7 +1292,7 @@ GrafanaCanary:
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; Passo 6</span>
+          <span class="deck-kicker">Prática &middot; Bloco 2 &middot; Passo 6</span>
           <h2 class="deck-title">Runbook <code>RetryEtlOnce</code> &mdash; SSM Document</h2>
           <p class="deck-summary">Document <code>Command</code> simples e idempotente. Roda no host do ETL via Run Command. Bem comentado &mdash; runbook mal escrito é runbook não rodado.</p>
         </div>
@@ -1260,7 +1325,7 @@ mainSteps:
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; Passo 7</span>
+          <span class="deck-kicker">Prática &middot; Bloco 2 &middot; Passo 6 (continuação)</span>
           <h2 class="deck-title">Dry-run do runbook antes do enable</h2>
           <p class="deck-summary">Regra dura: nenhum runbook entra em produção sem dry-run. Validamos parâmetros, role, conectividade e log antes da regra do EventBridge ficar com <code>State=ENABLED</code>.</p>
         </div>
@@ -1287,12 +1352,47 @@ aws events enable-rule --name olist-alarm-retry-etl</pre>
     </div>
 
     <!-- ============================================================ -->
+    <!-- SLIDE - ABERTURA BLOCO 3 - INCIDENTE & POSTMORTEM            -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a07-compact">
+        <div>
+          <span class="deck-kicker">Prática &middot; Bloco 3 &middot; Incidente &amp; postmortem</span>
+          <h2 class="deck-title">Bloco 3 &mdash; incidente e postmortem</h2>
+          <p class="deck-summary">Objetivo: provar a malha fechada injetando latência no Postgres, observar o runbook executando sozinho e fechar o ciclo com postmortem blameless commitado no repo.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Entregáveis</strong>
+            <ul>
+              <li>Chaos via Toxiproxy + SSM com kill switch automático em 10 min.</li>
+              <li>Alarm <code>OlistETL-FreshnessBreach</code> transitando <code>OK &rarr; ALARM &rarr; OK</code>.</li>
+              <li>EventBridge dispara o SSM Document &mdash; log em <code>/olist/runbooks</code>.</li>
+              <li>Postmortem em <code>documents/17_postmortems/2026-05-28-freshness-breach.md</code>.</li>
+              <li>Tag <code>aula-07</code> empurrada para <code>origin/main</code>.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Critério parcial</strong>
+            <ul>
+              <li>Timeline factual: detect, ack, mitigate, resolve com timestamps UTC.</li>
+              <li>MTTR registrado e error budget consumido calculado.</li>
+              <li>Contributing factors e action items com dono/prazo.</li>
+              <li>Linguagem despessoal, sem culpado.</li>
+              <li><code>git log --oneline aula-07</code> mostra o commit final.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
     <!-- SLIDE 35 - PASSO 8 SIMULACAO INCIDENTE                       -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; Passo 8</span>
+          <span class="deck-kicker">Prática &middot; Bloco 3 &middot; Passo 7</span>
           <h2 class="deck-title">Simulação de incidente &mdash; latência alta</h2>
           <p class="deck-summary">Reusamos o chaos da Aula 06 (Toxiproxy + SSM). Injetamos latência no Postgres, observamos alarm, vemos runbook executar, registramos timeline. Kill switch sempre claro.</p>
         </div>
@@ -1325,7 +1425,7 @@ $EDITOR documents/17_postmortems/2026-05-28-freshness-breach.md</pre>
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; Passo 9</span>
+          <span class="deck-kicker">Prática &middot; Bloco 3 &middot; Passo 8</span>
           <h2 class="deck-title">Template do postmortem blameless</h2>
           <p class="deck-summary">Template enxuto que vive em <code>documents/17_postmortems/</code>. A Aula 07 fecha com <em>1</em> postmortem completo.</p>
         </div>
@@ -1370,7 +1470,7 @@ em modo idempotente, Freshness retornou ao normal.
     <div class="slide">
       <div class="deck-shell a07-compact">
         <div>
-          <span class="deck-kicker">Prática &middot; Critério</span>
+          <span class="deck-kicker">Prática &middot; Bloco 3 &middot; Passo 9</span>
           <h2 class="deck-title">Critério de pronto e commit</h2>
           <p class="deck-summary">Antes do <code>git push</code>, cada item verde. Tudo é validável via <code>aws</code> &mdash; nada via console.</p>
         </div>

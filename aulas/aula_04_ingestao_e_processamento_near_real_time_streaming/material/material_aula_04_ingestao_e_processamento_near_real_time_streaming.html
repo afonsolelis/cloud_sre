@@ -111,7 +111,7 @@
   <main class="page">
 
     <section class="content-block">
-      <p class="meta">Aula 04 &nbsp;&bull;&nbsp; 07/05/2026 &nbsp;&bull;&nbsp; 19h00 &ndash; 22h00</p>
+      <p class="meta">Aula 04 &nbsp;&bull;&nbsp; 07/05/2026 &nbsp;&bull;&nbsp; Aula presencial</p>
       <h1>Equipe de agentes IA + CloudFormation: do markdown ao stack provisionado</h1>
       <p class="summary">
         Este material acompanha a Aula 04 da disciplina <strong>Cloud Computing e SRE &mdash; Visão Prática com AWS</strong>
@@ -185,7 +185,7 @@
       </table>
       <p>
         Hoje rodamos um híbrido <strong>planner+executor com revisão humana</strong>. O Architect planeja, DevOps executa, Tester e Reviewer fecham o loop, e o
-        humano dá o "go" antes do deploy. É o padrão que cabe em uma hora de prática sem perder rastreabilidade.
+        humano dá o "go" antes do deploy. É o padrão que cabe na prática guiada sem perder rastreabilidade.
       </p>
     </section>
 
@@ -460,15 +460,27 @@ flowchart LR
     </section>
 
     <section class="content-block">
-      <h2>10. Prática guiada (21h00 &ndash; 22h00)</h2>
+      <h2>10. Prática guiada</h2>
       <p>
-        Treze passos. Cada um tem um comando ou prompt pronto. Nada é feito clicando &mdash; tudo via CLI ou via skill da squad. Ao final, stack vivo,
-        smoke test passando e drift detection rodada.
+        Treze passos organizados em três blocos lógicos. Cada um tem um comando ou prompt pronto. Nada é feito clicando &mdash; tudo via CLI ou via skill
+        da squad. Ao final, stack vivo, smoke test passando e drift detection rodada.
+      </p>
+      <ul>
+        <li><strong>Bloco 1 &middot; Bootstrap &amp; squad</strong> &mdash; passos 1 a 4: token AWS renovado, orquestrador instalado, <code>squad.yml</code> e skills novas commitadas.</li>
+        <li><strong>Bloco 2 &middot; Squad gera</strong> &mdash; passos 5 a 8: Architect produz <code>PLAN.md</code>, DevOps gera os templates, Tester valida e Reviewer decide APROVADO ou VETO.</li>
+        <li><strong>Bloco 3 &middot; Deploy &amp; validação</strong> &mdash; passos 9 a 13: validate-template, deploy, verificação por CLI, smoke test no S3 raw e drift detection.</li>
+      </ul>
+
+      <h3>10.A Bloco 1 &mdash; Bootstrap &amp; squad</h3>
+      <p>
+        Antes de pedir IA para gerar qualquer coisa, deixar o Codespace conectado na AWS, instalar o orquestrador e formalizar a squad em arquivo versionado.
+        <strong>Critério parcial</strong> para seguir adiante: token válido, <code>--version</code> retornando OK no orquestrador e no <code>cfn-lint</code>, e
+        <code>agents/squad.yml</code> commitado com os 4 papéis.
       </p>
 
-      <h3>10.1 Passo 1 &mdash; renovar credenciais AWS</h3>
+      <h4>10.1 Passo 1 &mdash; renovar credenciais AWS</h4>
       <p>
-        O session token do Learner Lab dura cerca de três horas. Toda aula começa colando o bloco novo. Sem isso, todo comando devolve <code>ExpiredToken</code>.
+        O session token do Learner Lab tem validade curta. Toda aula começa colando o bloco novo. Sem isso, todo comando devolve <code>ExpiredToken</code>.
       </p>
 <pre># 1) AWS Academy: Start Lab -&gt; AWS Details -&gt; Show -&gt; copiar bloco "AWS CLI"
 
@@ -485,7 +497,7 @@ chmod 600 ~/.aws/credentials
 aws sts get-caller-identity
 aws cloudformation list-stacks --query "StackSummaries[?StackStatus!='DELETE_COMPLETE'].StackName"</pre>
 
-      <h3>10.2 Passo 2 &mdash; instalar a squad</h3>
+      <h4>10.2 Passo 2 &mdash; instalar a squad</h4>
       <p>
         AIOX como default; se a instalação falhar, caímos para o plano B. O importante é a forma da squad &mdash; não o nome do binário.
       </p>
@@ -501,7 +513,7 @@ pip install --user crewai || pip install --user pyautogen
 pipx install cfn-lint || pip install --user cfn-lint
 cfn-lint --version</pre>
 
-      <h3>10.3 Passo 3 &mdash; criar <code>agents/squad.yml</code></h3>
+      <h4>10.3 Passo 3 &mdash; criar <code>agents/squad.yml</code></h4>
       <p>
         Configuração declarativa da squad. Mesmo formato funciona em AIOX, CrewAI e no orquestrador caseiro.
       </p>
@@ -531,7 +543,7 @@ roles:
     writes: [documents/10_deploy_log.md]
     skills: [review_cfn, review_architecture]</pre>
 
-      <h3>10.4 Passo 4 &mdash; escrever as três skills novas</h3>
+      <h4>10.4 Passo 4 &mdash; escrever as três skills novas</h4>
       <p>
         Mesmo padrão das skills da Aula 03: nome verbo+objeto, quando usar, entrada, passos, saída, critério de aceitação. Esqueleto de uma delas:
       </p>
@@ -564,7 +576,14 @@ Quando existir iac/cloudformation/PLAN.md descrevendo modulos.
         gera asserts pytest. <code>review_cfn</code> descreve o ATAM enxuto que o Reviewer aplica sobre YAML.
       </p>
 
-      <h3>10.5 Passo 5 &mdash; Architect produz o plano</h3>
+      <h3>10.B Bloco 2 &mdash; Squad gera</h3>
+      <p>
+        Quatro turnos da squad rodam em sequência. Cada turno produz um artefato versionado &mdash; nenhum recurso na conta AWS ainda. Tudo é diff revisável no git.
+        <strong>Critério parcial</strong> para seguir adiante: <code>cfn-lint</code> sem erro, asserts pytest verdes e Reviewer marcou APROVADO PARA DEPLOY no
+        <code>10_deploy_log.md</code>. Se VETO, voltar para o DevOps com a lista de problemas.
+      </p>
+
+      <h4>10.5 Passo 5 &mdash; Architect produz o plano</h4>
 <pre>aiox run architect \
   --shared documents/agents/AGENTS.md \
   --input  documents/03_architecture.md \
@@ -581,7 +600,7 @@ gemini -p "Aplique review_architecture sobre
 documents/03_architecture.md. Em seguida produza
 iac/cloudformation/PLAN.md no formato acima."</pre>
 
-      <h3>10.6 Passo 6 &mdash; DevOps gera os templates</h3>
+      <h4>10.6 Passo 6 &mdash; DevOps gera os templates</h4>
 <pre>aiox run devops \
   --shared documents/agents/AGENTS.md,iac/cloudformation/PLAN.md \
   --skill  gen_cfn_template \
@@ -604,7 +623,7 @@ git diff  iac/cloudformation/</pre>
         ao DevOps com a lista de problemas.
       </p>
 
-      <h3>10.7 Passo 7 &mdash; Tester gera lint e asserts</h3>
+      <h4>10.7 Passo 7 &mdash; Tester gera lint e asserts</h4>
 <pre>aiox run tester \
   --shared documents/agents/AGENTS.md \
   --input  iac/cloudformation/ \
@@ -622,7 +641,7 @@ python -m pytest tests/iac/test_templates.py -v
 # - nenhum recurso usa Action:"*" em IAM
 # - bucket S3 raw tem DeletionPolicy: Retain</pre>
 
-      <h3>10.8 Passo 8 &mdash; Reviewer faz ATAM e decide</h3>
+      <h4>10.8 Passo 8 &mdash; Reviewer faz ATAM e decide</h4>
 <pre>aiox run reviewer \
   --shared documents/agents/AGENTS.md \
   --input  iac/cloudformation/,tests/iac/ \
@@ -639,7 +658,14 @@ python -m pytest tests/iac/test_templates.py -v
         que diferencia time SRE de time apagador-de-incêndio.
       </div>
 
-      <h3>10.9 Passo 9 &mdash; validar template no servidor</h3>
+      <h3>10.C Bloco 3 &mdash; Deploy &amp; validação</h3>
+      <p>
+        Aprovado pelo Reviewer, agora a infra entra na conta. Validate no servidor, deploy nested, verificação por CLI, smoke test no S3 raw e drift
+        detection &mdash; tudo via CLI, nada de console. <strong>Critério final</strong>: stack em <code>CREATE_COMPLETE</code>, smoke test escreveu, drift =
+        <code>IN_SYNC</code>, e tag <code>aula-04</code> empurrada para o repositório.
+      </p>
+
+      <h4>10.9 Passo 9 &mdash; validar template no servidor</h4>
       <p>
         <code>validate-template</code> roda no lado da AWS. Pega erro de schema/intrinsic function que o lint local pode não cobrir. Em seguida,
         <code>package</code> sobe os módulos filhos para um bucket de artefatos e gera <code>root.packaged.yaml</code>.
@@ -659,7 +685,7 @@ aws cloudformation package \
   --s3-bucket    ${INICIAIS}-cfn-artifacts-lab \
   --output-template-file iac/cloudformation/root.packaged.yaml</pre>
 
-      <h3>10.10 Passo 10 &mdash; deploy</h3>
+      <h4>10.10 Passo 10 &mdash; deploy</h4>
       <p>
         Único comando que cria recursos. Acompanhe pela CLI; se quiser ver eventos, use <code>describe-stack-events</code>.
         <strong>Nada de console.</strong>
@@ -682,7 +708,7 @@ aws cloudformation describe-stack-events \
   --query "StackEvents[].[Timestamp,LogicalResourceId,ResourceStatus]" \
   --output table</pre>
 
-      <h3>10.11 Passo 11 &mdash; verificar pelo CLI</h3>
+      <h4>10.11 Passo 11 &mdash; verificar pelo CLI</h4>
 <pre>aws cloudformation describe-stacks \
   --stack-name olist-sre-pipeline-lab \
   --query "Stacks[0].[StackStatus,Outputs]" \
@@ -701,7 +727,7 @@ aws cloudformation list-exports \
         a Aula 05, que vai usá-lo como GitHub Actions self-hosted runner.
       </p>
 
-      <h3>10.12 Passo 12 &mdash; smoke test no S3 raw</h3>
+      <h4>10.12 Passo 12 &mdash; smoke test no S3 raw</h4>
 <pre># Ler o nome do bucket diretamente do Output do stack
 RAW=$(aws cloudformation describe-stacks \
   --stack-name olist-sre-pipeline-lab \
@@ -718,7 +744,7 @@ aws logs describe-log-groups \
   --log-group-name-prefix "/olist-sre" \
   --query "logGroups[].logGroupName" --output table</pre>
 
-      <h3>10.13 Passo 13 &mdash; drift detection</h3>
+      <h4>10.13 Passo 13 &mdash; drift detection</h4>
       <p>
         Roda agora, antes que alguém edite um SG no console. Resultado vai para <code>11_drift_runbook.md</code> como referência da próxima aula.
       </p>

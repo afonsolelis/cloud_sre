@@ -4,41 +4,1846 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/png" href="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" />
-  <title>Material Aula 07 — Data Reliability e SRE aplicados a pipelines de dados</title>
+  <title>Material Aula 07 — SRE aplicado: observabilidade, runbooks automatizados e gestão distribuída via CloudFormation</title>
   <link rel="stylesheet" href="../../../assets/styles.css" />
+  <link rel="stylesheet" href="../../../assets/slides.css" />
+  <style data-material07-local>
+    /* Material is a long-form document — neutralize the height/overflow rules
+       that slides.css applies to html, body. */
+    html, body.material {
+      height: auto !important;
+      min-height: 100%;
+      overflow: visible !important;
+    }
+    body.material .page { max-width: 980px; }
+    body.material pre {
+      background: #0d1117;
+      color: #e6edf3;
+      padding: 16px 18px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: .92rem;
+      line-height: 1.65;
+      overflow-x: auto;
+      margin: 14px 0;
+    }
+    body.material code {
+      background: var(--deck-surface);
+      border: 1px solid var(--deck-line-soft);
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-family: var(--font-mono);
+      font-size: .9em;
+    }
+    body.material pre code { background: transparent; border: none; padding: 0; }
+    body.material table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: .95rem;
+    }
+    body.material thead th {
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-size: .82rem;
+      text-align: left;
+      padding: 10px 12px;
+      border-top: 1px solid #0f0f0f;
+      border-bottom: 1px solid #0f0f0f;
+      background: var(--deck-surface);
+    }
+    body.material tbody td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--deck-line-soft);
+      vertical-align: top;
+    }
+    body.material tbody tr:last-child td { border-bottom: 1px solid #0f0f0f; }
+    .m07-callout {
+      border-left: 3px solid #0f0f0f;
+      background: var(--deck-surface);
+      padding: 18px 22px;
+      margin: 18px 0;
+      border-radius: 0 4px 4px 0;
+    }
+    .m07-callout strong:first-child { display: block; margin-bottom: 6px; }
+    .m07-mermaid {
+      background: var(--deck-panel, #ffffff);
+      border: 1px solid var(--deck-line, #d6d6d1);
+      border-radius: 4px;
+      padding: 18px;
+      margin: 18px 0;
+      overflow: auto;
+    }
+    .m07-mermaid pre.mermaid {
+      background: transparent !important;
+      color: var(--deck-text, #0f0f0f) !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      box-shadow: none !important;
+      border: none !important;
+      border-radius: 0 !important;
+      overflow: visible;
+    }
+    .m07-mermaid pre.mermaid::before { display: none !important; }
+    .m07-mermaid svg {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+      background: transparent;
+    }
+    .m07-tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--deck-muted);
+      padding: 2px 8px;
+      border: 1px solid var(--deck-line);
+      border-radius: 3px;
+      margin-right: 6px;
+    }
+    .m07-block {
+      border: 1px solid var(--deck-line);
+      border-left: 3px solid #0f0f0f;
+      padding: 18px 22px;
+      margin: 22px 0;
+      border-radius: 0 4px 4px 0;
+      background: #ffffff;
+    }
+    .m07-block h3 { margin-top: 0; }
+  </style>
 </head>
 <body class="material">
   <main class="page">
 
     <section class="content-block">
-      <p class="meta">Aula 07 &nbsp;&bull;&nbsp; 28/05/2026 &nbsp;&bull;&nbsp; 19h00 &ndash; 22h00</p>
-      <h1>Data Reliability e SRE aplicados a pipelines de dados</h1>
+      <p class="meta">Aula 07 &nbsp;&bull;&nbsp; 28/05/2026</p>
+      <h1>SRE aplicado: observabilidade, runbooks automatizados e gestão distribuída via CloudFormation</h1>
       <p class="summary">
         Este material acompanha a Aula 07 da disciplina <strong>Cloud Computing e SRE &mdash; Visão Prática com AWS</strong>
-        do MBA em Engenharia de Dados. Nele trataremos confiabilidade como propriedade do sistema: SLI, SLO,
-        error budget, observabilidade e padrões de resiliência aplicados ao pipeline Olist.
+        do MBA em Engenharia de Dados. Hoje o pipeline Olist deixa de ser uma máquina cega e passa a ter sistema nervoso:
+        <strong>CloudWatch enxerga</strong> (logs, métricas, traces, canários) e <strong>EventBridge + SSM agem</strong>
+        (eventos roteados, runbooks executados, fleet sob controle). Os <em>closed loops</em> desenhados na Aula 03 saem
+        do markdown e viram CloudFormation deployado &mdash; com SLOs estáveis, alarms vinculados a runbooks, postmortem
+        blameless e tudo versionado em IaC. Pager humano só onde realmente precisa.
+      </p>
+      <p>
+        <span class="m07-tag">Pré-requisitos</span> Aula 06 entregue: <code>tests/integration/</code> em Testcontainers,
+        Toxiproxy provisionado, <code>documents/15_chaos_runs/</code> com pelo menos 1 run, <code>documents/16_quality_report.md</code>
+        gerado, gate <code>quality</code> verde no <code>wb.yml</code>, tag <code>aula-06</code> no remoto.
+      </p>
+      <p>
+        <span class="m07-tag">Sumário</span>
+        Recap das Aulas 03&ndash;06 &middot; tese da aula &middot; pilares SRE &middot; cinco SLIs canônicos &middot;
+        toil &middot; incident response &middot; postmortem blameless &middot; três pilares de observabilidade &middot;
+        CloudWatch Logs / Metrics / Alarms / Dashboards / Logs Insights &middot; EMF &middot; X-Ray &middot; Synthetics
+        &middot; EventBridge + SSM como closed loop &middot; SSM Documents &middot; padrões de auto-remediação &middot;
+        gestão de fleet &middot; tudo via CloudFormation &middot; mapa do dashboard &middot; anti-padrões &middot;
+        laboratório em três blocos &middot; critério de pronto &middot; tarefa de casa para a Aula 08 &middot; glossário
+        e bibliografia.
       </p>
     </section>
 
     <section class="content-block">
-      <h2>Status: em construção</h2>
+      <h2>1. Onde estamos &mdash; recap das Aulas 03 a 06</h2>
       <p>
-        Este material está sendo redigido e será publicado com pelo menos uma semana de antecedência
-        à data da aula (28/05/2026). A estrutura de seções abaixo antecipa o escopo.
+        A Aula 07 é a sexta peça de um arco de oito aulas. Para entender o que vamos construir, vale relembrar o que
+        já está no repositório. Cada aula deixou um artefato ou capacidade que sustenta o passo seguinte. Sem essa
+        base, falar de SRE vira slogan; com ela, vira engenharia.
+      </p>
+      <p>
+        A <strong>Aula 02</strong> ofereceu o ambiente de trabalho &mdash; Codespace com OpenCode e Gemini CLI, repositório
+        <code>cloud_sre</code> aberto, pasta <code>spec/</code> com a primeira documentação de hipótese. A
+        <strong>Aula 03</strong> entregou o desenho do sistema: <code>documents/01..09</code> com requisitos funcionais
+        e não funcionais, RTM, system design e os <em>closed loops</em> SRE do controlador. A <strong>Aula 04</strong>
+        ligou o sistema ao mundo real: squad de agentes, primeiros templates CloudFormation, stack
+        <code>olist-sre-pipeline-lab</code> em pé. A <strong>Aula 05</strong> amarrou a esteira de CI: workflow
+        <code>wb.yml</code> (white box) e <code>bb.yml</code> (black box), runner self-hosted em EC2 via SSM,
+        <em>branch protection</em> ligada na <code>main</code>, OIDC validado. A <strong>Aula 06</strong> trocou mock
+        por infra real (Testcontainers), introduziu <em>chaos engineering</em> com Toxiproxy + SSM e converteu três
+        métricas de qualidade em <em>gate</em> obrigatório de CI.
+      </p>
+      <p>
+        Apesar de tudo isso, três frentes ficaram em aberto. <strong>Primeiro</strong>: o pipeline ainda não
+        <em>se observa</em>. Os logs estão crus, métricas customizadas não existem e ninguém abre o CloudWatch durante
+        o dia. <strong>Segundo</strong>: o pipeline ainda não <em>se repara</em>. Quando algo sai do trilho, o máximo
+        que acontece é um e-mail &mdash; e e-mail não conserta. <strong>Terceiro</strong>: os <em>closed loops</em>
+        do system design ainda não viraram código. Estão desenhados em diagrama, mas não declarados em
+        CloudFormation. A Aula 07 fecha as três frentes.
+      </p>
+      <div class="m07-callout">
+        <strong>Tese</strong>
+        <p style="margin: 0;">
+          SRE não nasce do nada &mdash; nasce de modelagem (Aula 03), infra (Aula 04), CI (Aula 05) e chaos (Aula 06)
+          já validados. Hoje o pipeline ganha olhos (CloudWatch) e mãos (EventBridge + SSM), e tudo isso é declarado
+          em CloudFormation, revisado em diff, executado pela CLI. Sem console AWS &mdash; o console é só leitura.
+        </p>
+      </div>
+    </section>
+
+    <section class="content-block">
+      <h2>2. Tese da aula &mdash; o pipeline se observando e se reparando dentro do error budget</h2>
+      <p>
+        A tese da Aula 07 é simples e dura. <strong>SRE é o pipeline se observando e se reparando dentro do error
+        budget.</strong> Todo trabalho que acontece <em>abaixo</em> da linha do error budget pertence à malha fechada
+        &mdash; código que percebe a falha, código que aplica o conserto, código que registra o incidente.
+        Pager humano só quando o budget esgota; abaixo disso, automação. E essa automação não pode ser <em>cega</em>:
+        toda regra de auto-remediation passa por <em>dry-run</em> antes de ficar com <code>State=ENABLED</code>.
+      </p>
+      <p>
+        Cinco regras orientam toda a aula. Elas não são opcionais &mdash; são contrato. <strong>(1) Sem console AWS.</strong>
+        Tudo via CloudFormation e CLI, revisável em diff. O console serve para <em>ler</em>; nunca para clicar
+        configuração. <strong>(2) Alarm sem runbook é alarm-fadiga.</strong> Toda regra <code>AWS::CloudWatch::Alarm</code>
+        carrega <code>AlarmDescription</code> com link para um runbook executável. <strong>(3) Runbook sempre tem
+        dry-run antes do enable.</strong> Auto-remediação sem dry-run quebra mais do que conserta. <strong>(4) Toda
+        métrica tem unidade e janela.</strong> Métrica sem unidade é número decorativo &mdash; ninguém sabe se é
+        segundo, milissegundo ou minuto. <strong>(5) Todo incidente vira postmortem blameless</strong> em
+        <code>documents/17_postmortems/</code>. Sem culpado &mdash; com <em>contributing factors</em> e
+        <em>action items</em> com dono e prazo.
+      </p>
+      <p>
+        Essa tese não é original. Vem direto do livro <em>Site Reliability Engineering</em> (Beyer, Jones, Petoff,
+        Murphy &mdash; Google, O'Reilly) e do <em>Site Reliability Workbook</em>. O que a Aula 07 faz é traduzir o
+        livro azul para o vocabulário do AWS Learner Lab e do pipeline Olist. SLI vira <em>EMF metric</em> em
+        namespace <code>OlistETL</code>. SLO vira <em>CloudFormation alarm</em>. Error budget vira <em>tag</em> em
+        recurso. Runbook vira <em>SSM Document</em>. Postmortem vira <em>arquivo markdown</em> commitado no repo.
+      </p>
+    </section>
+
+    <section class="content-block">
+      <h2>3. Pilares SRE &mdash; o que herdamos do livro azul</h2>
+      <p>
+        O <em>Site Reliability Engineering</em> do Google (2016) consolidou um vocabulário que vinha sendo usado
+        internamente desde 2003. A Aula 07 importa seis pilares e mapeia cada um para uma prática operacional concreta
+        no pipeline Olist. Nenhum deles é folclore; cada um existe como código em algum lugar do repositório no
+        final da aula.
       </p>
 
-      <h3>Estrutura prevista</h3>
+      <h3>3.1 SLI / SLO / Error budget</h3>
+      <p>
+        <strong>SLI &mdash; Service Level Indicator</strong> é a medição. Um número, com unidade, dentro de uma janela
+        temporal. Por exemplo: <em>idade do registro mais recente carregado no Postgres, em minutos, calculada a cada
+        5 minutos</em>. <strong>SLO &mdash; Service Level Objective</strong> é a meta interna sobre o SLI. Por exemplo:
+        <em>p95 da freshness &le; 30 minutos, em janela de 24 horas</em>. <strong>SLA &mdash; Service Level Agreement</strong>
+        é o contrato externo, geralmente mais frouxo que o SLO &mdash; existe para o cliente, não para o time.
+        <strong>Error budget</strong> é o complemento: <code>1 &minus; SLO</code>. Se o SLO é 99,5%, o error budget é
+        0,5%. Quando o budget esgota numa janela, o time freia mudanças até o budget se renovar &mdash;
+        <em>error-budget-driven freeze</em>.
+      </p>
+
+      <h3>3.2 Toil &mdash; o trabalho que não escala</h3>
+      <p>
+        Toil tem definição operacional precisa: trabalho <em>manual, repetitivo, automatizável, sem valor durável,
+        que escala linearmente com o serviço</em>. Não é "trabalho difícil" &mdash; trabalho difícil pode ser
+        engenharia. Toil é o restart manual do ETL toda manhã, o SSH no Postgres para limpar quarentena, o copy-paste
+        de comando vindo de uma página de Notion. A meta clássica do Google é que toil consuma menos de 50% do tempo
+        do time SRE; o resto é engenharia.
+      </p>
+
+      <h3>3.3 Incident Response (IR) &mdash; papéis e cadência</h3>
+      <p>
+        Incidente é evento de alta severidade que precisa de coordenação. SRE separa papéis para evitar caos:
+        <strong>Incident Commander (IC)</strong> coordena e decide; <strong>Operations Lead (Ops)</strong> põe a mão
+        na massa investigando e aplicando fix; <strong>Communications (Comms)</strong> escreve atualizações para
+        stakeholders a cada 15&ndash;30 minutos; <strong>Scribe</strong> registra a timeline factual em tempo real.
+        Em time pequeno, a mesma pessoa pode acumular dois papéis &mdash; mas IC e Ops nunca são a mesma pessoa
+        durante o pico do incidente.
+      </p>
+
+      <h3>3.4 Postmortem blameless</h3>
+      <p>
+        Toda vez que um incidente é fechado, o time escreve um postmortem. <strong>Blameless</strong> significa que
+        o documento foca no <em>sistema</em> que permitiu o erro, não na pessoa que apertou o botão. Linguagem
+        despessoal: "o deploy foi feito" no lugar de "o Fulano fez o deploy". O resultado é uma timeline factual,
+        contributing factors honestos e <em>action items</em> com dono, prazo e link de ticket. O postmortem só está
+        fechado quando o último <em>action item</em> está em status <em>done</em>.
+      </p>
+
+      <h3>3.5 Releases progressivos</h3>
+      <p>
+        SRE não acredita em deploy big-bang. Releases progressivos &mdash; canário, blue/green, feature flags &mdash;
+        existem para reduzir o <em>blast radius</em> de uma mudança. O canário é a versão nova rodando para 1% do
+        tráfego; se a métrica degradar, rollback automático. Blue/green é a versão nova rodando em paralelo, com switch
+        no balanceador. Feature flag é a mudança guardada atrás de uma flag que pode ser desligada sem deploy.
+      </p>
+
+      <h3>3.6 Automação no lugar de heroísmo</h3>
+      <p>
+        SRE prefere runbook executável a procedimento em PDF. Heróis cansam, dormem, esquecem. Código não. Quando uma
+        falha repete três vezes, o time não escreve um terceiro post no Slack &mdash; escreve um SSM Document. Quando
+        uma resposta vira manual, o team a transforma em State Manager Association. Quando um patch vira tarefa
+        recorrente, o time monta um Patch Manager baseline. Pager só para o que realmente exige humano.
+      </p>
+    </section>
+
+    <section class="content-block">
+      <h2>4. Cinco SLIs canônicos para pipelines de dados</h2>
+      <p>
+        SLO genérico não funciona para dado. "Disponibilidade 99,9%" diz quase nada sobre um pipeline batch. Por isso
+        a comunidade de Data Reliability convergiu para cinco indicadores que cobrem 90% das dores reais de pipelines
+        de dados modernos. A Aula 07 os incorpora com IDs estáveis (<code>SLO-01</code> a <code>SLO-05</code>) que
+        valem do dashboard CW à RTM da Aula 03. Cada um tem fórmula, unidade e janela explícitas.
+      </p>
+
+      <table>
+        <thead>
+          <tr><th>ID</th><th>SLI</th><th>Fórmula</th><th>Unidade</th><th>Janela / SLO</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>SLO-01</code></td>
+            <td><strong>Freshness</strong> &mdash; idade do dado</td>
+            <td><code>now() &minus; max(loaded_at)</code></td>
+            <td>min</td>
+            <td>p95 &le; 30 min, 24 h</td>
+          </tr>
+          <tr>
+            <td><code>SLO-02</code></td>
+            <td><strong>Completeness</strong> &mdash; linhas presentes</td>
+            <td><code>rows_loaded / rows_expected</code></td>
+            <td>%</td>
+            <td>&ge; 99,5%, diária</td>
+          </tr>
+          <tr>
+            <td><code>SLO-03</code></td>
+            <td><strong>Accuracy</strong> &mdash; linhas válidas</td>
+            <td><code>1 &minus; (invalid_rows / total_rows)</code></td>
+            <td>%</td>
+            <td>&ge; 99,0%, diária</td>
+          </tr>
+          <tr>
+            <td><code>SLO-04</code></td>
+            <td><strong>Availability</strong> &mdash; pipeline rodou</td>
+            <td><code>successful_runs / scheduled_runs</code></td>
+            <td>%</td>
+            <td>&ge; 99,0%, mensal</td>
+          </tr>
+          <tr>
+            <td><code>SLO-05</code></td>
+            <td><strong>Latency</strong> &mdash; tempo total da execução</td>
+            <td><code>finish_ts &minus; start_ts</code></td>
+            <td>s</td>
+            <td>p95 &le; 30 min, 30 d</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>
+        <strong>Freshness (SLO-01)</strong> mede quão atual está o dado consumido pelo cliente final &mdash; no caso
+        Olist, o dashboard Grafana. É o SLI mais sensível a falhas de upstream: se a fonte parou, freshness sobe
+        sozinha. Costuma ser medida em minutos. <strong>Completeness (SLO-02)</strong> mede quanto do que era
+        esperado chegou de fato &mdash; calculada como razão entre linhas processadas e linhas esperadas, exige
+        contagem de referência (cadastro de origem ou heurística calibrada). <strong>Accuracy (SLO-03)</strong> mede
+        quanto do que chegou é válido segundo as regras do negócio &mdash; tipos certos, ranges plausíveis,
+        relacionamentos íntegros. <strong>Availability (SLO-04)</strong> mede quão frequentemente o pipeline
+        completou no horário planejado &mdash; é binária por execução, mas vira percentual ao longo da janela.
+        <strong>Latency (SLO-05)</strong> mede quanto tempo a execução leva, do disparo do schedule até o último
+        <code>UPDATE</code> no Postgres &mdash; importa porque latência alta corrói freshness rio abaixo.
+      </p>
+
+      <p>
+        Há ainda um sexto SLI implícito que aparece como <em>black box</em>: o <strong>canário Synthetics</strong>
+        (<code>ALARM-06 SyntheticsDown</code>). Ele bate no <code>/api/health</code> do Grafana a cada 5 minutos e
+        falha 2 datapoints quando o serviço cai. Não é um SLO de pipeline, é um SLO de <em>experiência do consumidor</em>.
+      </p>
+    </section>
+
+    <section class="content-block">
+      <h2>5. Toil &mdash; definição operacional e como medir</h2>
+      <p>
+        Toil é o conceito do SRE que mais é mal entendido. Vale repetir a definição operacional: trabalho que é
+        <em>(a) manual</em>, <em>(b) repetitivo</em>, <em>(c) automatizável</em>, <em>(d) reativo</em> em vez de
+        proativo, <em>(e) sem valor durável</em> e <em>(f) que escala linearmente com o serviço</em>. Os seis
+        critérios precisam estar presentes. Reunião de planejamento é repetitiva, mas não é toil &mdash; gera valor
+        durável. Refactor difícil é manual, mas não é toil &mdash; não é automatizável trivialmente.
+      </p>
+
+      <p>
+        Como medir? A maneira mais simples é registrar 5 minutos no fim do dia: cada engenheiro anota quantas horas
+        gastou em toil naquele dia. Em duas semanas, a média estabiliza. A meta é manter abaixo de 50%. Quando
+        ultrapassa, o time prioriza tickets de automação na próxima sprint. Outra maneira é olhar para frequência de
+        certas operações: quantos restarts manuais por semana, quantos SSH por semana, quantos copy-paste de
+        comandos. Cada um vira candidato a virar runbook.
+      </p>
+
+      <h3>5.1 Sintomas de toil no pipeline Olist</h3>
       <ul>
-        <li><strong>Contexto no pipeline Olist</strong> &mdash; onde entra reliability no arco do curso.</li>
-        <li><strong>SRE aplicado a dados</strong> &mdash; DataOps, DORA metrics e princípios do Google SRE.</li>
-        <li><strong>SLI, SLO, SLA e error budget</strong> &mdash; definições e aplicações em pipelines.</li>
-        <li><strong>SLIs para pipelines de dados</strong> &mdash; freshness, completeness, accuracy, consistency, availability.</li>
-        <li><strong>Observabilidade</strong> &mdash; logs, métricas, traces e linhagem de dados.</li>
-        <li><strong>Data quality frameworks</strong> &mdash; Great Expectations, Deequ, dbt tests, AWS Glue Data Quality (DQDL).</li>
-        <li><strong>Padrões de resiliência</strong> &mdash; retry com backoff, circuit breaker, DLQ, idempotência, checkpointing.</li>
-        <li><strong>Orquestração resiliente com Step Functions</strong> &mdash; estados, retry policies e catch handling.</li>
-        <li><strong>Runbooks e postmortem blameless</strong> &mdash; cultura operacional.</li>
-        <li><strong>Laboratório prático</strong> &mdash; alarmes, DLQ, Step Functions, data quality e injeção de falha.</li>
+        <li><strong>Restart manual de ETL</strong> todas as manhãs &mdash; vira <code>RetryEtlOnce</code> SSM Document.</li>
+        <li><strong>SSH no Postgres</strong> para limpar tabela de quarentena &mdash; vira <code>CleanQuarantine</code> SSM Document agendado.</li>
+        <li><strong>Subir agente CloudWatch</strong> à mão em cada nova EC2 &mdash; vira State Manager Association idempotente.</li>
+        <li><strong>Reabrir alarm</strong> que toca no fim de semana &mdash; vira composite alarm com lógica AND.</li>
+        <li><strong>Copy-paste de comando</strong> vindo de página de Notion &mdash; vira documento SSM versionado no repo.</li>
+        <li><strong>Aplicar patch de segurança</strong> manualmente em janela domingo 03h &mdash; vira Patch Manager baseline + maintenance window.</li>
+      </ul>
+    </section>
+
+    <section class="content-block">
+      <h2>6. Incident Response &mdash; papéis, cadência e canais</h2>
+      <p>
+        Em incidente, o caos custa MTTR. Papéis explícitos previnem caos. A AWS, Google, Meta e empresas brasileiras
+        maduras como Nubank e iFood operam com a mesma estrutura mínima. Mesmo em time pequeno, separar Incident
+        Commander de quem está com a mão na massa muda o tom do incidente.
+      </p>
+
+      <table>
+        <thead>
+          <tr><th>Role</th><th>Responsabilidade</th><th>Não faz</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>IC</strong> &mdash; Incident Commander</td>
+            <td>Coordena, decide prioridades, garante que comunicação flua. Pode chamar mais gente.</td>
+            <td>Não debuga código durante o incidente. Não é "o mais sênior".</td>
+          </tr>
+          <tr>
+            <td><strong>Ops</strong> &mdash; Operations Lead</td>
+            <td>Mão na massa: investiga logs, executa runbooks, aplica fix.</td>
+            <td>Não comunica externamente, não toma decisão de escopo.</td>
+          </tr>
+          <tr>
+            <td><strong>Comms</strong> &mdash; Communications</td>
+            <td>Atualiza status page, escreve updates a cada 15&ndash;30 min, traduz tecnês para stakeholders.</td>
+            <td>Não toma decisões técnicas; não inventa hipóteses sobre causa.</td>
+          </tr>
+          <tr>
+            <td><strong>Scribe</strong></td>
+            <td>Registra timeline factual em tempo real. Base do postmortem.</td>
+            <td>Não opera, só observa e anota com timestamp UTC.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>
+        A cadência típica é: a cada 15&ndash;30 minutos, o IC pede um <em>sitrep</em> (situational report) ao Ops e
+        o Comms publica um update. Depois de 60 minutos sem progresso, escala para o próximo nível (gerente, diretor).
+        O canal padrão é um Slack/Teams dedicado por incidente (ex.: <code>#inc-2026-05-28-01</code>) &mdash; nada de
+        DM, nada de e-mail. Tudo com timestamp.
+      </p>
+
+      <p>
+        <strong>SEV-1, SEV-2, SEV-3, SEV-4</strong>. SEV-1 é o pior &mdash; serviço crítico fora do ar, error budget
+        em queda livre, requer pager humano fora do horário. SEV-4 é o mais brando &mdash; degradação cosmética sem
+        impacto em SLI. A política da Aula 07: chaos planejado vai como SEV-3 (incidente real, mas com kill switch
+        e janela negociada).
+      </p>
+    </section>
+
+    <section class="content-block">
+      <h2>7. Postmortem blameless &mdash; estrutura, contributing factors e action items</h2>
+      <p>
+        O postmortem blameless é a peça onde aprendizado vira código. O nome vem de John Allspaw e foi popularizado
+        em 2012 no blog da Etsy. O ponto não é narrativa heróica nem caça às bruxas &mdash; é um documento curto,
+        factual, acionável. <strong>Uma página é melhor que cinco.</strong> O leitor precisa entender o que houve,
+        o que vai mudar, e quem é responsável pela mudança.
+      </p>
+
+      <h3>7.1 Estrutura mínima</h3>
+      <ol>
+        <li><strong>Cabeçalho</strong> &mdash; ID do incidente, severidade (<code>SEV-N</code>), datas, IC/Ops/Comms/Scribe, resumo de 3 linhas.</li>
+        <li><strong>Timeline (UTC)</strong> &mdash; eventos com timestamp absoluto: detect, ack, mitigate, resolve. Inclui MTTR e error budget consumido.</li>
+        <li><strong>Contributing factors</strong> &mdash; falhas técnicas plausíveis, falhas de processo, sinais que foram ignorados. Não é "causa raiz" &mdash; é uma teia.</li>
+        <li><strong>What went well</strong> &mdash; o que funcionou e por quê. Insumo para repetir, não elogio.</li>
+        <li><strong>Action items (AI-N)</strong> &mdash; uma frase, um dono, um prazo, um link de ticket. <em>Sem AI &equiv; sem aprendizado.</em></li>
+        <li><strong>Apêndices</strong> &mdash; queries de Logs Insights, capturas de gráficos, links de ADRs gerados.</li>
+      </ol>
+
+      <h3>7.2 Linguagem despessoal</h3>
+      <p>
+        Em vez de "o Fulano deployou a versão errada", escreva "a versão errada foi deployada". Em vez de "o time
+        de dados deveria ter testado", escreva "não havia teste cobrindo o cenário X". Pessoas agem racionalmente
+        dado o contexto que têm; quando o contexto é incompleto, o resultado é falha &mdash; e o sistema é responsável
+        por garantir contexto suficiente. Esse é o ponto do <em>blameless</em>.
+      </p>
+
+      <h3>7.3 Contributing factors em pipeline de dados</h3>
+      <p>
+        Em pipeline batch, contributing factors costumam ser combinações: schema da fonte mudou + teste não cobria
+        + alarm de accuracy não estava ativo. Cada um isoladamente seria absorvido; juntos, viram incidente. O
+        postmortem precisa explicitar a teia, não escolher um culpado técnico.
+      </p>
+    </section>
+
+    <section class="content-block">
+      <h2>8. Três pilares de observabilidade &mdash; logs, métricas, traces</h2>
+      <p>
+        Charity Majors, no livro <em>Observability Engineering</em>, define observabilidade como a capacidade de
+        responder perguntas novas sobre o sistema sem precisar deployar código novo. Os três pilares clássicos
+        &mdash; logs, métricas, traces &mdash; são as fontes de dado que tornam isso possível. Cada um responde uma
+        pergunta diferente. Pipeline maduro tem os três e os correlaciona por <em>request id</em> ou
+        <em>execution id</em>.
+      </p>
+
+      <table>
+        <thead>
+          <tr><th>Pilar</th><th>Pergunta</th><th>Estrutura</th><th>Custo</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Logs</strong></td>
+            <td>O que aconteceu aqui?</td>
+            <td>Eventos discretos com contexto, JSON estruturado.</td>
+            <td>Alto volume, custo proporcional ao GB ingerido.</td>
+          </tr>
+          <tr>
+            <td><strong>Métricas</strong></td>
+            <td>Como está, agora e antes?</td>
+            <td>Séries numéricas com dimensões, agregadas em janelas.</td>
+            <td>Baixo &mdash; agregação reduz cardinalidade.</td>
+          </tr>
+          <tr>
+            <td><strong>Traces</strong></td>
+            <td>Onde está o gargalo?</td>
+            <td>Cadeia causal entre componentes (segment, subsegment).</td>
+            <td>Alto sem sampling; sampling agressivo controla.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>
+        A correlação entre os três pilares é o que diferencia <em>observabilidade</em> de mera <em>monitoração</em>.
+        Métrica indica que algo está fora do trilho. Logs explicam o quê. Traces mostram onde. Sem correlação por
+        ID compartilhado, você tem três silos &mdash; e três silos não respondem perguntas novas.
+      </p>
+    </section>
+
+    <section class="content-block">
+      <h2>9. CloudWatch Logs &mdash; log groups, retenção e structured logging</h2>
+      <p>
+        CloudWatch Logs é o serviço gerenciado de logs da AWS. Cobra por <em>GB ingerido</em> e <em>GB armazenado</em>.
+        Tem três níveis hierárquicos: <strong>log group</strong> &mdash; container nomeado por aplicação ou por serviço;
+        <strong>log stream</strong> &mdash; uma instância concreta dentro do grupo, geralmente uma execução ou
+        instância; <strong>log event</strong> &mdash; o registro individual com timestamp e mensagem.
+      </p>
+
+      <h3>9.1 Anatomia operacional</h3>
+      <ul>
+        <li><strong>Retention policy</strong> &mdash; em dias (1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, 3653 ou nunca expira). No Learner Lab, 30 dias é razoável.</li>
+        <li><strong>Metric filter</strong> &mdash; um pattern que extrai número do log e publica como métrica CW. Útil para contar erros, somar valores, calcular percentuais.</li>
+        <li><strong>Subscription filter</strong> &mdash; envia eventos de log que casam um pattern para Lambda, Kinesis ou Firehose. Útil para processamento em tempo quase real.</li>
+        <li><strong>Resource policy</strong> &mdash; controla quem pode escrever no log group (cross-account, cross-service).</li>
+      </ul>
+
+      <h3>9.2 Padrão Olist</h3>
+      <table>
+        <thead>
+          <tr><th>Log group</th><th>Conteúdo</th><th>Retenção</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>/olist/etl</code></td><td>Runs do ETL (entrada de EMF + texto)</td><td>30 d</td></tr>
+          <tr><td><code>/olist/postgres</code></td><td>Logs do Postgres (slow query, locks)</td><td>30 d</td></tr>
+          <tr><td><code>/olist/grafana</code></td><td>Access log do dashboard</td><td>30 d</td></tr>
+          <tr><td><code>/olist/runbooks</code></td><td>Execução de SSM Documents</td><td>90 d</td></tr>
+          <tr><td><code>/aws/lambda/olist-canary</code></td><td>Logs do canário Synthetics</td><td>30 d</td></tr>
+        </tbody>
+      </table>
+
+      <h3>9.3 Structured logging &mdash; JSON sempre</h3>
+      <p>
+        Texto solto no log obriga grep e regex. JSON estruturado libera Logs Insights, EMF e correlação. A regra do
+        curso: nenhum <code>print()</code>, nenhum <code>logger.info("texto livre")</code>. Sempre
+        <code>logger.info(json.dumps({...}))</code> com chaves estáveis: <code>RunId</code>, <code>Stage</code>,
+        <code>Env</code>, <code>RowsProcessed</code>, etc.
+      </p>
+<pre>import json, logging, time
+
+log = logging.getLogger("olist")
+
+def log_event(event: str, **kwargs):
+    payload = {
+        "event": event,
+        "timestamp_ms": int(time.time() * 1000),
+        **kwargs,
+    }
+    log.info(json.dumps(payload))
+
+# uso
+log_event("etl.run.started", run_id="etl-2026-05-28T03:00", stage="raw")
+log_event("etl.run.finished", run_id="etl-2026-05-28T03:00",
+          rows_processed=102345, latency_s=1742.5, invalid=27)</pre>
+    </section>
+
+    <section class="content-block">
+      <h2>10. CloudWatch Metrics &mdash; namespace, dimensão, estatística</h2>
+      <p>
+        Métrica é endereçada por <strong>namespace</strong>, identificada por <strong>dimensions</strong> e consumida
+        por <strong>statistic</strong>. Errar qualquer dos três quebra o alarm silenciosamente &mdash; ele entra em
+        <code>INSUFFICIENT_DATA</code> e ninguém percebe. Cada um dos seis conceitos a seguir precisa ser explícito
+        em todo template CloudFormation.
+      </p>
+
+      <table>
+        <thead>
+          <tr><th>Conceito</th><th>Significado</th><th>Olist &mdash; exemplo</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Namespace</strong></td>
+            <td>Bucket lógico (AWS gerenciados começam com <code>AWS/</code>)</td>
+            <td><code>OlistETL</code>, <code>OlistGrafana</code></td>
+          </tr>
+          <tr>
+            <td><strong>Metric name</strong></td>
+            <td>Nome do indicador, em PascalCase</td>
+            <td><code>RowsProcessed</code>, <code>Latency</code>, <code>InvalidRows</code></td>
+          </tr>
+          <tr>
+            <td><strong>Dimensions</strong></td>
+            <td>Pares chave-valor que segmentam (até 30 por métrica)</td>
+            <td><code>Stage=raw|silver|gold</code>, <code>Env=lab|prod</code></td>
+          </tr>
+          <tr>
+            <td><strong>Unit</strong></td>
+            <td>Unidade canônica do CW</td>
+            <td><code>Count</code>, <code>Seconds</code>, <code>Bytes</code>, <code>Percent</code>, <code>None</code></td>
+          </tr>
+          <tr>
+            <td><strong>Statistic</strong></td>
+            <td>Função sobre a janela</td>
+            <td><code>Sum</code>, <code>Average</code>, <code>p95</code>, <code>p99</code>, <code>Maximum</code></td>
+          </tr>
+          <tr>
+            <td><strong>Period</strong></td>
+            <td>Granularidade da agregação (alta resolução é múltiplo de 1s; padrão é múltiplo de 60s)</td>
+            <td>60s, 300s, 900s</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>10.1 Math expressions</h3>
+      <p>
+        Métricas podem ser combinadas com expressões matemáticas dentro do CloudWatch &mdash; sem precisar publicar
+        uma nova métrica derivada. Por exemplo, <code>completeness = m1 / m2 * 100</code> onde <code>m1 = RowsProcessed</code>
+        e <code>m2 = RowsExpected</code>. A vantagem é que o alarm pode ser declarado sobre a expressão, garantindo
+        <em>versão única da verdade</em> entre dashboard e alarm. <strong>Sempre</strong> usar math expression para
+        SLIs derivados &mdash; nunca duas implementações para o mesmo cálculo.
+      </p>
+    </section>
+
+    <section class="content-block">
+      <h2>11. Embedded Metric Format (EMF) &mdash; log JSON vira métrica</h2>
+      <p>
+        O <strong>Embedded Metric Format</strong> é o padrão atual da AWS para apps emitirem métricas customizadas
+        sem chamar <code>PutMetricData</code> diretamente. Você emite um log estruturado em JSON; o CloudWatch
+        reconhece o bloco especial <code>_aws.CloudWatchMetrics</code> e <em>publica métricas automaticamente</em>.
+        O custo é uma única chamada <code>PutLogEvents</code> &mdash; um único <em>request</em> publica log e métrica.
+      </p>
+
+      <h3>11.1 Por que EMF importa</h3>
+      <p>
+        Antes do EMF, métrica customizada exigia <code>boto3.client("cloudwatch").put_metric_data(...)</code> &mdash;
+        uma chamada de API por publicação, com cota e custo. Em pipeline com milhares de eventos por minuto, isso
+        explodia em latência e cobrança. EMF resolve com três vantagens: <strong>(1)</strong> elimina chamadas extras
+        de API; <strong>(2)</strong> mantém log e métrica sincronizados &mdash; o mesmo evento é fonte dos dois;
+        <strong>(3)</strong> dimensões são definidas no próprio JSON, sem hardcoding. EMF é a maneira <em>certa</em>
+        de instrumentar Lambda, ECS, EC2 e Glue Jobs em 2026.
+      </p>
+
+      <h3>11.2 Anatomia do JSON EMF</h3>
+<pre>{
+  "_aws": {
+    "Timestamp": 1716902400000,
+    "CloudWatchMetrics": [{
+      "Namespace": "OlistETL",
+      "Dimensions": [["Stage", "Env"]],
+      "Metrics": [
+        {"Name": "RowsProcessed", "Unit": "Count"},
+        {"Name": "Latency",       "Unit": "Seconds"},
+        {"Name": "InvalidRows",   "Unit": "Count"}
+      ]
+    }]
+  },
+  "Stage": "raw",
+  "Env": "lab",
+  "RowsProcessed": 102345,
+  "Latency": 1742.5,
+  "InvalidRows": 27,
+  "RunId": "etl-2026-05-28T03:00:00Z"
+}</pre>
+
+      <p>
+        O bloco <code>_aws</code> diz ao CloudWatch como interpretar o restante. <code>Namespace</code> é onde a
+        métrica vai aparecer. <code>Dimensions</code> é uma lista de listas &mdash; cada lista interna é um conjunto
+        de dimensões a serem combinadas para gerar uma série. <code>Metrics</code> declara cada métrica com nome e
+        unidade. Os valores ficam <em>fora</em> do bloco <code>_aws</code> &mdash; o CloudWatch lê o JSON e correlaciona
+        nome com valor. Tudo o que <em>não</em> está em <code>Metrics</code> fica como atributo de log, queryable em
+        Logs Insights.
+      </p>
+
+      <h3>11.3 EMF em Python</h3>
+<pre>import json, time, logging
+log = logging.getLogger("olist")
+
+def emit_emf(stage: str, env: str, rows: int, latency_s: float,
+             invalid: int, run_id: str):
+    payload = {
+        "_aws": {
+            "Timestamp": int(time.time() * 1000),
+            "CloudWatchMetrics": [{
+                "Namespace": "OlistETL",
+                "Dimensions": [["Stage", "Env"]],
+                "Metrics": [
+                    {"Name": "RowsProcessed", "Unit": "Count"},
+                    {"Name": "Latency",       "Unit": "Seconds"},
+                    {"Name": "InvalidRows",   "Unit": "Count"},
+                ],
+            }],
+        },
+        "Stage": stage,
+        "Env": env,
+        "RowsProcessed": rows,
+        "Latency": latency_s,
+        "InvalidRows": invalid,
+        "RunId": run_id,
+    }
+    log.info(json.dumps(payload))</pre>
+
+      <p>
+        Existe a biblioteca oficial <code>aws-embedded-metrics</code> (Python, Node, Java, .NET) que abstrai o JSON
+        e oferece API mais ergonômica. Para o lab da Aula 07, a versão crua acima basta &mdash; é melhor entender a
+        estrutura antes de adotar wrapper.
+      </p>
+    </section>
+
+    <section class="content-block">
+      <h2>12. CloudWatch Alarms &mdash; threshold, anomaly e composite</h2>
+      <p>
+        Alarm é o gatilho da malha fechada. Tem três estados (<code>OK</code>, <code>ALARM</code>,
+        <code>INSUFFICIENT_DATA</code>) e pode acionar SNS, Auto Scaling, EC2 actions ou EventBridge. Existem três
+        variantes principais; a Aula 07 usa as três.
+      </p>
+
+      <h3>12.1 Threshold alarm</h3>
+      <p>
+        Compara estatística da métrica contra um valor fixo. Por exemplo: <em>Freshness p95 maior que 30 min em 2
+        datapoints consecutivos de 5 min</em>. É a variante mais usada &mdash; simples, defensável, auditável. Os
+        parâmetros chave são <code>MetricName</code>, <code>Statistic</code>, <code>Period</code>,
+        <code>EvaluationPeriods</code>, <code>DatapointsToAlarm</code>, <code>Threshold</code>,
+        <code>ComparisonOperator</code> e <code>TreatMissingData</code>.
+      </p>
+
+      <h3>12.2 Anomaly detection alarm</h3>
+      <p>
+        Em vez de threshold fixo, o CloudWatch treina um modelo da métrica e dispara quando o valor sai do envelope
+        esperado (configurável em desvios padrão). Útil para métricas com sazonalidade forte &mdash; volume de
+        tráfego horário, contagem de pedidos por hora do dia. Cuidado: modelo aprende baseline ruim se você ligar
+        durante incidente.
+      </p>
+
+      <h3>12.3 Composite alarm</h3>
+      <p>
+        Combina alarms via expressão booleana <code>AND</code>, <code>OR</code>, <code>NOT</code>. Reduz alarm-fadiga
+        em incidentes correlacionados. Por exemplo, um composite que dispara só quando <em>Freshness E Completeness</em>
+        violam ao mesmo tempo &mdash; sinal de problema sistêmico, não cosmético.
+      </p>
+
+      <h3>12.4 AlarmDescription &mdash; o link para o runbook</h3>
+      <p>
+        Toda regra <code>AWS::CloudWatch::Alarm</code> precisa carregar <code>AlarmDescription</code> com link para
+        o runbook executável. Quando o alarm dispara fora de hora, o on-call lê a descrição e clica direto. Sem
+        runbook, o alarm é apenas barulho &mdash; isso é alarm-fadiga.
+      </p>
+<pre>FreshnessAlarm:
+  Type: AWS::CloudWatch::Alarm
+  Properties:
+    AlarmName: OlistETL-FreshnessBreach
+    AlarmDescription: |
+      ALARM-01 - Freshness p95 > 30 min em 24h.
+      Runbook: SSM Document RetryEtlOnce
+      Postmortem template: documents/17_postmortems/_template.md
+    Namespace: OlistETL
+    MetricName: Freshness
+    Dimensions:
+      - Name: Stage
+        Value: gold
+      - Name: Env
+        Value: lab
+    Statistic: p95
+    Period: 300
+    EvaluationPeriods: 2
+    DatapointsToAlarm: 2
+    Threshold: 1800
+    ComparisonOperator: GreaterThanThreshold
+    TreatMissingData: breaching
+    AlarmActions:
+      - !GetAtt AlarmEventBus.Arn</pre>
+    </section>
+
+    <section class="content-block">
+      <h2>13. Dashboards via CloudFormation &mdash; widget JSON e math expression</h2>
+      <p>
+        Dashboard CloudWatch é JSON. Vai versionado no repo, junto do template CloudFormation. Dashboard sem dono
+        morre &mdash; cada um da turma fica com o seu, com tag <code>Owner</code> que aponta para o aluno responsável.
+        O dashboard <code>olist-sre</code> tem 8 widgets, um por SLI mais canário e grade de alarms.
+      </p>
+
+      <h3>13.1 Tipos de widget</h3>
+      <ul>
+        <li><strong><code>metric</code></strong> &mdash; gráfico de série temporal. Suporta múltiplas métricas, math expressions, anotações horizontais.</li>
+        <li><strong><code>singleValue</code></strong> &mdash; KPI grande para o topo do dashboard. Ideal para "freshness atual" ou "última run".</li>
+        <li><strong><code>log</code></strong> &mdash; tabela de Logs Insights embutida. Roda a query a cada refresh.</li>
+        <li><strong><code>alarm</code></strong> &mdash; status visual de alarms. Verde, vermelho, cinza.</li>
+        <li><strong><code>text</code></strong> &mdash; markdown estático. Lugar para link de runbook e contato do on-call.</li>
+      </ul>
+
+      <h3>13.2 Math expression no widget</h3>
+      <p>
+        Um widget pode misturar métricas e math expressions. Por exemplo, completeness = <code>m1 / m2 * 100</code>:
+      </p>
+<pre>{
+  "type": "metric",
+  "x": 0, "y": 0, "width": 12, "height": 6,
+  "properties": {
+    "title": "SLO-02 Completeness (%)",
+    "metrics": [
+      [{ "expression": "m1 / m2 * 100", "label": "Completeness", "id": "e1" }],
+      ["OlistETL", "RowsProcessed", "Stage", "gold", { "id": "m1", "visible": false }],
+      ["OlistETL", "RowsExpected", "Stage", "gold", { "id": "m2", "visible": false }]
+    ],
+    "view": "timeSeries",
+    "stat": "Sum",
+    "period": 300,
+    "annotations": {
+      "horizontal": [{ "label": "SLO 99.5%", "value": 99.5 }]
+    }
+  }
+}</pre>
+    </section>
+
+    <section class="content-block">
+      <h2>14. CloudWatch Logs Insights &mdash; query estruturada em log group</h2>
+      <p>
+        Logs Insights é a linguagem de consulta do CloudWatch. SQL-like, com pipelines (sintaxe parecida com
+        Splunk/Elastic). Cobra por GB escaneado &mdash; mantenha a janela curta. Bom para investigação durante
+        incidente; queries salvas viram parte do runbook.
+      </p>
+
+      <h3>14.1 Operadores principais</h3>
+      <ul>
+        <li><strong><code>fields</code></strong> &mdash; seleciona campos. <code>@timestamp</code>, <code>@message</code> e <code>@logStream</code> são built-in.</li>
+        <li><strong><code>filter</code></strong> &mdash; filtra eventos. Aceita regex, comparação, like.</li>
+        <li><strong><code>stats</code></strong> &mdash; agrega: <code>count(*)</code>, <code>sum()</code>, <code>avg()</code>, <code>pct(field, 95)</code>, <code>by</code>.</li>
+        <li><strong><code>parse</code></strong> &mdash; extrai campos de string com glob ou regex.</li>
+        <li><strong><code>sort</code></strong> &mdash; ordena pelo campo.</li>
+        <li><strong><code>limit</code></strong> &mdash; trunca o resultado.</li>
+      </ul>
+
+      <h3>14.2 Query padrão para diagnóstico de run do ETL</h3>
+<pre>fields @timestamp, @message, RunId, Stage, RowsProcessed, InvalidRows, Latency
+| filter Stage = "raw"
+| filter @timestamp &gt; ago(1h)
+| stats sum(RowsProcessed) as total_rows,
+        sum(InvalidRows)   as total_invalid,
+        max(Latency)       as worst_latency
+        by RunId
+| sort worst_latency desc
+| limit 20</pre>
+
+      <h3>14.3 Query salva como widget</h3>
+      <p>
+        Toda query útil durante incidente vira widget de log no dashboard. Próxima vez, em vez de o on-call procurar
+        a query no Notion, ele abre o dashboard e a query já está rodando &mdash; com janela ajustável.
+      </p>
+    </section>
+
+    <section class="content-block">
+      <h2>15. AWS X-Ray &mdash; tracing distribuído</h2>
+      <p>
+        X-Ray é o serviço de tracing distribuído da AWS. Ele captura uma <strong>trace</strong> &mdash; árvore completa
+        de uma request &mdash; composta de <strong>segments</strong> (trabalho em um componente) e
+        <strong>subsegments</strong> (chamada interna). Você anota a trace com chaves indexadas (<code>annotation</code>)
+        e não indexadas (<code>metadata</code>). No Learner Lab, X-Ray funciona via SDK em EC2 &mdash; o uso clássico
+        é instrumentar o ETL para ver onde o tempo vai entre <em>read S3 &rarr; transform &rarr; write Postgres</em>.
+      </p>
+
+      <h3>15.1 Conceitos</h3>
+      <table>
+        <thead>
+          <tr><th>Termo</th><th>Definição</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Trace</strong></td><td>Árvore completa de uma request, identificada por <code>TraceId</code>.</td></tr>
+          <tr><td><strong>Segment</strong></td><td>Trabalho em um componente (Lambda, EC2, ECS task).</td></tr>
+          <tr><td><strong>Subsegment</strong></td><td>Chamada interna dentro do segment (ex.: query SQL, chamada HTTP).</td></tr>
+          <tr><td><strong>Annotation</strong></td><td>Par chave-valor indexado, queryable em filter expression.</td></tr>
+          <tr><td><strong>Metadata</strong></td><td>Par chave-valor não indexado, só visível ao abrir a trace.</td></tr>
+          <tr><td><strong>Sampling rule</strong></td><td>Política que decide quais traces são capturadas (controla custo).</td></tr>
+        </tbody>
+      </table>
+
+      <h3>15.2 Sampling no Learner Lab</h3>
+      <p>
+        Sampling 100% só vale em desenvolvimento curto. Em prod, padrão razoável é 5% + reservoir de 1 trace por
+        segundo &mdash; garante visibilidade sem explodir custo. Sampling rule é declarada via CloudFormation
+        (<code>AWS::XRay::SamplingRule</code>). Para o lab, manter <code>RunId</code> como annotation facilita
+        correlação com EMF e Logs Insights pelo mesmo identificador.
+      </p>
+
+      <h3>15.3 Instrumentação Python</h3>
+<pre>from aws_xray_sdk.core import xray_recorder, patch_all
+
+patch_all()  # instrumenta boto3, requests, sqlalchemy
+
+@xray_recorder.capture("etl.run")
+def run(run_id: str):
+    xray_recorder.put_annotation("RunId", run_id)
+    xray_recorder.put_annotation("Stage", "raw")
+
+    with xray_recorder.in_subsegment("read_s3"):
+        df = read_s3(...)
+
+    with xray_recorder.in_subsegment("transform"):
+        df = transform(df)
+
+    with xray_recorder.in_subsegment("write_pg"):
+        write_pg(df)</pre>
+    </section>
+
+    <section class="content-block">
+      <h2>16. CloudWatch Synthetics &mdash; canários sintéticos</h2>
+      <p>
+        Synthetics é um Lambda gerenciado pela AWS que executa um script (Node.js Puppeteer ou Python Selenium) a
+        cada <em>N</em> minutos. A saída vira métrica (<code>SuccessPercent</code>, <code>Duration</code>) e screenshot
+        no S3. É o primeiro SLI <em>black box</em> do dashboard &mdash; o ponto de vista do <em>cliente</em>, não do
+        servidor. Quando o canário falha, o cliente está vendo o problema; o monitoramento white-box pode dizer que
+        está tudo OK, mas o canário diz a verdade.
+      </p>
+
+      <h3>16.1 Tipos de canário</h3>
+      <ul>
+        <li><strong>Heartbeat HTTP</strong> &mdash; bate em endpoint <code>/api/health</code> a cada 5 min e valida status code 200.</li>
+        <li><strong>API canário</strong> &mdash; consulta um KPI do dashboard e valida shape do JSON retornado.</li>
+        <li><strong>Visual canário</strong> &mdash; screenshot do dashboard, diff visual contra baseline registrado.</li>
+        <li><strong>Broken link checker</strong> &mdash; navega na página e verifica que nenhum link 404.</li>
+        <li><strong>Multi-step API</strong> &mdash; sequência de chamadas que simula fluxo do usuário.</li>
+      </ul>
+
+      <h3>16.2 Custo no Learner Lab</h3>
+      <p>
+        Cada execução de canário é um Lambda &mdash; cobra por invocação e duração. Em rate de 5 min, são 288
+        execuções por dia, ~8.640 por mês. No tier gratuito, isso costuma caber. Vale checar o saldo do Learner Lab
+        antes de subir mais de 2 canários simultâneos.
+      </p>
+    </section>
+
+    <section class="content-block">
+      <h2>17. EventBridge + SSM como closed loop</h2>
+      <p>
+        Aqui mora o coração da Aula 07. Alarm CloudWatch dispara um evento; EventBridge roteia esse evento para
+        SSM; SSM executa um Document de remediação na EC2 alvo. Tudo em código, tudo auditável, tudo sem clique no
+        console. É o <em>closed loop</em> que estava no markdown da Aula 03 virando recurso CloudFormation deployado.
+      </p>
+
+      <h3>17.1 EventBridge &mdash; o roteador</h3>
+      <p>
+        EventBridge é o bus de eventos serverless da AWS. Tem um <strong>bus default</strong> e suporta buses
+        customizados. Cada bus aceita <strong>rules</strong>; cada rule combina um <code>EventPattern</code> (filtro
+        sobre campos do evento) ou um <code>ScheduleExpression</code> (cron) com <strong>targets</strong> (Lambda,
+        SSM, SNS, Step Functions, ECS, etc.).
+      </p>
+
+      <p>
+        Um <code>InputTransformer</code> formata o payload antes de mandar para o target &mdash; útil porque o SSM
+        Document espera campos específicos. <strong>Dead Letter Queue</strong> por target (SQS) captura falhas;
+        sem DLQ, falhas viajam para o vazio.
+      </p>
+
+      <h3>17.2 SSM &mdash; o atuador</h3>
+      <p>
+        AWS Systems Manager (SSM) é o canivete suíço para operação de fleet. Quatro capabilities cobrem o uso da
+        Aula 07. <strong>Run Command</strong> &mdash; execução pontual de Document em uma ou várias EC2.
+        <strong>State Manager</strong> &mdash; aplica Document de forma idempotente em janelas recorrentes.
+        <strong>Automation</strong> &mdash; workflow multi-passo com aprovação humana opcional, branching, loops.
+        <strong>Session Manager</strong> &mdash; acesso interativo seguro à EC2 sem SSH bastion.
+      </p>
+
+      <p>
+        Toda execução vai para o CloudTrail (audit) e os logs do Run Command vão para CloudWatch Logs em
+        <code>/olist/runbooks</code>. Auditável por padrão.
+      </p>
+
+      <h3>17.3 Sequência completa</h3>
+      <div class="m07-mermaid">
+        <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    participant ETL as EC2 ETL
+    participant CW as CloudWatch
+    participant ALM as Alarm OlistETL-FreshnessBreach
+    participant EB as EventBridge Rule
+    participant SSM as SSM Document RetryEtlOnce
+    ETL-&gt;&gt;CW: emite EMF (Freshness, Latency, RowsProcessed)
+    CW--&gt;&gt;ALM: avalia threshold p95 &gt; 30min
+    ALM-&gt;&gt;EB: state=ALARM publica evento
+    EB-&gt;&gt;SSM: target = StartAutomationExecution
+    SSM-&gt;&gt;ETL: aws-runShellScript (retry idempotente)
+    ETL-&gt;&gt;CW: nova métrica Freshness
+    CW--&gt;&gt;ALM: state=OK ou continua ALARM
+    Note over ALM,SSM: se state=ALARM persistir, freeze deploy via tag
+        </pre>
+      </div>
+    </section>
+
+    <section class="content-block">
+      <h2>18. SSM Documents &mdash; tipos e quando usar</h2>
+      <p>
+        Document é YAML (preferido) ou JSON declarativo. Vive no SSM como recurso versionado &mdash; toda alteração
+        gera nova versão imutável. Cinco tipos cobrem 95% dos casos do Olist.
+      </p>
+
+      <table>
+        <thead>
+          <tr><th>Tipo</th><th>Quando usar</th><th>Exemplo no Olist</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>Command</code></td>
+            <td>Executar script ad-hoc em uma ou várias EC2</td>
+            <td><code>RetryEtlOnce</code> &mdash; retry idempotente do ETL</td>
+          </tr>
+          <tr>
+            <td><code>Automation</code></td>
+            <td>Workflow multi-passo com branching e aprovação</td>
+            <td><code>FreezeDeployOnBudgetBurn</code> &mdash; freeze quando budget esgota</td>
+          </tr>
+          <tr>
+            <td><code>Session</code></td>
+            <td>Acesso interativo via Session Manager</td>
+            <td>Debug de Postgres sem SSH público</td>
+          </tr>
+          <tr>
+            <td><code>Package</code></td>
+            <td>Distribuir software para fleet</td>
+            <td>Distribuir agente CW unificado</td>
+          </tr>
+          <tr>
+            <td><code>Policy</code></td>
+            <td>State Manager &mdash; configuração contínua idempotente</td>
+            <td>Garantir agent SSM sempre ligado</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>18.1 Estrutura de um Document Command</h3>
+<pre>schemaVersion: "2.2"
+description: |
+  RUNBOOK-01 - Retry idempotente do ETL Olist quando ALARM-01
+  (FreshnessBreach) entra em ALARM. Stop apos 1 tentativa: se
+  ainda falhar, sobe para humano via SNS.
+parameters:
+  RunId:
+    type: String
+    default: "auto-{{global:DATE_TIME}}"
+mainSteps:
+  - action: aws:runShellScript
+    name: retryEtl
+    inputs:
+      runCommand:
+        - set -euo pipefail
+        - cd /opt/olist
+        - echo "[runbook] retry RunId={{ RunId }}"
+        - python -m etl.main --idempotent --run-id "{{ RunId }}"
+        - echo "[runbook] done"</pre>
+
+      <h3>18.2 AWS-RunShellScript &mdash; o coringa</h3>
+      <p>
+        Existe um Document built-in chamado <code>AWS-RunShellScript</code> que aceita um array de comandos como
+        parâmetro. É a forma mais simples de mandar comandos arbitrários para EC2 &mdash; sem precisar criar Document
+        customizado. Tem trade-off: comandos não ficam versionados como recurso, só na <em>command history</em> do
+        Run Command. Bom para experimentação; ruim para runbook recorrente.
+      </p>
+    </section>
+
+    <section class="content-block">
+      <h2>19. Padrões de auto-remediação</h2>
+      <p>
+        A auto-remediação não é improviso &mdash; tem padrões clássicos. Cada um tem trigger, ação, salvaguarda e
+        critério de stop. Reconhecer o padrão certo evita reescrever runbook de cabeça toda vez.
+      </p>
+
+      <table>
+        <thead>
+          <tr><th>Padrão</th><th>Trigger</th><th>Ação</th><th>Stop</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Restart</strong></td>
+            <td>Heartbeat falhou</td>
+            <td><code>systemctl restart</code></td>
+            <td>3 retries em 15 min</td>
+          </tr>
+          <tr>
+            <td><strong>Scale out</strong></td>
+            <td>Latência subiu</td>
+            <td>ASG +1 instância</td>
+            <td>Cap absoluto + budget</td>
+          </tr>
+          <tr>
+            <td><strong>Circuit breaker</strong></td>
+            <td>Erros 5xx &gt; threshold</td>
+            <td>Param flag <code>etl_paused=true</code></td>
+            <td>Cooldown e half-open</td>
+          </tr>
+          <tr>
+            <td><strong>Freeze deploy</strong></td>
+            <td>Error budget esgotou</td>
+            <td>Tag <code>deploy=frozen</code> bloqueia CI</td>
+            <td>Humano remove tag após postmortem</td>
+          </tr>
+          <tr>
+            <td><strong>Rollback</strong></td>
+            <td>SLO degradado pós-deploy</td>
+            <td>Deploy versão anterior</td>
+            <td>1 vez automático, 2&ordf; é humano</td>
+          </tr>
+          <tr>
+            <td><strong>Quarentena</strong></td>
+            <td>Linhas inválidas &gt; 0,5%</td>
+            <td>Rota para tabela DLQ</td>
+            <td>Backpressure no upstream</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>19.1 Idempotência é obrigatória</h3>
+      <p>
+        Toda ação de auto-remediação precisa ser idempotente. Se o EventBridge dispara duas vezes (acontece em
+        retry transitório), o resultado precisa ser igual ao de uma execução só. No Olist, o <code>--idempotent</code>
+        do <code>etl.main</code> garante isso por <em>upsert</em> em vez de <em>insert</em>, e por chave de
+        idempotência baseada em <code>RunId</code>.
+      </p>
+
+      <h3>19.2 Salvaguardas</h3>
+      <p>
+        Toda ação carrega salvaguardas: cap absoluto (não escala além de N), cooldown (não repete em menos de M
+        minutos), kill switch manual (humano consegue desligar a regra com 1 comando). Sem salvaguarda, a
+        auto-remediação vira loop de pesadelo &mdash; cada conserto piora a situação.
+      </p>
+    </section>
+
+    <section class="content-block">
+      <h2>20. Gestão distribuída de fleet &mdash; Inventory, Patch Manager, State Manager</h2>
+      <p>
+        SSM agente já vem em quase toda AMI moderna (Amazon Linux 2023, Amazon Linux 2, Ubuntu desde 18.04). Sem
+        agente extra, você ganha visibilidade, patching e configuração contínua de toda a frota. As capabilities a
+        seguir são as mais usadas em operação real.
+      </p>
+
+      <table>
+        <thead>
+          <tr><th>Capability</th><th>O que entrega</th><th>Olist &mdash; uso</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Inventory</strong></td>
+            <td>Visibilidade de software, network, processos por host</td>
+            <td>Confirma que EC2 ETL roda Python 3.11 e não 3.9</td>
+          </tr>
+          <tr>
+            <td><strong>Patch Manager</strong></td>
+            <td>Patching declarativo via baseline + maintenance window</td>
+            <td>Aplica security patch domingo 03h sem clique</td>
+          </tr>
+          <tr>
+            <td><strong>State Manager</strong></td>
+            <td>Associations idempotentes em schedule</td>
+            <td>Garante CW agent sempre ligado, mesmo após reboot</td>
+          </tr>
+          <tr>
+            <td><strong>Run Command</strong></td>
+            <td>Execução pontual em fleet selecionada por tag</td>
+            <td>Executa <code>RetryEtlOnce</code> em EC2 com <code>tag:Role=etl</code></td>
+          </tr>
+          <tr>
+            <td><strong>Compliance</strong></td>
+            <td>Relatório agregado de drift de configuração e patch</td>
+            <td>Alerta se EC2 perder encryption-at-rest</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>20.1 State Manager Association &mdash; por que importa</h3>
+      <p>
+        Sem State Manager, configuração que você aplicou na EC2 some no próximo reboot ou na próxima recriação por
+        ASG. State Manager garante que toda EC2 com tag <code>Role=etl</code> tenha o CW agent rodando &mdash; checa
+        a cada N minutos e re-aplica se sumir. É a versão SSM de "convergência" do Puppet/Chef, sem agente extra.
+      </p>
+    </section>
+
+    <section class="content-block">
+      <h2>21. Tudo via CloudFormation &mdash; sem clique no console</h2>
+      <p>
+        A regra do curso vale para esta aula com força total: nenhum recurso AWS é criado pelo console. Tudo via
+        CloudFormation. A stack <code>olist-observability</code> declara o sistema nervoso completo &mdash; log
+        groups, alarms, dashboard, EventBridge rules, SSM Document, Synthetics canary, IAM roles. Cada deploy é um
+        diff no Git.
+      </p>
+
+      <table>
+        <thead>
+          <tr><th>Tipo CFN</th><th>O que provisiona</th><th>Olist &mdash; uso</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>AWS::Logs::LogGroup</code></td><td>Log group nomeado com retenção</td><td><code>/olist/etl</code>, <code>/olist/runbooks</code></td></tr>
+          <tr><td><code>AWS::Logs::MetricFilter</code></td><td>Pattern em log &rarr; CW metric</td><td>Conta linhas com <code>level=ERROR</code></td></tr>
+          <tr><td><code>AWS::CloudWatch::Alarm</code></td><td>Alarm threshold/anomaly/composite</td><td><code>OlistETL-FreshnessBreach</code></td></tr>
+          <tr><td><code>AWS::CloudWatch::Dashboard</code></td><td>Dashboard com widget JSON</td><td><code>olist-sre</code></td></tr>
+          <tr><td><code>AWS::Events::Rule</code></td><td>Regra EventBridge com targets</td><td>Alarm &rarr; SSM Run Command</td></tr>
+          <tr><td><code>AWS::SSM::Document</code></td><td>Runbook automatizado versionado</td><td><code>RetryEtlOnce</code></td></tr>
+          <tr><td><code>AWS::SSM::Association</code></td><td>State Manager idempotente</td><td>Garantir CW agent ligado</td></tr>
+          <tr><td><code>AWS::Synthetics::Canary</code></td><td>Canário Lambda gerenciado</td><td>Heartbeat do Grafana</td></tr>
+          <tr><td><code>AWS::IAM::Role</code></td><td>Role de execução para SSM, Synthetics</td><td><code>OlistObservabilityRole</code></td></tr>
+          <tr><td><code>AWS::SNS::Topic</code></td><td>Tópico de notificação para humano</td><td><code>olist-pager</code></td></tr>
+        </tbody>
+      </table>
+
+      <h3>21.1 Esqueleto de <code>iac/cloudformation/observability.yaml</code></h3>
+<pre>AWSTemplateFormatVersion: '2010-09-09'
+Description: |
+  Olist - Observability stack (Aula 07).
+  - 5 log groups (etl, postgres, grafana, runbooks, lambda canary)
+  - 1 metric filter (ERROR count)
+  - 5 SLO alarms (SLO-01..05)
+  - 1 composite alarm (Freshness AND Completeness)
+  - 1 dashboard olist-sre com 8 widgets
+  - 1 EventBridge rule alarm -&gt; SSM
+  - 1 SSM Document RetryEtlOnce
+  - 1 Synthetics canary olist-grafana-heartbeat
+  - 1 SNS topic olist-pager para humano
+
+Parameters:
+  Owner:
+    Type: String
+    Description: Aluno responsavel pela stack.
+  ArtifactsBucket:
+    Type: String
+    Default: olist-sre-artifacts
+
+Resources:
+  EtlLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /olist/etl
+      RetentionInDays: 30
+      Tags:
+        - { Key: Owner,  Value: !Ref Owner }
+        - { Key: Aula,   Value: '07' }
+        - { Key: Stack,  Value: olist-observability }
+  # ... demais recursos</pre>
+    </section>
+
+    <section class="content-block">
+      <h2>22. Mapa do dashboard CW &mdash; widgets para SLIs da Aula 03</h2>
+      <p>
+        Cada widget do dashboard <code>olist-sre</code> aponta para um SLI definido na Aula 03. Cada SLI tem alarm
+        correspondente. Cada alarm tem runbook. É a versão visual da RTM (Requirements Traceability Matrix) &mdash;
+        com IDs estáveis <code>SLO-NN</code> e <code>ALARM-NN</code> que sobrevivem a refactor.
+      </p>
+
+      <div class="m07-mermaid">
+        <pre class="mermaid">
+flowchart LR
+  subgraph DASH["Dashboard olist-sre (CFN)"]
+    W1["W1 Freshness p95"]
+    W2["W2 Completeness %"]
+    W3["W3 Accuracy %"]
+    W4["W4 Availability"]
+    W5["W5 Latency p95"]
+    W6["W6 Error log lines"]
+    W7["W7 Synthetics canary"]
+    W8["W8 Alarm status grid"]
+  end
+  subgraph SLO["SLOs da Aula 03"]
+    S1["SLO-01 Freshness"]
+    S2["SLO-02 Completeness"]
+    S3["SLO-03 Accuracy"]
+    S4["SLO-04 Availability"]
+    S5["SLO-05 Latency"]
+  end
+  subgraph ALM["Alarms (CFN)"]
+    A1["ALARM-01 FreshnessBreach"]
+    A2["ALARM-02 CompletenessBreach"]
+    A3["ALARM-03 AccuracyBreach"]
+    A4["ALARM-04 AvailabilityBreach"]
+    A5["ALARM-05 LatencyBreach"]
+    A6["ALARM-06 SyntheticsDown"]
+  end
+
+  W1 --&gt; S1 --&gt; A1
+  W2 --&gt; S2 --&gt; A2
+  W3 --&gt; S3 --&gt; A3
+  W4 --&gt; S4 --&gt; A4
+  W5 --&gt; S5 --&gt; A5
+  W7 --&gt; A6
+  W6 -.-&gt; A1
+  A1 ==&gt; RUN["EventBridge + SSM RetryEtlOnce"]
+  A2 ==&gt; RUN
+  A6 ==&gt; RUN
+        </pre>
+      </div>
+
+      <p>
+        O mapa diz: dashboard <code>olist-sre</code> tem 8 widgets; cinco apontam para os 5 SLOs canônicos; um aponta
+        para canário Synthetics; um para grade de status; um (W6) é informativo (linhas de erro). Cinco alarms (mais
+        o canário) disparam para a regra EventBridge que chama o SSM Document <code>RetryEtlOnce</code>.
+      </p>
+    </section>
+
+    <section class="content-block">
+      <h2>23. Anti-padrões &mdash; o que <em>não</em> fazer</h2>
+      <p>
+        Cada anti-padrão abaixo corrompe a malha fechada de alguma forma. Reconhecer cedo evita reescrever a stack
+        semana que vem. Todos foram observados em projetos reais.
+      </p>
+
+      <table>
+        <thead>
+          <tr><th>Anti-padrão</th><th>Sintoma</th><th>Cura</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Dashboard sem dono</strong></td><td>Widget quebrado há 3 semanas, ninguém viu</td><td>Tag <code>Owner</code> obrigatória; revisão semanal</td></tr>
+          <tr><td><strong>Alarm sem runbook</strong></td><td>Sai do <code>OK</code> e ninguém sabe o que fazer</td><td><code>AlarmDescription</code> sempre aponta para SSM Document</td></tr>
+          <tr><td><strong>Runbook sem dry-run</strong></td><td>Auto-remediation derruba prod no 1&ordm; uso</td><td>Sempre executar com parâmetros de teste antes do <em>enable</em></td></tr>
+          <tr><td><strong>Métrica sem unidade</strong></td><td>Não sabe se é segundo, ms ou minuto</td><td>Campo <code>Unit</code> obrigatório no EMF e no Alarm</td></tr>
+          <tr><td><strong>Métrica sem janela</strong></td><td>Threshold flutua porque period é inconsistente</td><td><code>Period</code> e <code>EvaluationPeriods</code> sempre explícitos</td></tr>
+          <tr><td><strong>Incident sem postmortem</strong></td><td>Mesma falha repete em 3 meses</td><td>PR de postmortem na <code>main</code> antes de fechar incidente</td></tr>
+          <tr><td><strong>Console-driven ops</strong></td><td>Nada é reproduzível, ninguém revisa</td><td>Tudo CloudFormation; console só leitura</td></tr>
+          <tr><td><strong>Alarm com TreatMissingData=ignore</strong></td><td>Pipeline morto e ninguém sabe</td><td>Padrão <code>breaching</code> &mdash; missing é falha</td></tr>
+          <tr><td><strong>Auto-remediação sem cap</strong></td><td>Loop de scale infinito explode budget</td><td>Cap absoluto + cooldown sempre</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="content-block">
+      <h2>24. Laboratório prático &mdash; três blocos, nove passos</h2>
+      <p>
+        A prática da Aula 07 é organizada em três blocos lógicos, cada um com objetivo claro e critério parcial. A
+        sequência abaixo é a mesma dos slides &mdash; aqui, com passo a passo detalhado e comandos completos.
+      </p>
+
+      <p>
+        <strong>Pré-flight check.</strong> Antes de qualquer coisa, garanta:
+      </p>
+      <ul>
+        <li>Codespace aberto no repo <code>cloud_sre</code>, branch <code>main</code> atualizada.</li>
+        <li>Stack <code>olist-sre-pipeline-lab</code> da Aula 04 em <code>CREATE_COMPLETE</code> ou <code>UPDATE_COMPLETE</code>.</li>
+        <li>Self-hosted runner da Aula 05 ainda <em>idle</em> e respondendo (<code>aws ssm describe-instance-information</code>).</li>
+        <li><code>tests/integration/</code> em Testcontainers; <code>wb.yml</code> verde no último PR (Aula 06).</li>
+        <li>Tag <code>aula-06</code> existe no remoto.</li>
+      </ul>
+
+      <div class="m07-block">
+        <h3>Bloco 1 &middot; Observability stack</h3>
+        <p>
+          <strong>Objetivo.</strong> Nascer o sistema nervoso do pipeline &mdash; <code>iac/cloudformation/observability.yaml</code>
+          escrito por skill, deployado e validado pela CLI. Sem clique no console.
+        </p>
+        <p>
+          <strong>Entregáveis.</strong> Session token válido; skill <code>gen_observability_stack</code> em
+          <code>agents/skills/</code>; template <code>observability.yaml</code> revisado em diff; stack
+          <code>olist-observability</code> em <code>CREATE_COMPLETE</code>; log groups, dashboard, 5 alarms,
+          EventBridge rule e SSM Document criados.
+        </p>
+        <p>
+          <strong>Critério parcial.</strong> <code>aws sts get-caller-identity</code> retorna a conta;
+          <code>describe-stacks</code> mostra status verde; <code>describe-alarms</code> lista os 5 alarms
+          <code>OlistETL-*</code>; <code>list-dashboards</code> mostra <code>olist-sre</code>.
+        </p>
+
+        <h4>Passo 1 &mdash; renovar session token e validar handshake</h4>
+        <p>
+          O token do Learner Lab expira a cada ~3 horas. Sempre o primeiro passo de qualquer prática &mdash;
+          senão o <code>cloudformation deploy</code> falha calado.
+        </p>
+<pre># 1) Learner Lab -&gt; Start Lab -&gt; AWS Details -&gt; Show -&gt; copiar bloco "AWS CLI"
+cat &gt; ~/.aws/credentials &lt;&lt;'EOF'
+[default]
+aws_access_key_id=ASIA...
+aws_secret_access_key=...
+aws_session_token=...
+EOF
+chmod 600 ~/.aws/credentials
+
+# 2) Validar
+aws sts get-caller-identity
+aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE UPDATE_COMPLETE \
+  --query "StackSummaries[?StackName=='olist-sre-pipeline-lab'].StackName" \
+  --output text</pre>
+
+        <h4>Passo 2 &mdash; skill <code>gen_observability_stack</code></h4>
+        <p>
+          A skill lê os SLOs do <code>02_non_functional_requirements.md</code> e gera o template CloudFormation. A
+          saída é revisada em diff antes do deploy &mdash; nunca colada cegamente.
+        </p>
+<pre># agents/skills/gen_observability_stack.md
+
+## Quando usar
+Quando o usuario pedir para gerar/atualizar a observability stack.
+
+## Entrada
+- documents/02_non_functional_requirements.md  (SLOs SLO-01..05)
+- documents/03_architecture.md                 (componentes)
+- iac/cloudformation/                          (templates existentes)
+
+## Passos
+1. Ler os 5 SLOs e mapear cada um para 1 metric + 1 alarm.
+2. Para cada componente da arquitetura, criar log group dedicado.
+3. Criar dashboard olist-sre com 8 widgets (1 por SLI + canary + alarms grid).
+4. Criar EventBridge rule por alarm critico apontando para SSM Document.
+5. Criar SSM Document RetryEtlOnce (Command, AWS-RunShellScript).
+6. Adicionar Outputs com ARNs do dashboard, alarms e do SSM Document.
+
+## Saida
+- iac/cloudformation/observability.yaml
+- IDs estaveis ALARM-NN amarrados a SLO-NN.
+- Tags Owner=&lt;aluno&gt;, Aula=07, Stack=olist-observability.
+
+## Criterios de aceitacao
+- aws cloudformation validate-template passa.
+- 5 alarms apontam para 5 SLOs distintos.
+- Cada alarm tem AlarmDescription com link para runbook.</pre>
+        <p>
+          Invoque a skill no OpenCode/Gemini CLI:
+        </p>
+<pre>opencode
+
+&gt; Aplique a skill agents/skills/gen_observability_stack.md.
+&gt; Saida em iac/cloudformation/observability.yaml.
+&gt; Antes de gerar, leia os 5 SLOs e proponha em diff.</pre>
+
+        <h4>Passo 3 &mdash; deploy da stack e validação CLI</h4>
+        <p>
+          Sem console. Tudo via <code>aws</code>. Se algo falhar, o CloudFormation faz rollback &mdash; revisamos diff
+          e tentamos de novo.
+        </p>
+<pre># Validar template antes
+aws cloudformation validate-template \
+  --template-body file://iac/cloudformation/observability.yaml
+
+# Deploy
+aws cloudformation deploy \
+  --stack-name olist-observability \
+  --template-file iac/cloudformation/observability.yaml \
+  --parameter-overrides Owner=$USER \
+  --capabilities CAPABILITY_NAMED_IAM \
+  --tags Aula=07 Stack=olist-observability
+
+# Conferir tudo via CLI
+aws cloudwatch describe-alarms \
+  --query "MetricAlarms[].AlarmName"
+aws cloudwatch list-dashboards \
+  --query "DashboardEntries[].DashboardName"
+aws events list-rules \
+  --query "Rules[?starts_with(Name,'olist-')].Name"
+aws ssm list-documents \
+  --filters Key=Owner,Values=Self \
+  --query "DocumentIdentifiers[].Name"</pre>
+      </div>
+
+      <div class="m07-block">
+        <h3>Bloco 2 &middot; Closed loop</h3>
+        <p>
+          <strong>Objetivo.</strong> Fechar a malha alarm &rarr; EventBridge &rarr; SSM. O pipeline passa a se
+          observar (EMF, Synthetics) e a se reparar (runbook idempotente com dry-run obrigatório).
+        </p>
+        <p>
+          <strong>Entregáveis.</strong> <code>src/etl/main.py</code> emitindo EMF para namespace <code>OlistETL</code>;
+          skill <code>wire_emf_logging</code> registrada; canário <code>olist-grafana-heartbeat</code> <em>RUNNING</em>;
+          SSM Document <code>RetryEtlOnce</code> publicado; 1 dry-run com <code>Status=Success</code>; EventBridge
+          rule <code>olist-alarm-retry-etl</code> em <code>ENABLED</code>.
+        </p>
+        <p>
+          <strong>Critério parcial.</strong> Métricas <code>RowsProcessed</code>, <code>Latency</code>,
+          <code>InvalidRows</code> aparecem no namespace <code>OlistETL</code>; canário verde por 2 datapoints;
+          <code>get-command-invocation</code> retorna <code>Status: Success</code>; rule em <code>ENABLED</code>;
+          dry-run executado <em>antes</em> do enable.
+        </p>
+
+        <h4>Passo 4 &mdash; skill <code>wire_emf_logging</code> &mdash; EMF no ETL</h4>
+        <p>
+          O ETL para de emitir log de texto solto. Passa a emitir EMF JSON. CloudWatch reconhece e publica métricas
+          <em>sem</em> <code>PutMetricData</code>. <code>RowsProcessed</code>, <code>Latency</code> e
+          <code>InvalidRows</code> ganham vida.
+        </p>
+<pre># Em src/etl/main.py
+import json, time, logging
+log = logging.getLogger("olist")
+
+def emit_emf(stage: str, rows: int, latency_s: float,
+             invalid: int, run_id: str):
+    payload = {
+      "_aws": {
+        "Timestamp": int(time.time() * 1000),
+        "CloudWatchMetrics": [{
+          "Namespace": "OlistETL",
+          "Dimensions": [["Stage", "Env"]],
+          "Metrics": [
+            {"Name": "RowsProcessed", "Unit": "Count"},
+            {"Name": "Latency",       "Unit": "Seconds"},
+            {"Name": "InvalidRows",   "Unit": "Count"}
+          ]
+        }]
+      },
+      "Stage": stage, "Env": "lab",
+      "RowsProcessed": rows, "Latency": latency_s, "InvalidRows": invalid,
+      "RunId": run_id,
+    }
+    log.info(json.dumps(payload))</pre>
+
+        <h4>Passo 5 &mdash; canário Synthetics via CFN</h4>
+        <p>
+          Heartbeat de 5 minutos no Grafana. Falhar 2 datapoints &rarr; alarm <code>ALARM-06 SyntheticsDown</code>.
+          Primeiro SLI <em>black box</em> do dashboard.
+        </p>
+<pre># Trecho de iac/cloudformation/observability.yaml
+GrafanaCanary:
+  Type: AWS::Synthetics::Canary
+  Properties:
+    Name: olist-grafana-heartbeat
+    ArtifactS3Location: !Sub "s3://${ArtifactsBucket}/canary"
+    ExecutionRoleArn: !GetAtt CanaryRole.Arn
+    RuntimeVersion: syn-nodejs-puppeteer-7.0
+    Schedule: { Expression: "rate(5 minutes)" }
+    StartCanaryAfterCreation: true
+    Code:
+      Handler: index.handler
+      Script: |
+        const synthetics = require('Synthetics');
+        exports.handler = async () =&gt; {
+          await synthetics.executeHttpStep(
+            'grafana-health',
+            { url: 'http://&lt;ec2-grafana&gt;:3000/api/health',
+              method: 'GET' },
+            r =&gt; r.statusCode === 200);
+        };</pre>
+
+        <h4>Passo 6 &mdash; runbook <code>RetryEtlOnce</code> e dry-run</h4>
+        <p>
+          O Document é simples e idempotente. Roda no host do ETL via Run Command. Bem comentado &mdash; runbook mal
+          escrito é runbook não rodado. <strong>Antes</strong> de habilitar a regra do EventBridge, executamos
+          <em>dry-run</em> manualmente para validar parâmetros, role, conectividade e log.
+        </p>
+<pre># runbooks/RetryEtlOnce.yaml
+schemaVersion: "2.2"
+description: |
+  RUNBOOK-01 - Retry idempotente do ETL Olist quando ALARM-01
+  (FreshnessBreach) entra em ALARM. Stop apos 1 tentativa: se
+  ainda falhar, sobe para humano via SNS.
+parameters:
+  RunId:
+    type: String
+    default: "auto-{{global:DATE_TIME}}"
+mainSteps:
+  - action: aws:runShellScript
+    name: retryEtl
+    inputs:
+      runCommand:
+        - set -euo pipefail
+        - cd /opt/olist
+        - echo "[runbook] retry RunId={{ RunId }}"
+        - python -m etl.main --idempotent --run-id "{{ RunId }}"
+        - echo "[runbook] done"</pre>
+        <p>
+          Executar dry-run manualmente:
+        </p>
+<pre>INSTANCE=$(aws ec2 describe-instances \
+  --filters "Name=tag:Role,Values=etl" \
+  --query "Reservations[].Instances[].InstanceId" --output text)
+
+aws ssm send-command \
+  --document-name "RetryEtlOnce" \
+  --instance-ids $INSTANCE \
+  --parameters 'RunId=dryrun-2026-05-28' \
+  --comment "Aula 07 - dry-run do runbook"
+
+# Esperar status e ver log
+CMDID=$(aws ssm list-commands --query "Commands[0].CommandId" --output text)
+aws ssm get-command-invocation \
+  --command-id $CMDID --instance-id $INSTANCE \
+  --query "{Status:Status, Stdout:StandardOutputContent}"
+
+# Soh DEPOIS, habilitar a regra do EventBridge
+aws events enable-rule --name olist-alarm-retry-etl</pre>
+      </div>
+
+      <div class="m07-block">
+        <h3>Bloco 3 &middot; Incidente &amp; postmortem</h3>
+        <p>
+          <strong>Objetivo.</strong> Provar a malha fechada injetando latência no Postgres, observar o runbook
+          executando sozinho e fechar o ciclo com postmortem blameless commitado no repo. Tag <code>aula-07</code>
+          é o último passo.
+        </p>
+        <p>
+          <strong>Entregáveis.</strong> Chaos via Toxiproxy + SSM com kill switch automático em 10 min; alarm
+          <code>OlistETL-FreshnessBreach</code> transitando <code>OK &rarr; ALARM &rarr; OK</code>; EventBridge
+          dispara o SSM Document; postmortem em <code>documents/17_postmortems/2026-05-28-freshness-breach.md</code>;
+          tag <code>aula-07</code> em <code>origin/main</code>.
+        </p>
+        <p>
+          <strong>Critério parcial.</strong> Timeline factual com timestamps UTC; MTTR e error budget consumido
+          calculados; contributing factors e action items com dono/prazo; linguagem despessoal; <code>git log --oneline
+          aula-07</code> mostra o commit final.
+        </p>
+
+        <h4>Passo 7 &mdash; simulação de incidente (latência alta)</h4>
+        <p>
+          Reusamos o chaos da Aula 06 (Toxiproxy + SSM). Injetamos latência no Postgres, observamos o alarm subir,
+          vemos o runbook executar e registramos a timeline. Kill switch sempre claro &mdash; janela máxima 10 min.
+        </p>
+<pre># 1) Kill switch — janela maxima 10 min
+aws ssm send-command \
+  --document-name "AWS-RunShellScript" \
+  --instance-ids $INSTANCE \
+  --parameters 'commands=[
+    "toxiproxy-cli toxic add postgres -t latency -a latency=8000",
+    "(sleep 600 && toxiproxy-cli toxic remove postgres -n latency_downstream) &"
+  ]'
+
+# 2) Observar
+watch -n 30 'aws cloudwatch describe-alarms \
+  --alarm-names OlistETL-FreshnessBreach \
+  --query "MetricAlarms[].StateValue"'
+
+# 3) Quando ALARM, EventBridge dispara SSM. Conferir logs:
+aws logs tail /olist/runbooks --since 10m --follow
+
+# 4) Postmortem
+mkdir -p documents/17_postmortems
+$EDITOR documents/17_postmortems/2026-05-28-freshness-breach.md</pre>
+
+        <h4>Passo 8 &mdash; template do postmortem blameless</h4>
+        <p>
+          Template enxuto que vive em <code>documents/17_postmortems/</code>. A Aula 07 fecha com 1 postmortem
+          completo &mdash; SEV-3 porque o chaos foi planejado, mas a malha de resposta foi exercitada de verdade.
+        </p>
+<pre># INC-2026-05-28-01 · Freshness breach (latencia injetada)
+
+- Severity: SEV-3 (chaos planejado)
+- IC / Ops / Comms / Scribe: &lt;nomes&gt;
+- Detect / Ack / Mitigate / Resolve: 21h12 / 21h13 / 21h14 / 21h21 UTC-3
+- MTTR: 9 min · Error budget consumido (mes): 0.4%
+
+## Resumo
+Latencia injetada no Postgres elevou Freshness p95 acima de 30min.
+ALARM-01 disparou, EventBridge acionou SSM RunbookOnce, ETL re-rodou
+em modo idempotente, Freshness retornou ao normal.
+
+## Timeline (UTC-3)
+21:12 - chaos iniciado (Toxiproxy +8s)
+21:13 - ALARM-01 OK -&gt; ALARM
+21:13 - EventBridge -&gt; SSM RetryEtlOnce
+21:18 - ETL retry concluido
+21:21 - ALARM-01 ALARM -&gt; OK
+
+## Contributing factors
+- Latencia upstream nao tinha guard rail.
+- Sem circuit breaker no client do Postgres.
+
+## What went well
+- EMF emitiu metrica em &lt; 1 min.
+- Runbook idempotente nao duplicou linhas.
+- Kill switch automatico desfez chaos em 10 min.
+
+## Action items
+- AI-1 owner=@a, due=2026-06-04: adicionar circuit breaker no client.
+- AI-2 owner=@b, due=2026-06-04: composite alarm SLO-01 + SLO-05.
+- AI-3 owner=@c, due=2026-05-30: registrar runbook em 18_runbook_catalog.md.</pre>
+
+        <h4>Passo 9 &mdash; critério de pronto, commit e tag</h4>
+        <p>
+          Antes do <code>git push</code>, cada item verde. Tudo é validável via <code>aws</code> &mdash; nada via
+          console.
+        </p>
+        <ul>
+          <li><code>describe-stacks</code> retorna <code>CREATE_COMPLETE</code>.</li>
+          <li>Dashboard <code>olist-sre</code> existe e tem 8 widgets.</li>
+          <li>5 alarms com <code>AlarmDescription</code> apontando para runbook.</li>
+          <li>Canário Synthetics <code>RUNNING</code> e páginas verdes.</li>
+          <li>EMF chegando ao namespace <code>OlistETL</code>.</li>
+          <li>SSM Document <code>RetryEtlOnce</code> com 1 dry-run verde.</li>
+          <li>EventBridge rule <code>ENABLED</code> apontando para o Document.</li>
+          <li>1 postmortem em <code>documents/17_postmortems/</code>.</li>
+          <li><code>18_runbook_catalog.md</code> com 3 runbooks listados.</li>
+          <li>Tag <code>aula-07</code> empurrada para origem.</li>
+        </ul>
+<pre>git add iac/ src/etl/main.py runbooks/ \
+        documents/17_postmortems/ documents/18_runbook_catalog.md \
+        agents/skills/
+git commit -m "feat(aula-07): observability stack, EMF, runbook automatizado e postmortem"
+git tag aula-07
+git push origin main --tags</pre>
+      </div>
+    </section>
+
+    <section class="content-block">
+      <h2>25. Restrições duras desta aula</h2>
+      <ul>
+        <li><strong>Sem console AWS.</strong> Tudo via CLI / CloudFormation. Console só para leitura.</li>
+        <li><strong>Toda métrica</strong> tem <code>Namespace</code>, <code>MetricName</code>, <code>Dimensions</code> e <code>Unit</code> explícitos.</li>
+        <li><strong>Todo alarm</strong> tem <code>AlarmDescription</code> com link para SSM Document.</li>
+        <li><strong>Todo runbook</strong> passa por dry-run antes do <em>enable</em>. Sem exceção.</li>
+        <li><strong>Toda ação automática</strong> é idempotente.</li>
+        <li><strong>Todo incidente</strong> vira postmortem blameless commitado em <code>documents/17_postmortems/</code>.</li>
+        <li><strong>Toda mudança</strong> de configuração é diff de CloudFormation, não clique no console.</li>
+      </ul>
+    </section>
+
+    <section class="content-block">
+      <h2>26. Tarefa de casa para a Aula 08</h2>
+      <p>
+        A Aula 08 (11/06/2026) é o <strong>projeto final em sala</strong>: três horas de execução guiada construindo
+        uma análise de série temporal 100% AWS Student, do zero, com IA no Codespace. Não há código antes da aula.
+        O que cada aluno precisa entregar <em>antes</em> da Aula 08 é mínimo &mdash; mas é bloqueante.
+      </p>
+
+      <h3>26.1 Datasets sugeridos</h3>
+      <ul>
+        <li><em>Bitcoin Historical Data</em> (Kaggle).</li>
+        <li><em>Walmart Sales Forecasting</em> (Kaggle).</li>
+        <li><em>Air Passengers</em> (clássico, Kaggle).</li>
+        <li><em>Hourly Energy Consumption</em> (Kaggle).</li>
+        <li><em>NYC Taxi Trip Duration</em> &mdash; filtre por time bucket (Kaggle).</li>
+        <li><em>Daily Climate Time Series</em> (Kaggle).</li>
+      </ul>
+      <p>
+        <strong>Critério mínimo do dataset.</strong> Coluna <code>timestamp</code> + ao menos uma série numérica
+        com pelo menos 1.000 pontos.
+      </p>
+
+      <h3>26.2 O que entregar antes de 11/06</h3>
+      <ul>
+        <li>Repositório <code>tsa-{iniciais}-{slug-curto}</code> aberto no GitHub.</li>
+        <li>Dataset commitado em pasta <code>data/</code> (Git LFS opcional para arquivo grande).</li>
+        <li>Issue documentando: <em>fonte do dataset</em>, <em>periodicidade</em>, <em>hipótese inicial</em>.</li>
+        <li><strong>Não codar nada antes.</strong> A Aula 08 começa pela issue.</li>
+      </ul>
+    </section>
+
+    <section class="content-block">
+      <h2>27. Glossário consolidado</h2>
+      <p>
+        Vocabulário usado nesta aula. As três tabelas de glossário no slide são compactas; aqui há descrições mais
+        longas para consulta.
+      </p>
+
+      <h3>27.1 SRE e confiabilidade</h3>
+      <table>
+        <thead><tr><th style="width:18%;">Sigla</th><th>Significado</th></tr></thead>
+        <tbody>
+          <tr><td><strong>SRE</strong></td><td>Site Reliability Engineering &mdash; disciplina do Google formalizada em 2003 e popularizada com o livro de 2016.</td></tr>
+          <tr><td><strong>SLI</strong></td><td>Service Level Indicator &mdash; medição com unidade e janela.</td></tr>
+          <tr><td><strong>SLO</strong></td><td>Service Level Objective &mdash; meta interna sobre o SLI.</td></tr>
+          <tr><td><strong>SLA</strong></td><td>Service Level Agreement &mdash; contrato externo, geralmente mais frouxo que o SLO.</td></tr>
+          <tr><td><strong>Error budget</strong></td><td>Complemento do SLO (<code>1 &minus; SLO</code>); quando esgota, freeze de feature.</td></tr>
+          <tr><td><strong>MTTR</strong></td><td>Mean Time To Recovery &mdash; tempo médio de recuperação.</td></tr>
+          <tr><td><strong>MTBF</strong></td><td>Mean Time Between Failures.</td></tr>
+          <tr><td><strong>RTO</strong></td><td>Recovery Time Objective &mdash; tempo máximo aceitável para recuperar.</td></tr>
+          <tr><td><strong>RPO</strong></td><td>Recovery Point Objective &mdash; perda máxima de dado aceitável.</td></tr>
+          <tr><td><strong>Toil</strong></td><td>Trabalho manual, repetitivo, automatizável e sem valor durável.</td></tr>
+          <tr><td><strong>IC</strong></td><td>Incident Commander &mdash; coordena e decide durante incidente.</td></tr>
+          <tr><td><strong>Ops</strong></td><td>Operations Lead &mdash; mão na massa durante incidente.</td></tr>
+          <tr><td><strong>Comms</strong></td><td>Communications &mdash; atualiza stakeholders durante incidente.</td></tr>
+          <tr><td><strong>Scribe</strong></td><td>Registra timeline factual em tempo real.</td></tr>
+          <tr><td><strong>SEV-1..4</strong></td><td>Severidade de incidente (1 maior).</td></tr>
+          <tr><td><strong>Postmortem blameless</strong></td><td>Documento factual sem culpado, foco em sistema.</td></tr>
+          <tr><td><strong>DORA</strong></td><td>DevOps Research and Assessment &mdash; quatro métricas-chave de delivery.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>27.2 Observabilidade e CloudWatch</h3>
+      <table>
+        <thead><tr><th style="width:18%;">Sigla</th><th>Significado</th></tr></thead>
+        <tbody>
+          <tr><td><strong>EMF</strong></td><td>Embedded Metric Format &mdash; padrão da AWS para emitir métricas via log.</td></tr>
+          <tr><td><strong>CW</strong></td><td>Amazon CloudWatch &mdash; logs, métricas, alarms, dashboards, eventos.</td></tr>
+          <tr><td><strong>X-Ray</strong></td><td>Serviço de tracing distribuído da AWS.</td></tr>
+          <tr><td><strong>Trace</strong></td><td>Árvore completa de uma request, com segments e subsegments.</td></tr>
+          <tr><td><strong>Segment</strong></td><td>Trabalho em um componente dentro de uma trace.</td></tr>
+          <tr><td><strong>Annotation</strong></td><td>Par chave-valor indexado em X-Ray.</td></tr>
+          <tr><td><strong>p50 / p95 / p99</strong></td><td>Percentis 50, 95 e 99 da distribuição.</td></tr>
+          <tr><td><strong>Synthetics</strong></td><td>Canários sintéticos do CloudWatch (Lambda gerenciado).</td></tr>
+          <tr><td><strong>Logs Insights</strong></td><td>Linguagem de query SQL-like sobre log groups.</td></tr>
+          <tr><td><strong>Math expression</strong></td><td>Expressão matemática sobre métricas no CW (ex.: <code>m1/m2*100</code>).</td></tr>
+          <tr><td><strong>Metric filter</strong></td><td>Pattern em log group que vira CW metric.</td></tr>
+          <tr><td><strong>Subscription filter</strong></td><td>Pattern em log group que envia eventos a Lambda/Kinesis.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>27.3 AWS, automação e fleet</h3>
+      <table>
+        <thead><tr><th style="width:18%;">Sigla</th><th>Significado</th></tr></thead>
+        <tbody>
+          <tr><td><strong>EventBridge</strong></td><td>Bus de eventos serverless da AWS.</td></tr>
+          <tr><td><strong>SSM</strong></td><td>AWS Systems Manager &mdash; capabilities Run Command, State Manager, Patch, Inventory.</td></tr>
+          <tr><td><strong>Run Command</strong></td><td>Execução pontual de Document em fleet.</td></tr>
+          <tr><td><strong>State Manager</strong></td><td>Aplicação idempotente recorrente de Document.</td></tr>
+          <tr><td><strong>Automation</strong></td><td>Workflow multi-passo SSM com branching e aprovação.</td></tr>
+          <tr><td><strong>Patch Manager</strong></td><td>Patching declarativo via baseline + maintenance window.</td></tr>
+          <tr><td><strong>Inventory</strong></td><td>Visibilidade de software/network/processo por host.</td></tr>
+          <tr><td><strong>SNS</strong></td><td>Simple Notification Service.</td></tr>
+          <tr><td><strong>SQS</strong></td><td>Simple Queue Service (usado como DLQ).</td></tr>
+          <tr><td><strong>EC2</strong></td><td>Elastic Compute Cloud.</td></tr>
+          <tr><td><strong>S3</strong></td><td>Simple Storage Service.</td></tr>
+          <tr><td><strong>IAM</strong></td><td>Identity and Access Management.</td></tr>
+          <tr><td><strong>STS</strong></td><td>Security Token Service.</td></tr>
+          <tr><td><strong>CFN</strong></td><td>CloudFormation &mdash; IaC declarativa nativa AWS.</td></tr>
+          <tr><td><strong>ARN</strong></td><td>Amazon Resource Name &mdash; identificador único de recurso.</td></tr>
+          <tr><td><strong>DLQ</strong></td><td>Dead Letter Queue &mdash; fila para mensagens que não puderam ser processadas.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>27.4 IaC, dev e normas</h3>
+      <table>
+        <thead><tr><th style="width:18%;">Sigla</th><th>Significado</th></tr></thead>
+        <tbody>
+          <tr><td><strong>IaC</strong></td><td>Infrastructure as Code &mdash; descrição declarativa de infra em arquivo versionado.</td></tr>
+          <tr><td><strong>YAML</strong></td><td>YAML Ain't Markup Language &mdash; formato declarativo de templates CFN e SSM.</td></tr>
+          <tr><td><strong>JSON</strong></td><td>JavaScript Object Notation &mdash; formato dos dashboards CW.</td></tr>
+          <tr><td><strong>CI / CD</strong></td><td>Continuous Integration / Continuous Delivery.</td></tr>
+          <tr><td><strong>SDK</strong></td><td>Software Development Kit (boto3, aws-sdk-js, etc.).</td></tr>
+          <tr><td><strong>CLI</strong></td><td>Command Line Interface.</td></tr>
+          <tr><td><strong>OpenTelemetry</strong></td><td>Padrão aberto de telemetria (logs, metrics, traces).</td></tr>
+          <tr><td><strong>ISO/IEC 25010</strong></td><td>Quality model &mdash; atributos de qualidade de software.</td></tr>
+          <tr><td><strong>NIST</strong></td><td>National Institute of Standards and Technology (EUA).</td></tr>
+          <tr><td><strong>ITIL</strong></td><td>Information Technology Infrastructure Library &mdash; framework de serviços.</td></tr>
+          <tr><td><strong>RM-ODP</strong></td><td>Reference Model for Open Distributed Processing.</td></tr>
+          <tr><td><strong>TSA</strong></td><td>Time Series Analysis &mdash; tema da Aula 08.</td></tr>
+          <tr><td><strong>STL</strong></td><td>Seasonal-Trend Loess decomposition.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="content-block">
+      <h2>28. Bibliografia / referências</h2>
+      <h3>28.1 Primárias</h3>
+      <ul>
+        <li>Beyer, B.; Jones, C.; Petoff, J.; Murphy, N. R. &mdash; <em>Site Reliability Engineering &mdash; How Google Runs Production Systems</em>, O'Reilly, 2016.</li>
+        <li>Beyer, B.; Murphy, N. R.; Rensin, D. K.; Kawahara, K.; Thorne, S. &mdash; <em>The Site Reliability Workbook</em>, O'Reilly, 2018.</li>
+        <li>Sridharan, C. &mdash; <em>Distributed Systems Observability</em>, O'Reilly, 2018.</li>
+        <li>Majors, C.; Fong-Jones, L.; Miranda, G. &mdash; <em>Observability Engineering</em>, O'Reilly, 2022.</li>
+        <li>Allspaw, J. &mdash; <em>Blameless PostMortems and a Just Culture</em>, Etsy Engineering Blog, 2012.</li>
+        <li>Hellerstein, J. L.; Diao, Y.; Parekh, S.; Tilbury, D. M. &mdash; <em>Feedback Control of Computing Systems</em>, Wiley/IEEE, 2004.</li>
+      </ul>
+
+      <h3>28.2 AWS &middot; documentação oficial</h3>
+      <ul>
+        <li>AWS Well-Architected Framework &mdash; <em>Operational Excellence Pillar</em>.</li>
+        <li>AWS Builders' Library &mdash; <em>Amazon's approach to high-availability deployment</em>.</li>
+        <li>AWS docs &mdash; <em>CloudWatch Embedded Metric Format Specification</em>.</li>
+        <li>AWS docs &mdash; <em>CloudWatch Logs Insights Query Syntax</em>.</li>
+        <li>AWS docs &mdash; <em>CloudWatch Synthetics</em>; <em>AWS X-Ray Developer Guide</em>.</li>
+        <li>AWS docs &mdash; <em>Systems Manager Documents</em>; <em>EventBridge Rules</em>.</li>
+        <li>AWS docs &mdash; <em>CloudFormation Resource and Property Types Reference</em>.</li>
+      </ul>
+
+      <h3>28.3 Padrões abertos e contexto</h3>
+      <ul>
+        <li>OpenTelemetry &mdash; <code>opentelemetry.io</code>.</li>
+        <li>DORA &mdash; <em>Accelerate State of DevOps Reports</em>.</li>
+        <li>ISO/IEC 25010:2023 &mdash; <em>Systems and software Quality Requirements and Evaluation</em>.</li>
+        <li>principlesofchaos.org &mdash; <em>Principles of Chaos Engineering</em> (citado pela Aula 06).</li>
       </ul>
     </section>
 
@@ -51,5 +1856,26 @@
     </section>
 
   </main>
+
+  <!-- Mermaid v11 — closed loop sequence + dashboard map -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'neutral',
+      securityLevel: 'loose',
+      flowchart: { htmlLabels: true, curve: 'basis' },
+      sequence: { showSequenceNumbers: false, mirrorActors: false },
+      themeVariables: {
+        fontFamily: 'JetBrains Mono, ui-monospace, monospace',
+        primaryColor: '#ffffff',
+        primaryBorderColor: '#0f0f0f',
+        primaryTextColor: '#0f0f0f',
+        lineColor: '#5c5c5c',
+        clusterBkg: '#fafaf7',
+        clusterBorder: '#d6d6d1'
+      }
+    });
+  </script>
 </body>
 </html>

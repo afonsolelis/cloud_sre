@@ -111,7 +111,7 @@
   <main class="page">
 
     <section class="content-block">
-      <p class="meta">Aula 06 &nbsp;&bull;&nbsp; 21/05/2026 &nbsp;&bull;&nbsp; 19h00 &ndash; 22h00</p>
+      <p class="meta">Aula 06 &nbsp;&bull;&nbsp; 21/05/2026</p>
       <h1>Testcontainers, chaos engineering e qualidade de código mensurada</h1>
       <p class="summary">
         Este material acompanha a Aula 06 da disciplina <strong>Cloud Computing e SRE &mdash; Visão Prática com AWS</strong>
@@ -494,14 +494,23 @@ flowchart LR
     </section>
 
     <section class="content-block">
-      <h2>7. Roteiro da prática &mdash; 21h00 &ndash; 22h00</h2>
+      <h2>7. Roteiro da prática</h2>
       <p>
-        A próxima hora é guiada passo a passo. Saímos com <code>tests/integration/</code> migrado para Testcontainers,
-        Toxiproxy provisionado, um chaos run documentado, um relatório de qualidade gerado e um job <code>quality</code>
-        novo no <code>wb.yml</code>. Tudo via CLI &mdash; nada de console AWS.
+        A prática é guiada passo a passo, organizada em três blocos lógicos. Saímos com <code>tests/integration/</code>
+        migrado para Testcontainers, Toxiproxy provisionado, um chaos run documentado, um relatório de qualidade gerado
+        e um job <code>quality</code> novo no <code>wb.yml</code>. Tudo via CLI &mdash; nada de console AWS.
       </p>
 
-      <h3>7.1 Passo 1 &mdash; renovar token, branch nova, esqueleto de skills</h3>
+      <h3>7.A &mdash; Bloco 1 &middot; Testcontainers</h3>
+      <p>
+        Substituímos o mock do Postgres por container efêmero controlado pelo teste e validamos o workflow localmente
+        antes do push. <strong>Entregáveis:</strong> token renovado, branch nova, skill <code>migrate_to_testcontainers</code>,
+        <code>conftest.py</code> com Postgres + LocalStack e <code>wb.yml</code> verde via <code>act</code>.
+        <strong>Critério parcial:</strong> <code>pytest tests/integration/</code> passa sem mock, em &le; 90 s, sem
+        dependência de ordem entre testes.
+      </p>
+
+      <h4>Passo 1 &mdash; renovar token, branch nova, esqueleto de skills</h4>
 <pre>cd ~/olist-sre-pipeline
 git pull origin main
 git checkout -b aula-06-chaos-quality
@@ -517,7 +526,7 @@ touch agents/skills/migrate_to_testcontainers.md \
       agents/skills/measure_quality.md \
       documents/16_quality_report.md</pre>
 
-      <h3>7.2 Passo 2 &mdash; skill <code>migrate_to_testcontainers</code></h3>
+      <h4>Passo 2 &mdash; skill <code>migrate_to_testcontainers</code></h4>
       <p>
         A skill instrui o agente Tester a ler o estado atual de <code>tests/integration/</code> e o
         <code>documents/03_architecture.md</code>, e produzir um diff que substitui mocks por Testcontainers,
@@ -547,7 +556,7 @@ em tests/integration/.
 - Tempo total &lt;= 90 s.
 - Nenhum teste depende de outro (ordem livre).</pre>
 
-      <h3>7.3 Passo 3 &mdash; rodar a skill e validar localmente com <code>act</code></h3>
+      <h4>Passo 3 &mdash; rodar a skill e validar localmente com <code>act</code></h4>
       <p>
         Antes de gastar minuto de runner ou quebrar a branch protection, rodamos o workflow no Codespace via
         <code>act</code>. Ele simula o ambiente do GitHub Actions. Esperado: <code>pytest tests/integration/</code>
@@ -564,7 +573,17 @@ act -W .github/workflows/wb.yml -j integration \
 # Esperado: pytest tests/integration/ verde com Postgres real
 # Tempo aproximado: 60-90 s na primeira run, 20-30 s nas seguintes.</pre>
 
-      <h3>7.4 Passo 4 &mdash; Toxiproxy via CFN ao lado do ETL</h3>
+      <h3>7.B &mdash; Bloco 2 &middot; Chaos engineering</h3>
+      <p>
+        Provisionamos o Toxiproxy como sidecar do ETL, desenhamos o experimento via skill, injetamos latência por SSM
+        e registramos o run com baseline, observação e ADR. <strong>Entregáveis:</strong> Toxiproxy via CFN, skill
+        <code>design_chaos_experiment</code>, comando SSM com kill switch e arquivo em
+        <code>documents/15_chaos_runs/</code>. <strong>Critério parcial:</strong> YAML de experimento com hipótese,
+        baseline, salvaguardas e <code>duracao_max</code>; kill switch testado; Toxiproxy <em>OFF</em> ao final;
+        1 ADR por descoberta.
+      </p>
+
+      <h4>Passo 4 &mdash; Toxiproxy via CFN ao lado do ETL</h4>
       <p>
         Estendemos <code>iac/cloudformation/compute.yaml</code> da Aula 04 com o Toxiproxy rodando como container
         sidecar na mesma EC2 ETL, ouvindo só na rede interna (<code>127.0.0.1</code>). O ETL passa a falar com o
@@ -587,7 +606,7 @@ aws cloudformation deploy \
   --stack-name olist-sre-pipeline-lab \
   --capabilities CAPABILITY_IAM</pre>
 
-      <h3>7.5 Passo 5 &mdash; skill <code>design_chaos_experiment</code></h3>
+      <h4>Passo 5 &mdash; skill <code>design_chaos_experiment</code></h4>
       <p>
         A skill obriga a IA a escrever YAML válido contra <code>chaos/experiments/_schema.json</code>. Sem
         <code>kill_switch</code>, sem <code>duracao_max</code> e sem <code>blast_radius</code>, a skill recusa.
@@ -615,7 +634,7 @@ Quando o usuario pedir para desenhar um experimento de chaos.
 - duracao_max obrigatoria.
 - blast_radius descrito por tag.</pre>
 
-      <h3>7.6 Passo 6 &mdash; injetar a falha via SSM Run Command</h3>
+      <h4>Passo 6 &mdash; injetar a falha via SSM Run Command</h4>
       <p>
         Com o YAML pronto, transformamos a sequência de ações em um <code>aws ssm send-command</code> que distribui
         para a EC2 alvo (selecionada por tag). O ID do comando volta como variável de ambiente; é ele que usamos no
@@ -640,7 +659,7 @@ aws ssm cancel-command --command-id "$CMD_ID"
 # Observar
 aws logs tail /aws/ec2/etl-lab --follow --since 2m</pre>
 
-      <h3>7.7 Passo 7 &mdash; registrar o run</h3>
+      <h4>Passo 7 &mdash; registrar o run</h4>
       <p>Sem registro, o experimento não existiu. Um arquivo por run, datado, com hipótese, execução, resultado e ADR.</p>
 <pre># documents/15_chaos_runs/2026-05-21T2105_CHAOS-02.md
 
@@ -664,7 +683,17 @@ PASSOU. Aceitacao integralmente atendida.
 ADR-12 - circuit breaker abre em 7s, dentro do limite de 10s.
 Manter threshold atual. Proximo experimento: latencia 5000ms.</pre>
 
-      <h3>7.8 Passo 8 &mdash; skill <code>measure_quality</code> e relatório</h3>
+      <h3>7.C &mdash; Bloco 3 &middot; Qualidade &amp; gate</h3>
+      <p>
+        Rodamos as métricas de qualidade no <code>src/</code>, consolidamos em relatório com plano de refactor e
+        transformamos os limiares em gate obrigatório do <code>wb.yml</code>. <strong>Entregáveis:</strong> skill
+        <code>measure_quality</code>, <code>documents/16_quality_report.md</code> com top-5 funções, job
+        <code>quality</code> dependente de <code>unit</code> e <code>integration</code>, tag <code>aula-06</code> no
+        remoto. <strong>Critério parcial:</strong> <code>xenon</code> verde com gate B-A-A; MI &ge; 65 em todo módulo
+        crítico; job <code>quality</code> verde; cada função fora do limite tem ADR <code>QUALITY-NN</code>.
+      </p>
+
+      <h4>Passo 8 &mdash; skill <code>measure_quality</code> e relatório</h4>
       <p>
         O agente Reviewer roda <code>radon</code>, <code>xenon</code> e <code>ruff</code>, consolida tudo em
         <code>documents/16_quality_report.md</code> com top-5 funções por complexidade, vínculo de cada item à RTM
@@ -688,7 +717,7 @@ xenon --max-absolute B --max-modules A --max-average A src/
 radon mi src/        &gt; reports/mi.txt
 ruff check --statistics src/ &gt; reports/ruff.txt</pre>
 
-      <h3>7.9 Passo 9 &mdash; gate de qualidade no <code>wb.yml</code></h3>
+      <h4>Passo 9 &mdash; gate de qualidade no <code>wb.yml</code></h4>
       <p>
         A métrica só vira realidade quando vira CI gate. PR que cruzar o limiar não merge sem ADR. Adicionamos um
         job novo, dependente dos jobs <code>unit</code> e <code>integration</code>:
@@ -715,7 +744,7 @@ quality:
     - name: Ruff gate
       run: ruff check src/</pre>
 
-      <h3>7.10 Passo 10 &mdash; critério de pronto, commit e tag</h3>
+      <h4>Passo 10 &mdash; critério de pronto, commit e tag</h4>
       <p>Antes do <code>git push</code>, cada item verde:</p>
       <ul>
         <li><code>tests/integration/</code> migrado para Testcontainers, sem mock.</li>

@@ -119,7 +119,7 @@
           <img class="deck-logo-full" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_e4vyyw.png" alt="Universidade Presbiteriana Mackenzie" />
           <span class="deck-kicker">Cloud Computing e SRE &middot; MBA Engenharia de Dados</span>
           <h1 class="deck-title">Equipe de agentes IA + CloudFormation</h1>
-          <p class="deck-meta">Aula 04 &nbsp;&bull;&nbsp; 07/05/2026 &nbsp;&bull;&nbsp; 19h00 &ndash; 22h00</p>
+          <p class="deck-meta">Aula 04 &nbsp;&bull;&nbsp; 07/05/2026 &nbsp;&bull;&nbsp; Aula presencial</p>
           <p class="deck-year">2026</p>
           <p class="deck-subtitle">Do markdown ao stack provisionado &mdash; squad de papéis, IaC declarativa, zero clique no console.</p>
         </div>
@@ -134,11 +134,11 @@
         <div>
           <span class="deck-kicker">Agenda</span>
           <h2 class="deck-title">O que vai acontecer nesta aula</h2>
-          <p class="deck-summary">Duas horas de teoria sobre orquestração de agentes e CloudFormation; uma hora de prática provisionando o stack do Olist via CLI.</p>
+          <p class="deck-summary">Bloco teórico sobre orquestração de agentes e CloudFormation; prática guiada provisionando o stack do Olist via CLI.</p>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
-            <h3>19h00 &ndash; 21h00 &middot; Teoria</h3>
+            <h3>Bloco teórico</h3>
             <ul>
               <li>Recap Aula 03 e salto para infraestrutura</li>
               <li>Por que multi-agente: limites do prompt único</li>
@@ -149,7 +149,7 @@
             </ul>
           </article>
           <article class="deck-card">
-            <h3>21h00 &ndash; 22h00 &middot; Prática</h3>
+            <h3>Prática guiada</h3>
             <ul>
               <li>Renovar session token, instalar a squad</li>
               <li>Architect &rarr; <code>PLAN.md</code></li>
@@ -271,7 +271,7 @@
         <div>
           <span class="deck-kicker">Teoria &middot; Padrões</span>
           <h2 class="deck-title">Padrões de orquestração de agentes</h2>
-          <p class="deck-summary">Quatro arquétipos comuns. Hoje rodamos um híbrido planner+executor com revisão humana &mdash; é o que cabe na hora prática.</p>
+          <p class="deck-summary">Quatro arquétipos comuns. Hoje rodamos um híbrido planner+executor com revisão humana &mdash; é o que cabe na prática guiada.</p>
         </div>
         <table class="deck-table">
           <thead>
@@ -700,9 +700,9 @@ flowchart LR
     <div class="slide">
       <div class="deck-shell a04-compact">
         <div>
-          <span class="deck-kicker">Prática &middot; 21h00 &ndash; 22h00</span>
+          <span class="deck-kicker">Prática &middot; Abertura</span>
           <h2 class="deck-title">Da teoria para o stack provisionado</h2>
-          <p class="deck-summary">Próxima hora guiada. Toda a turma sai com squad rodando, templates gerados, stack vivo no Learner Lab e drift detection rodada.</p>
+          <p class="deck-summary">Próximo bloco guiado. Toda a turma sai com squad rodando, templates gerados, stack vivo no Learner Lab e drift detection rodada.</p>
         </div>
         <div class="deck-panel">
           <strong>Sequência da prática</strong>
@@ -723,14 +723,43 @@ flowchart LR
     </div>
 
     <!-- ============================================================ -->
+    <!-- SLIDE - BLOCO 1 OPENER - BOOTSTRAP & SQUAD                   -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a04-compact">
+        <div>
+          <span class="deck-kicker">Prática &middot; Bloco 1 &middot; Bootstrap &amp; squad</span>
+          <h2 class="deck-title">Bloco 1 &mdash; ambiente pronto e squad declarada</h2>
+          <p class="deck-summary">Antes de pedir IA para gerar qualquer coisa, deixar o Codespace conectado na AWS, instalar o orquestrador e formalizar a squad em arquivo versionado.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Entregáveis do bloco</strong>
+            <ul>
+              <li>Token AWS renovado &mdash; <code>aws sts get-caller-identity</code> OK.</li>
+              <li>Orquestrador (AIOX ou plano B) e <code>cfn-lint</code> instalados.</li>
+              <li><code>agents/squad.yml</code> com 4 papéis declarados.</li>
+              <li>Skill <code>gen_cfn_template.md</code> escrita (e análogas <code>lint_cfn</code>, <code>review_cfn</code>).</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Critério parcial</strong>
+            <p style="margin:8px 0 0;">Seguir para o próximo bloco quando: token válido, <code>--version</code> retornar OK no orquestrador e no <code>cfn-lint</code>, e <code>agents/squad.yml</code> commitado com os 4 papéis.</p>
+          </div>
+        </div>
+        <p style="margin-top:10px; font-size:.86em; color: var(--deck-muted);"><strong>Passos do bloco:</strong> 1 &middot; renovar credenciais &nbsp;&middot;&nbsp; 2 &middot; instalar squad &nbsp;&middot;&nbsp; 3 &middot; <code>squad.yml</code> &nbsp;&middot;&nbsp; 4 &middot; skills novas.</p>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
     <!-- SLIDE 20 - PASSO 1 RENOVAR CREDS                             -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; Passo 1</span>
+          <span class="deck-kicker">Bloco 1 &middot; Passo 1</span>
           <h2 class="deck-title">Renovar credenciais AWS</h2>
-          <p class="deck-summary">O session token do Learner Lab dura ~3h. Toda aula começa colando o bloco novo. Sem isso, tudo dá <code>ExpiredToken</code>.</p>
+          <p class="deck-summary">O session token do Learner Lab tem validade curta. Toda aula começa colando o bloco novo. Sem isso, tudo dá <code>ExpiredToken</code>.</p>
         </div>
 <pre class="a04-prompt"># 1) AWS Academy: Start Lab -&gt; AWS Details -&gt; Show -&gt; copiar bloco "AWS CLI"
 
@@ -759,7 +788,7 @@ aws cloudformation list-stacks --query "StackSummaries[?StackStatus!='DELETE_COM
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; Passo 2</span>
+          <span class="deck-kicker">Bloco 1 &middot; Passo 2</span>
           <h2 class="deck-title">Instalar a squad de agentes</h2>
           <p class="deck-summary">AIOX como default. Se falhar, caímos no plano B. O importante é a forma da squad &mdash; não o nome do binário.</p>
         </div>
@@ -784,7 +813,7 @@ cfn-lint --version</pre>
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; Passo 3</span>
+          <span class="deck-kicker">Bloco 1 &middot; Passo 3</span>
           <h2 class="deck-title">Criar <code>agents/squad.yml</code></h2>
           <p class="deck-summary">Configuração declarativa da squad. Mesmo formato funciona em AIOX, CrewAI e no orquestrador caseiro &mdash; o que muda é só o runner.</p>
         </div>
@@ -822,7 +851,7 @@ roles:
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; Passo 4</span>
+          <span class="deck-kicker">Bloco 1 &middot; Passo 4</span>
           <h2 class="deck-title">Skills novas &mdash; <code>gen_cfn_template</code></h2>
           <p class="deck-summary">Mesmo padrão das skills da Aula 03: nome verbo+objeto, quando usar, entrada, passos, saída, critério de aceitação. Faça também <code>lint_cfn</code> e <code>review_cfn</code> análogas.</p>
         </div>
@@ -854,12 +883,41 @@ Quando existir iac/cloudformation/PLAN.md descrevendo modulos.
     </div>
 
     <!-- ============================================================ -->
+    <!-- SLIDE - BLOCO 2 OPENER - SQUAD GERA                          -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a04-compact">
+        <div>
+          <span class="deck-kicker">Prática &middot; Bloco 2 &middot; Squad gera</span>
+          <h2 class="deck-title">Bloco 2 &mdash; quatro turnos da squad, zero deploy</h2>
+          <p class="deck-summary">Architect, DevOps, Tester e Reviewer rodam em sequência. Cada turno produz um artefato versionado. Nenhum recurso na conta AWS ainda &mdash; tudo é diff revisável no git.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Entregáveis do bloco</strong>
+            <ul>
+              <li><code>iac/cloudformation/PLAN.md</code> &mdash; plano por módulo (Architect).</li>
+              <li><code>root.yaml</code> + 5 módulos em <code>iac/cloudformation/</code> (DevOps).</li>
+              <li><code>tests/iac/test_templates.py</code> + <code>cfn-lint</code> verde (Tester).</li>
+              <li>Decisão APROVADO/VETO no <code>10_deploy_log.md</code> (Reviewer).</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Critério parcial</strong>
+            <p style="margin:8px 0 0;">Seguir para o próximo bloco quando: <code>cfn-lint</code> sem erro, asserts pytest verdes, e Reviewer marcou APROVADO PARA DEPLOY no log. Se VETO, voltar para o DevOps.</p>
+          </div>
+        </div>
+        <p style="margin-top:10px; font-size:.86em; color: var(--deck-muted);"><strong>Passos do bloco:</strong> 5 &middot; Architect &rarr; PLAN &nbsp;&middot;&nbsp; 6 &middot; DevOps &rarr; templates &nbsp;&middot;&nbsp; 7 &middot; Tester &rarr; lint &nbsp;&middot;&nbsp; 8 &middot; Reviewer &rarr; ATAM.</p>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
     <!-- SLIDE 24 - PASSO 5 ARCHITECT                                 -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; Passo 5</span>
+          <span class="deck-kicker">Bloco 2 &middot; Passo 5</span>
           <h2 class="deck-title">Architect &rarr; <code>PLAN.md</code></h2>
           <p class="deck-summary">Primeiro turno da squad. O Architect lê a arquitetura RM-ODP da Aula 03 e devolve um plano de módulos &mdash; sem escrever uma linha de YAML.</p>
         </div>
@@ -888,7 +946,7 @@ iac/cloudformation/PLAN.md no formato acima."</pre>
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; Passo 6</span>
+          <span class="deck-kicker">Bloco 2 &middot; Passo 6</span>
           <h2 class="deck-title">DevOps &rarr; templates CFN</h2>
           <p class="deck-summary">A partir do plano, geramos seis arquivos. <code>root.yaml</code> orquestra os outros via nested stacks. Toda saída entra como diff revisável no git.</p>
         </div>
@@ -919,7 +977,7 @@ git diff  iac/cloudformation/</pre>
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; Passo 7</span>
+          <span class="deck-kicker">Bloco 2 &middot; Passo 7</span>
           <h2 class="deck-title">Tester &rarr; lint + asserts em Outputs</h2>
           <p class="deck-summary">Antes de gastar token de deploy, validamos localmente. <code>cfn-lint</code> pega 90% dos erros bobos e o pytest cobre o que importa para o stack do Olist.</p>
         </div>
@@ -948,7 +1006,7 @@ python -m pytest tests/iac/test_templates.py -v
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; Passo 8</span>
+          <span class="deck-kicker">Bloco 2 &middot; Passo 8</span>
           <h2 class="deck-title">Reviewer &rarr; ATAM enxuto no template</h2>
           <p class="deck-summary">Antes do deploy, último crivo. Reusa a skill <code>review_architecture</code> da Aula 03 e a nova <code>review_cfn</code> &mdash; agora sobre YAML, não sobre prosa.</p>
         </div>
@@ -970,12 +1028,42 @@ python -m pytest tests/iac/test_templates.py -v
     </div>
 
     <!-- ============================================================ -->
+    <!-- SLIDE - BLOCO 3 OPENER - DEPLOY & VALIDACAO                  -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a04-compact">
+        <div>
+          <span class="deck-kicker">Prática &middot; Bloco 3 &middot; Deploy &amp; validação</span>
+          <h2 class="deck-title">Bloco 3 &mdash; do YAML revisado ao stack vivo</h2>
+          <p class="deck-summary">Aprovado pelo Reviewer, agora a infra entra na conta. Validate no servidor, deploy nested, verificação por CLI, smoke test no S3 raw e drift detection &mdash; nada de console.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Entregáveis do bloco</strong>
+            <ul>
+              <li>Stack <code>olist-sre-pipeline-lab</code> em <code>CREATE_COMPLETE</code>.</li>
+              <li>Outputs e resources confirmados pelo CLI; ao menos 1 EC2 com tag <code>Role=runner</code>.</li>
+              <li>Smoke test escrevendo CSV no bucket raw via Output do stack.</li>
+              <li>Drift detection rodada com resultado <code>IN_SYNC</code>.</li>
+              <li><code>10_deploy_log.md</code> e <code>11_drift_runbook.md</code> commitados.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Critério parcial / fechamento</strong>
+            <p style="margin:8px 0 0;">Encerrar a aula quando: stack em <code>CREATE_COMPLETE</code>, smoke test escreveu, drift = <code>IN_SYNC</code>, e tag <code>aula-04</code> empurrada para o repositório com <code>git push --tags</code>.</p>
+          </div>
+        </div>
+        <p style="margin-top:10px; font-size:.86em; color: var(--deck-muted);"><strong>Passos do bloco:</strong> 9 &middot; validate &nbsp;&middot;&nbsp; 10 &middot; deploy &nbsp;&middot;&nbsp; 11 &middot; verificar CLI &nbsp;&middot;&nbsp; 12 &middot; smoke test &nbsp;&middot;&nbsp; 13 &middot; drift detection.</p>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
     <!-- SLIDE 28 - PASSO 9 VALIDATE                                  -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; Passo 9</span>
+          <span class="deck-kicker">Bloco 3 &middot; Passo 9</span>
           <h2 class="deck-title">Validar template no servidor antes do deploy</h2>
           <p class="deck-summary"><code>validate-template</code> roda no lado da AWS. Pega erro de schema/intrinsic function que o lint local pode não cobrir.</p>
         </div>
@@ -1002,7 +1090,7 @@ aws cloudformation package \
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; Passo 10</span>
+          <span class="deck-kicker">Bloco 3 &middot; Passo 10</span>
           <h2 class="deck-title">Deploy do stack &mdash; momento da verdade</h2>
           <p class="deck-summary">Único comando que cria recursos hoje. Acompanhe pela CLI; se quiser ver eventos, use <code>describe-stack-events</code> &mdash; <strong>nada de console</strong>.</p>
         </div>
@@ -1032,7 +1120,7 @@ aws cloudformation describe-stack-events \
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; Passo 11</span>
+          <span class="deck-kicker">Bloco 3 &middot; Passo 11</span>
           <h2 class="deck-title">Verificar o stack pela CLI</h2>
           <p class="deck-summary">Três comandos para fechar o loop e gerar input do <code>10_deploy_log.md</code>. Tudo que veria no console aparece aqui &mdash; e em formato versionável.</p>
         </div>
@@ -1059,7 +1147,7 @@ aws cloudformation list-exports \
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; Passo 12</span>
+          <span class="deck-kicker">Bloco 3 &middot; Passo 12</span>
           <h2 class="deck-title">Smoke test &mdash; ETL dummy escreve no S3 raw</h2>
           <p class="deck-summary">Stack pronto não vale nada se ninguém escreve dado. Smoke test mínimo: copiar 1 CSV no bucket raw e ver os logs do controlador SRE.</p>
         </div>
@@ -1087,7 +1175,7 @@ aws logs describe-log-groups \
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; Passo 13</span>
+          <span class="deck-kicker">Bloco 3 &middot; Passo 13</span>
           <h2 class="deck-title">Drift detection &mdash; foto vs realidade</h2>
           <p class="deck-summary">Roda agora, antes que alguém edite um SG no console. O resultado vai para <code>11_drift_runbook.md</code> como referência da próxima aula.</p>
         </div>
@@ -1119,7 +1207,7 @@ aws cloudformation describe-stack-resource-drifts \
     <div class="slide">
       <div class="deck-shell a04-compact">
         <div>
-          <span class="deck-kicker">Prática &middot; Critério</span>
+          <span class="deck-kicker">Bloco 3 &middot; Critério final</span>
           <h2 class="deck-title">Critério de pronto e commit</h2>
           <p class="deck-summary">Antes do <code>git push</code>, cada item verde. Se faltar, próxima aula herda dívida &mdash; e a Aula 05 começa quebrada.</p>
         </div>

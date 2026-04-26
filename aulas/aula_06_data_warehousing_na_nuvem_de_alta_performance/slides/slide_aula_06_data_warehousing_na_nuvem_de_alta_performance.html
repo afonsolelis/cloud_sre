@@ -117,7 +117,7 @@
           <img class="deck-logo-full" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_e4vyyw.png" alt="Universidade Presbiteriana Mackenzie" />
           <span class="deck-kicker">Cloud Computing e SRE &middot; MBA Engenharia de Dados</span>
           <h1 class="deck-title">Testcontainers, chaos engineering e qualidade de código mensurada</h1>
-          <p class="deck-meta">Aula 06 &nbsp;&bull;&nbsp; 21/05/2026 &nbsp;&bull;&nbsp; 19h00 &ndash; 22h00</p>
+          <p class="deck-meta">Aula 06 &nbsp;&bull;&nbsp; 21/05/2026</p>
           <p class="deck-year">2026</p>
           <p class="deck-subtitle">Saímos do mock e vamos para infraestrutura real e descartável. Quebramos o sistema de propósito. Medimos o custo cognitivo do código.</p>
         </div>
@@ -132,11 +132,11 @@
         <div>
           <span class="deck-kicker">Agenda</span>
           <h2 class="deck-title">O que vai acontecer nesta aula</h2>
-          <p class="deck-summary">Duas horas de teoria sobre paridade de ambiente, falha controlada e métricas de qualidade. Uma hora de prática com Postgres real em container, um experimento de chaos via SSM e um relatório de qualidade que vira gate no CI.</p>
+          <p class="deck-summary">Bloco teórico sobre paridade de ambiente, falha controlada e métricas de qualidade. Prática guiada com Postgres real em container, um experimento de chaos via SSM e um relatório de qualidade que vira gate no CI.</p>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
-            <h3>19h00 &ndash; 21h00 &middot; Teoria</h3>
+            <h3>Bloco teórico</h3>
             <ul>
               <li>Recap Aula 05 &mdash; CI verde, integration ainda mockada</li>
               <li>Testcontainers &mdash; Postgres, Kafka, LocalStack</li>
@@ -147,7 +147,7 @@
             </ul>
           </article>
           <article class="deck-card">
-            <h3>21h00 &ndash; 22h00 &middot; Prática</h3>
+            <h3>Prática guiada</h3>
             <ul>
               <li>Renovar session token e <code>act</code> local</li>
               <li>Migrar <code>tests/integration/</code> para Testcontainers</li>
@@ -885,23 +885,49 @@ aceitacao:
     <div class="slide">
       <div class="deck-shell a06-compact">
         <div>
-          <span class="deck-kicker">Prática &middot; 21h00 &ndash; 22h00</span>
+          <span class="deck-kicker">Prática &middot; Abertura</span>
           <h2 class="deck-title">Da teoria para o laboratório</h2>
-          <p class="deck-summary">Próxima hora guiada. Saímos com integration real, um chaos run e um gate de qualidade no CI.</p>
+          <p class="deck-summary">A prática vem em três blocos lógicos. Saímos com integration real, um chaos run e um gate de qualidade no CI.</p>
         </div>
         <div class="deck-panel">
-          <strong>Sequência da prática</strong>
+          <strong>Três blocos da prática</strong>
           <ol>
-            <li>Renovar session token e abrir Codespace na branch nova.</li>
-            <li>Criar skills <code>migrate_to_testcontainers</code>, <code>design_chaos_experiment</code>, <code>measure_quality</code>.</li>
-            <li>Migrar <code>tests/integration/</code> para Testcontainers + LocalStack.</li>
-            <li>Rodar <code>wb.yml</code> via <code>act</code> e confirmar verde com Postgres real.</li>
-            <li>Adicionar Toxiproxy ao <code>compute.yaml</code> e re-deploy.</li>
-            <li>Executar 1 experimento de chaos e documentar em <code>15_chaos_runs/</code>.</li>
-            <li>Rodar <code>radon</code>, <code>xenon</code>, <code>ruff</code> e gerar <code>16_quality_report.md</code>.</li>
-            <li>Adicionar job <code>quality</code> no <code>wb.yml</code>.</li>
-            <li>Critério de pronto, commit, tag <code>aula-06</code>.</li>
+            <li><strong>Bloco 1 &middot; Testcontainers</strong> &mdash; renovar token, skills, <code>conftest.py</code> com Postgres + LocalStack, validar com <code>act</code>.</li>
+            <li><strong>Bloco 2 &middot; Chaos engineering</strong> &mdash; Toxiproxy via CFN, skill <code>design_chaos_experiment</code>, injeção via SSM, registro em <code>15_chaos_runs/</code>.</li>
+            <li><strong>Bloco 3 &middot; Qualidade &amp; gate</strong> &mdash; skill <code>measure_quality</code>, relatório, job <code>quality</code> no <code>wb.yml</code>, critério de pronto e tag <code>aula-06</code>.</li>
           </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 27 - ABERTURA BLOCO 1 - TESTCONTAINERS                  -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a06-compact">
+        <div>
+          <span class="deck-kicker">Prática &middot; Bloco 1 &middot; Testcontainers</span>
+          <h2 class="deck-title">Bloco 1 &mdash; infra real e descartável no teste</h2>
+          <p class="deck-summary">Substituir o mock do Postgres por container efêmero controlado pelo teste e validar o workflow localmente antes do push.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Entregáveis</strong>
+            <ul>
+              <li>Token renovado e branch <code>aula-06-chaos-quality</code> aberta.</li>
+              <li>Skill <code>migrate_to_testcontainers</code> criada.</li>
+              <li><code>tests/integration/conftest.py</code> com Postgres + LocalStack.</li>
+              <li><code>wb.yml</code> verde via <code>act</code> no Codespace.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Critério parcial</strong>
+            <ul>
+              <li><code>pytest tests/integration/</code> passa contra Postgres real, sem mock.</li>
+              <li>Tempo total da suíte de integração &le; 90 s.</li>
+              <li>Nenhum teste depende da ordem de execução.</li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
@@ -1033,6 +1059,39 @@ act -W .github/workflows/wb.yml -j integration \
     </div>
 
     <!-- ============================================================ -->
+    <!-- SLIDE - ABERTURA BLOCO 2 - CHAOS ENGINEERING                  -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a06-compact">
+        <div>
+          <span class="deck-kicker">Prática &middot; Bloco 2 &middot; Chaos engineering</span>
+          <h2 class="deck-title">Bloco 2 &mdash; quebrar de propósito, com hipótese e kill switch</h2>
+          <p class="deck-summary">Provisionar Toxiproxy como sidecar do ETL, desenhar o experimento via skill, injetar latência por SSM e registrar o run com baseline, observação e ADR.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Entregáveis</strong>
+            <ul>
+              <li>Toxiproxy provisionado via CFN ao lado da EC2 ETL.</li>
+              <li>Skill <code>design_chaos_experiment</code> criada.</li>
+              <li>Latência injetada via <code>aws ssm send-command</code>.</li>
+              <li>Run documentado em <code>documents/15_chaos_runs/&lt;ts&gt;.md</code>.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Critério parcial</strong>
+            <ul>
+              <li>YAML de experimento com hipótese, baseline, salvaguardas e <code>duracao_max</code>.</li>
+              <li>Kill switch testado (<code>ssm cancel-command</code>).</li>
+              <li>Toxiproxy <em>OFF</em> ao final &mdash; sem toxic residual.</li>
+              <li>1 ADR por descoberta gerado.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
     <!-- SLIDE 31 - TOXIPROXY CFN                                     -->
     <!-- ============================================================ -->
     <div class="slide">
@@ -1158,6 +1217,39 @@ PASSOU. Aceitacao integralmente atendida.
 ## ADR gerado
 ADR-12 &mdash; circuit breaker abre em 7s, dentro do limite de 10s.
 Manter threshold atual. Prox experimento: latencia 5000ms.</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE - ABERTURA BLOCO 3 - QUALIDADE E GATE                   -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a06-compact">
+        <div>
+          <span class="deck-kicker">Prática &middot; Bloco 3 &middot; Qualidade &amp; gate</span>
+          <h2 class="deck-title">Bloco 3 &mdash; medir o custo cognitivo e travar o CI</h2>
+          <p class="deck-summary">Rodar as métricas de qualidade no <code>src/</code>, consolidar em relatório com plano de refactor e transformar os limiares em gate obrigatório do <code>wb.yml</code>.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Entregáveis</strong>
+            <ul>
+              <li>Skill <code>measure_quality</code> criada.</li>
+              <li><code>documents/16_quality_report.md</code> com top-5 funções e plano de refactor.</li>
+              <li>Job <code>quality</code> no <code>wb.yml</code> dependente de <code>unit</code> e <code>integration</code>.</li>
+              <li>Tag <code>aula-06</code> empurrada para o remoto.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Critério parcial</strong>
+            <ul>
+              <li><code>xenon</code> verde com gate B-A-A.</li>
+              <li>MI &ge; 65 em todo módulo crítico.</li>
+              <li>Job <code>quality</code> verde no <code>wb.yml</code>.</li>
+              <li>Cada função fora do limite tem ADR <code>QUALITY-NN</code>.</li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
 

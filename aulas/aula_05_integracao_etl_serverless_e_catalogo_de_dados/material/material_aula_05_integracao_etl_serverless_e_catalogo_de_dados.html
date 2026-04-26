@@ -111,7 +111,7 @@
   <main class="page">
 
     <section class="content-block">
-      <p class="meta">Aula 05 &nbsp;&bull;&nbsp; 14/05/2026 &nbsp;&bull;&nbsp; 19h00 &ndash; 22h00</p>
+      <p class="meta">Aula 05 &nbsp;&bull;&nbsp; 14/05/2026</p>
       <h1>Pipeline de testes white box + black box: GitHub Actions com EC2 distribuído</h1>
       <p class="summary">
         Este material acompanha a Aula 05 da disciplina <strong>Cloud Computing e SRE &mdash; Visão Prática com AWS</strong>
@@ -702,13 +702,26 @@ sequenceDiagram
     <!-- ==================================================================== -->
 
     <section class="content-block">
-      <h2>12. Roteiro prático guiado &mdash; 21h00 a 22h00</h2>
+      <h2>12. Roteiro prático guiado</h2>
       <p>
-        Sequência de 9 passos. Cada aluno sai com dois workflows verdes em <code>main</code>, EC2 ativo como
-        runner ephemeral e branch protection ligada. Tudo é CLI &mdash; nada por console AWS, nada de SSH.
+        Sequência de 9 passos organizada em 3 blocos lógicos. Cada aluno sai com dois workflows verdes em
+        <code>main</code>, EC2 ativo como runner ephemeral, branch protection ligada e closed loop CI &harr; CFN
+        ativo. Tudo é CLI &mdash; nada por console AWS, nada de SSH.
       </p>
 
-      <h3>12.1 Passo 1 &mdash; renovar o session token</h3>
+      <h3>12.A Bloco 1 &middot; CI white box</h3>
+      <p>
+        Objetivo do bloco: levantar a base do pipeline (lint + unit + mutation suave) rodando 100% no
+        <code>ubuntu-latest</code>, com testes gerados pelo agente Tester e credencial AWS espelhada nos
+        secrets do GitHub. Entregáveis: <code>~/.aws/credentials</code> renovado, secrets <code>AWS_*</code>
+        atualizados, skill <code>gen_test_suite.md</code> commitada, pasta <code>tests/</code> populada e
+        workflow <code>wb.yml</code> verde em <code>main</code>. Critério parcial:
+        <code>aws sts get-caller-identity</code> retorna sucesso, <code>pytest -m unit --collect-only</code>
+        lista &ge; 20 casos com IDs <code>TC-WB-UN-NN</code>, <code>wb / lint</code> e <code>wb / unit</code>
+        verdes em PR de teste.
+      </p>
+
+      <h4>12.1 Passo 1 &mdash; renovar o session token</h4>
       <p>
         O token de hoje precisa estar no <code>~/.aws/credentials</code> do Codespace e nos secrets do GitHub.
         O CI usa o secret; o terminal usa o local; os dois espelham.
@@ -734,7 +747,7 @@ gh secret set AWS_REGION --body "us-east-1"
 # 3. Validar handshake
 aws sts get-caller-identity</pre>
 
-      <h3>12.2 Passo 2 &mdash; skill <code>gen_test_suite</code> + geração</h3>
+      <h4>12.2 Passo 2 &mdash; skill <code>gen_test_suite</code> + geração</h4>
       <p>
         A skill ensina o agente Tester a ler RF/RNF e gerar os arquivos de teste com identificadores estáveis.
         Saída: pasta <code>tests/</code> populada e RTM atualizada.
@@ -763,7 +776,7 @@ Gere os arquivos em tests/. Atualize a RTM."
 
 pytest -m unit --collect-only | head -40</pre>
 
-      <h3>12.3 Passo 3 &mdash; <code>wb.yml</code></h3>
+      <h4>12.3 Passo 3 &mdash; <code>wb.yml</code></h4>
       <pre>name: wb
 on:
   pull_request:
@@ -809,13 +822,26 @@ jobs:
       - run: mutmut run --paths-to-mutate=etl/critical || true
       - run: mutmut results</pre>
 
-      <h3>12.4 Passo 4 &mdash; EC2 vira self-hosted runner via SSM</h3>
+      <h3>12.B Bloco 2 &middot; EC2 self-hosted runner</h3>
+      <p>
+        Objetivo do bloco: plugar o EC2 da Aula 04 (tag <code>Role=runner</code>) como self-hosted runner
+        ephemeral via SSM Run Command e mover os jobs black box (api, contract, e2e) para esse runner.
+        Entregáveis: EC2 registrado em <code>gh api /repos/.../actions/runners</code> com label <code>lab</code>,
+        <code>scripts/register_runner.sh</code> versionado, <code>.github/workflows/bb.yml</code> com jobs
+        <code>api</code>, <code>contract</code>, <code>e2e</code> em <code>[self-hosted, lab]</code> e a
+        distribuição entre runners (<code>ubuntu-latest</code> vs <code>self-hosted</code>) documentada.
+        Critério parcial: runner aparece <code>online</code>, <code>aws sts get-caller-identity</code> roda
+        no runner EC2, <code>bb / api</code>, <code>bb / contract</code> e <code>bb / e2e</code> verdes em
+        PR de teste &mdash; sem console AWS, sem SSH, só CLI + SSM.
+      </p>
+
+      <h4>12.4 Passo 4 &mdash; EC2 vira self-hosted runner via SSM</h4>
       <p>
         Comando completo na seção 8. Após a execução, o runner aparece em
         <code>gh api /repos/.../actions/runners</code> com label <code>lab</code> e status <code>online</code>.
       </p>
 
-      <h3>12.5 Passo 5 &mdash; <code>bb.yml</code></h3>
+      <h4>12.5 Passo 5 &mdash; <code>bb.yml</code></h4>
       <pre>name: bb
 on:
   pull_request:
@@ -858,7 +884,20 @@ jobs:
       - run: pip install -r requirements-dev.txt
       - run: schemathesis run docs/openapi.yaml --checks all</pre>
 
-      <h3>12.6 Passo 6 &mdash; branch protection</h3>
+      <h3>12.C Bloco 3 &middot; Branch protection &amp; closed loop</h3>
+      <p>
+        Objetivo do bloco: ligar branch protection à <code>main</code>, validar com PR proposital quebrando
+        RF-06 e fechar o loop com EventBridge disparando rollback do change set quando o CI fica vermelho.
+        Entregáveis: branch protection ativa em <code>main</code> com 5 checks obrigatórios, PR
+        <code>smoke/quebra-rf-06</code> aberto e bloqueado pelo gate, <code>iac/ssm/cancel_update_stack.yaml</code>
+        versionado, rule no EventBridge ligada ao <code>workflow_run</code> failure e tag <code>aula-05</code>
+        no git. Critério parcial: botão <em>Merge</em> bloqueado no PR smoke, <code>bb / api</code> vermelho
+        em <code>TC-BB-API-04</code>, stack revertido pós-rollback, drift detection consistente, documentação
+        <code>12_test_strategy.md</code>, <code>13_ci_pipeline.md</code> e <code>14_runner_runbook.md</code>
+        commitada.
+      </p>
+
+      <h4>12.6 Passo 6 &mdash; branch protection</h4>
       <pre>OWNER=$(gh repo view --json owner -q .owner.login)
 REPO=$(gh repo view --json name -q .name)
 
@@ -883,7 +922,7 @@ gh api -X PUT /repos/$OWNER/$REPO/branches/main/protection \
 }
 EOF</pre>
 
-      <h3>12.7 Passo 7 &mdash; smoke quebrando RF-06</h3>
+      <h4>12.7 Passo 7 &mdash; smoke quebrando RF-06</h4>
       <p>
         RF-06 é "ETL idempotente sem duplicar". Forçamos uma quebra removendo o <code>ON CONFLICT</code> do
         upsert e abrimos um PR. Resultado esperado: <code>wb / unit</code> ainda passa (mock não detecta),
@@ -897,7 +936,7 @@ git push -u origin smoke/quebra-rf-06
 gh pr create --fill --title "smoke: quebra RF-06"
 gh pr checks --watch</pre>
 
-      <h3>12.8 Passo 8 &mdash; closed loop CI &harr; CFN</h3>
+      <h4>12.8 Passo 8 &mdash; closed loop CI &harr; CFN</h4>
       <pre># Rule no EventBridge filtrando workflow_run com falha em main
 aws events put-rule \
   --name olist-ci-failure-rollback \
@@ -923,7 +962,7 @@ aws events put-targets \
   --rule olist-ci-failure-rollback \
   --targets "Id=1,Arn=arn:aws:ssm:us-east-1:$ACCOUNT:automation-definition/CancelOlistStackUpdate,RoleArn=arn:aws:iam::$ACCOUNT:role/LabRole"</pre>
 
-      <h3>12.9 Passo 9 &mdash; critério de pronto e commit</h3>
+      <h4>12.9 Passo 9 &mdash; critério de pronto e commit</h4>
       <p>
         Antes do <code>git push</code> da tag, conferir:
       </p>

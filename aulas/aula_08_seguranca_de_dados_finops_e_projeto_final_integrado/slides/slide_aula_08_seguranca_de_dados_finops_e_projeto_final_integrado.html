@@ -133,7 +133,7 @@
           <img class="deck-logo-full" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_e4vyyw.png" alt="Universidade Presbiteriana Mackenzie" />
           <span class="deck-kicker">Cloud Computing e SRE &middot; MBA Engenharia de Dados</span>
           <h1 class="deck-title">Projeto final em sala &mdash; análise de série temporal 100% AWS Student</h1>
-          <p class="deck-meta">Aula 08 &nbsp;&bull;&nbsp; 11/06/2026 &nbsp;&bull;&nbsp; 19h00 &ndash; 22h00</p>
+          <p class="deck-meta">Aula 08 &nbsp;&bull;&nbsp; 11/06/2026</p>
           <p class="deck-year">2026</p>
           <p class="deck-subtitle">Repositório novo, dataset trazido da semana, IA orquestrada. Três horas de execução, demo no fim.</p>
         </div>
@@ -148,11 +148,11 @@
         <div>
           <span class="deck-kicker">Agenda</span>
           <h2 class="deck-title">O que vai acontecer nesta aula</h2>
-          <p class="deck-summary">Inversão consciente: 1h de teoria curta para alinhar contrato e 2h de execução pura em 4 sprints. A fundação já veio das Aulas 02 a 07 — hoje é dia de entregar.</p>
+          <p class="deck-summary">Teoria curta para alinhar contrato e execução em três blocos lógicos. A fundação já veio das Aulas 02 a 07 — hoje é dia de entregar.</p>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
-            <h3>19h00 &ndash; 20h00 &middot; Teoria (1h)</h3>
+            <h3>Bloco teórico</h3>
             <ul>
               <li>Recap visual das 7 aulas em mini-mapa</li>
               <li>Briefing do projeto: cliente, escopo, 3 abas</li>
@@ -164,12 +164,11 @@
             </ul>
           </article>
           <article class="deck-card">
-            <h3>20h00 &ndash; 22h00 &middot; Prática (2h)</h3>
+            <h3>Prática em 3 blocos</h3>
             <ul>
-              <li>Sprint 1 &middot; Bootstrap + spec (30 min)</li>
-              <li>Sprint 2 &middot; Arquitetura + IaC (30 min)</li>
-              <li>Sprint 3 &middot; App + observabilidade (30 min)</li>
-              <li>Sprint 4 &middot; Validação + demo (30 min)</li>
+              <li>Bloco 1 &middot; Bootstrap &amp; arquitetura</li>
+              <li>Bloco 2 &middot; App + observabilidade</li>
+              <li>Bloco 3 &middot; Validação &amp; demo</li>
               <li>Demo de 3 minutos por dupla &mdash; URL pública</li>
             </ul>
           </article>
@@ -241,7 +240,7 @@ flowchart LR
         <div>
           <span class="deck-kicker">Recap &middot; o anuncio veio na Aula 07</span>
           <h2 class="deck-title">Tarefa de casa que abriu a Aula 08</h2>
-          <p class="deck-summary">Quem chegou com a lição feita, ganha tempo. Quem não chegou, escolhe dataset no Sprint 1 &mdash; com o cronômetro mais apertado.</p>
+          <p class="deck-summary">Quem chegou com a lição feita, ganha tempo. Quem não chegou, escolhe dataset no Bloco 1 &mdash; com a janela mais apertada.</p>
         </div>
         <div class="deck-columns">
           <div class="deck-panel">
@@ -271,7 +270,7 @@ flowchart LR
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Teoria &middot; 19h05</span>
+          <span class="deck-kicker">Teoria &middot; Abertura</span>
           <h2 class="deck-title">O briefing do cliente</h2>
           <p class="deck-summary">Você foi contratado pela diretoria para construir um <strong>mini-observatório de série temporal</strong> sobre o tema escolhido. 3 abas, deploy AWS, demo viva ao fim do dia.</p>
         </div>
@@ -549,7 +548,7 @@ flowchart LR
         <div>
           <span class="deck-kicker">Teoria &middot; estrutura</span>
           <h2 class="deck-title">Estrutura do repositório <code>tsa-{iniciais}-{slug}</code></h2>
-          <p class="deck-summary">Mesma filosofia da Aula 03: <code>spec/</code>, <code>documents/</code>, <code>iac/</code>, <code>src/</code>, <code>tests/</code>, <code>runbooks/</code>. Skill <code>bootstrap_tsa_project</code> gera tudo no Sprint 1.</p>
+          <p class="deck-summary">Mesma filosofia da Aula 03: <code>spec/</code>, <code>documents/</code>, <code>iac/</code>, <code>src/</code>, <code>tests/</code>, <code>runbooks/</code>. Skill <code>bootstrap_tsa_project</code> gera tudo no início do Bloco 1.</p>
         </div>
 <pre class="a08-prompt">tsa-{iniciais}-{slug}/
 ├── AGENTS.md                          # squad de IA simplificada
@@ -631,39 +630,33 @@ flowchart LR
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; 20h00</span>
-          <h2 class="deck-title">A partir daqui é execução &mdash; 4 sprints, 30 min cada</h2>
-          <p class="deck-summary">Teoria fechada. Daqui em diante o cronômetro corre. Cada sprint tem checkpoint claro &mdash; quem fica para trás, encurta o app, não aumenta o tempo.</p>
+          <span class="deck-kicker">Prática &middot; Abertura</span>
+          <h2 class="deck-title">A partir daqui é execução &mdash; 3 blocos lógicos</h2>
+          <p class="deck-summary">Teoria fechada. Daqui em diante cada bloco tem checkpoint claro &mdash; quem fica para trás, encurta o app, não estica a entrega.</p>
         </div>
         <div class="a08-grid-3">
           <article class="deck-card">
-            <h3>Sprint 1 &middot; 20h00&ndash;20h30</h3>
+            <h3>Bloco 1 &middot; Bootstrap &amp; arquitetura</h3>
             <ul>
               <li>Bootstrap + spec do problema</li>
-              <li>Skill <code>bootstrap_tsa_project</code></li>
-              <li>5 RF + 5 RNF em <code>spec/00_problem.md</code></li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Sprint 2 &middot; 20h30&ndash;21h00</h3>
-            <ul>
               <li>System design + IaC base</li>
-              <li><code>aws cloudformation deploy</code></li>
               <li>EC2 ativa, S3 com dataset</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>Sprint 3 &middot; 21h00&ndash;21h30</h3>
+            <h3>Bloco 2 &middot; App + observabilidade</h3>
             <ul>
-              <li>App 3 abas + observabilidade</li>
+              <li>App 3 abas implementado</li>
               <li>Dashboard CW com 3 SLIs</li>
               <li>Closed loop ligado</li>
             </ul>
           </article>
-          <article class="deck-card" style="grid-column: span 3;">
-            <h3>Sprint 4 &middot; 21h30&ndash;22h00 &middot; Validação + demo</h3>
+          <article class="deck-card">
+            <h3>Bloco 3 &middot; Validação &amp; demo</h3>
             <ul>
-              <li>Smoke test verde, checklist do reviewer marcado, simulação de falha visível, <code>git push --tags</code>, demo de 3 min por dupla.</li>
+              <li>Smoke test verde + checklist do reviewer</li>
+              <li>Simulação de falha visível</li>
+              <li>Demo de 3 min por dupla</li>
             </ul>
           </article>
         </div>
@@ -671,12 +664,45 @@ flowchart LR
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 18 - SPRINT 1 — BOOTSTRAP                              -->
+    <!-- SLIDE - ABERTURA DO BLOCO 1                                  -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a08-compact">
+        <div>
+          <span class="deck-kicker">Prática &middot; Bloco 1 &middot; Bootstrap &amp; arquitetura</span>
+          <h2 class="deck-title">Bloco 1 &mdash; do repo vazio à infra de pé</h2>
+          <p class="deck-summary">Dois movimentos no mesmo bloco: contrato escrito (spec do problema) e arquitetura no ar (CFN base). Ao fim, EC2 sobe e S3 já tem o dataset.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Objetivo</strong>
+            <ul>
+              <li>Repositório <code>tsa-{iniciais}-{slug}</code> com estrutura completa.</li>
+              <li>Spec do problema (5 RF + 5 RNF) commitada.</li>
+              <li>System design Mermaid em <code>documents/</code>.</li>
+              <li>Stack CFN base aplicada na conta do Learner Lab.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Entregáveis &amp; critério parcial</strong>
+            <ul>
+              <li><code>spec/00_problem.md</code>, <code>system_design.md</code>, <code>iac/cloudformation/app.yaml</code>.</li>
+              <li>Stack <code>tsa-{iniciais}</code> em <code>CREATE_COMPLETE</code>.</li>
+              <li>EC2 com IP público anotado, SG aberto na 8501.</li>
+              <li>S3 com <code>dataset.csv</code> listado via <code>aws s3 ls</code>.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 18 - BLOCO 1 — BOOTSTRAP                               -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Sprint 1 &middot; 20h00 &ndash; 20h30</span>
+          <span class="deck-kicker">Prática &middot; Bloco 1 &middot; Bootstrap &amp; arquitetura</span>
           <h2 class="deck-title">Bootstrap + spec do problema</h2>
           <p class="deck-summary">Renovar token, abrir Codespace, gerar estrutura. Spec do problema escrita à mão (com IA refinando) &mdash; é o contrato com o cliente fictício.</p>
         </div>
@@ -690,11 +716,11 @@ flowchart LR
 #    spec/, documents/, iac/cloudformation/, src/, tests/,
 #    runbooks/, README.md e AGENTS.md simplificado.
 
-# 5) Mini-spec do problema (≤ 15 min, IA escreve, voce revisa)
+# 5) Mini-spec do problema (IA escreve, voce revisa)
 > /draft_problem_spec --dataset {slug-kaggle}
 # Saida: 5 RF + 5 RNF em spec/00_problem.md</pre>
         <div class="deck-callout" style="margin-top:14px;">
-          <strong>Checkpoint Sprint 1</strong>
+          <strong>Checkpoint do Bloco 1 &middot; etapa 1</strong>
           <p style="margin:8px 0 0;"><code>spec/00_problem.md</code> commitado, estrutura completa, AWS CLI respondendo <code>aws sts get-caller-identity</code>.</p>
         </div>
       </div>
@@ -706,7 +732,7 @@ flowchart LR
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Sprint 2 &middot; 20h30 &ndash; 21h00</span>
+          <span class="deck-kicker">Prática &middot; Bloco 1 &middot; Bootstrap &amp; arquitetura</span>
           <h2 class="deck-title">System design + CFN base</h2>
           <p class="deck-summary">Architect produz Mermaid de 1 página. DevOps gera <code>app.yaml</code>. Deploy roda. EC2 ativa, S3 recebe o CSV via <code>aws s3 cp</code>.</p>
         </div>
@@ -730,19 +756,52 @@ aws cloudformation deploy \
 # Upload do dataset
 aws s3 cp data/dataset.csv s3://tsa-{iniciais}-data/dataset.csv</pre>
         <div class="deck-callout" style="margin-top:14px;">
-          <strong>Checkpoint Sprint 2</strong>
+          <strong>Checkpoint do Bloco 1 &middot; fechamento</strong>
           <p style="margin:8px 0 0;">EC2 visível em <code>aws ec2 describe-instances</code>, IP público anotado, S3 com CSV listado, SG aberto na porta 8501.</p>
         </div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 20 - SPRINT 3 — APP + OBSERVABILIDADE                  -->
+    <!-- SLIDE - ABERTURA DO BLOCO 2                                  -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a08-compact">
+        <div>
+          <span class="deck-kicker">Prática &middot; Bloco 2 &middot; App + observabilidade</span>
+          <h2 class="deck-title">Bloco 2 &mdash; do produto à observabilidade</h2>
+          <p class="deck-summary">Com a infra de pé, agora o app entra no ar e a observabilidade sobe junto. Sem dashboard e sem closed loop, a entrega não defende a demo final.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Objetivo</strong>
+            <ul>
+              <li><code>app.py</code> com 3 abas (Histórico, STL, Forecast).</li>
+              <li>Deploy do app no EC2 via SSM Run Command (sem SSH).</li>
+              <li>Log group, dashboard, alarm e EventBridge no template.</li>
+              <li>Closed loop SLO-01 &rarr; EVB &rarr; SSM ligado.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Entregáveis &amp; critério parcial</strong>
+            <ul>
+              <li>URL pública abre as 3 abas com dados reais.</li>
+              <li>Dashboard CW com 3 widgets dos SLIs preenchidos.</li>
+              <li>Alarm <code>SLO-01-availability</code> em estado <em>OK</em>.</li>
+              <li>SSM document <code>restart-streamlit-{iniciais}</code> executável.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 20 - BLOCO 2 — APP + OBSERVABILIDADE                   -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Sprint 3 &middot; 21h00 &ndash; 21h30</span>
+          <span class="deck-kicker">Prática &middot; Bloco 2 &middot; App + observabilidade</span>
           <h2 class="deck-title">App 3 abas + observabilidade ligada</h2>
           <p class="deck-summary">DataDev gera <code>app.py</code>. DevOps adiciona log group, metric filters, dashboard, alarm e EventBridge rule. Re-deploy.</p>
         </div>
@@ -769,19 +828,52 @@ aws ssm send-command \
 # Re-deploy do stack com observabilidade
 aws cloudformation deploy --stack-name tsa-{iniciais} ...</pre>
         <div class="deck-callout" style="margin-top:14px;">
-          <strong>Checkpoint Sprint 3</strong>
+          <strong>Checkpoint do Bloco 2 &middot; fechamento</strong>
           <p style="margin:8px 0 0;">URL pública abre as 3 abas. Dashboard CW mostra os 3 SLIs. Alarm está em <em>OK</em>. EventBridge rule conectada ao SSM document.</p>
         </div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 21 - SPRINT 4 — VALIDACAO + DEMO                       -->
+    <!-- SLIDE - ABERTURA DO BLOCO 3                                  -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a08-compact">
+        <div>
+          <span class="deck-kicker">Prática &middot; Bloco 3 &middot; Validação &amp; demo</span>
+          <h2 class="deck-title">Bloco 3 &mdash; validar, simular falha e defender</h2>
+          <p class="deck-summary">Smoke verde, checklist marcado, falha simulada com closed loop respondendo, tag <code>final-v1</code> empurrada. Demo de 3 minutos por dupla é o fechamento.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Objetivo</strong>
+            <ul>
+              <li>Smoke test contra a URL pública passando.</li>
+              <li>Release checklist com os 8 critérios marcados.</li>
+              <li>Simulação de falha (kill via SSM) demonstrando closed loop.</li>
+              <li>Tag <code>final-v1</code> empurrada para o GitHub.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Entregáveis &amp; critério parcial</strong>
+            <ul>
+              <li><code>pytest tests/smoke/</code> verde.</li>
+              <li><code>documents/release_checklist.md</code> com 8/8.</li>
+              <li>Alarm dispara após kill, serviço retorna sozinho.</li>
+              <li>Demo de 3 min apresentada &mdash; gate da entrega.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 21 - BLOCO 3 — VALIDACAO + DEMO                        -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Sprint 4 &middot; 21h30 &ndash; 22h00</span>
+          <span class="deck-kicker">Prática &middot; Bloco 3 &middot; Validação &amp; demo</span>
           <h2 class="deck-title">Smoke + checklist + demo</h2>
           <p class="deck-summary">Tester roda smoke contra a URL. Reviewer audita o checklist. Aluno simula falha (kill do processo via SSM) e mostra o closed loop subindo o serviço de novo.</p>
         </div>
@@ -814,7 +906,7 @@ git push origin main --tags</pre>
     <div class="slide">
       <div class="deck-shell a08-compact">
         <div>
-          <span class="deck-kicker">Sprint 4 &middot; demo</span>
+          <span class="deck-kicker">Prática &middot; Bloco 3 &middot; demo</span>
           <h2 class="deck-title">Roteiro da demo de 3 minutos</h2>
           <p class="deck-summary">Tempo é fixo. Quem ultrapassa, perde a parte final. Pratique antes &mdash; nessa ordem, sem improviso.</p>
         </div>
@@ -839,15 +931,15 @@ git push origin main --tags</pre>
     <div class="slide">
       <div class="deck-shell a08-compact">
         <div>
-          <span class="deck-kicker">Sprint 4 &middot; armadilhas</span>
+          <span class="deck-kicker">Prática &middot; Bloco 3 &middot; armadilhas</span>
           <h2 class="deck-title">O que costuma quebrar &mdash; e como evitar</h2>
-          <p class="deck-summary">Lista curta dos erros mais comuns no Learner Lab. Antecipá-los economiza 20 min de sprint.</p>
+          <p class="deck-summary">Lista curta dos erros mais comuns no Learner Lab. Antecipá-los economiza muitas idas e vindas no bloco final.</p>
         </div>
         <div class="deck-columns">
           <div class="deck-panel">
             <strong>Erros frequentes</strong>
             <ul>
-              <li>Token expirado no meio do Sprint 3 &rarr; renovar antes de cada deploy.</li>
+              <li>Token expirado no meio do Bloco 2 &rarr; renovar antes de cada deploy.</li>
               <li>SG sem inbound 8501 &rarr; conferir no template.</li>
               <li>EC2 sem LabRole anexado &rarr; <code>IamInstanceProfile</code> obrigatório.</li>
               <li><code>requirements.txt</code> sem <code>statsmodels</code> &rarr; STL falha em runtime.</li>
@@ -917,7 +1009,7 @@ git push origin main --tags</pre>
         <div>
           <span class="deck-kicker">Glossário &middot; 2 / 3</span>
           <h2 class="deck-title">Siglas &mdash; AWS e SRE</h2>
-          <p class="deck-summary">Vocabulário do CFN, observabilidade e closed loop usados nos sprints 2, 3 e 4.</p>
+          <p class="deck-summary">Vocabulário do CFN, observabilidade e closed loop usados nos Blocos 1, 2 e 3.</p>
         </div>
         <div class="deck-columns">
           <div class="deck-panel">
@@ -1036,7 +1128,7 @@ git push origin main --tags</pre>
     <div class="slide">
       <div class="deck-shell a08-closing">
         <div>
-          <span class="deck-kicker">Fechamento do semestre &middot; 22h00</span>
+          <span class="deck-kicker">Fechamento do semestre</span>
           <h2 class="deck-title">Obrigado &mdash; e parabéns pela entrega</h2>
           <p class="deck-summary">Oito quintas-feiras, oito camadas, um pipeline e um projeto autoral. O que vocês construíram em 24 horas de aula é o que muitos times levam meses para encadear.</p>
         </div>

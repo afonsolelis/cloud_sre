@@ -119,7 +119,7 @@
           <img class="deck-logo-full" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_e4vyyw.png" alt="Universidade Presbiteriana Mackenzie" />
           <span class="deck-kicker">Cloud Computing e SRE &middot; MBA Engenharia de Dados</span>
           <h1 class="deck-title">Pipeline de testes white box + black box</h1>
-          <p class="deck-meta">Aula 05 &nbsp;&bull;&nbsp; 14/05/2026 &nbsp;&bull;&nbsp; 19h00 &ndash; 22h00</p>
+          <p class="deck-meta">Aula 05 &nbsp;&bull;&nbsp; 14/05/2026</p>
           <p class="deck-year">2026</p>
           <p class="deck-subtitle">GitHub Actions com EC2 distribuído &mdash; o primeiro closed loop humano do projeto Olist.</p>
         </div>
@@ -134,11 +134,11 @@
         <div>
           <span class="deck-kicker">Agenda</span>
           <h2 class="deck-title">O que vai acontecer nesta aula</h2>
-          <p class="deck-summary">Duas horas de teoria sobre testes white/black box, GitHub Actions e runners distribuídos. Uma hora de prática plugando o EC2 da Aula 04 como self-hosted runner via SSM, com dois workflows quebrando PRs ruins.</p>
+          <p class="deck-summary">Bloco teórico cobre testes white/black box, GitHub Actions e runners distribuídos. Prática em três blocos plugando o EC2 da Aula 04 como self-hosted runner via SSM, com dois workflows quebrando PRs ruins.</p>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
-            <h3>19h00 &ndash; 21h00 &middot; Teoria</h3>
+            <h3>Bloco teórico</h3>
             <ul>
               <li>Recap Aula 04 e o estado vivo do stack</li>
               <li>White box: unit, integration, coverage, mutation</li>
@@ -150,13 +150,12 @@
             </ul>
           </article>
           <article class="deck-card">
-            <h3>21h00 &ndash; 22h00 &middot; Prática guiada</h3>
+            <h3>Prática guiada &middot; 3 blocos</h3>
             <ul>
-              <li>Renovar session token + skill <code>gen_test_suite</code></li>
-              <li>Workflow <code>wb.yml</code> (lint, unit, mutation)</li>
-              <li>Plugar EC2 como runner via <code>aws ssm send-command</code></li>
-              <li>Workflow <code>bb.yml</code> (api, contract, e2e) no <code>self-hosted</code></li>
-              <li>Branch protection + PR proposital quebrando RF-06</li>
+              <li><strong>Bloco 1 &middot; CI white box</strong> &mdash; token, skill, <code>wb.yml</code></li>
+              <li><strong>Bloco 2 &middot; EC2 self-hosted runner</strong> &mdash; SSM + <code>bb.yml</code></li>
+              <li><strong>Bloco 3 &middot; Branch protection &amp; closed loop</strong> &mdash; gate + rollback</li>
+              <li>PR proposital quebrando RF-06</li>
               <li>Tag <code>aula-05</code> no git</li>
             </ul>
           </article>
@@ -885,23 +884,49 @@ sequenceDiagram
     <div class="slide">
       <div class="deck-shell a05-compact">
         <div>
-          <span class="deck-kicker">Prática &middot; 21h00 &ndash; 22h00</span>
+          <span class="deck-kicker">Prática &middot; Abertura</span>
           <h2 class="deck-title">Da teoria para o pipeline rodando</h2>
-          <p class="deck-summary">Próxima hora guiada. Toda a turma sai com dois workflows verdes, EC2 ativo como runner ephemeral e branch protection ligada.</p>
+          <p class="deck-summary">Prática guiada em três blocos. Toda a turma sai com dois workflows verdes, EC2 ativo como runner ephemeral, branch protection ligada e closed loop CI &harr; CFN ativo.</p>
         </div>
         <div class="deck-panel">
-          <strong>Sequência da prática</strong>
+          <strong>Roteiro &middot; 3 blocos</strong>
           <ol>
-            <li>Renovar session token AWS no Codespace.</li>
-            <li>Skill <code>gen_test_suite</code> &mdash; agente Tester gera <code>tests/unit/</code>, <code>integration/</code>, <code>contract/</code>, <code>api/</code>.</li>
-            <li>Escrever e commitar <code>.github/workflows/wb.yml</code>.</li>
-            <li>Plugar EC2 como self-hosted runner via SSM Run Command.</li>
-            <li>Escrever e commitar <code>.github/workflows/bb.yml</code>.</li>
-            <li>Configurar branch protection com checks obrigatórios.</li>
-            <li>Smoke: PR proposital quebrando RF-06 &rArr; CI vermelho.</li>
-            <li>Ligar EventBridge ao workflow_run failure.</li>
-            <li>Critério de pronto + tag <code>aula-05</code>.</li>
+            <li><strong>Bloco 1 &middot; CI white box</strong> &mdash; renovar token, skill <code>gen_test_suite</code>, workflow <code>wb.yml</code>.</li>
+            <li><strong>Bloco 2 &middot; EC2 self-hosted runner</strong> &mdash; plugar EC2 via SSM, workflow <code>bb.yml</code>, distribuição entre runners.</li>
+            <li><strong>Bloco 3 &middot; Branch protection &amp; closed loop</strong> &mdash; gate de merge, PR smoke quebrando RF-06, rollback automático no CFN, critério de pronto.</li>
           </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 25b - ABERTURA BLOCO 1                                  -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a05-compact">
+        <div>
+          <span class="deck-kicker">Prática &middot; Bloco 1 &middot; CI white box</span>
+          <h2 class="deck-title">Bloco 1 &mdash; CI white box no runner público</h2>
+          <p class="deck-summary">Objetivo: levantar a base do pipeline (lint + unit + mutation suave) rodando 100% no <code>ubuntu-latest</code>, com testes gerados pelo agente Tester e credencial AWS espelhada nos secrets do GitHub.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Entregáveis do bloco</strong>
+            <ul>
+              <li><code>~/.aws/credentials</code> e secrets <code>AWS_*</code> renovados.</li>
+              <li><code>documents/agents/skills/gen_test_suite.md</code> commitado.</li>
+              <li><code>tests/unit/</code>, <code>integration/</code>, <code>contract/</code>, <code>api/</code>, <code>e2e/</code> populados.</li>
+              <li><code>.github/workflows/wb.yml</code> verde em <code>main</code>.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Critério parcial</strong>
+            <ul>
+              <li><code>aws sts get-caller-identity</code> retorna sucesso.</li>
+              <li><code>pytest -m unit --collect-only</code> lista &ge; 20 casos com IDs <code>TC-WB-UN-NN</code>.</li>
+              <li><code>wb / lint</code> e <code>wb / unit</code> verdes em PR de teste.</li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
@@ -1037,6 +1062,39 @@ jobs:
     </div>
 
     <!-- ============================================================ -->
+    <!-- SLIDE 28b - ABERTURA BLOCO 2                                  -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a05-compact">
+        <div>
+          <span class="deck-kicker">Prática &middot; Bloco 2 &middot; EC2 self-hosted runner</span>
+          <h2 class="deck-title">Bloco 2 &mdash; trazendo o EC2 para dentro do pipeline</h2>
+          <p class="deck-summary">Objetivo: plugar o EC2 da Aula 04 (tag <code>Role=runner</code>) como self-hosted runner ephemeral via SSM Run Command e mover os jobs black box (api, contract, e2e) para esse runner.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Entregáveis do bloco</strong>
+            <ul>
+              <li>EC2 registrado em <code>gh api /repos/.../actions/runners</code> com label <code>lab</code>.</li>
+              <li><code>scripts/register_runner.sh</code> versionado.</li>
+              <li><code>.github/workflows/bb.yml</code> com jobs <code>api</code>, <code>contract</code>, <code>e2e</code> em <code>[self-hosted, lab]</code>.</li>
+              <li>Distribuição entre runners documentada (<code>ubuntu-latest</code> vs <code>self-hosted</code>).</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Critério parcial</strong>
+            <ul>
+              <li>Runner aparece <code>online</code> no <code>gh api</code>.</li>
+              <li><code>aws sts get-caller-identity</code> roda no runner EC2.</li>
+              <li><code>bb / api</code>, <code>bb / contract</code>, <code>bb / e2e</code> verdes em PR de teste.</li>
+              <li>Sem console AWS, sem SSH &mdash; só CLI + SSM.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
     <!-- SLIDE 29 - PASSO 4 EC2 VIRA RUNNER                           -->
     <!-- ============================================================ -->
     <div class="slide">
@@ -1125,6 +1183,40 @@ jobs:
       - uses: actions/checkout@v4
       - run: pip install -r requirements-dev.txt
       - run: schemathesis run docs/openapi.yaml --checks all</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 30b - ABERTURA BLOCO 3                                  -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a05-compact">
+        <div>
+          <span class="deck-kicker">Prática &middot; Bloco 3 &middot; Branch protection &amp; closed loop</span>
+          <h2 class="deck-title">Bloco 3 &mdash; transformando CI em gate e closed loop</h2>
+          <p class="deck-summary">Objetivo: ligar branch protection à <code>main</code>, validar com PR proposital quebrando RF-06 e fechar o loop com EventBridge disparando rollback do change set quando o CI fica vermelho.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Entregáveis do bloco</strong>
+            <ul>
+              <li>Branch protection ativa em <code>main</code> com 5 checks obrigatórios.</li>
+              <li>PR <code>smoke/quebra-rf-06</code> aberto e bloqueado pelo gate.</li>
+              <li><code>iac/ssm/cancel_update_stack.yaml</code> versionado.</li>
+              <li>Rule no EventBridge ligada ao <code>workflow_run</code> failure.</li>
+              <li>Tag <code>aula-05</code> no git.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Critério parcial &middot; pronto</strong>
+            <ul>
+              <li>Botão <em>Merge</em> bloqueado no PR smoke.</li>
+              <li><code>bb / api</code> vermelho em <code>TC-BB-API-04</code> (idempotência).</li>
+              <li>Stack revertido pós-rollback &mdash; drift detection reporta consistência.</li>
+              <li>Documentação <code>12_test_strategy.md</code>, <code>13_ci_pipeline.md</code>, <code>14_runner_runbook.md</code> commitada.</li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
 

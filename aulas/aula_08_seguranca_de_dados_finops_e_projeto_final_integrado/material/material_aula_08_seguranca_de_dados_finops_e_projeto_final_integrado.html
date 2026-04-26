@@ -111,7 +111,7 @@
   <main class="page">
 
     <section class="content-block">
-      <p class="meta">Aula 08 &nbsp;&bull;&nbsp; 11/06/2026 &nbsp;&bull;&nbsp; 19h00 &ndash; 22h00</p>
+      <p class="meta">Aula 08 &nbsp;&bull;&nbsp; 11/06/2026</p>
       <h1>Projeto final em sala &mdash; análise de série temporal 100% AWS Student, com IA na cavalaria</h1>
       <p class="summary">
         Este material acompanha a Aula 08, última da disciplina <strong>Cloud Computing e SRE &mdash; Visão Prática com AWS</strong>
@@ -133,19 +133,21 @@
     </section>
 
     <section class="content-block">
-      <h2>1. Por que este formato &mdash; uma hora de teoria, duas horas de execução</h2>
+      <h2>1. Por que este formato &mdash; teoria curta e prática em três blocos</h2>
       <p>
         As Aulas 02 a 07 construíram repertório suficiente para que a Aula 08 não precise repetir conceitos. Em 02, instalamos
         Spec-Driven Development com OpenCode e Gemini CLI. Em 03, escrevemos RF, RNF, RTM e system design em Mermaid. Em 04,
         montamos squad de agentes e provisionamos via CloudFormation. Em 05, automatizamos com GitHub Actions e self-hosted runner.
         Em 06, blindamos a base de código com Testcontainers e chaos engineering. Em 07, ligamos CloudWatch, EventBridge e SSM
         em closed loop, também via CloudFormation. Tudo isso já é vocabulário do aluno. A Aula 08 é o dia de aplicar &mdash; em um
-        repositório novo, com um dataset autoral, sob restrição de tempo.
+        repositório novo, com um dataset autoral.
       </p>
       <p>
-        A inversão do tempo (1h teoria + 2h prática) é deliberada. Teoria longa neste momento seria recapitulação preguiçosa;
-        prática curta seria desperdício do laboratório. A primeira hora cobre exatamente três coisas: o briefing do cliente
-        fictício, os critérios de avaliação, e a divisão dos sprints. A partir das 20h00, o cronômetro corre.
+        A inversão de prioridade (teoria curta + execução longa) é deliberada. Teoria longa neste momento seria recapitulação
+        preguiçosa; prática curta seria desperdício do laboratório. A teoria cobre exatamente três coisas: o briefing do cliente
+        fictício, os critérios de avaliação, e a estrutura dos três blocos práticos. A execução depois acontece em três blocos
+        lógicos &mdash; <strong>Bloco 1: Bootstrap &amp; arquitetura</strong>, <strong>Bloco 2: App + observabilidade</strong>,
+        <strong>Bloco 3: Validação &amp; demo</strong> &mdash; cada um com objetivo claro, entregáveis explícitos e checkpoint.
       </p>
 
       <h3>1.1 O caminho até aqui &mdash; visão de arco</h3>
@@ -240,7 +242,7 @@ flowchart LR
       </table>
       <p>
         Repositórios fora do padrão são rejeitados pela primeira passada do reviewer &mdash; o aluno precisa renomear no GitHub
-        e refazer push antes de pedir nova avaliação. Custa 5 a 10 minutos do sprint final, normalmente sob estresse de demo.
+        e refazer push antes de pedir nova avaliação. Custa minutos preciosos do bloco final, normalmente sob estresse de demo.
       </p>
     </section>
 
@@ -381,25 +383,25 @@ flowchart LR
       </p>
       <table>
         <thead>
-          <tr><th>Agente</th><th>Skill</th><th>Produto</th><th>Sprint que aciona</th></tr>
+          <tr><th>Agente</th><th>Skill</th><th>Produto</th><th>Bloco que aciona</th></tr>
         </thead>
         <tbody>
-          <tr><td><strong>Architect</strong></td><td><code>gen_app_template --kind system_design</code></td><td><code>documents/system_design.md</code></td><td>2</td></tr>
-          <tr><td><strong>DevOps</strong></td><td><code>gen_app_template --kind cfn</code> e <code>gen_observability</code></td><td><code>iac/cloudformation/app.yaml</code></td><td>2 e 3</td></tr>
-          <tr><td><strong>DataDev</strong></td><td><code>gen_streamlit_tsa_app</code></td><td><code>src/app.py</code> + <code>requirements.txt</code></td><td>3</td></tr>
-          <tr><td><strong>Tester</strong></td><td><code>gen_smoke_tests</code></td><td><code>tests/smoke/test_url.py</code></td><td>4</td></tr>
-          <tr><td><strong>Reviewer</strong></td><td><code>gen_release_checklist</code></td><td><code>documents/release_checklist.md</code></td><td>4</td></tr>
+          <tr><td><strong>Architect</strong></td><td><code>gen_app_template --kind system_design</code></td><td><code>documents/system_design.md</code></td><td>Bloco 1</td></tr>
+          <tr><td><strong>DevOps</strong></td><td><code>gen_app_template --kind cfn</code> e <code>gen_observability</code></td><td><code>iac/cloudformation/app.yaml</code></td><td>Blocos 1 e 2</td></tr>
+          <tr><td><strong>DataDev</strong></td><td><code>gen_streamlit_tsa_app</code></td><td><code>src/app.py</code> + <code>requirements.txt</code></td><td>Bloco 2</td></tr>
+          <tr><td><strong>Tester</strong></td><td><code>gen_smoke_tests</code></td><td><code>tests/smoke/test_url.py</code></td><td>Bloco 3</td></tr>
+          <tr><td><strong>Reviewer</strong></td><td><code>gen_release_checklist</code></td><td><code>documents/release_checklist.md</code></td><td>Bloco 3</td></tr>
         </tbody>
       </table>
       <p>
-        O <code>AGENTS.md</code> simplificado, gerado pela skill <code>bootstrap_tsa_project</code> no Sprint 1, contém a
+        O <code>AGENTS.md</code> simplificado, gerado pela skill <code>bootstrap_tsa_project</code> na abertura do Bloco 1, contém a
         descrição de cada papel, as restrições (sem credenciais em prompts, sem reescrita silenciosa de arquivos sensíveis)
         e o output esperado por cada skill.
       </p>
     </section>
 
     <section class="content-block">
-      <h2>9. Estrutura do repositório &mdash; o que existe ao fim do Sprint 1</h2>
+      <h2>9. Estrutura do repositório &mdash; o que existe ao fim da abertura do Bloco 1</h2>
       <p>
         A estrutura é simétrica à da Aula 03, em escala reduzida. <code>spec/</code> guarda o contrato com o cliente.
         <code>documents/</code> guarda artefatos de arquitetura e release. <code>iac/</code> guarda CloudFormation. <code>src/</code>
@@ -456,15 +458,23 @@ flowchart LR
     </section>
 
     <section class="content-block">
-      <h2>11. Sprint 1 &middot; bootstrap + spec do problema (20h00 &ndash; 20h30)</h2>
+      <h2>11. Bloco 1 &middot; Bootstrap &amp; arquitetura</h2>
       <p>
-        O primeiro sprint é, ao mesmo tempo, configuração de ambiente e contrato com o cliente. Renovar token, abrir Codespace,
-        gerar a estrutura do repositório com a skill, escrever a mini-spec.
+        O primeiro bloco prático funde duas etapas distintas: configurar ambiente e escrever o contrato
+        com o cliente, depois desenhar arquitetura e levantar a infra base. Ao final, o repositório existe, a spec está commitada,
+        o system design está em Mermaid, a stack CFN base está aplicada e EC2 + S3 estão de pé.
       </p>
-      <h3>11.1 Renovação do session token</h3>
+
+      <h3>11.1 Etapa 1 &mdash; bootstrap + spec do problema</h3>
+      <p>
+        A primeira etapa do Bloco 1 é, ao mesmo tempo, configuração de ambiente e contrato com o cliente. Renovar token, abrir
+        Codespace, gerar a estrutura do repositório com a skill, escrever a mini-spec.
+      </p>
+
+      <h4>11.1.1 Renovação do session token</h4>
       <p>
         O token do Learner Lab dura cerca de três horas, contadas do clique em <em>Start Lab</em>. Pelo cronograma da aula,
-        o token sobrevive até o início do Sprint 4 &mdash; mas a margem é apertada, e qualquer pausa ou reinício de lab quebra
+        o token sobrevive até o Bloco 3 &mdash; mas a margem é apertada, e qualquer pausa ou reinício de lab quebra
         a continuidade. O aluno deve renovar o token antes de cada deploy CloudFormation, mesmo que pareça desnecessário:
       </p>
 <pre># Sempre que renovar, atualizar ~/.aws/credentials no Codespace
@@ -478,7 +488,7 @@ EOF
 chmod 600 ~/.aws/credentials
 aws sts get-caller-identity</pre>
 
-      <h3>11.2 Skill <code>bootstrap_tsa_project</code></h3>
+      <h4>11.1.2 Skill <code>bootstrap_tsa_project</code></h4>
       <p>
         A skill clona o esqueleto da Aula 03 e simplifica para o escopo desta aula. Ela é parametrizada por iniciais e slug,
         e cria todos os diretórios e arquivos vazios listados na seção 9.
@@ -491,10 +501,10 @@ aws sts get-caller-identity</pre>
 # README.md com placeholder de runbook,
 # .gitignore cobrindo ~/.aws/ e *.csv grande.</pre>
 
-      <h3>11.3 Mini-spec do problema</h3>
+      <h4>11.1.3 Mini-spec do problema</h4>
       <p>
         O <code>spec/00_problem.md</code> tem cinco requisitos funcionais e cinco não-funcionais. A IA escreve a primeira passada,
-        o aluno revisa e aceita. Quinze minutos é o teto. Exemplo de RF para o dataset Air Passengers:
+        o aluno revisa e aceita. Exemplo de RF para o dataset Air Passengers:
       </p>
 <pre>RF-01: Quando o usuario abrir a aba Historico, o sistema deve exibir
        o grafico de linha completo do dataset, com seletor de janela
@@ -503,26 +513,25 @@ aws sts get-caller-identity</pre>
 RNF-PERF-01: O p95 do tempo de render da aba Forecast deve ser &lt; 10s
              em datasets de ate 10k pontos.</pre>
       <div class="m08-callout">
-        <strong>Checkpoint Sprint 1</strong>
+        <strong>Checkpoint da etapa 1</strong>
         <code>spec/00_problem.md</code> commitado, estrutura completa, <code>aws sts get-caller-identity</code> retornando ARN,
-        AGENTS.md preenchido. Faltando algum item, o aluno entra no Sprint 2 com dívida.
+        AGENTS.md preenchido. Faltando algum item, o aluno entra na etapa 2 com dívida.
       </div>
-    </section>
 
-    <section class="content-block">
-      <h2>12. Sprint 2 &middot; system design + CFN base (20h30 &ndash; 21h00)</h2>
+      <h3>11.2 Etapa 2 &mdash; system design + CFN base</h3>
       <p>
-        O segundo sprint produz a arquitetura no markdown e a primeira versão executável do template. EC2 sobe, S3 recebe o
-        dataset, SG fica aberto na porta 8501. Não há observabilidade ainda &mdash; ela entra no Sprint 3.
+        A segunda etapa do Bloco 1 produz a arquitetura no markdown e a primeira versão executável do template. EC2 sobe,
+        S3 recebe o dataset, SG fica aberto na porta 8501. Não há observabilidade ainda &mdash; ela entra no Bloco 2.
       </p>
-      <h3>12.1 Architect &mdash; system design Mermaid</h3>
+
+      <h4>11.2.1 Architect &mdash; system design Mermaid</h4>
       <p>
         A skill <code>gen_app_template --kind system_design</code> recebe o slug do dataset e devolve o desenho da seção 5
         já escrito no formato Mermaid. O aluno revisa os labels (substituindo "diretoria" pelo persona apropriado, ajustando
         nomes de buckets) e commita.
       </p>
 
-      <h3>12.2 DevOps &mdash; CloudFormation base</h3>
+      <h4>11.2.2 DevOps &mdash; CloudFormation base</h4>
       <p>
         A skill <code>gen_app_template --kind cfn</code> gera <code>iac/cloudformation/app.yaml</code> contendo:
       </p>
@@ -552,20 +561,21 @@ aws ec2 describe-instances \
   --query "Reservations[].Instances[].PublicIpAddress" \
   --output text</pre>
       <div class="m08-callout">
-        <strong>Checkpoint Sprint 2</strong>
+        <strong>Checkpoint do Bloco 1</strong>
         Stack <code>tsa-{iniciais}</code> em <code>CREATE_COMPLETE</code>. EC2 com IP público anotado. S3 listado com o CSV.
-        SG permitindo 8501. Nada de Streamlit ainda &mdash; é Sprint 3.
+        SG permitindo 8501. Nada de Streamlit ainda &mdash; isso entra no Bloco 2.
       </div>
     </section>
 
     <section class="content-block">
-      <h2>13. Sprint 3 &middot; app + observabilidade (21h00 &ndash; 21h30)</h2>
+      <h2>12. Bloco 2 &middot; App + observabilidade</h2>
       <p>
-        O terceiro sprint é o de maior densidade. DataDev produz o app. DevOps adiciona log group, metric filters, dashboard,
-        alarm e EventBridge rule. SSM document do runbook é commitado. O template é re-deployado.
+        O segundo bloco prático é o de maior densidade. DataDev produz o app. DevOps adiciona log group, metric filters, dashboard,
+        alarm e EventBridge rule. SSM document do runbook é commitado. O template é re-deployado. Ao final, a URL pública abre
+        as três abas e o closed loop está armado.
       </p>
 
-      <h3>13.1 DataDev &mdash; <code>app.py</code> com 3 abas</h3>
+      <h3>12.1 DataDev &mdash; <code>app.py</code> com 3 abas</h3>
       <p>
         A skill <code>gen_streamlit_tsa_app</code> recebe três parâmetros: as abas desejadas (sempre <code>historico,stl,forecast</code>),
         o modelo de forecast (sugestão: <code>expsmoothing</code> por estabilidade) e o bucket S3 de origem. Saída: um <code>app.py</code>
@@ -581,7 +591,7 @@ aws ec2 describe-instances \
 <pre>{"event":"render","aba":"forecast","duration_ms":4820,"points":120,
  "mape":0.073,"rmse":12.4,"ts":"2026-06-11T20:18:32Z"}</pre>
 
-      <h3>13.2 DevOps &mdash; observabilidade no template</h3>
+      <h3>12.2 DevOps &mdash; observabilidade no template</h3>
       <p>
         A skill <code>gen_observability</code> aceita os SLOs e o nome do runbook. Ela aumenta o template com:
       </p>
@@ -594,7 +604,7 @@ aws ec2 describe-instances \
         <li>SSM Document local em <code>runbooks/restart_streamlit.yaml</code>, registrado no template.</li>
       </ul>
 
-      <h3>13.3 Deploy do app no EC2 (sem SSH)</h3>
+      <h3>12.3 Deploy do app no EC2 (sem SSH)</h3>
       <p>
         O aluno não usa SSH. O deploy do código no EC2 passa por SSM Run Command, que executa um shell script que faz pull do
         repositório, instala dependências e sobe o Streamlit:
@@ -615,20 +625,20 @@ aws cloudformation deploy --stack-name tsa-{iniciais} \
   --parameter-overrides Iniciais={iniciais} DatasetSlug={slug} \
   --capabilities CAPABILITY_IAM</pre>
       <div class="m08-callout">
-        <strong>Checkpoint Sprint 3</strong>
+        <strong>Checkpoint do Bloco 2</strong>
         URL pública abre as 3 abas. Dashboard CW mostra os 3 SLIs preenchidos. Alarm em estado <em>OK</em>. EventBridge rule
         ligada ao SSM document. SSM document executável manualmente como teste.
       </div>
     </section>
 
     <section class="content-block">
-      <h2>14. Sprint 4 &middot; validação + demo (21h30 &ndash; 22h00)</h2>
+      <h2>13. Bloco 3 &middot; Validação &amp; demo</h2>
       <p>
-        Último sprint. Tester roda smoke. Reviewer marca o checklist. Aluno simula falha e demonstra closed loop. Push da tag
-        <code>final-v1</code>. Demo de 3 minutos.
+        Bloco final. Tester roda smoke. Reviewer marca o checklist. Aluno simula falha e demonstra closed loop. Push da tag
+        <code>final-v1</code>. Demo de 3 minutos &mdash; gate da entrega.
       </p>
 
-      <h3>14.1 Tester &mdash; smoke contra a URL</h3>
+      <h3>13.1 Tester &mdash; smoke contra a URL</h3>
 <pre># tests/smoke/test_url.py (gerado pela skill)
 import httpx, os
 
@@ -647,14 +657,14 @@ def test_smoke_03_aba_forecast():
     assert r.status_code == 200</pre>
 <pre>TSA_URL="http://&lt;ip-publico&gt;:8501" pytest tests/smoke/ -v</pre>
 
-      <h3>14.2 Reviewer &mdash; release checklist</h3>
+      <h3>13.2 Reviewer &mdash; release checklist</h3>
       <p>
         A skill <code>gen_release_checklist</code> gera <code>documents/release_checklist.md</code> com os oito critérios da
         seção 10. O reviewer marca cada item, anexando print ou comando que prova cumprimento. Critérios não marcados ficam
         explícitos no documento, e o aluno tem até o início da demo para corrigir.
       </p>
 
-      <h3>14.3 Simulação de falha &mdash; o ato 4 da demo</h3>
+      <h3>13.3 Simulação de falha &mdash; o ato 4 da demo</h3>
       <p>
         O closed loop é demonstrado matando o processo Streamlit via SSM e observando o sistema voltar sozinho. Sequência:
       </p>
@@ -675,7 +685,7 @@ aws ssm send-command --document-name "AWS-RunShellScript" \
 git tag final-v1
 git push origin main --tags</pre>
 
-      <h3>14.4 Roteiro da demo de 3 minutos</h3>
+      <h3>13.4 Roteiro da demo de 3 minutos</h3>
       <table>
         <thead>
           <tr><th>Tempo</th><th>Ato</th><th>O que mostrar</th></tr>
@@ -691,10 +701,10 @@ git push origin main --tags</pre>
     </section>
 
     <section class="content-block">
-      <h2>15. Erros frequentes e atalhos defensivos</h2>
+      <h2>14. Erros frequentes e atalhos defensivos</h2>
       <p>
-        A lista abaixo concentra os defeitos vistos em turmas anteriores ao executar projeto sob restrição de tempo. Antecipar
-        cada um economiza minutos preciosos no Sprint 3 ou 4.
+        A lista abaixo concentra os defeitos vistos em turmas anteriores ao executar projeto sob essa pressão. Antecipar
+        cada um economiza idas e vindas nos Blocos 2 e 3.
       </p>
       <table>
         <thead>
@@ -702,7 +712,7 @@ git push origin main --tags</pre>
         </thead>
         <tbody>
           <tr>
-            <td><code>UnauthorizedOperation</code> no meio do Sprint 3</td>
+            <td><code>UnauthorizedOperation</code> no meio do Bloco 2</td>
             <td>Token expirado.</td>
             <td>Renovar token antes de cada <code>cloudformation deploy</code>.</td>
           </tr>
@@ -734,7 +744,7 @@ git push origin main --tags</pre>
         </tbody>
       </table>
 
-      <h3>15.1 Comandos de diagnóstico úteis durante a demo</h3>
+      <h3>14.1 Comandos de diagnóstico úteis durante a demo</h3>
 <pre># Stack events em ordem cronologica
 aws cloudformation describe-stack-events \
   --stack-name tsa-{iniciais} \
@@ -751,7 +761,7 @@ aws cloudwatch describe-alarms \
     </section>
 
     <section class="content-block">
-      <h2>16. Restrições duras &mdash; linhas vermelhas</h2>
+      <h2>15. Restrições duras &mdash; linhas vermelhas</h2>
       <div class="m08-callout">
         <strong>Cinco regras inegociáveis</strong>
         <ol>
@@ -770,7 +780,7 @@ aws cloudwatch describe-alarms \
     </section>
 
     <section class="content-block">
-      <h2>17. Glossário &mdash; séries temporais e modelagem</h2>
+      <h2>16. Glossário &mdash; séries temporais e modelagem</h2>
       <table>
         <thead>
           <tr><th>Sigla</th><th>Significado</th><th>Onde aparece nesta aula</th></tr>
@@ -795,7 +805,7 @@ aws cloudwatch describe-alarms \
     </section>
 
     <section class="content-block">
-      <h2>18. Glossário &mdash; AWS, SRE e infra</h2>
+      <h2>17. Glossário &mdash; AWS, SRE e infra</h2>
       <table>
         <thead>
           <tr><th>Sigla</th><th>Significado</th><th>Onde aparece nesta aula</th></tr>
@@ -822,7 +832,7 @@ aws cloudwatch describe-alarms \
     </section>
 
     <section class="content-block">
-      <h2>19. Glossário &mdash; projeto, IA e entrega</h2>
+      <h2>18. Glossário &mdash; projeto, IA e entrega</h2>
       <table>
         <thead>
           <tr><th>Sigla / termo</th><th>Significado</th><th>Onde aparece nesta aula</th></tr>
@@ -835,26 +845,26 @@ aws cloudwatch describe-alarms \
           <tr><td><strong>TC-SMOKE</strong></td><td>Smoke test case</td><td><code>tests/smoke/test_url.py</code>, IDs <code>TC-SMOKE-NN</code>.</td></tr>
           <tr><td><strong>AGENTS.md</strong></td><td>Manifesto do squad de agentes</td><td>Raiz do repositório, gerado pelo bootstrap.</td></tr>
           <tr><td><strong>Skill</strong></td><td>Comando reutilizável da IA</td><td><code>bootstrap_tsa_project</code>, <code>gen_app_template</code>, etc.</td></tr>
-          <tr><td><strong>Architect</strong></td><td>Agente que produz o system design</td><td>Sprint 2.</td></tr>
-          <tr><td><strong>DevOps</strong></td><td>Agente que produz CFN</td><td>Sprints 2 e 3.</td></tr>
-          <tr><td><strong>DataDev</strong></td><td>Agente que produz o app Streamlit/Dash</td><td>Sprint 3.</td></tr>
-          <tr><td><strong>Tester</strong></td><td>Agente que produz smoke tests</td><td>Sprint 4.</td></tr>
-          <tr><td><strong>Reviewer</strong></td><td>Agente que audita o release</td><td>Sprint 4.</td></tr>
-          <tr><td><strong>final-v1</strong></td><td>Tag git do release</td><td>Push obrigatório no Sprint 4.</td></tr>
+          <tr><td><strong>Architect</strong></td><td>Agente que produz o system design</td><td>Bloco 1.</td></tr>
+          <tr><td><strong>DevOps</strong></td><td>Agente que produz CFN</td><td>Blocos 1 e 2.</td></tr>
+          <tr><td><strong>DataDev</strong></td><td>Agente que produz o app Streamlit/Dash</td><td>Bloco 2.</td></tr>
+          <tr><td><strong>Tester</strong></td><td>Agente que produz smoke tests</td><td>Bloco 3.</td></tr>
+          <tr><td><strong>Reviewer</strong></td><td>Agente que audita o release</td><td>Bloco 3.</td></tr>
+          <tr><td><strong>final-v1</strong></td><td>Tag git do release</td><td>Push obrigatório no Bloco 3.</td></tr>
         </tbody>
       </table>
     </section>
 
     <section class="content-block">
-      <h2>20. Referências &mdash; para continuar depois da Aula 08</h2>
-      <h3>20.1 Séries temporais</h3>
+      <h2>19. Referências &mdash; para continuar depois da Aula 08</h2>
+      <h3>19.1 Séries temporais</h3>
       <ul>
         <li>Hyndman, R. J., &amp; Athanasopoulos, G. <em>Forecasting: Principles and Practice</em> (3rd ed., 2021). Disponível online.</li>
         <li><code>statsmodels</code> &mdash; documentação de <code>tsa.seasonal.STL</code> e <code>tsa.holtwinters.ExponentialSmoothing</code>.</li>
         <li>Prophet &mdash; documentação oficial Meta/Facebook (<em>github.com/facebook/prophet</em>).</li>
         <li>Kaggle &mdash; trilha "Time Series" e competições históricas (M4, M5).</li>
       </ul>
-      <h3>20.2 AWS, IaC e SRE</h3>
+      <h3>19.2 AWS, IaC e SRE</h3>
       <ul>
         <li>AWS CloudFormation User Guide &mdash; <em>aws.amazon.com/cloudformation/</em>.</li>
         <li>AWS Well-Architected Framework &mdash; Reliability Pillar.</li>
@@ -862,7 +872,7 @@ aws cloudwatch describe-alarms \
         <li>EventBridge &mdash; <em>Developer Guide</em>, focando em rules e targets.</li>
         <li>Systems Manager &mdash; <em>Run Command</em> e <em>SSM Documents</em>.</li>
       </ul>
-      <h3>20.3 Front e produto</h3>
+      <h3>19.3 Front e produto</h3>
       <ul>
         <li>Streamlit &mdash; <em>Deployment Guide</em> e <em>API reference</em>.</li>
         <li>Plotly Dash &mdash; <em>Layout</em> e <em>Callbacks</em>.</li>
@@ -871,27 +881,25 @@ aws cloudwatch describe-alarms \
     </section>
 
     <section class="content-block">
-      <h2>21. Atividade prática em sala &mdash; o que executar</h2>
+      <h2>20. Atividade prática em sala &mdash; o que executar</h2>
       <p>
-        O fechamento deste material aponta para a atividade prática que ocupa as duas horas finais. A trilha é a sequência dos
-        Sprints 1 a 4, executada com Codespace aberto, OpenCode (ou Gemini CLI) carregado com as skills do AGENTS.md, e AWS CLI
-        autenticado pelo session token do Learner Lab.
+        O fechamento deste material aponta para a atividade prática que ocupa a parte de execução da aula. A trilha é a
+        sequência dos três blocos, executada com Codespace aberto, OpenCode (ou Gemini CLI) carregado com as skills do
+        AGENTS.md, e AWS CLI autenticado pelo session token do Learner Lab.
       </p>
       <ol>
         <li>
-          <strong>Sprint 1 &middot; 20h00&ndash;20h30.</strong> Renovar token. Abrir Codespace do <code>tsa-{iniciais}-{slug}</code>.
-          Rodar <code>/bootstrap_tsa_project</code>. Escrever <code>spec/00_problem.md</code> com 5 RFs e 5 RNFs.
+          <strong>Bloco 1 &middot; Bootstrap &amp; arquitetura.</strong> Renovar token. Abrir Codespace do <code>tsa-{iniciais}-{slug}</code>.
+          Rodar <code>/bootstrap_tsa_project</code>. Escrever <code>spec/00_problem.md</code> com 5 RFs e 5 RNFs. Em seguida, rodar
+          <code>/gen_app_template</code> nos modos <code>system_design</code> e <code>cfn</code>. Validar template.
+          <code>aws cloudformation deploy</code>. Subir CSV para o S3.
         </li>
         <li>
-          <strong>Sprint 2 &middot; 20h30&ndash;21h00.</strong> Rodar <code>/gen_app_template</code> em modo <code>system_design</code>
-          e em modo <code>cfn</code>. Validar template. <code>aws cloudformation deploy</code>. Subir CSV para o S3.
-        </li>
-        <li>
-          <strong>Sprint 3 &middot; 21h00&ndash;21h30.</strong> Rodar <code>/gen_streamlit_tsa_app</code>. Deploy do app via SSM.
+          <strong>Bloco 2 &middot; App + observabilidade.</strong> Rodar <code>/gen_streamlit_tsa_app</code>. Deploy do app via SSM.
           Rodar <code>/gen_observability</code>. Re-deploy do template com log group, dashboard, alarm e EventBridge.
         </li>
         <li>
-          <strong>Sprint 4 &middot; 21h30&ndash;22h00.</strong> Rodar <code>pytest tests/smoke/</code>. Marcar <code>release_checklist.md</code>.
+          <strong>Bloco 3 &middot; Validação &amp; demo.</strong> Rodar <code>pytest tests/smoke/</code>. Marcar <code>release_checklist.md</code>.
           Simular falha via SSM. Mostrar closed loop. <code>git tag final-v1 &amp;&amp; git push --tags</code>. Demo de 3 minutos.
         </li>
       </ol>
