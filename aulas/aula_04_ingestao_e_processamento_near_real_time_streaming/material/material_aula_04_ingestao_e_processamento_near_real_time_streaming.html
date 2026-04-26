@@ -4,51 +4,905 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/png" href="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" />
-  <title>Material Aula 04 — Ingestão e processamento near real-time com streaming</title>
+  <title>Material Aula 04 — Equipe de agentes IA + CloudFormation: do markdown ao stack provisionado</title>
   <link rel="stylesheet" href="../../../assets/styles.css" />
+  <link rel="stylesheet" href="../../../assets/slides.css" />
+  <style data-material04-local>
+    /* Material is a long-form document — neutralize the height/overflow rules
+       that slides.css applies to html, body. */
+    html, body.material {
+      height: auto !important;
+      min-height: 100%;
+      overflow: visible !important;
+    }
+    body.material .page { max-width: 980px; }
+    body.material pre {
+      background: #0d1117;
+      color: #e6edf3;
+      padding: 16px 18px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: .92rem;
+      line-height: 1.65;
+      overflow-x: auto;
+      margin: 14px 0;
+    }
+    body.material code {
+      background: var(--deck-surface);
+      border: 1px solid var(--deck-line-soft);
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-family: var(--font-mono);
+      font-size: .9em;
+    }
+    body.material pre code { background: transparent; border: none; padding: 0; }
+    body.material table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: .95rem;
+    }
+    body.material thead th {
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-size: .82rem;
+      text-align: left;
+      padding: 10px 12px;
+      border-top: 1px solid #0f0f0f;
+      border-bottom: 1px solid #0f0f0f;
+      background: var(--deck-surface);
+    }
+    body.material tbody td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--deck-line-soft);
+      vertical-align: top;
+    }
+    body.material tbody tr:last-child td { border-bottom: 1px solid #0f0f0f; }
+    .m04-callout {
+      border-left: 3px solid #0f0f0f;
+      background: var(--deck-surface);
+      padding: 18px 22px;
+      margin: 18px 0;
+      border-radius: 0 4px 4px 0;
+    }
+    .m04-callout strong:first-child { display: block; margin-bottom: 6px; }
+    .m04-mermaid {
+      background: var(--deck-panel, #ffffff);
+      border: 1px solid var(--deck-line, #d6d6d1);
+      border-radius: 4px;
+      padding: 18px;
+      margin: 18px 0;
+      overflow: auto;
+    }
+    .m04-mermaid pre.mermaid {
+      background: transparent !important;
+      color: var(--deck-text, #0f0f0f) !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      box-shadow: none !important;
+      border: none !important;
+      border-radius: 0 !important;
+      overflow: visible;
+    }
+    .m04-mermaid pre.mermaid::before { display: none !important; }
+    .m04-mermaid svg {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+      background: transparent;
+    }
+    .m04-tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--deck-muted);
+      padding: 2px 8px;
+      border: 1px solid var(--deck-line);
+      border-radius: 3px;
+      margin-right: 6px;
+    }
+  </style>
 </head>
 <body class="material">
   <main class="page">
 
     <section class="content-block">
       <p class="meta">Aula 04 &nbsp;&bull;&nbsp; 07/05/2026 &nbsp;&bull;&nbsp; 19h00 &ndash; 22h00</p>
-      <h1>Ingestão e processamento near real-time com streaming</h1>
+      <h1>Equipe de agentes IA + CloudFormation: do markdown ao stack provisionado</h1>
       <p class="summary">
         Este material acompanha a Aula 04 da disciplina <strong>Cloud Computing e SRE &mdash; Visão Prática com AWS</strong>
-        do MBA em Engenharia de Dados. Nele sairemos do mundo batch e passaremos a ingerir eventos do Olist
-        em tempo quase real, entregando ao Data Lake com garantias de ordem, duplicidade e latência.
+        do MBA em Engenharia de Dados. A aula tira a arquitetura do papel e a põe na conta AWS &mdash; mas com regras: nada manual, tudo declarativo via
+        CloudFormation, e quem propõe o template é uma <em>squad</em> de agentes IA com papéis bem cortados, não um agente solitário.
+        Entrega: stack <code>olist-sre-pipeline-lab</code> em <code>CREATE_COMPLETE</code>, ETL dummy escrevendo no S3 raw, drift detection rodada
+        e dois novos arquivos em <code>/documents</code>: <code>10_deploy_log.md</code> e <code>11_drift_runbook.md</code>.
+      </p>
+      <p>
+        <span class="m04-tag">Pré-requisitos</span> Aula 03 entregue: <code>/documents/01..09</code> preenchidos, pasta
+        <code>documents/agents/</code> com <code>AGENTS.md</code>, <code>GEMINI.md</code> e seis skills, AWS CLI conectado pelo session
+        token do Learner Lab, tag <code>aula-03</code> no git.
+      </p>
+      <p>
+        <span class="m04-tag">Restrições duras</span> Sem clicar no console AWS &middot; sem secrets em template &middot; sem Glue, Redshift ou SageMaker (Learner Lab
+        não habilita) &middot; tudo idempotente: re-rodar o deploy não pode mudar estado.
       </p>
     </section>
 
     <section class="content-block">
-      <h2>Status: em construção</h2>
+      <h2>1. Da arquitetura ao stack</h2>
       <p>
-        Este material está sendo redigido e será publicado com pelo menos uma semana de antecedência
-        à data da aula (07/05/2026). A estrutura de seções abaixo antecipa o escopo.
+        Na Aula 03 modelamos a arquitetura em RM-ODP, escrevemos a RTM e desenhamos o system design em Mermaid mapeando RF/RNF.
+        Tudo isso vive em markdown na pasta <code>/documents</code>. O problema agora muda: <em>como tirar a arquitetura do papel sem
+        introduzir dívida operacional?</em> A resposta da disciplina tem duas partes inseparáveis.
+      </p>
+      <p>
+        A primeira é <strong>Infrastructure as Code</strong> &mdash; toda decisão de infra é arquivo versionado, revisado em PR e auditável.
+        Cliques no console são proibidos porque cliques não deixam rastro. A segunda parte é <strong>multi-agente</strong> &mdash; em vez de pedir para
+        uma única IA "gerar tudo", separamos em quatro papéis com escopos curtos. Architect lê arquitetura, DevOps gera YAML, Tester valida, Reviewer
+        veta. O humano é o árbitro e o único que aciona <code>aws cloudformation deploy</code>.
       </p>
 
-      <h3>Estrutura prevista</h3>
+      <h3>1.1 As cinco regras desta aula</h3>
+      <div class="m04-callout">
+        <strong>Não-negociáveis</strong>
+        <ol>
+          <li>Toda decisão de infra é arquivo YAML versionado &mdash; nada de cliques no console.</li>
+          <li>Quatro papéis distintos na squad: Architect, DevOps, Tester, Reviewer.</li>
+          <li>Cada recurso provisionado nasce com tag, log group e métrica.</li>
+          <li>Re-rodar o deploy não pode mudar estado &mdash; idempotência ou nada.</li>
+          <li>Recurso sem caminho de remediação no closed loop não entra no stack.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="content-block">
+      <h2>2. Por que sair do prompt único</h2>
+      <p>
+        Um agente sozinho funciona bem para tarefas curtas. Quando o pedido cresce &mdash; gerar templates, escrever testes, fazer ATAM, atualizar
+        runbook &mdash; ele começa a perder aderência: esquece que IAM com <code>Action: '*'</code> está proibido, mistura saídas (joga ATAM dentro do YAML),
+        e propaga alucinações entre artefatos. Um erro na primeira etapa contamina as próximas.
+      </p>
+      <p>
+        Multi-agente resolve isso dividindo cognição. Cada papel tem prompt curto, lê arquivos específicos e escreve em pasta específica.
+        Saídas são separadas, comparáveis e comitáveis. O custo é orquestração: alguém precisa coordenar a sequência. Em troca, a auditoria
+        fica trivial &mdash; você sabe quem produziu cada arquivo.
+      </p>
+
+      <h3>2.1 Padrões de orquestração</h3>
+      <table>
+        <thead>
+          <tr><th>Padrão</th><th>Como funciona</th><th>Quando usar</th><th>Risco</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Planner + Executor</td><td>Um agente planeja, outro(s) executam tarefas pequenas.</td><td>Pipeline previsível com etapas claras.</td><td>Plano ruim se propaga.</td></tr>
+          <tr><td>Hierárquico</td><td>Manager delega para sub-agentes especializados.</td><td>Tarefas com dependências fortes entre subtarefas.</td><td>Latência cumulativa.</td></tr>
+          <tr><td>Blackboard</td><td>Agentes leem e escrevem em quadro comum.</td><td>Problemas exploratórios, sem ordem fixa.</td><td>Difícil auditar quem mudou o quê.</td></tr>
+          <tr><td>Swarm</td><td>Vários agentes paralelos, sem coordenador central.</td><td>Geração de variantes, brainstorming.</td><td>Pode divergir; precisa redutor.</td></tr>
+        </tbody>
+      </table>
+      <p>
+        Hoje rodamos um híbrido <strong>planner+executor com revisão humana</strong>. O Architect planeja, DevOps executa, Tester e Reviewer fecham o loop, e o
+        humano dá o "go" antes do deploy. É o padrão que cabe em uma hora de prática sem perder rastreabilidade.
+      </p>
+    </section>
+
+    <section class="content-block">
+      <h2>3. A squad canônica</h2>
+      <p>
+        Quatro papéis. Cada um com escopo de leitura, escopo de escrita e critério de aceitação. Nenhum papel pode invadir o outro &mdash; o Architect
+        não escreve YAML, o DevOps não escreve ADR, o Tester não decide arquitetura, o Reviewer não fecha PR sozinho.
+      </p>
+
+      <h3>3.1 Architect</h3>
+      <p>
+        Lê <code>documents/03_architecture.md</code> da Aula 03 e devolve um plano de módulos CFN em <code>iac/cloudformation/PLAN.md</code>. O plano descreve cada
+        módulo (network, storage, compute, observability, sre-loop) com parâmetros esperados, outputs e qual RF/RNF da Aula 03 ele atende. Nenhuma linha de YAML.
+        A saída é texto em markdown, fácil de revisar e diffar.
+      </p>
+
+      <h3>3.2 DevOps</h3>
+      <p>
+        Recebe o <code>PLAN.md</code> do Architect e gera <code>root.yaml</code> + cinco módulos. Aplica a skill <code>gen_cfn_template</code> (ver seção 6).
+        Tags obrigatórias, Outputs por módulo, <code>DeletionPolicy</code> escolhido por recurso. Saída entra como diff revisável; nada vai direto para a AWS.
+      </p>
+
+      <h3>3.3 Tester</h3>
+      <p>
+        Gera <code>tests/iac/test_templates.py</code>. Roda <code>cfn-lint</code> em todos os YAMLs e adiciona asserts pytest sobre Outputs esperados,
+        ausência de <code>Action: '*'</code> em IAM, presença de <code>DeletionPolicy</code> em recursos críticos. Falha do Tester é blocker do deploy.
+      </p>
+
+      <h3>3.4 Reviewer</h3>
+      <p>
+        Faz ATAM enxuto sobre o template, reusando a skill <code>review_architecture</code> da Aula 03 e a nova <code>review_cfn</code>. Lista cinco riscos,
+        três sensibilidades e dois trade-offs. Decide explicitamente: APROVADO PARA DEPLOY ou VETO + razão. A saída do Reviewer vai para a primeira seção
+        do <code>10_deploy_log.md</code>.
+      </p>
+
+      <div class="m04-callout">
+        <strong>Regra de veto</strong>
+        Se o Reviewer disser VETO, o ciclo volta para o DevOps com a lista de problemas. Não dá deploy "para ver no que dá". Custo de errar no Lab é tempo,
+        mas a disciplina é hábito que precisa ser construído antes de chegar em produção.
+      </div>
+    </section>
+
+    <section class="content-block">
+      <h2>4. AIOX e alternativas pragmáticas</h2>
+      <p>
+        AIOX é o orquestrador CLI multi-agente que adotamos como default da disciplina. A ideia é pequena: um binário Python que lê um <code>squad.yml</code>
+        descrevendo papéis, skills e arquivos compartilhados, e roda cada papel chamando o LLM com o prompt certo. Logs por papel/turno ficam em arquivos auditáveis.
+      </p>
+      <p>
+        O nome do binário pode mudar &mdash; o que importa é o <strong>comportamento</strong>. Se a turma não conseguir instalar AIOX (cache do PyPI vazio,
+        rede do Codespace bloqueando, versão Python inadequada), caímos para um plano B equivalente:
+      </p>
       <ul>
-        <li><strong>Contexto no pipeline Olist</strong> &mdash; onde o streaming se encaixa ao lado do batch.</li>
-        <li><strong>Batch vs micro-batch vs streaming</strong> &mdash; latência, throughput e trade-offs.</li>
-        <li><strong>Produtor, broker e consumidor</strong> &mdash; metáfora do avião e responsabilidades de cada lado.</li>
-        <li><strong>Janelas e tempo</strong> &mdash; tumbling, sliding, session windows, event time, watermarks.</li>
-        <li><strong>Garantias de entrega</strong> &mdash; at-most-once, at-least-once, exactly-once, idempotência, backpressure.</li>
-        <li><strong>Kinesis Data Streams e Firehose</strong> &mdash; shards, partition key, retenção, conversão de formato.</li>
-        <li><strong>Comparação com Kafka/MSK</strong> &mdash; limitações no Learner Lab e quando justificar.</li>
-        <li><strong>Serverless no consumo</strong> &mdash; características de Lambda, modelo de cobrança, event-driven.</li>
-        <li><strong>Laboratório prático</strong> &mdash; Kinesis + produtor Python + Firehose + Lambda + DynamoDB + CloudWatch.</li>
+        <li><strong>CrewAI</strong> &mdash; framework Python de squads, declarativo via YAML/Python.</li>
+        <li><strong>AutoGen</strong> &mdash; multi-agent dialog da Microsoft, usado em pesquisa.</li>
+        <li><strong>LangGraph CLI</strong> &mdash; grafo de estados para LLM workflows.</li>
+        <li><strong>Caseiro</strong> &mdash; <code>Makefile</code> chamando Gemini CLI ou OpenCode com cada skill em sequência. Mais simples, audita do mesmo jeito.</li>
+      </ul>
+      <p>
+        Critério de escolha: roda no Codespace sem chave paga, lê markdown como input, escreve markdown e YAML como saída, deixa rastro no <code>git</code>.
+        Nada além disso. A discussão sobre qual é "o melhor framework" fica fora desta aula.
+      </p>
+    </section>
+
+    <section class="content-block">
+      <h2>5. Fluxo da squad &mdash; visão de cima</h2>
+      <p>
+        Cada agente lê um insumo, produz um artefato versionado e passa adiante. O humano é o árbitro &mdash; e o único que aciona o deploy. O diagrama abaixo
+        mostra o caminho completo, dos arquivos da Aula 03 até o stack vivo na AWS.
+      </p>
+      <div class="m04-mermaid">
+        <pre class="mermaid">
+flowchart LR
+  subgraph IN["Insumos (Aula 03)"]
+    ARCH["documents/<br/>03_architecture.md"]
+    AGENTS["documents/agents/<br/>AGENTS.md + skills"]
+  end
+
+  subgraph SQUAD["Squad (Aula 04)"]
+    A["Architect<br/>plano de modulos"]
+    D["DevOps<br/>gera CFN YAML"]
+    T["Tester<br/>cfn-lint + asserts"]
+    R["Reviewer<br/>ATAM no template"]
+  end
+
+  subgraph OUT["Artefatos versionados"]
+    PLAN["iac/.../PLAN.md"]
+    YAML["iac/cloudformation/<br/>root.yaml + modulos"]
+    TESTS["tests/iac/<br/>test_templates.py"]
+    LOG["documents/<br/>10_deploy_log.md"]
+  end
+
+  subgraph AWS["AWS Student Lab"]
+    STACK["CloudFormation Stack<br/>olist-sre-pipeline-lab"]
+    RES["S3 + EC2 + IAM + CW<br/>EventBridge + SSM"]
+  end
+
+  ARCH --> A
+  AGENTS --> A
+  AGENTS --> D
+  AGENTS --> T
+  AGENTS --> R
+  A --> PLAN --> D
+  D --> YAML --> T
+  T --> R
+  R ==> |"veto / ok"| HUMAN["Humano (voce)"]
+  HUMAN ==> |"aws cfn deploy"| STACK
+  STACK --> RES
+  STACK -.-> LOG
+        </pre>
+      </div>
+    </section>
+
+    <section class="content-block">
+      <h2>6. CloudFormation 101</h2>
+      <p>
+        Antes de revisar o YAML que a IA gera, é preciso saber para que serve cada seção. CFN é declarativo: você descreve o estado desejado e o serviço da AWS
+        cuida do diff. Não há comando <em>create</em> e comando <em>delete</em> separados &mdash; há um único objeto chamado <strong>stack</strong> que tem ciclo de vida.
+      </p>
+
+      <h3>6.1 Anatomia do template</h3>
+      <table>
+        <thead>
+          <tr><th>Seção</th><th>Para que serve</th><th>Obrigatória?</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>AWSTemplateFormatVersion</code></td><td>Versão do schema (sempre <code>2010-09-09</code>).</td><td>Recomendada</td></tr>
+          <tr><td><code>Description</code></td><td>O que o template provisiona, em uma frase.</td><td>Recomendada</td></tr>
+          <tr><td><code>Parameters</code></td><td>Entradas do stack (env, iniciais, sizing).</td><td>Não</td></tr>
+          <tr><td><code>Mappings</code></td><td>Tabelas estáticas (ex.: AMI por região).</td><td>Não</td></tr>
+          <tr><td><code>Conditions</code></td><td>Liga/desliga recursos por env.</td><td>Não</td></tr>
+          <tr><td><code>Resources</code></td><td>O que vai existir na conta.</td><td>Sim</td></tr>
+          <tr><td><code>Outputs</code></td><td>Valores expostos pelo stack (ARNs, URLs).</td><td>Recomendada</td></tr>
+        </tbody>
+      </table>
+
+      <h3>6.2 Funções intrínsecas</h3>
+      <p>
+        A IA vai gerar template recheado de funções intrínsecas. Saber decodificar é a diferença entre revisar e copiar cego.
+      </p>
+      <table>
+        <thead>
+          <tr><th>Função</th><th>Para quê</th><th>Exemplo</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>!Ref</code></td><td>Referencia parâmetro ou resource.</td><td><code>!Ref BucketRaw</code></td></tr>
+          <tr><td><code>!Sub</code></td><td>Interpola variável em string.</td><td><code>!Sub "${Iniciais}-raw"</code></td></tr>
+          <tr><td><code>!GetAtt</code></td><td>Lê atributo de outro resource.</td><td><code>!GetAtt MyEC2.PublicIp</code></td></tr>
+          <tr><td><code>!ImportValue</code></td><td>Lê Output exportado por outro stack.</td><td><code>!ImportValue VpcId-lab</code></td></tr>
+          <tr><td><code>!Join</code></td><td>Concatena lista com separador.</td><td><code>!Join ["/", [a, b]]</code></td></tr>
+          <tr><td><code>!If</code></td><td>Condicional baseado em Conditions.</td><td><code>!If [IsProd, t3.large, t3.micro]</code></td></tr>
+        </tbody>
+      </table>
+
+      <h3>6.3 Lifecycle do stack</h3>
+      <p>
+        Stack tem máquina de estados explícita. Conhecer os estados é condição para depurar deploy travado sem chutar.
+      </p>
+      <table>
+        <thead>
+          <tr><th>Operação</th><th>Estados principais</th><th>Quando ocorre</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>CREATE</td><td>CREATE_IN_PROGRESS &rarr; CREATE_COMPLETE</td><td>Primeiro <code>deploy</code> com stack inexistente.</td></tr>
+          <tr><td>CREATE c/ falha</td><td>CREATE_FAILED &rarr; ROLLBACK_IN_PROGRESS &rarr; ROLLBACK_COMPLETE</td><td>Recurso falha; tudo é desfeito.</td></tr>
+          <tr><td>UPDATE</td><td>UPDATE_IN_PROGRESS &rarr; UPDATE_COMPLETE</td><td>Template muda; aplica diff.</td></tr>
+          <tr><td>UPDATE c/ falha</td><td>UPDATE_ROLLBACK_IN_PROGRESS &rarr; UPDATE_ROLLBACK_COMPLETE</td><td>Reverte para estado anterior.</td></tr>
+          <tr><td>DELETE</td><td>DELETE_IN_PROGRESS &rarr; DELETE_COMPLETE</td><td><code>delete-stack</code> respeita DeletionPolicy.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>6.4 Capabilities, Stack Policy e DeletionPolicy</h3>
+      <ul>
+        <li><strong>Capabilities</strong> &mdash; <code>CAPABILITY_IAM</code> autoriza CFN a criar IAM Roles. Sem isso, deploy falha por segurança. <code>CAPABILITY_NAMED_IAM</code> aceita nome customizado.</li>
+        <li><strong>Stack Policy</strong> &mdash; JSON inline que protege resources críticos contra UPDATE acidental. Útil para banco de dados e buckets de raw.</li>
+        <li><strong>DeletionPolicy</strong> &mdash; <code>Delete</code> (default) &middot; <code>Retain</code> (mantém recurso após delete-stack) &middot; <code>Snapshot</code> (faz snapshot antes de deletar). Bucket S3 e RDS nunca devem ser <code>Delete</code> em prod. No Lab, usamos <code>Retain</code> só para o bucket raw.</li>
+      </ul>
+
+      <h3>6.5 Drift detection</h3>
+      <p>
+        Drift é a diferença entre o que está no template e o que está vivo na conta. Se alguém abre o console e edita um Security Group "só para ver",
+        o template mente. CFN consegue detectar drift em propriedades de resources (não consegue detectar drift em <em>dados</em> dentro de S3 ou RDS).
+        Roda hoje, antes que algum colega edite no console e quebre o ciclo.
+      </p>
+
+      <h3>6.6 Composição: nested vs cross-stack</h3>
+      <p>
+        Stack único e gigante é difícil de revisar e ainda mais difícil de atualizar. O padrão é quebrar em módulos por domínio.
+      </p>
+      <ul>
+        <li><strong>Nested stacks</strong> &mdash; pai inclui filhos via <code>AWS::CloudFormation::Stack</code>. Atualização do pai propaga. Bom quando o ciclo de vida é compartilhado.</li>
+        <li><strong>Cross-stack via Outputs/Exports</strong> &mdash; stack A exporta valor; stack B faz <code>!ImportValue</code>. Ciclos de vida independentes. Cuidado: Export usado não pode mudar nome.</li>
+      </ul>
+      <p>
+        Nesta aula usamos nested stacks com <code>root.yaml</code> incluindo <code>network</code>, <code>storage</code>, <code>compute</code>, <code>observability</code> e <code>sre-loop</code>.
+        Ciclo de vida único: o stack do laboratório.
+      </p>
+    </section>
+
+    <section class="content-block">
+      <h2>7. CloudFormation vs Terraform vs CDK</h2>
+      <p>
+        Por que CFN é o default da disciplina? Porque é o que cabe no Learner Lab sem instalar nada além do AWS CLI já presente.
+      </p>
+      <table>
+        <thead>
+          <tr><th>Critério</th><th>CloudFormation</th><th>Terraform</th><th>CDK</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Linguagem</td><td>YAML/JSON declarativo</td><td>HCL declarativo</td><td>TS/Python imperativo</td></tr>
+          <tr><td>Estado</td><td>Gerenciado pela AWS</td><td>State file externo (S3 + lock)</td><td>Sintetiza CFN; usa state da AWS</td></tr>
+          <tr><td>Multi-cloud</td><td>Não</td><td>Sim</td><td>Não</td></tr>
+          <tr><td>No Learner Lab</td><td>Funciona out-of-the-box</td><td>Exige bucket de state &mdash; complica</td><td>Funciona, exige Node/Python e bootstrap</td></tr>
+          <tr><td>Curva</td><td>Média (YAML longo)</td><td>Média (HCL+providers)</td><td>Alta (modelo OOP)</td></tr>
+        </tbody>
+      </table>
+      <p>
+        Decisão da disciplina: CFN puro nesta aula. CDK fica como leitura complementar para quem já programa em TS/Python e quer abstrair templates atrás de classes.
+      </p>
+    </section>
+
+    <section class="content-block">
+      <h2>8. SRE começa no template</h2>
+      <p>
+        Cada recurso provisionado já nasce com tag de SLO, log group e métrica. Observabilidade adicionada depois é dívida garantida &mdash; o time esquece, o
+        budget aperta, e o recurso fica sem dono. Por isso a Aula 04 adota um conjunto pequeno de regras que entram diretamente no template gerado pela squad.
+      </p>
+
+      <h3>8.1 Higiene mínima por recurso</h3>
+      <ul>
+        <li>Tags <code>Project</code>, <code>Env</code>, <code>SLO</code>, <code>Owner</code> em 100% dos resources tagueáveis.</li>
+        <li>Log group dedicado quando aplicável (Lambda, EC2 com agent, EventBridge target).</li>
+        <li>Métricas customizadas via CloudWatch Embedded Metric Format quando o caso justifica.</li>
+        <li><code>DeletionPolicy</code> e <code>UpdateReplacePolicy</code> escolhidos explicitamente.</li>
+      </ul>
+
+      <h3>8.2 Closed loop herdado da Aula 03</h3>
+      <p>
+        O system design da Aula 03 já desenhou o closed loop CW &rarr; Controlador SRE &rarr; ETL/Postgres. Hoje ele vira YAML em <code>sre-loop.yaml</code>:
+      </p>
+      <ul>
+        <li><strong>Sensor</strong> &mdash; CloudWatch alarm de frescor (idade do último arquivo no bucket raw).</li>
+        <li><strong>Comparador/Controlador</strong> &mdash; EventBridge rule que escuta o alarm.</li>
+        <li><strong>Atuador</strong> &mdash; SSM Run Command que tenta retry no ETL.</li>
+        <li><strong>Audit</strong> &mdash; log group dedicado do controlador.</li>
+      </ul>
+      <p>
+        Recurso que não tem caminho de remediação no closed loop não entra no stack. Se alguém propõe um componente novo, a primeira pergunta é
+        <em>"o que acontece quando ele falha?"</em>.
+      </p>
+    </section>
+
+    <section class="content-block">
+      <h2>9. Anti-padrões em template CFN</h2>
+      <p>
+        A IA vai acertar 80% do template na primeira tentativa. Os 20% restantes geralmente são variações desta lista. O Reviewer existe para pegá-los antes do deploy.
+      </p>
+      <table>
+        <thead>
+          <tr><th>Anti-padrão</th><th>Por que dói</th><th>Como evitar</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Secret no template</td><td>Vai parar no git e nos logs do stack.</td><td>SSM Parameter Store + <code>!Sub</code>.</td></tr>
+          <tr><td>IAM com <code>Action: '*'</code></td><td>Privilege escalation pronta.</td><td>Action mínimo + Resource mínimo.</td></tr>
+          <tr><td>Sem <code>DeletionPolicy</code></td><td>Bucket de raw some no <code>delete-stack</code>.</td><td>Definir explícito por resource crítico.</td></tr>
+          <tr><td>ARN hardcoded</td><td>Quebra ao trocar de conta/região.</td><td><code>!Sub</code> com <code>${AWS::AccountId}</code> e <code>${AWS::Region}</code>.</td></tr>
+          <tr><td>Sem Outputs</td><td>Outros stacks não conseguem consumir.</td><td>Exportar IDs e ARNs relevantes.</td></tr>
+          <tr><td>Tags ausentes</td><td>FinOps cego, SLO sem dono.</td><td>Tags obrigatórias no padrão da turma.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="content-block">
+      <h2>10. Prática guiada (21h00 &ndash; 22h00)</h2>
+      <p>
+        Treze passos. Cada um tem um comando ou prompt pronto. Nada é feito clicando &mdash; tudo via CLI ou via skill da squad. Ao final, stack vivo,
+        smoke test passando e drift detection rodada.
+      </p>
+
+      <h3>10.1 Passo 1 &mdash; renovar credenciais AWS</h3>
+      <p>
+        O session token do Learner Lab dura cerca de três horas. Toda aula começa colando o bloco novo. Sem isso, todo comando devolve <code>ExpiredToken</code>.
+      </p>
+<pre># 1) AWS Academy: Start Lab -&gt; AWS Details -&gt; Show -&gt; copiar bloco "AWS CLI"
+
+# 2) No Codespace, sobrescrever credenciais
+cat &gt; ~/.aws/credentials &lt;&lt;'EOF'
+[default]
+aws_access_key_id=ASIA...
+aws_secret_access_key=...
+aws_session_token=...
+EOF
+chmod 600 ~/.aws/credentials
+
+# 3) Validar
+aws sts get-caller-identity
+aws cloudformation list-stacks --query "StackSummaries[?StackStatus!='DELETE_COMPLETE'].StackName"</pre>
+
+      <h3>10.2 Passo 2 &mdash; instalar a squad</h3>
+      <p>
+        AIOX como default; se a instalação falhar, caímos para o plano B. O importante é a forma da squad &mdash; não o nome do binário.
+      </p>
+<pre># Tentativa 1 - AIOX
+pipx install aiox || pip install --user aiox
+aiox --version
+
+# Plano B (se AIOX nao existir/instalar)
+pip install --user crewai || pip install --user pyautogen
+# ou orquestrador caseiro com Makefile chamando gemini/opencode
+
+# cfn-lint para o Tester
+pipx install cfn-lint || pip install --user cfn-lint
+cfn-lint --version</pre>
+
+      <h3>10.3 Passo 3 &mdash; criar <code>agents/squad.yml</code></h3>
+      <p>
+        Configuração declarativa da squad. Mesmo formato funciona em AIOX, CrewAI e no orquestrador caseiro.
+      </p>
+<pre># agents/squad.yml
+shared_context:
+  - documents/agents/AGENTS.md
+  - documents/03_architecture.md
+
+roles:
+  architect:
+    reads:  [documents/03_architecture.md]
+    writes: [iac/cloudformation/PLAN.md]
+    skills: [review_architecture]
+
+  devops:
+    reads:  [iac/cloudformation/PLAN.md]
+    writes: [iac/cloudformation/*.yaml]
+    skills: [gen_cfn_template]
+
+  tester:
+    reads:  [iac/cloudformation/*.yaml]
+    writes: [tests/iac/test_templates.py]
+    skills: [lint_cfn]
+
+  reviewer:
+    reads:  [iac/cloudformation/*.yaml, tests/iac/]
+    writes: [documents/10_deploy_log.md]
+    skills: [review_cfn, review_architecture]</pre>
+
+      <h3>10.4 Passo 4 &mdash; escrever as três skills novas</h3>
+      <p>
+        Mesmo padrão das skills da Aula 03: nome verbo+objeto, quando usar, entrada, passos, saída, critério de aceitação. Esqueleto de uma delas:
+      </p>
+<pre># documents/agents/skills/gen_cfn_template.md
+
+## Quando usar
+Quando existir iac/cloudformation/PLAN.md descrevendo modulos.
+
+## Entrada
+- iac/cloudformation/PLAN.md
+- documents/03_architecture.md
+
+## Passos
+1. Para cada modulo do PLAN.md, gere um YAML em iac/cloudformation/.
+2. Inclua AWSTemplateFormatVersion, Description, Parameters, Resources, Outputs.
+3. Tags obrigatorias: Project=olist-sre, Env=!Ref Env, Owner=!Ref Iniciais, SLO=...
+4. DeletionPolicy: Retain em S3 raw; Delete no resto do Lab.
+5. Sem secrets. Sem Action:'*' em IAM. Sem ARN hardcoded.
+6. root.yaml inclui modulos via AWS::CloudFormation::Stack.
+
+## Saida
+- iac/cloudformation/{root,network,storage,compute,observability,sre-loop}.yaml
+
+## Aceitacao
+- cfn-lint passa em todos os arquivos.
+- Cada modulo tem ao menos 1 Output.
+- Tags presentes em 100% dos resources tagueaveis.</pre>
+      <p>
+        Faça <code>lint_cfn.md</code> e <code>review_cfn.md</code> análogas. <code>lint_cfn</code> descreve como o Tester chama <code>cfn-lint</code> e
+        gera asserts pytest. <code>review_cfn</code> descreve o ATAM enxuto que o Reviewer aplica sobre YAML.
+      </p>
+
+      <h3>10.5 Passo 5 &mdash; Architect produz o plano</h3>
+<pre>aiox run architect \
+  --shared documents/agents/AGENTS.md \
+  --input  documents/03_architecture.md \
+  --output iac/cloudformation/PLAN.md \
+  --task   "Decomponha a arquitetura em modulos CFN.
+            Para cada modulo: nome, recursos, parametros,
+            outputs esperados, qual RF/RNF ele atende e
+            qual ramo do closed loop ele toca.
+            Modulos esperados: network, storage, compute,
+            observability, sre-loop."
+
+# Plano B (caseiro com Gemini)
+gemini -p "Aplique review_architecture sobre
+documents/03_architecture.md. Em seguida produza
+iac/cloudformation/PLAN.md no formato acima."</pre>
+
+      <h3>10.6 Passo 6 &mdash; DevOps gera os templates</h3>
+<pre>aiox run devops \
+  --shared documents/agents/AGENTS.md,iac/cloudformation/PLAN.md \
+  --skill  gen_cfn_template \
+  --output iac/cloudformation/
+
+# Estrutura esperada apos o turno
+iac/cloudformation/
+├── PLAN.md
+├── root.yaml          # nested stacks orchestrator
+├── network.yaml       # VPC default + SG
+├── storage.yaml       # S3 raw / trusted / refined
+├── compute.yaml       # EC2 ETL (tag Role=runner)
+├── observability.yaml # CW log groups + alarms + EventBridge
+└── sre-loop.yaml      # SSM Document + role do controlador
+
+git status iac/
+git diff  iac/cloudformation/</pre>
+      <p>
+        Antes de seguir, leia ao menos um template inteiro. Se algo assustar (IAM larga, ARN fixo, recurso sem tag), volte um turno e peça correção
+        ao DevOps com a lista de problemas.
+      </p>
+
+      <h3>10.7 Passo 7 &mdash; Tester gera lint e asserts</h3>
+<pre>aiox run tester \
+  --shared documents/agents/AGENTS.md \
+  --input  iac/cloudformation/ \
+  --skill  lint_cfn \
+  --output tests/iac/test_templates.py
+
+# Rodar localmente
+cfn-lint iac/cloudformation/*.yaml
+python -m pytest tests/iac/test_templates.py -v
+
+# Asserts esperados em test_templates.py
+# - cada YAML tem Description nao vazio
+# - cada YAML tem ao menos 1 Output
+# - root.yaml referencia os 5 modulos
+# - nenhum recurso usa Action:"*" em IAM
+# - bucket S3 raw tem DeletionPolicy: Retain</pre>
+
+      <h3>10.8 Passo 8 &mdash; Reviewer faz ATAM e decide</h3>
+<pre>aiox run reviewer \
+  --shared documents/agents/AGENTS.md \
+  --input  iac/cloudformation/,tests/iac/ \
+  --skills review_cfn,review_architecture \
+  --task   "Liste 5 riscos, 3 sensibilidades e 2 trade-offs
+            do template. Marque qualquer recurso sem
+            DeletionPolicy, Tag ou Output. Decida:
+            APROVADO PARA DEPLOY ou VETO + razao."
+
+# Saida vai para documents/10_deploy_log.md (secao 'pre-deploy')</pre>
+      <div class="m04-callout">
+        <strong>Regra de veto</strong>
+        Reviewer marcou VETO &rArr; voltamos para o DevOps com a lista. Não dá deploy "para ver no que dá". A disciplina de não pular essa etapa é o
+        que diferencia time SRE de time apagador-de-incêndio.
+      </div>
+
+      <h3>10.9 Passo 9 &mdash; validar template no servidor</h3>
+      <p>
+        <code>validate-template</code> roda no lado da AWS. Pega erro de schema/intrinsic function que o lint local pode não cobrir. Em seguida,
+        <code>package</code> sobe os módulos filhos para um bucket de artefatos e gera <code>root.packaged.yaml</code>.
+      </p>
+<pre>for f in iac/cloudformation/*.yaml; do
+  echo "==== $f ===="
+  aws cloudformation validate-template \
+    --template-body "file://$f" \
+    --query "Description" --output text
+done
+
+# Empacotar nested stacks (sobe filhos para S3)
+aws s3 mb s3://${INICIAIS}-cfn-artifacts-lab 2&gt;/dev/null || true
+
+aws cloudformation package \
+  --template-file iac/cloudformation/root.yaml \
+  --s3-bucket    ${INICIAIS}-cfn-artifacts-lab \
+  --output-template-file iac/cloudformation/root.packaged.yaml</pre>
+
+      <h3>10.10 Passo 10 &mdash; deploy</h3>
+      <p>
+        Único comando que cria recursos. Acompanhe pela CLI; se quiser ver eventos, use <code>describe-stack-events</code>.
+        <strong>Nada de console.</strong>
+      </p>
+<pre>export INICIAIS=afn   # suas iniciais
+
+aws cloudformation deploy \
+  --stack-name olist-sre-pipeline-lab \
+  --template-file iac/cloudformation/root.packaged.yaml \
+  --capabilities CAPABILITY_IAM \
+  --parameter-overrides \
+      Env=lab \
+      Iniciais=${INICIAIS} \
+  --tags Project=olist-sre Env=lab Owner=${INICIAIS}
+
+# Acompanhar (em outro shell)
+aws cloudformation describe-stack-events \
+  --stack-name olist-sre-pipeline-lab \
+  --max-items 20 \
+  --query "StackEvents[].[Timestamp,LogicalResourceId,ResourceStatus]" \
+  --output table</pre>
+
+      <h3>10.11 Passo 11 &mdash; verificar pelo CLI</h3>
+<pre>aws cloudformation describe-stacks \
+  --stack-name olist-sre-pipeline-lab \
+  --query "Stacks[0].[StackStatus,Outputs]" \
+  --output json | tee documents/10_deploy_log.md.tmp
+
+aws cloudformation describe-stack-resources \
+  --stack-name olist-sre-pipeline-lab \
+  --query "StackResources[].[LogicalResourceId,ResourceType,ResourceStatus]" \
+  --output table
+
+aws cloudformation list-exports \
+  --query "Exports[?starts_with(Name, 'olist-')].[Name,Value]" \
+  --output table</pre>
+      <p>
+        Critério: <code>StackStatus = CREATE_COMPLETE</code> e ao menos uma EC2 com tag <code>Role=runner</code> nos resources. Esse runner é a ponte para
+        a Aula 05, que vai usá-lo como GitHub Actions self-hosted runner.
+      </p>
+
+      <h3>10.12 Passo 12 &mdash; smoke test no S3 raw</h3>
+<pre># Ler o nome do bucket diretamente do Output do stack
+RAW=$(aws cloudformation describe-stacks \
+  --stack-name olist-sre-pipeline-lab \
+  --query "Stacks[0].Outputs[?OutputKey=='BucketRaw'].OutputValue" \
+  --output text)
+
+echo "id,event_ts" &gt; /tmp/dummy.csv
+echo "1,$(date -u +%FT%TZ)" &gt;&gt; /tmp/dummy.csv
+
+aws s3 cp /tmp/dummy.csv s3://${RAW}/smoke/dummy.csv
+
+# Ver os logs do controlador SRE
+aws logs describe-log-groups \
+  --log-group-name-prefix "/olist-sre" \
+  --query "logGroups[].logGroupName" --output table</pre>
+
+      <h3>10.13 Passo 13 &mdash; drift detection</h3>
+      <p>
+        Roda agora, antes que alguém edite um SG no console. Resultado vai para <code>11_drift_runbook.md</code> como referência da próxima aula.
+      </p>
+<pre>DRIFT_ID=$(aws cloudformation detect-stack-drift \
+  --stack-name olist-sre-pipeline-lab \
+  --query "StackDriftDetectionId" --output text)
+
+while true; do
+  STATUS=$(aws cloudformation describe-stack-drift-detection-status \
+    --stack-drift-detection-id $DRIFT_ID \
+    --query "DetectionStatus" --output text)
+  [ "$STATUS" = "DETECTION_COMPLETE" ] && break
+  [ "$STATUS" = "DETECTION_FAILED" ]   && break
+  sleep 5
+done
+
+aws cloudformation describe-stack-resource-drifts \
+  --stack-name olist-sre-pipeline-lab \
+  --query "StackResourceDrifts[].[LogicalResourceId,StackResourceDriftStatus]" \
+  --output table</pre>
+      <p>
+        Esperado hoje: <code>IN_SYNC</code> em todos os recursos. Se aparecer <code>MODIFIED</code>, alguém clicou no console e o ciclo do template já está quebrado.
+      </p>
+    </section>
+
+    <section class="content-block">
+      <h2>11. Critério de pronto e commit</h2>
+      <p>
+        Antes do <code>git push</code>, cada item verde. Se faltar, próxima aula herda dívida.
+      </p>
+      <ul>
+        <li><code>agents/squad.yml</code> com 4 papéis.</li>
+        <li>Três skills novas em <code>documents/agents/skills/</code>: <code>gen_cfn_template</code>, <code>lint_cfn</code>, <code>review_cfn</code>.</li>
+        <li><code>iac/cloudformation/</code> com <code>root.yaml</code> + 5 módulos.</li>
+        <li><code>tests/iac/test_templates.py</code> passando, <code>cfn-lint</code> sem erro.</li>
+        <li>Stack <code>olist-sre-pipeline-lab</code> em <code>CREATE_COMPLETE</code>.</li>
+        <li>Pelo menos uma EC2 com tag <code>Role=runner</code>.</li>
+        <li>Smoke test no S3 raw OK.</li>
+        <li>Drift = <code>IN_SYNC</code>.</li>
+        <li><code>10_deploy_log.md</code> e <code>11_drift_runbook.md</code> commitados.</li>
+      </ul>
+<pre>git add iac/ agents/ tests/iac/ documents/10_deploy_log.md documents/11_drift_runbook.md
+git commit -m "feat(aula-04): squad CFN + stack olist-sre-pipeline-lab provisionado"
+git tag aula-04
+git push origin main --tags</pre>
+    </section>
+
+    <section class="content-block">
+      <h2>12. Ponte para a Aula 05</h2>
+      <p>
+        A arquitetura modelada virou stack vivo. Próxima aula transforma o repo em pipeline de CI/CD &mdash; usando o EC2 com tag <code>Role=runner</code> que
+        provisionamos hoje como GitHub Actions self-hosted runner. A RTM ganha casos de teste automatizados, e o ciclo SDD da disciplina passa a ter
+        validação contínua a cada PR.
+      </p>
+    </section>
+
+    <section class="content-block">
+      <h2>13. Glossário</h2>
+      <p>
+        Vocabulário usado nesta aula, organizado em três blocos.
+      </p>
+
+      <h3>13.1 Agentes e orquestração</h3>
+      <table>
+        <thead>
+          <tr><th>Sigla</th><th>Significado</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>AIOX</strong></td><td>Orquestrador CLI multi-agente da disciplina</td></tr>
+          <tr><td><strong>CrewAI</strong></td><td>Framework Python de squads de agentes</td></tr>
+          <tr><td><strong>AutoGen</strong></td><td>Framework Microsoft de multi-agent dialog</td></tr>
+          <tr><td><strong>LangGraph</strong></td><td>Grafo de estados para LLM workflows</td></tr>
+          <tr><td><strong>CLI</strong></td><td>Command Line Interface</td></tr>
+          <tr><td><strong>SDK</strong></td><td>Software Development Kit</td></tr>
+          <tr><td><strong>YAML</strong></td><td>YAML Ain't Markup Language</td></tr>
+          <tr><td><strong>JSON</strong></td><td>JavaScript Object Notation</td></tr>
+          <tr><td><strong>ATAM</strong></td><td>Architecture Tradeoff Analysis Method</td></tr>
+          <tr><td><strong>SDD</strong></td><td>Spec-Driven Development</td></tr>
+          <tr><td><strong>RM-ODP</strong></td><td>Reference Model for Open Distributed Processing</td></tr>
+          <tr><td><strong>OOP</strong></td><td>Object-Oriented Programming</td></tr>
+          <tr><td><strong>HCL</strong></td><td>HashiCorp Configuration Language</td></tr>
+          <tr><td><strong>OIDC</strong></td><td>OpenID Connect</td></tr>
+          <tr><td><strong>RTM</strong></td><td>Requirements Traceability Matrix</td></tr>
+          <tr><td><strong>ADR</strong></td><td>Architecture Decision Record</td></tr>
+        </tbody>
+      </table>
+
+      <h3>13.2 CloudFormation e IaC</h3>
+      <table>
+        <thead>
+          <tr><th>Sigla / Termo</th><th>Significado</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>IaC</strong></td><td>Infrastructure as Code</td></tr>
+          <tr><td><strong>CFN</strong></td><td>CloudFormation</td></tr>
+          <tr><td><strong>CDK</strong></td><td>Cloud Development Kit (AWS)</td></tr>
+          <tr><td><strong>TF</strong></td><td>Terraform (HashiCorp)</td></tr>
+          <tr><td><strong>cfn-lint</strong></td><td>Linter open-source para templates CFN</td></tr>
+          <tr><td><strong>CI / CD</strong></td><td>Continuous Integration / Delivery</td></tr>
+          <tr><td><strong>PR</strong></td><td>Pull Request</td></tr>
+          <tr><td><strong>SCM</strong></td><td>Source Code Management</td></tr>
+          <tr><td><strong>Stack</strong></td><td>Conjunto de resources gerenciados juntos pelo CFN</td></tr>
+          <tr><td><strong>Change Set</strong></td><td>Diff simulado antes do UPDATE</td></tr>
+          <tr><td><strong>Drift</strong></td><td>Diferença entre template e realidade</td></tr>
+          <tr><td><strong>Nested Stack</strong></td><td>Stack incluído por outro</td></tr>
+          <tr><td><strong>Output</strong></td><td>Valor exposto pelo stack</td></tr>
+          <tr><td><strong>Export</strong></td><td>Output cross-stack</td></tr>
+          <tr><td><strong>Parameter</strong></td><td>Entrada do template</td></tr>
+          <tr><td><strong>Capability</strong></td><td>Permissão explícita ao deploy (<code>CAPABILITY_IAM</code>)</td></tr>
+        </tbody>
+      </table>
+
+      <h3>13.3 AWS e SRE</h3>
+      <table>
+        <thead>
+          <tr><th>Sigla</th><th>Significado</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>AWS</strong></td><td>Amazon Web Services</td></tr>
+          <tr><td><strong>ARN</strong></td><td>Amazon Resource Name</td></tr>
+          <tr><td><strong>IAM</strong></td><td>Identity and Access Management</td></tr>
+          <tr><td><strong>EC2</strong></td><td>Elastic Compute Cloud</td></tr>
+          <tr><td><strong>S3</strong></td><td>Simple Storage Service</td></tr>
+          <tr><td><strong>CW</strong></td><td>CloudWatch</td></tr>
+          <tr><td><strong>SSM</strong></td><td>Systems Manager (Run Command, Parameter Store)</td></tr>
+          <tr><td><strong>STS</strong></td><td>Security Token Service</td></tr>
+          <tr><td><strong>SG</strong></td><td>Security Group</td></tr>
+          <tr><td><strong>VPC</strong></td><td>Virtual Private Cloud</td></tr>
+          <tr><td><strong>SRE</strong></td><td>Site Reliability Engineering</td></tr>
+          <tr><td><strong>SLI</strong></td><td>Service Level Indicator</td></tr>
+          <tr><td><strong>SLO</strong></td><td>Service Level Objective</td></tr>
+          <tr><td><strong>SLA</strong></td><td>Service Level Agreement</td></tr>
+          <tr><td><strong>MTTR</strong></td><td>Mean Time To Recovery</td></tr>
+          <tr><td><strong>EMF</strong></td><td>Embedded Metric Format (CloudWatch)</td></tr>
+          <tr><td><strong>ETL</strong></td><td>Extract, Transform, Load</td></tr>
+          <tr><td><strong>FinOps</strong></td><td>Disciplina financeira de cloud</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="content-block">
+      <h2>14. Referências</h2>
+      <ul>
+        <li>Park, J. et al. &mdash; <em>Generative Agents: Interactive Simulacra of Human Behavior</em>.</li>
+        <li>Microsoft Research &mdash; <em>AutoGen: Enabling Next-Gen LLM Apps via Multi-Agent Conversation</em>.</li>
+        <li>LangGraph docs &mdash; <em>State machines for LLM apps</em>.</li>
+        <li>CrewAI docs &mdash; <em>Role-based agent orchestration</em>.</li>
+        <li>Spec Kit, AGENTS.md spec, Gemini CLI, OpenCode docs.</li>
+        <li>AWS &mdash; <em>CloudFormation User Guide</em> (Template Reference, Drift Detection, Change Sets).</li>
+        <li>HashiCorp &mdash; <em>Terraform vs CloudFormation</em> (technical comparison).</li>
+        <li>AWS &mdash; <em>CDK Best Practices</em>.</li>
+        <li>Beyer et al. &mdash; <em>Site Reliability Engineering</em> (Google), capítulo de Configuration.</li>
+        <li>Burns &amp; Beda &mdash; <em>Designing Distributed Systems</em>.</li>
       </ul>
     </section>
 
     <section class="content-block">
-      <nav class="material-nav">
-        <a href="../slides/slide_aula_04_ingestao_e_processamento_near_real_time_streaming.html">&larr; Ir para os slides da Aula 04</a>
-        <span> &nbsp;&middot;&nbsp; </span>
-        <a href="../../../index.html">Voltar ao índice do curso</a>
-      </nav>
+      <p>
+        <a href="../slides/slide_aula_04_ingestao_e_processamento_near_real_time_streaming.html">Voltar aos slides desta aula</a>
+        &nbsp;&middot;&nbsp;
+        <a href="../../../index.html">Índice do curso</a>
+      </p>
     </section>
 
   </main>
+
+  <!-- Mermaid v11 — squad flow diagram -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'neutral',
+      securityLevel: 'loose',
+      flowchart: { htmlLabels: true, curve: 'basis' },
+      themeVariables: {
+        fontFamily: 'JetBrains Mono, ui-monospace, monospace',
+        primaryColor: '#ffffff',
+        primaryBorderColor: '#0f0f0f',
+        primaryTextColor: '#0f0f0f',
+        lineColor: '#5c5c5c',
+        clusterBkg: '#fafaf7',
+        clusterBorder: '#d6d6d1'
+      }
+    });
+  </script>
 </body>
 </html>

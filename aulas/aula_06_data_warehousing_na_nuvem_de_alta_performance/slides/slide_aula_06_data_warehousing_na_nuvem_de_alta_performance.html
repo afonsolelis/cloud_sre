@@ -4,8 +4,106 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" />
-  <title>Aula 06 — Data warehousing na nuvem de alta performance</title>
+  <title>Aula 06 — Testcontainers, chaos engineering e qualidade de código mensurada</title>
   <link href="../../../assets/slides.css" rel="stylesheet">
+  <style data-aula06-local>
+    /* Estilos scoped da Aula 06 — diagramas Mermaid + utilidades de layout.
+       Tokens e componentes base vêm de assets/slides.css. */
+
+    @media (max-height: 900px) {
+      .deck-shell { min-height: 520px; padding: 32px 44px; margin: 14px; gap: 16px; }
+      .deck-shell .deck-title { font-size: 2.05em; }
+      .deck-shell .deck-year  { font-size: 3em; margin: 4px 0; }
+      .deck-shell .deck-summary { margin-bottom: 6px; }
+      .deck-shell h2.deck-title { margin-bottom: 4px; }
+    }
+    @media (max-height: 820px) {
+      .deck-shell { min-height: 440px; padding: 22px 34px; margin: 8px; gap: 8px; }
+      .deck-shell .deck-title { font-size: 1.7em; line-height: 1.15; }
+      .deck-shell .deck-year  { font-size: 2.2em; margin: 2px 0; }
+      .deck-shell .deck-meta { margin: 2px 0; }
+      .deck-shell .deck-subtitle { margin-top: 4px; }
+      .deck-shell .deck-logo-full { max-height: 28px; }
+    }
+
+    .a06-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .a06-grid-3 .deck-card { padding: 18px 20px; }
+    .a06-grid-3 .deck-card h3 { font-size: 1.05em; }
+    .a06-grid-3 .deck-card ul { margin: 8px 0 0; }
+    .a06-grid-3 .deck-card li { margin-bottom: 4px; font-size: .95em; }
+    @media (max-width: 1100px) {
+      .a06-grid-3 { grid-template-columns: 1fr; }
+    }
+
+    .a06-compact .deck-card { padding: 16px 18px; }
+    .a06-compact .deck-card h3 { font-size: 1em; margin-bottom: 6px; }
+    .a06-compact .deck-card ul { margin: 6px 0 0; }
+    .a06-compact .deck-card li { margin-bottom: 4px; font-size: .92em; line-height: 1.45; }
+    .a06-compact .deck-panel { padding: 16px 18px; }
+    .a06-compact .deck-panel li { margin-bottom: 4px; font-size: .92em; line-height: 1.45; }
+    .a06-compact .deck-summary { margin-bottom: 10px; }
+    .a06-compact .deck-callout { padding: 16px 20px; }
+    .a06-compact .deck-callout li,
+    .a06-compact .deck-callout ol li { margin-bottom: 4px; }
+
+    .a06-table-compact .deck-table th,
+    .a06-table-compact .deck-table td {
+      padding: 7px 10px;
+      font-size: .92em;
+      line-height: 1.4;
+    }
+
+    .a06-mermaid {
+      background: var(--deck-panel);
+      border: 1px solid var(--deck-line);
+      border-radius: 4px;
+      padding: 18px;
+      margin-top: 8px;
+      overflow: auto;
+    }
+    .a06-mermaid pre.mermaid {
+      background: transparent !important;
+      color: var(--deck-text) !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      box-shadow: none !important;
+      border: none !important;
+      border-radius: 0 !important;
+      overflow: visible;
+    }
+    .a06-mermaid pre.mermaid::before { display: none !important; }
+    .a06-mermaid svg {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+      background: transparent;
+    }
+    .a06-prompt {
+      background: #0d1117;
+      color: #e6edf3;
+      padding: 14px 16px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: .88rem;
+      line-height: 1.6;
+      overflow-x: auto;
+      margin: 10px 0 0;
+    }
+    .a06-prompt-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--deck-muted);
+      margin-bottom: 4px;
+      display: block;
+    }
+  </style>
 </head>
 <body>
   <div class="slide-container">
@@ -18,10 +116,10 @@
         <div>
           <img class="deck-logo-full" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_e4vyyw.png" alt="Universidade Presbiteriana Mackenzie" />
           <span class="deck-kicker">Cloud Computing e SRE &middot; MBA Engenharia de Dados</span>
-          <h1 class="deck-title">Data warehousing na nuvem de alta performance</h1>
+          <h1 class="deck-title">Testcontainers, chaos engineering e qualidade de código mensurada</h1>
           <p class="deck-meta">Aula 06 &nbsp;&bull;&nbsp; 21/05/2026 &nbsp;&bull;&nbsp; 19h00 &ndash; 22h00</p>
           <p class="deck-year">2026</p>
-          <p class="deck-subtitle">Do Data Lake ao warehouse colunar: modelagem dimensional, performance e consultas analíticas em escala.</p>
+          <p class="deck-subtitle">Saímos do mock e vamos para infraestrutura real e descartável. Quebramos o sistema de propósito. Medimos o custo cognitivo do código.</p>
         </div>
       </div>
     </div>
@@ -34,25 +132,29 @@
         <div>
           <span class="deck-kicker">Agenda</span>
           <h2 class="deck-title">O que vai acontecer nesta aula</h2>
-          <p class="deck-summary">Conteúdo em construção. Esta seção será refinada antes de 21/05/2026.</p>
+          <p class="deck-summary">Duas horas de teoria sobre paridade de ambiente, falha controlada e métricas de qualidade. Uma hora de prática com Postgres real em container, um experimento de chaos via SSM e um relatório de qualidade que vira gate no CI.</p>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
-            <h3>19h00 &ndash; 20h30 &middot; Teoria</h3>
+            <h3>19h00 &ndash; 21h00 &middot; Teoria</h3>
             <ul>
-              <li>TODO &mdash; fundamentos de Data Warehouse e evolução (Kimball vs Inmon).</li>
-              <li>TODO &mdash; MPP, armazenamento colunar e zone maps.</li>
-              <li>TODO &mdash; modelagem dimensional: star, snowflake, SCDs, surrogate keys.</li>
-              <li>TODO &mdash; Redshift Serverless e alternativa lakehouse com Iceberg.</li>
+              <li>Recap Aula 05 &mdash; CI verde, integration ainda mockada</li>
+              <li>Testcontainers &mdash; Postgres, Kafka, LocalStack</li>
+              <li>Chaos engineering &mdash; princípios, métodos, kill switch</li>
+              <li>Os 5 closed loops da Aula 03 sob fogo</li>
+              <li>McCabe, Halstead, Maintainability Index</li>
+              <li>Cognitive complexity e gates de CI</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>20h30 &ndash; 22h00 &middot; Prática</h3>
+            <h3>21h00 &ndash; 22h00 &middot; Prática</h3>
             <ul>
-              <li>TODO &mdash; plano A: provisionar Redshift Serverless.</li>
-              <li>TODO &mdash; COPY do Gold em Parquet para o warehouse.</li>
-              <li>TODO &mdash; plano B: Athena + Apache Iceberg como fallback.</li>
-              <li>TODO &mdash; consultas analíticas e comparação de performance.</li>
+              <li>Renovar session token e <code>act</code> local</li>
+              <li>Migrar <code>tests/integration/</code> para Testcontainers</li>
+              <li>Toxiproxy via CFN ao lado da EC2 ETL</li>
+              <li>1 experimento de chaos com hipótese e kill switch</li>
+              <li><code>radon</code>, <code>xenon</code>, <code>ruff</code> &rarr; relatório de qualidade</li>
+              <li>Job <code>quality</code> no <code>wb.yml</code> e tag <code>aula-06</code></li>
             </ul>
           </article>
         </div>
@@ -60,125 +162,33 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 3 - EM CONSTRUCAO                                      -->
+    <!-- SLIDE 3 - RECAP AULA 05                                      -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Status &middot; Placeholder</span>
-          <h2 class="deck-title">Aula em construção</h2>
-          <p class="deck-summary">Este deck é um esqueleto no novo design system. O conteúdo será preenchido incrementalmente nas próximas semanas.</p>
-        </div>
-        <div class="deck-callout">
-          <strong>O que já está definido</strong>
-          <ul>
-            <li>Tema central: transformar o Gold do Olist em um warehouse colunar de alta performance.</li>
-            <li>Datas e duração: 21/05/2026, 19h00 &ndash; 22h00.</li>
-            <li>Posição no arco do curso: Aula 06 de 8.</li>
-            <li>Pré-requisitos: Trusted e Refined já populados pela Aula 05 (ETL serverless e catálogo).</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 4 - PLACEHOLDER TEORIA (TABELA)                        -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Teoria &middot; Placeholder</span>
-          <h2 class="deck-title">Row-store vs column-store em uma tabela</h2>
-          <p class="deck-summary">Estrutura de tabela editorial que será preenchida com os critérios de decisão entre armazenamento por linha e por coluna.</p>
-        </div>
-        <table class="deck-table">
-          <thead>
-            <tr>
-              <th>Dimensão</th>
-              <th>Row-store (OLTP)</th>
-              <th>Column-store (OLAP)</th>
-              <th>Escolha quando</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>Padrão de acesso</td><td>TODO</td><td>TODO</td><td>TODO</td></tr>
-            <tr><td>Compressão</td><td>TODO</td><td>TODO</td><td>TODO</td></tr>
-            <tr><td>Escrita vs leitura</td><td>TODO</td><td>TODO</td><td>TODO</td></tr>
-            <tr><td>Agregações</td><td>TODO</td><td>TODO</td><td>TODO</td></tr>
-            <tr><td>Custo na AWS</td><td>TODO</td><td>TODO</td><td>TODO</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 5 - PLACEHOLDER TEORIA (GRID DE CARDS)                 -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Teoria &middot; Placeholder</span>
-          <h2 class="deck-title">Quatro técnicas de modelagem dimensional</h2>
-          <p class="deck-summary">Grid de cards que será preenchido com definições, exemplos no Olist e quando aplicar cada técnica.</p>
-        </div>
-        <div class="deck-grid">
-          <article class="deck-card">
-            <h3>Fato e dimensão</h3>
-            <ul>
-              <li>TODO &mdash; grain do fato e chaves.</li>
-              <li>TODO &mdash; exemplo no pipeline Olist.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Star schema</h3>
-            <ul>
-              <li>TODO &mdash; definição e casos de uso.</li>
-              <li>TODO &mdash; exemplo no pipeline Olist.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Snowflake</h3>
-            <ul>
-              <li>TODO &mdash; quando normalizar dimensões.</li>
-              <li>TODO &mdash; exemplo no pipeline Olist.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Slow Changing Dimensions</h3>
-            <ul>
-              <li>TODO &mdash; tipos 0, 1, 2 e 3.</li>
-              <li>TODO &mdash; surrogate keys e histórico.</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 6 - PLACEHOLDER TEORIA (2 COLUNAS)                     -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Teoria &middot; Placeholder</span>
-          <h2 class="deck-title">Star schema vs Snowflake &mdash; trade-offs</h2>
-          <p class="deck-summary">Duas colunas comparando a simplicidade desnormalizada do star com a economia de storage e complexidade do snowflake.</p>
+          <span class="deck-kicker">Abertura &middot; Recap</span>
+          <h2 class="deck-title">De onde viemos &mdash; Aula 05</h2>
+          <p class="deck-summary">A Aula 05 entregou white box e black box no CI, com EC2 atuando como self-hosted runner via SSM. Ficou um débito explícito.</p>
         </div>
         <div class="deck-columns">
           <div class="deck-panel">
-            <strong>Star schema</strong>
+            <strong>O que já está verde</strong>
             <ul>
-              <li>TODO &mdash; quando priorizar simplicidade de consulta.</li>
-              <li>TODO &mdash; impacto em performance e storage.</li>
-              <li>TODO &mdash; aplicação no Gold do Olist.</li>
+              <li><code>.github/workflows/wb.yml</code> &mdash; ruff, mypy, pytest unit, coverage, mutmut</li>
+              <li><code>.github/workflows/bb.yml</code> &mdash; API, contract, Schemathesis e2e</li>
+              <li>EC2 self-hosted runner registrado via SSM</li>
+              <li>Branch protection ligada na <code>main</code></li>
+              <li>Tag <code>aula-05</code> no repo</li>
             </ul>
           </div>
           <div class="deck-panel">
-            <strong>Snowflake</strong>
+            <strong>O débito que herdamos</strong>
             <ul>
-              <li>TODO &mdash; quando normalizar dimensões vale a pena.</li>
-              <li>TODO &mdash; impacto em joins e manutenção.</li>
-              <li>TODO &mdash; aplicação no Gold do Olist.</li>
+              <li><code>tests/integration/</code> ainda mocka o Postgres</li>
+              <li>Nenhum experimento de chaos foi rodado &mdash; só desenhado</li>
+              <li>Métricas de qualidade lidas, mas nunca aplicadas como gate</li>
+              <li>Closed loops da Aula 03 nunca foram exercitados em laboratório</li>
             </ul>
           </div>
         </div>
@@ -186,56 +196,1277 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 7 - PLACEHOLDER PRATICA                                -->
+    <!-- SLIDE 4 - TESE DA AULA                                       -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; 20h30 &ndash; 22h00</span>
-          <h2 class="deck-title">Laboratório: carga do Refined no warehouse colunar</h2>
-          <p class="deck-summary">O roteiro prático será detalhado com comandos SQL, COPY a partir do S3 e fallback via Athena + Iceberg antes da aula.</p>
+          <span class="deck-kicker">Tese da aula</span>
+          <h2 class="deck-title">Sem paridade, sem falha controlada e sem métrica, não há SRE</h2>
+          <p class="deck-summary">Mock esconde bug de driver. Sistema sem chaos quebra na produção pela primeira vez. Código sem métrica vira <em>toil</em> permanente. Hoje fechamos os três.</p>
         </div>
-        <div class="deck-panel">
-          <strong>Esqueleto dos passos</strong>
-          <ol>
-            <li>TODO &mdash; provisionar Redshift Serverless (namespace + workgroup).</li>
-            <li>TODO &mdash; conectar via Query Editor v2 associando LabRole.</li>
-            <li>TODO &mdash; criar dimensões e fato com distribution style e sort key adequados.</li>
-            <li>TODO &mdash; executar COPY do Gold em Parquet para a fato.</li>
-            <li>TODO &mdash; plano B: criar tabela Iceberg no Athena e demonstrar MERGE INTO + time travel.</li>
-            <li>TODO &mdash; rodar consultas analíticas e comparar tempo Redshift vs Athena.</li>
+        <div class="deck-callout">
+          <strong>Três regras desta aula</strong>
+          <ol style="margin:12px 0 0; padding-left:22px;">
+            <li>Integration test toca infra real &mdash; descartável, mas real.</li>
+            <li>Todo experimento de chaos tem hipótese, salvaguarda e kill switch escritos antes do <em>run</em>.</li>
+            <li>Métrica de qualidade só vale se virar gate no CI &mdash; senão é decoração.</li>
           </ol>
         </div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 8 - FECHAMENTO E PONTE PARA AULA 07                    -->
+    <!-- SLIDE 5 - O QUE E TESTCONTAINERS                              -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Fechamento &middot; Placeholder</span>
-          <h2 class="deck-title">O que levamos e o que vem</h2>
-          <p class="deck-summary">Resumo e ponte para a Aula 07 (Data Reliability e SRE aplicados a pipelines de dados), em 28/05/2026.</p>
+          <span class="deck-kicker">Testcontainers &middot; Definição</span>
+          <h2 class="deck-title">Containers Docker descartáveis controlados pelos testes</h2>
+          <p class="deck-summary">A suíte de teste sobe o container, espera o readiness, conecta, roda o teste, desliga o container. O código de produção nunca sabe que estava conversando com um container efêmero.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>O ciclo do TC</strong>
+            <ol>
+              <li><code>start()</code> &mdash; pull da imagem, run, wait strategy.</li>
+              <li><code>get_connection_url()</code> &mdash; URI dinâmica com porta efêmera.</li>
+              <li>Teste roda contra a infra real.</li>
+              <li><code>stop()</code> &mdash; container some, volume some.</li>
+            </ol>
+          </div>
+          <div class="deck-panel">
+            <strong>Pacotes Python &middot; <code>testcontainers-python</code></strong>
+            <ul>
+              <li><code>PostgresContainer</code> &mdash; nosso DW dimensional do gold.</li>
+              <li><code>KafkaContainer</code> &mdash; streaming da Aula 04.</li>
+              <li><code>LocalStackContainer</code> &mdash; S3, SSM, IAM <em>off-cloud</em>.</li>
+              <li><code>GenericContainer</code> &mdash; Toxiproxy, Redis, qualquer imagem.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 6 - MOCK VS TC                                          -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a06-table-compact">
+        <div>
+          <span class="deck-kicker">Trade-off</span>
+          <h2 class="deck-title">Mock vs Testcontainer &mdash; quem ganha o quê</h2>
+          <p class="deck-summary">Não é guerra de "melhor". Cada um cobre um nicho. Mock é rápido e pobre; TC é lento e rico. A pirâmide convive.</p>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr><th>Critério</th><th>Mock</th><th>Testcontainer</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Tempo por teste</td><td>1&ndash;5 ms</td><td>200 ms&ndash;2 s (1ª subida do container)</td></tr>
+            <tr><td>Paridade com produção</td><td>Baixa &mdash; só o que o mock prevê</td><td>Alta &mdash; SQL real, driver real, lock real</td></tr>
+            <tr><td>Bug de driver / dialeto</td><td>Não pega</td><td>Pega na primeira execução</td></tr>
+            <tr><td>Dependência de Docker</td><td>Nenhuma</td><td>Obrigatória no runner</td></tr>
+            <tr><td>Custo de manutenção</td><td>Alto &mdash; mock vira ficção</td><td>Médio &mdash; subiu a imagem certa, acabou</td></tr>
+            <tr><td>Onde aplicar</td><td>Unit, lógica pura</td><td>Integration, contract com infra</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 7 - PADROES DE FIXTURE                                  -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Testcontainers &middot; Pytest</span>
+          <h2 class="deck-title">Fixture session vs function &mdash; o trade-off</h2>
+          <p class="deck-summary">Container compartilhado entre testes é rápido mas exige reset; container por teste é seguro mas explode o tempo total. A escolha depende da granularidade do dado.</p>
+        </div>
+<pre class="a06-prompt"># tests/integration/conftest.py
+import pytest
+from testcontainers.postgres import PostgresContainer
+
+@pytest.fixture(scope="session")
+def pg_container():
+    with PostgresContainer("postgres:16-alpine") as pg:
+        yield pg
+
+@pytest.fixture
+def pg_conn(pg_container, db_session_reset):
+    # db_session_reset trunca tabelas entre testes -> isolation barata
+    return pg_container.get_connection_url()</pre>
+        <p style="margin-top:12px; font-size:.92em; color: var(--deck-muted);"><em>Regra prática:</em> escopo <code>session</code> + reset transacional ou <code>TRUNCATE</code> entre testes &mdash; 10&times; mais rápido que recriar o container.</p>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 8 - LOCALSTACK COMO VARIANTE                           -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a06-compact">
+        <div>
+          <span class="deck-kicker">LocalStack &middot; AWS local</span>
+          <h2 class="deck-title">Quando vale subir LocalStack no teste</h2>
+          <p class="deck-summary">LocalStack emula APIs AWS dentro de um container. Para S3, SSM e SQS é fiel. Para serviços profundos (IAM policy boundary, KMS HSM) não &mdash; teste em conta real.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Vale &mdash; rodar local</strong>
+            <ul>
+              <li>S3 &mdash; <code>put_object</code>, <code>list_objects_v2</code>.</li>
+              <li>SSM Parameter Store &mdash; <code>get_parameter</code>, hierarquias.</li>
+              <li>SQS &mdash; ordenação <em>FIFO</em> e visibility timeout.</li>
+              <li>EventBridge &mdash; bus + rule + target básico.</li>
+              <li>Lambda em modo <em>docker-reuse</em>.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Não vale &mdash; testar em conta real</strong>
+            <ul>
+              <li>IAM &mdash; <code>SCP</code>, permissions boundary, condições de tag.</li>
+              <li>KMS &mdash; chaves HSM e <em>grants</em>.</li>
+              <li>Redes complexas &mdash; <code>VPC peering</code>, transit gateway.</li>
+              <li>Quotas &mdash; throttling do serviço real.</li>
+              <li>Custo &mdash; LocalStack não fatura.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 9 - DOCKER NO RUNNER                                   -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Pré-requisito do runner</span>
+          <h2 class="deck-title">Docker tem que existir &mdash; e ser confiável</h2>
+          <p class="deck-summary">Testcontainer sem Docker é fixture vazia. No nosso self-hosted runner (EC2 da Aula 04), o daemon precisa estar instalado, ativo no boot, e com o usuário do runner no grupo <code>docker</code>.</p>
+        </div>
+<pre class="a06-prompt"># cloud-init / userdata da EC2 runner
+yum install -y docker
+systemctl enable --now docker
+usermod -aG docker ec2-user
+
+# Sanity-check (rodado pelo workflow antes dos testes)
+docker info | grep -E "Server Version|Storage Driver"
+docker run --rm hello-world</pre>
+        <div class="deck-callout" style="margin-top:14px;">
+          <strong>Anti-padrão</strong>
+          <p style="margin:8px 0 0;">Rodar Testcontainers em GitHub-hosted runner gratuito sem cache de imagens &mdash; a primeira <code>pull</code> de cada job paga 5&ndash;15 s. Em runner self-hosted com cache, paga uma vez por boot.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 10 - CHAOS DEFINICAO                                    -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Chaos Engineering &middot; Origem</span>
+          <h2 class="deck-title">Quebrar de propósito antes que quebre por acidente</h2>
+          <p class="deck-summary">Netflix, 2010. Chaos Monkey desliga máquinas aleatoriamente em produção para forçar a arquitetura a tolerar falhas. Em 2014 vira disciplina formal: <em>principlesofchaos.org</em>.</p>
+        </div>
+        <div class="deck-callout">
+          <strong>Definição operacional</strong>
+          <p style="margin:8px 0 0;">Chaos engineering é a disciplina de experimentar em um sistema para construir confiança na sua capacidade de tolerar condições turbulentas em produção. <strong>É experimento, não teste.</strong> Tem hipótese, observação e conclusão.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 11 - PRINCIPIOS                                         -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a06-compact">
+        <div>
+          <span class="deck-kicker">Princípios &middot; principlesofchaos.org</span>
+          <h2 class="deck-title">Os cinco princípios canônicos</h2>
+          <p class="deck-summary">Saem dos slides; entram em todo experimento que vamos rodar a partir de hoje.</p>
+        </div>
+        <div class="a06-grid-3">
+          <article class="deck-card">
+            <h3>1. Estado estacionário</h3>
+            <ul>
+              <li>Hipótese sobre o output observável.</li>
+              <li>Métrica única, mensurável.</li>
+              <li>Antes do experimento, mede-se a baseline.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>2. Variar eventos reais</h3>
+            <ul>
+              <li>Latência, perda de pacote, kill de processo.</li>
+              <li>Falha que ocorre no mundo real.</li>
+              <li>Não inventar falha exótica.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>3. Rodar em prod</h3>
+            <ul>
+              <li>Com salvaguardas e blast radius mínimo.</li>
+              <li>Por enquanto, no nosso lab.</li>
+              <li>Aula 08 discute prod real.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>4. Automatizar</h3>
+            <ul>
+              <li>Experimento como código (<code>chaos/experiments/*.yaml</code>).</li>
+              <li>Roda em <em>game day</em>, vira regressão.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>5. Minimizar raio</h3>
+            <ul>
+              <li>Kill switch <strong>obrigatório</strong>.</li>
+              <li>Janela curta, área isolada.</li>
+              <li>Quem aborta? Como?</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Bonus &middot; cultura</h3>
+            <ul>
+              <li>Postmortem sem culpa.</li>
+              <li>Lições viram ADR.</li>
+              <li>Falha vira regressão.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 12 - METODOS                                            -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a06-table-compact">
+        <div>
+          <span class="deck-kicker">Chaos &middot; Métodos</span>
+          <h2 class="deck-title">Catálogo de falhas que cabem no Learner Lab</h2>
+          <p class="deck-summary">AWS FIS não está disponível no Learner Lab. Substituímos com SSM Run Command + ferramentas Linux instaladas na própria EC2.</p>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr><th>ID</th><th>Falha</th><th>Ferramenta</th><th>Loop validado</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>CHAOS-01</td><td>Kill de processo ETL</td><td><code>kill -9 $(pgrep etl)</code></td><td>Backpressure / restart</td></tr>
+            <tr><td>CHAOS-02</td><td>Latência ETL &harr; Postgres</td><td>Toxiproxy <code>add_latency</code></td><td>Circuit breaker</td></tr>
+            <tr><td>CHAOS-03</td><td>Perda de pacote 30%</td><td><code>tc qdisc add netem loss</code></td><td>Retry idempotente</td></tr>
+            <tr><td>CHAOS-04</td><td>Disco cheio</td><td><code>fallocate -l 9G /tmp/x</code></td><td>Quarentena de payload</td></tr>
+            <tr><td>CHAOS-05</td><td>CPU saturada</td><td><code>stress-ng --cpu 4</code></td><td>Freeze por error budget</td></tr>
+            <tr><td>CHAOS-06</td><td>Falha de DNS</td><td><code>echo 127.0.0.1 db &gt; /etc/hosts</code></td><td>Drift / circuit breaker</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 13 - FIS NAO DISPONIVEL                                 -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Restrição do Learner Lab</span>
+          <h2 class="deck-title">Sem AWS FIS &mdash; usamos SSM + Toxiproxy</h2>
+          <p class="deck-summary">FIS (Fault Injection Service) é o serviço gerenciado de chaos da AWS. No Learner Lab ele <strong>não está habilitado</strong>. A boa notícia: tudo que a FIS faz pode ser reproduzido com SSM Run Command e ferramentas instaladas na EC2.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>O que a FIS daria de graça</strong>
+            <ul>
+              <li>Templates de experimento versionáveis.</li>
+              <li>Stop conditions vinculadas a alarme do CW.</li>
+              <li>Targets selecionados por tag.</li>
+              <li>Histórico de runs no console.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>O que substitui no nosso lab</strong>
+            <ul>
+              <li><code>chaos/experiments/*.yaml</code> versionado no repo.</li>
+              <li>CW alarm + SSM <code>cancel-command</code> como kill switch.</li>
+              <li><code>aws ssm send-command --targets "tag:Role,Value=etl"</code>.</li>
+              <li><code>documents/15_chaos_runs/&lt;ts&gt;.md</code> + ADR.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 14 - DIAGRAMA DO EXPERIMENTO MERMAID                   -->
+    <!-- ============================================================ -->
+    <div class="slide" data-slide="chaos-flow">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Anatomia do experimento</span>
+          <h2 class="deck-title">Fluxo &mdash; do estado estacionário ao postmortem</h2>
+          <p class="deck-summary">Cinco passos. Não pula nenhum. Se faltar a hipótese, é vandalismo, não chaos engineering.</p>
+        </div>
+        <div class="a06-mermaid">
+          <pre class="mermaid">
+flowchart LR
+  H["1. Hipótese<br/>(estado estacionário)"]
+  B["2. Baseline<br/>medir SLI normal"]
+  I["3. Injeção<br/>(SSM + Toxiproxy)"]
+  O["4. Observação<br/>(CW Logs + métricas)"]
+  C["5. Conclusão<br/>+ ADR"]
+
+  H --> B --> I --> O --> C
+
+  KS["Kill switch<br/>(CW alarm + ssm cancel)"]
+  I -.->|aborta se SLO crítico| KS
+  KS -.->|stop| O
+          </pre>
+        </div>
+        <p style="margin-top:12px; font-size:.92em;"><em>Critério de aceitação:</em> métrica retorna ao estado estacionário em &le; tempo previsto. Se passar, vira regressão. Se falhar, vira ticket.</p>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 15 - CINCO LOOPS RADIAL MERMAID                        -->
+    <!-- ============================================================ -->
+    <div class="slide" data-slide="loops-radial">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Aula 03 sob fogo</span>
+          <h2 class="deck-title">Os cinco closed loops &mdash; cada um tem seu chaos</h2>
+          <p class="deck-summary">A arquitetura da Aula 03 desenhou cinco malhas fechadas. Hoje cada loop ganha um experimento que prova que ele reage como prometido.</p>
+        </div>
+        <div class="a06-mermaid">
+          <pre class="mermaid">
+flowchart LR
+  CTRL(("Controlador SRE<br/>EventBridge + SSM"))
+  L1["Backpressure<br/>RNF-PERF-01"]
+  L2["Circuit breaker<br/>RNF-REL-01"]
+  L3["Freeze por error budget<br/>RNF-SAFE-01"]
+  L4["Quarentena de payload<br/>RNF-REL-02"]
+  L5["Drift / DNS<br/>RNF-MAINT-01"]
+
+  CTRL --- L1
+  CTRL --- L2
+  CTRL --- L3
+  CTRL --- L4
+  CTRL --- L5
+
+  L1 -.->|valida| C1["CHAOS-01<br/>kill ETL"]
+  L2 -.->|valida| C2["CHAOS-02<br/>latência 2s"]
+  L3 -.->|valida| C5["CHAOS-05<br/>CPU 100%"]
+  L4 -.->|valida| C4["CHAOS-04<br/>disco cheio"]
+  L5 -.->|valida| C6["CHAOS-06<br/>DNS quebrado"]
+          </pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 16 - HIPOTESE EXEMPLO                                  -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Experimento &middot; CHAOS-02</span>
+          <h2 class="deck-title">Hipótese, ação, observação, kill switch</h2>
+          <p class="deck-summary">Forma canônica do experimento. Nada fora dela é aceito como chaos engineering.</p>
+        </div>
+<pre class="a06-prompt">id: CHAOS-02
+titulo: Latencia ETL -&gt; Postgres por 60s
+hipotese: |
+  Se a latencia entre ETL e Postgres subir para 2000ms por 60s,
+  o circuit breaker abre em &lt;= 10s e o ETL faz freeze do
+  proximo run sem perder mensagens em flight.
+estado_estacionario:
+  sli: pg_query_p95_ms
+  baseline: "&lt; 80 ms por 5 min"
+acoes:
+  - toxiproxy-cli toxic add -t latency -a latency=2000 etl-pg
+  - sleep 60
+  - toxiproxy-cli toxic remove --toxicName etl-pg-latency etl-pg
+salvaguardas:
+  - kill_switch: "alarm SLO_BREACH ON =&gt; ssm cancel-command"
+  - blast_radius: "apenas instancia tag Role=etl-lab"
+  - duracao_max: 90s
+aceitacao:
+  - circuit_breaker_aberto_em: "&lt;= 10 s"
+  - mensagens_perdidas: "= 0"
+  - retorno_ao_baseline_em: "&lt;= 30 s pos-fim"</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 17 - GAME DAY                                          -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a06-compact">
+        <div>
+          <span class="deck-kicker">Cultura &middot; Game day</span>
+          <h2 class="deck-title">Game day &mdash; o ritual</h2>
+          <p class="deck-summary">Game day é a cerimônia em que o time roda chaos junto, na mesma sala (virtual ou física), com papéis claros. Sem ritual, vira <em>blame</em>.</p>
+        </div>
+        <div class="a06-grid-3">
+          <article class="deck-card">
+            <h3>Papéis</h3>
+            <ul>
+              <li><strong>Comandante</strong> &mdash; decide go/no-go.</li>
+              <li><strong>Operador</strong> &mdash; injeta a falha.</li>
+              <li><strong>Observador</strong> &mdash; lê CW Logs.</li>
+              <li><strong>Escriba</strong> &mdash; transcreve.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Roteiro</h3>
+            <ul>
+              <li>Ler hipótese em voz alta.</li>
+              <li>Confirmar baseline.</li>
+              <li>Anunciar T-0.</li>
+              <li>Injetar.</li>
+              <li>Observar 5 min.</li>
+              <li>Postmortem ao final.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Saída</h3>
+            <ul>
+              <li><code>15_chaos_runs/&lt;ts&gt;.md</code></li>
+              <li>1 ADR por descoberta.</li>
+              <li>Issue para cada bug.</li>
+              <li>Próximo experimento agendado.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 18 - QUALIDADE COMO ENG SRE                            -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Qualidade &middot; Definição</span>
+          <h2 class="deck-title">Código de baixa qualidade vira <em>toil</em></h2>
+          <p class="deck-summary">SRE chama de <em>toil</em> trabalho repetitivo, sem valor duradouro, que escala linearmente com o serviço. Função com complexidade alta vira <em>toil</em>: cada bug fix dura horas, cada feature pequena trava em revisão.</p>
+        </div>
+        <div class="deck-callout">
+          <strong>Tese</strong>
+          <p style="margin:8px 0 0;">Medimos a qualidade do código <strong>antes</strong> de ela virar incidente. Se a função está acima do limiar de complexidade, ela é candidata a refactor patrocinado pelo error budget &mdash; não pela boa vontade.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 19 - MCCABE                                            -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">QM-01 &middot; Complexidade ciclomática</span>
+          <h2 class="deck-title">McCabe (1976) &mdash; caminhos linearmente independentes</h2>
+          <p class="deck-summary">Conta os pontos de decisão. Cada <code>if</code>, <code>elif</code>, <code>and</code>, <code>or</code>, <code>for</code>, <code>while</code>, <code>except</code>, <code>case</code> incrementa. Acima de 10, a função é candidata a quebrar.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Fórmula</strong>
+            <p style="margin:8px 0;"><code>M = E &minus; N + 2P</code></p>
+            <ul>
+              <li><strong>E</strong> &mdash; arestas do grafo de controle.</li>
+              <li><strong>N</strong> &mdash; nós.</li>
+              <li><strong>P</strong> &mdash; componentes conexos.</li>
+              <li>Equivale a "nº de decisões + 1".</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Limites práticos</strong>
+            <ul>
+              <li>1&ndash;5 &mdash; função simples, baixa.</li>
+              <li>6&ndash;10 &mdash; média, aceitável.</li>
+              <li>11&ndash;20 &mdash; alta, refatorar.</li>
+              <li>&gt; 20 &mdash; muito alta, dívida.</li>
+              <li>Gate do curso: <strong>McCabe &le; 10</strong>.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 20 - COGNITIVE COMPLEXITY                              -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">QM-02 &middot; Cognitive Complexity</span>
+          <h2 class="deck-title">SonarSource &mdash; o que dói para o leitor humano</h2>
+          <p class="deck-summary">McCabe não distingue <code>if</code> aninhado de <code>if</code> sequencial &mdash; mas o cérebro distingue. Cognitive complexity penaliza aninhamento, recursão e quebra de fluxo (break/continue) progressivamente.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Regras de incremento</strong>
+            <ul>
+              <li><strong>+1</strong> a cada quebra de fluxo (<code>if</code>, <code>else</code>, <code>switch</code>, <code>for</code>, <code>catch</code>).</li>
+              <li><strong>+1 extra</strong> por nível de aninhamento.</li>
+              <li><strong>+1</strong> por sequência de operadores lógicos heterogêneos.</li>
+              <li>Recursão e <code>goto</code> &mdash; sempre +1.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Por que importa</strong>
+            <ul>
+              <li>Mais fiel ao tempo de leitura humano.</li>
+              <li>Captura "código que parece simples mas é confuso".</li>
+              <li>Alvo: &le; 15 por função.</li>
+              <li>Em Python, <code>flake8-cognitive-complexity</code> ou <code>radon mi</code> + revisão manual.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 21 - HALSTEAD                                          -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a06-compact">
+        <div>
+          <span class="deck-kicker">QM-03 &middot; Halstead</span>
+          <h2 class="deck-title">Halstead (1977) &mdash; vocabulário, volume, esforço</h2>
+          <p class="deck-summary">Olha a função como texto e conta operadores e operandos. Revela duplicação semântica e densidade de informação que McCabe não vê.</p>
+        </div>
+        <table class="deck-table" style="font-size:.92em;">
+          <thead>
+            <tr><th>Métrica</th><th>Fórmula</th><th>O que diz</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Vocabulário</td><td><code>n = n1 + n2</code></td><td>Tipos distintos de tokens</td></tr>
+            <tr><td>Comprimento</td><td><code>N = N1 + N2</code></td><td>Total de tokens</td></tr>
+            <tr><td>Volume</td><td><code>V = N · log₂(n)</code></td><td>Tamanho da informação</td></tr>
+            <tr><td>Dificuldade</td><td><code>D = (n1/2) · (N2/n2)</code></td><td>Quão denso é o código</td></tr>
+            <tr><td>Esforço</td><td><code>E = D · V</code></td><td>Custo de entender</td></tr>
+            <tr><td>Tempo (s)</td><td><code>T = E / 18</code></td><td>Estimado para 1 leitor</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 22 - MI                                                -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">QM-04 &middot; Maintainability Index</span>
+          <h2 class="deck-title">MI &mdash; combina Halstead, McCabe e LOC</h2>
+          <p class="deck-summary">Métrica única, normalizada de 0 a 100. Acima de 65 é manutenível. Abaixo, é dívida. Cada projeto define seu limiar &mdash; o nosso é 65.</p>
+        </div>
+        <div class="deck-callout">
+          <strong>Fórmula clássica (normalizada 0&ndash;100)</strong>
+          <p style="margin:8px 0 0; font-family: var(--font-mono);">MI = max(0, (171 &minus; 5.2 &middot; ln(V) &minus; 0.23 &middot; G &minus; 16.2 &middot; ln(LOC)) &middot; 100 / 171)</p>
+          <ul style="margin-top:10px;">
+            <li><strong>V</strong> &mdash; volume de Halstead.</li>
+            <li><strong>G</strong> &mdash; complexidade ciclomática (McCabe).</li>
+            <li><strong>LOC</strong> &mdash; linhas de código.</li>
+            <li>Em Python: <code>radon mi src/</code>.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 23 - FERRAMENTAS                                       -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a06-table-compact">
+        <div>
+          <span class="deck-kicker">Ferramentas</span>
+          <h2 class="deck-title">O que roda no nosso CI</h2>
+          <p class="deck-summary">Stack mínimo para Python. Em Node há equivalentes (referenciados no glossário).</p>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr><th>Ferramenta</th><th>Métrica</th><th>Saída</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>radon cc</code></td><td>McCabe</td><td>Grade A&ndash;F por função</td></tr>
+            <tr><td><code>radon mi</code></td><td>Maintainability Index</td><td>0&ndash;100 por arquivo</td></tr>
+            <tr><td><code>radon hal</code></td><td>Halstead</td><td>V, D, E, T por função</td></tr>
+            <tr><td><code>xenon</code></td><td>McCabe gate</td><td>Exit 1 se acima do limiar</td></tr>
+            <tr><td><code>ruff check</code></td><td>Lint + estilos</td><td>Estatística por regra</td></tr>
+            <tr><td><code>mypy --strict-equality</code></td><td>Tipos</td><td>Erros semânticos</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 24 - LIMITES E RTM                                     -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Política de qualidade</span>
+          <h2 class="deck-title">Limites duros &mdash; sem ADR, sem merge</h2>
+          <p class="deck-summary">Limiares ligados à RTM. Função crítica que cruza um limiar precisa de ADR justificando, ou ela não entra na <code>main</code>.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Limiares do projeto</strong>
+            <ul>
+              <li><strong>McCabe</strong> &le; 10 por função; &le; 8 média por arquivo.</li>
+              <li><strong>Cognitive</strong> &le; 15 por função.</li>
+              <li><strong>MI</strong> &ge; 65 em todo módulo crítico.</li>
+              <li><strong>Duplicação</strong> &le; 5% (regra <code>SIM</code> do ruff).</li>
+              <li><strong>Cobertura unit</strong> &ge; 80%.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Como ligar à RTM</strong>
+            <ul>
+              <li>Cada função crítica tem RF/RNF correspondente.</li>
+              <li>Ultrapassar limiar = ADR <code>QUALITY-NN</code> obrigatório.</li>
+              <li>ADR explica trade-off e plano de refactor.</li>
+              <li>Refactor é orçado pelo error budget restante.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 25 - ANTI PADROES                                      -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a06-compact">
+        <div>
+          <span class="deck-kicker">Anti-padrões</span>
+          <h2 class="deck-title">O que não fazer hoje</h2>
+          <p class="deck-summary">Cada um desses já travou um time real. Estão na aula porque são tentadores.</p>
+        </div>
+        <div class="a06-grid-3">
+          <article class="deck-card">
+            <h3>Testcontainers</h3>
+            <ul>
+              <li>Container persistente entre testes sem reset &rarr; testes não-determinísticos.</li>
+              <li>Pull em todo job &rarr; runner lento &mdash; cache de imagem é obrigatório.</li>
+              <li>Mock + TC misturados sem critério.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Chaos</h3>
+            <ul>
+              <li>Rodar em prod sem kill switch.</li>
+              <li>Toxiproxy esquecido ligado pós-experimento.</li>
+              <li>Experimento sem hipótese &mdash; vandalismo.</li>
+              <li>Game day sem postmortem.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Qualidade</h3>
+            <ul>
+              <li>Métrica vista, nunca aplicada.</li>
+              <li>Limiar negociado por sprint.</li>
+              <li>Refactor sem orçamento de error budget.</li>
+              <li>Ignorar deps cíclicas (<code>madge</code>).</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 26 - PONTE PARA PRATICA                                -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a06-compact">
+        <div>
+          <span class="deck-kicker">Prática &middot; 21h00 &ndash; 22h00</span>
+          <h2 class="deck-title">Da teoria para o laboratório</h2>
+          <p class="deck-summary">Próxima hora guiada. Saímos com integration real, um chaos run e um gate de qualidade no CI.</p>
+        </div>
+        <div class="deck-panel">
+          <strong>Sequência da prática</strong>
+          <ol>
+            <li>Renovar session token e abrir Codespace na branch nova.</li>
+            <li>Criar skills <code>migrate_to_testcontainers</code>, <code>design_chaos_experiment</code>, <code>measure_quality</code>.</li>
+            <li>Migrar <code>tests/integration/</code> para Testcontainers + LocalStack.</li>
+            <li>Rodar <code>wb.yml</code> via <code>act</code> e confirmar verde com Postgres real.</li>
+            <li>Adicionar Toxiproxy ao <code>compute.yaml</code> e re-deploy.</li>
+            <li>Executar 1 experimento de chaos e documentar em <code>15_chaos_runs/</code>.</li>
+            <li>Rodar <code>radon</code>, <code>xenon</code>, <code>ruff</code> e gerar <code>16_quality_report.md</code>.</li>
+            <li>Adicionar job <code>quality</code> no <code>wb.yml</code>.</li>
+            <li>Critério de pronto, commit, tag <code>aula-06</code>.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 27 - PASSO 1 RENOVAR + SKILLS                          -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; Passo 1</span>
+          <h2 class="deck-title">Token novo + branch nova + esqueleto de skills</h2>
+          <p class="deck-summary">Abrir o lab, copiar credenciais, criar a branch da Aula 06 e os arquivos de skill que serão chamados pelos agentes Tester e Reviewer.</p>
+        </div>
+<pre class="a06-prompt">cd ~/olist-sre-pipeline
+git pull origin main
+git checkout -b aula-06-chaos-quality
+
+# (re)conectar AWS CLI &mdash; bloco do Learner Lab
+nano ~/.aws/credentials   # cola access_key, secret, session_token
+aws sts get-caller-identity
+
+# Skeleton das skills
+mkdir -p agents/skills chaos/experiments documents/15_chaos_runs
+touch agents/skills/migrate_to_testcontainers.md \
+      agents/skills/design_chaos_experiment.md \
+      agents/skills/measure_quality.md \
+      documents/16_quality_report.md</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 28 - SKILL MIGRATE TC                                  -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; Passo 2</span>
+          <h2 class="deck-title">Skill <code>migrate_to_testcontainers</code></h2>
+          <p class="deck-summary">A skill diz à IA o quê migrar, com qual versão de Postgres e qual seed mínimo carregar. Resultado é um diff em <code>tests/integration/</code> &mdash; nada além disso.</p>
+        </div>
+<pre class="a06-prompt"># agents/skills/migrate_to_testcontainers.md
+
+## Quando acionar
+Quando o usuario pedir para sair do mock e usar Postgres real
+em tests/integration/.
+
+## Entrada esperada
+- documents/03_architecture.md  (versao do Postgres alvo)
+- tests/integration/  (estado atual dos testes mockados)
+- documents/01_functional_requirements.md  (escopo do gold)
+
+## Passos
+1. Ler a versao do Postgres em documents/03_architecture.md.
+2. Substituir mocks por fixture session-scoped com PostgresContainer.
+3. Carregar seed minimo do gold dimensional (5 dim x 50 fato).
+4. Garantir TRUNCATE entre testes (escopo function).
+5. Ajustar pyproject.toml: testcontainers[postgres] como dev dep.
+
+## Aceitacao
+- pytest tests/integration/ passa sem mock.
+- Tempo total &lt;= 90 s.
+- Nenhum teste depende de outro (ordem livre).</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 29 - INTEGRATION CONFTEST                              -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; Passo 3</span>
+          <h2 class="deck-title"><code>conftest.py</code> &mdash; Postgres + LocalStack</h2>
+          <p class="deck-summary">A IA gera; você revisa o diff. O <code>conftest.py</code> resultante sobe Postgres + LocalStack uma vez por sessão de teste.</p>
+        </div>
+<pre class="a06-prompt"># tests/integration/conftest.py
+import pytest
+from testcontainers.postgres import PostgresContainer
+from testcontainers.localstack import LocalStackContainer
+
+@pytest.fixture(scope="session")
+def pg():
+    with PostgresContainer("postgres:16-alpine") as c:
+        yield c
+
+@pytest.fixture(scope="session")
+def aws():
+    with LocalStackContainer(image="localstack/localstack:3").with_services(
+        "s3", "ssm"
+    ) as c:
+        yield c
+
+@pytest.fixture
+def db(pg, _truncate_all):
+    return pg.get_connection_url()
+
+@pytest.fixture
+def s3_client(aws):
+    import boto3
+    return boto3.client("s3", endpoint_url=aws.get_url(),
+                        region_name="us-east-1",
+                        aws_access_key_id="test",
+                        aws_secret_access_key="test")</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 30 - ACT LOCAL                                         -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; Passo 4</span>
+          <h2 class="deck-title">Rodar <code>wb.yml</code> localmente com <code>act</code></h2>
+          <p class="deck-summary">Antes de gastar minuto de runner ou quebrar a branch protection, rodamos o workflow no Codespace via <code>act</code>.</p>
+        </div>
+<pre class="a06-prompt"># Instalar act (uma vez)
+curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
+
+# Rodar so o job 'integration' do wb.yml
+act -W .github/workflows/wb.yml -j integration \
+    --container-architecture linux/amd64 \
+    -P self-hosted=catthehacker/ubuntu:act-latest
+
+# Esperado: pytest tests/integration/ verde com Postgres real
+# Tempo aproximado: 60-90 s na primeira run, 20-30 s nas seguintes.</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 31 - TOXIPROXY CFN                                     -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; Passo 5</span>
+          <h2 class="deck-title">Toxiproxy via CFN ao lado do ETL</h2>
+          <p class="deck-summary">Estendemos o <code>iac/cloudformation/compute.yaml</code> da Aula 04. Toxiproxy roda em container <em>sidecar</em> na mesma EC2, expondo a porta 8474 só para a VPC.</p>
+        </div>
+<pre class="a06-prompt"># Adendo ao compute.yaml (UserData da EC2 ETL)
+docker run -d --name toxiproxy \
+  --restart unless-stopped \
+  -p 127.0.0.1:8474:8474 \
+  -p 127.0.0.1:5433:5433 \
+  ghcr.io/shopify/toxiproxy:latest
+
+# Cria o proxy etl-pg que vai virar nosso ponto de injecao
+docker exec toxiproxy /toxiproxy-cli create -l 0.0.0.0:5433 \
+  -u $PG_HOST:5432 etl-pg
+
+# Re-deploy
+aws cloudformation deploy \
+  --template-file iac/cloudformation/compute.yaml \
+  --stack-name olist-sre-pipeline-lab \
+  --capabilities CAPABILITY_IAM</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 32 - SKILL CHAOS                                       -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; Passo 6</span>
+          <h2 class="deck-title">Skill <code>design_chaos_experiment</code></h2>
+          <p class="deck-summary">A skill produz YAML de experimento e o comando SSM correspondente, ambos com kill switch e duração máxima &mdash; nunca aceita experimento solto.</p>
+        </div>
+<pre class="a06-prompt"># agents/skills/design_chaos_experiment.md
+
+## Quando acionar
+Quando o usuario pedir para desenhar um experimento de chaos.
+
+## Entrada esperada
+- ID do loop a validar (ex.: "circuit breaker do RNF-REL-01")
+- SLI alvo
+- Janela maxima permitida
+
+## Passos
+1. Escrever YAML em chaos/experiments/CHAOS-NN.yaml com:
+   - hipotese, baseline, acoes, salvaguardas, aceitacao.
+2. Anexar comando aws ssm send-command para injetar.
+3. Anexar comando de kill switch (ssm cancel-command + reverter toxico).
+4. Listar metricas CW que sustentam aceitacao.
+5. Recusar experimento sem kill switch ou sem janela.
+
+## Aceitacao
+- YAML valida contra schema chaos/experiments/_schema.json.
+- Duracao_max obrigatoria.
+- Blast_radius descrito por tag.</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 33 - INJECAO SSM                                       -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; Passo 6b</span>
+          <h2 class="deck-title">Injetar latência via SSM Run Command</h2>
+          <p class="deck-summary">SSM Run Command roda <code>toxiproxy-cli</code> dentro da EC2 alvo. O ID do comando volta para o terminal &mdash; é ele que usamos no kill switch.</p>
+        </div>
+<pre class="a06-prompt"># Injetar latencia 2000ms por 60s no proxy etl-pg
+CMD_ID=$(aws ssm send-command \
+  --document-name "AWS-RunShellScript" \
+  --targets "Key=tag:Role,Values=etl-lab" \
+  --parameters 'commands=[
+    "docker exec toxiproxy /toxiproxy-cli toxic add -t latency -a latency=2000 etl-pg",
+    "sleep 60",
+    "docker exec toxiproxy /toxiproxy-cli toxic remove --toxicName etl-pg-latency etl-pg"
+  ]' \
+  --query "Command.CommandId" --output text)
+
+echo "$CMD_ID" &gt; /tmp/last_chaos_cmd
+
+# Kill switch (executar se algo sair do controle)
+aws ssm cancel-command --command-id "$CMD_ID"
+
+# Observar
+aws logs tail /aws/ec2/etl-lab --follow --since 2m</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 34 - REGISTRO DO RUN                                   -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; Passo 6c</span>
+          <h2 class="deck-title">Registrar o run em <code>15_chaos_runs/</code></h2>
+          <p class="deck-summary">Um arquivo por run, datado, com a hipótese, o que aconteceu, a decisão e o ADR gerado. Sem registro, o experimento não existiu.</p>
+        </div>
+<pre class="a06-prompt"># documents/15_chaos_runs/2026-05-21T2105_CHAOS-02.md
+
+## Hipotese
+Se a latencia ETL -&gt; Postgres subir para 2000ms por 60s,
+o circuit breaker abre em &lt;= 10s e nao perde mensagens.
+
+## Baseline
+pg_query_p95_ms = 42 ms (5 min antes)
+
+## Execucao
+- T-0: latencia injetada via toxiproxy
+- T+7s: circuit_breaker_open=true (CW Logs)
+- T+60s: latencia removida
+- T+78s: pg_query_p95_ms = 51 ms (volta ao baseline)
+
+## Resultado
+PASSOU. Aceitacao integralmente atendida.
+
+## ADR gerado
+ADR-12 &mdash; circuit breaker abre em 7s, dentro do limite de 10s.
+Manter threshold atual. Prox experimento: latencia 5000ms.</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 35 - SKILL MEASURE                                     -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; Passo 7</span>
+          <h2 class="deck-title">Skill <code>measure_quality</code> + relatório</h2>
+          <p class="deck-summary">Roda radon, xenon, ruff, consolida em <code>16_quality_report.md</code> com top-5 funções por complexidade e plano de refactor priorizado pelo error budget.</p>
+        </div>
+<pre class="a06-prompt"># Comando do agente Reviewer (chama a skill measure_quality)
+opencode
+
+&gt; Aplique a skill agents/skills/measure_quality.md em src/.
+&gt; Gere documents/16_quality_report.md com:
+&gt;   - tabela radon cc -s -a (media e grade)
+&gt;   - resultado xenon (gate B-A-A)
+&gt;   - radon mi (MI por arquivo, alerta &lt; 65)
+&gt;   - ruff check --statistics
+&gt;   - top-5 funcoes mais complexas
+&gt;   - plano de refactor com horas estimadas
+&gt;   - vinculo de cada item ao RF/RNF da RTM
+
+# Comandos crus para fallback
+radon cc -s -a src/  &gt; reports/cc.txt
+xenon --max-absolute B --max-modules A --max-average A src/
+radon mi src/        &gt; reports/mi.txt
+ruff check --statistics src/ &gt; reports/ruff.txt</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 36 - GATE NO CI                                        -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; Passo 8</span>
+          <h2 class="deck-title">Job <code>quality</code> no <code>wb.yml</code></h2>
+          <p class="deck-summary">A métrica só vira realidade quando vira CI gate. PR que cruzar o limiar não merge sem ADR.</p>
+        </div>
+<pre class="a06-prompt"># .github/workflows/wb.yml (adendo)
+quality:
+  runs-on: [self-hosted, lab]
+  needs: [unit, integration]
+  steps:
+    - uses: actions/checkout@v4
+    - run: pip install radon xenon ruff
+    - name: McCabe gate
+      run: xenon --max-absolute B --max-modules A --max-average A src/
+    - name: MI gate
+      run: |
+        python - &lt;&lt;'EOF'
+        import subprocess, sys, json, re
+        out = subprocess.check_output(["radon","mi","-j","src/"]).decode()
+        data = json.loads(out)
+        bad = [f for f, m in data.items() if m["mi"] &lt; 65]
+        if bad:
+            print("MI &lt; 65 em:", bad); sys.exit(1)
+        EOF
+    - name: Ruff gate
+      run: ruff check src/</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 37 - CRITERIO DE PRONTO                                -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a06-compact">
+        <div>
+          <span class="deck-kicker">Prática &middot; Critério</span>
+          <h2 class="deck-title">Critério de pronto e commit</h2>
+          <p class="deck-summary">Antes do <code>git push</code>, cada item verde. Sem isso, a Aula 07 herda dívida.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Engenharia</strong>
+            <ul>
+              <li><code>tests/integration/</code> sem mock.</li>
+              <li>1 chaos run completo em <code>15_chaos_runs/</code>.</li>
+              <li><code>16_quality_report.md</code> gerado.</li>
+              <li>Job <code>quality</code> verde no <code>wb.yml</code>.</li>
+              <li>Toxiproxy provisionado e <em>OFF</em> ao final.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Repo</strong>
+            <ul>
+              <li><code>chaos/experiments/CHAOS-NN.yaml</code>.</li>
+              <li>3 skills novas em <code>agents/skills/</code>.</li>
+              <li>1 ADR (<code>ADR-NN</code>) por descoberta.</li>
+              <li>Tag <code>aula-06</code> no remoto.</li>
+              <li><code>.gitignore</code> revisado &mdash; sem credenciais.</li>
+            </ul>
+          </div>
+        </div>
+<pre class="a06-prompt" style="margin-top:14px;">git add tests/integration chaos documents agents .github
+git commit -m "feat(aula-06): testcontainers + chaos run + quality gate"
+git tag aula-06
+git push origin aula-06-chaos-quality --tags</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 38 - RESUMO E PROXIMA AULA                             -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Fechamento</span>
+          <h2 class="deck-title">Resumo e ponte para a Aula 07</h2>
+          <p class="deck-summary">Hoje passamos de "CI verde" para "CI verde com paridade real, falha controlada e qualidade aplicada". As métricas de hoje viram SLIs internos amanhã.</p>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
             <h3>O que fica desta aula</h3>
             <ul>
-              <li>TODO &mdash; decisão clara entre Redshift e Athena + Iceberg por caso de uso.</li>
-              <li>TODO &mdash; modelagem dimensional aplicada ao Gold do Olist.</li>
-              <li>TODO &mdash; warehouse consultável com performance analítica.</li>
+              <li>Integration test contra Postgres real.</li>
+              <li>Toxiproxy provisionado e disponível.</li>
+              <li>1 chaos run documentado com ADR.</li>
+              <li>Gate de qualidade no <code>wb.yml</code>.</li>
+              <li>Tag <code>aula-06</code> no repo.</li>
             </ul>
           </article>
           <article class="deck-card">
             <h3>Aula 07 &middot; 28/05/2026</h3>
             <ul>
-              <li>Data Reliability e SRE aplicados a pipelines de dados.</li>
-              <li>TODO &mdash; expectativas de SLO/SLI sobre o pipeline Olist.</li>
-              <li>TODO &mdash; entregável da Aula 07.</li>
+              <li>Data reliability e SRE em pipelines de dados.</li>
+              <li>McCabe, MI e taxa de chaos passados viram SLIs internos.</li>
+              <li>Dashboards CloudWatch consolidados.</li>
+              <li>Error budget como orçamento de refactor.</li>
             </ul>
           </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE GLOSSARIO 1/3 - TESTES E TC                            -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a06-table-compact a06-compact">
+        <div>
+          <span class="deck-kicker">Glossário &middot; 1 / 3</span>
+          <h2 class="deck-title">Siglas &mdash; testes e Testcontainers</h2>
+          <p class="deck-summary">Vocabulário do bloco de paridade entre laboratório e produção.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Testes &middot; pirâmide</strong>
+            <table class="deck-table">
+              <tbody>
+                <tr><td><strong>TC</strong></td><td>Testcontainer (container de teste descartável)</td></tr>
+                <tr><td><strong>WB</strong></td><td>White Box test (caixa branca)</td></tr>
+                <tr><td><strong>BB</strong></td><td>Black Box test (caixa preta)</td></tr>
+                <tr><td><strong>e2e</strong></td><td>End-to-End</td></tr>
+                <tr><td><strong>BDD</strong></td><td>Behavior-Driven Development</td></tr>
+                <tr><td><strong>CI / CD</strong></td><td>Continuous Integration / Delivery</td></tr>
+                <tr><td><strong>SUT</strong></td><td>System Under Test</td></tr>
+                <tr><td><strong>DI</strong></td><td>Dependency Injection</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="deck-panel">
+            <strong>Testcontainers &middot; infra</strong>
+            <table class="deck-table">
+              <tbody>
+                <tr><td><strong>OCI</strong></td><td>Open Container Initiative (imagens, runtime)</td></tr>
+                <tr><td><strong>LS</strong></td><td>LocalStack (emulação AWS local)</td></tr>
+                <tr><td><strong>JDBC</strong></td><td>Java Database Connectivity</td></tr>
+                <tr><td><strong>DSN</strong></td><td>Data Source Name (URI de conexão)</td></tr>
+                <tr><td><strong>PG</strong></td><td>PostgreSQL</td></tr>
+                <tr><td><strong>SQS</strong></td><td>Simple Queue Service (AWS)</td></tr>
+                <tr><td><strong>SSM</strong></td><td>Systems Manager (AWS)</td></tr>
+                <tr><td><strong>IaC</strong></td><td>Infrastructure as Code</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE GLOSSARIO 2/3 - CHAOS E SRE                            -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a06-table-compact a06-compact">
+        <div>
+          <span class="deck-kicker">Glossário &middot; 2 / 3</span>
+          <h2 class="deck-title">Siglas &mdash; chaos engineering e SRE</h2>
+          <p class="deck-summary">Vocabulário dos blocos de falha controlada e confiabilidade.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Chaos engineering</strong>
+            <table class="deck-table">
+              <tbody>
+                <tr><td><strong>FIS</strong></td><td>AWS Fault Injection Service (não disponível no Lab)</td></tr>
+                <tr><td><strong>SSM</strong></td><td>AWS Systems Manager &mdash; Run Command, Session Manager</td></tr>
+                <tr><td><strong>Toxiproxy</strong></td><td>Proxy TCP que injeta falhas (Shopify)</td></tr>
+                <tr><td><strong>tc</strong></td><td>Linux traffic control (<code>iproute2</code>)</td></tr>
+                <tr><td><strong>netem</strong></td><td>Network emulator (latência, perda)</td></tr>
+                <tr><td><strong>Blast radius</strong></td><td>Raio de explosão do experimento</td></tr>
+                <tr><td><strong>Steady state</strong></td><td>Estado estacionário medido por SLI</td></tr>
+                <tr><td><strong>Game day</strong></td><td>Cerimônia em que o time roda chaos junto</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="deck-panel">
+            <strong>SRE &middot; confiabilidade</strong>
+            <table class="deck-table">
+              <tbody>
+                <tr><td><strong>SRE</strong></td><td>Site Reliability Engineering</td></tr>
+                <tr><td><strong>SLI</strong></td><td>Service Level Indicator (métrica)</td></tr>
+                <tr><td><strong>SLO</strong></td><td>Service Level Objective (meta interna)</td></tr>
+                <tr><td><strong>SLA</strong></td><td>Service Level Agreement (contrato)</td></tr>
+                <tr><td><strong>MTBF</strong></td><td>Mean Time Between Failures</td></tr>
+                <tr><td><strong>MTTR</strong></td><td>Mean Time To Recovery</td></tr>
+                <tr><td><strong>RTO</strong></td><td>Recovery Time Objective</td></tr>
+                <tr><td><strong>RPO</strong></td><td>Recovery Point Objective</td></tr>
+                <tr><td><strong>Toil</strong></td><td>Trabalho repetitivo, sem valor duradouro</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE GLOSSARIO 3/3 - QUALIDADE E NORMAS                     -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a06-table-compact a06-compact">
+        <div>
+          <span class="deck-kicker">Glossário &middot; 3 / 3</span>
+          <h2 class="deck-title">Siglas &mdash; qualidade de código e normas</h2>
+          <p class="deck-summary">Vocabulário das métricas mensuráveis e dos padrões internacionais citados.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Métricas &middot; qualidade</strong>
+            <table class="deck-table">
+              <tbody>
+                <tr><td><strong>McCabe</strong></td><td>Complexidade ciclomática (1976)</td></tr>
+                <tr><td><strong>CC</strong></td><td>Cyclomatic Complexity</td></tr>
+                <tr><td><strong>MI</strong></td><td>Maintainability Index (0&ndash;100)</td></tr>
+                <tr><td><strong>LOC</strong></td><td>Lines Of Code</td></tr>
+                <tr><td><strong>SLOC</strong></td><td>Source Lines Of Code</td></tr>
+                <tr><td><strong>QM</strong></td><td>Quality Metric (ID do curso, QM-NN)</td></tr>
+                <tr><td><strong>RPN</strong></td><td>Risk Priority Number (FMEA)</td></tr>
+                <tr><td><strong>ADR</strong></td><td>Architecture Decision Record</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="deck-panel">
+            <strong>Normas &middot; ferramentas</strong>
+            <table class="deck-table">
+              <tbody>
+                <tr><td><strong>ISO/IEC 25010</strong></td><td>Quality model (atributos de qualidade)</td></tr>
+                <tr><td><strong>IEEE 982</strong></td><td>Standard Dictionary of Measures of Reliability</td></tr>
+                <tr><td><strong>NIST</strong></td><td>National Institute of Standards and Technology</td></tr>
+                <tr><td><strong>radon</strong></td><td>Toolkit Python para CC, MI, Halstead</td></tr>
+                <tr><td><strong>xenon</strong></td><td>Gate de complexidade sobre radon</td></tr>
+                <tr><td><strong>ruff</strong></td><td>Linter Python rápido (Astral)</td></tr>
+                <tr><td><strong>act</strong></td><td>Roda GitHub Actions localmente</td></tr>
+                <tr><td><strong>YAML</strong></td><td>YAML Ain't Markup Language</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 42 - REFERENCIAS                                       -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Bibliografia</span>
+          <h2 class="deck-title">Referências e leituras</h2>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Primárias</strong>
+            <ul>
+              <li>McCabe, T. J. &mdash; <em>A Complexity Measure</em>, IEEE TSE, 1976.</li>
+              <li>Halstead, M. &mdash; <em>Elements of Software Science</em>, 1977.</li>
+              <li>Oman, P.; Hagemeister, J. &mdash; <em>Maintainability Index</em>, 1992.</li>
+              <li>SonarSource &mdash; <em>Cognitive Complexity, a new way of measuring understandability</em>, 2017.</li>
+              <li>ISO/IEC 25010:2023 &mdash; Quality model.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Operacionais</strong>
+            <ul>
+              <li>Basiri et al. &mdash; <em>Chaos Engineering</em> (Netflix), IEEE Software 2016.</li>
+              <li>Rosenthal, Jones et al. &mdash; <em>Chaos Engineering</em> (O'Reilly).</li>
+              <li>principlesofchaos.org &mdash; Princípios de Chaos Engineering.</li>
+              <li>Beyer et al. &mdash; <em>Site Reliability Engineering</em> (Google).</li>
+              <li>Testcontainers docs &mdash; <code>testcontainers.com</code>.</li>
+              <li>Toxiproxy &mdash; <code>github.com/Shopify/toxiproxy</code>.</li>
+              <li>radon &middot; xenon &middot; ruff &middot; act docs.</li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
@@ -271,6 +1502,46 @@
     function toggleFullScreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
     document.addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); } else if (e.key === 'ArrowLeft') { e.preventDefault(); previousSlide(); } else if (e.key.toLowerCase() === 'f') toggleFullScreen(); });
     showSlide(0);
+  </script>
+
+  <!-- Mermaid v11 — chaos flow + radial loops (lazy render on activation) -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'neutral',
+      securityLevel: 'loose',
+      flowchart: { htmlLabels: true, curve: 'basis' },
+      themeVariables: {
+        fontFamily: 'JetBrains Mono, ui-monospace, monospace',
+        primaryColor: '#ffffff',
+        primaryBorderColor: '#0f0f0f',
+        primaryTextColor: '#0f0f0f',
+        lineColor: '#5c5c5c',
+        clusterBkg: '#fafaf7',
+        clusterBorder: '#d6d6d1'
+      }
+    });
+
+    // Render lazy por slide com diagrama
+    const targets = document.querySelectorAll('[data-slide="chaos-flow"], [data-slide="loops-radial"]');
+    const renderedSet = new WeakSet();
+    async function renderIfNeeded(target) {
+      if (renderedSet.has(target)) return;
+      if (!target.classList.contains('active')) return;
+      renderedSet.add(target);
+      try {
+        await mermaid.run({ nodes: target.querySelectorAll('pre.mermaid') });
+      } catch (e) {
+        renderedSet.delete(target);
+        console.warn('Mermaid render falhou:', e);
+      }
+    }
+    targets.forEach((target) => {
+      const obs = new MutationObserver(() => renderIfNeeded(target));
+      obs.observe(target, { attributes: true, attributeFilter: ['class'] });
+      renderIfNeeded(target);
+    });
   </script>
 </body>
 </html>

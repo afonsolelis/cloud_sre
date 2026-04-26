@@ -4,39 +4,857 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/png" href="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" />
-  <title>Material Aula 06 — Data warehousing na nuvem de alta performance</title>
+  <title>Material Aula 06 — Testcontainers, chaos engineering e qualidade de código mensurada</title>
   <link rel="stylesheet" href="../../../assets/styles.css" />
+  <link rel="stylesheet" href="../../../assets/slides.css" />
+  <style data-material06-local>
+    /* Material is a long-form document — neutralize the height/overflow rules
+       that slides.css applies to html, body. */
+    html, body.material {
+      height: auto !important;
+      min-height: 100%;
+      overflow: visible !important;
+    }
+    body.material .page { max-width: 980px; }
+    body.material pre {
+      background: #0d1117;
+      color: #e6edf3;
+      padding: 16px 18px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: .92rem;
+      line-height: 1.65;
+      overflow-x: auto;
+      margin: 14px 0;
+    }
+    body.material code {
+      background: var(--deck-surface);
+      border: 1px solid var(--deck-line-soft);
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-family: var(--font-mono);
+      font-size: .9em;
+    }
+    body.material pre code { background: transparent; border: none; padding: 0; }
+    body.material table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: .95rem;
+    }
+    body.material thead th {
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-size: .82rem;
+      text-align: left;
+      padding: 10px 12px;
+      border-top: 1px solid #0f0f0f;
+      border-bottom: 1px solid #0f0f0f;
+      background: var(--deck-surface);
+    }
+    body.material tbody td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--deck-line-soft);
+      vertical-align: top;
+    }
+    body.material tbody tr:last-child td { border-bottom: 1px solid #0f0f0f; }
+    .m06-callout {
+      border-left: 3px solid #0f0f0f;
+      background: var(--deck-surface);
+      padding: 18px 22px;
+      margin: 18px 0;
+      border-radius: 0 4px 4px 0;
+    }
+    .m06-callout strong:first-child { display: block; margin-bottom: 6px; }
+    .m06-mermaid {
+      background: var(--deck-panel, #ffffff);
+      border: 1px solid var(--deck-line, #d6d6d1);
+      border-radius: 4px;
+      padding: 18px;
+      margin: 18px 0;
+      overflow: auto;
+    }
+    .m06-mermaid pre.mermaid {
+      background: transparent !important;
+      color: var(--deck-text, #0f0f0f) !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      box-shadow: none !important;
+      border: none !important;
+      border-radius: 0 !important;
+      overflow: visible;
+    }
+    .m06-mermaid pre.mermaid::before { display: none !important; }
+    .m06-mermaid svg {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+      background: transparent;
+    }
+    .m06-tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--deck-muted);
+      padding: 2px 8px;
+      border: 1px solid var(--deck-line);
+      border-radius: 3px;
+      margin-right: 6px;
+    }
+  </style>
 </head>
 <body class="material">
   <main class="page">
 
     <section class="content-block">
       <p class="meta">Aula 06 &nbsp;&bull;&nbsp; 21/05/2026 &nbsp;&bull;&nbsp; 19h00 &ndash; 22h00</p>
-      <h1>Data warehousing na nuvem de alta performance</h1>
+      <h1>Testcontainers, chaos engineering e qualidade de código mensurada</h1>
       <p class="summary">
         Este material acompanha a Aula 06 da disciplina <strong>Cloud Computing e SRE &mdash; Visão Prática com AWS</strong>
-        do MBA em Engenharia de Dados. Nele discutiremos como transformar o Gold do Data Lake
-        em um warehouse colunar de alta performance, cobrindo modelagem dimensional, Amazon
-        Redshift Serverless e a alternativa lakehouse com Athena + Apache Iceberg.
+        do MBA em Engenharia de Dados. Hoje saímos do mock e ganhamos infraestrutura real e descartável (Testcontainers).
+        Em seguida, quebramos o sistema de propósito com chaos engineering &mdash; o closed loop CW &rarr; Controlador SRE
+        &rarr; ETL/Postgres da Aula 03 é exercitado em laboratório controlado. E medimos o custo cognitivo do código com
+        complexidade ciclomática, Halstead e Maintainability Index. Tudo entra como gate no CI da Aula 05.
+      </p>
+      <p>
+        <span class="m06-tag">Pré-requisitos</span> Aula 05 entregue: <code>wb.yml</code> e <code>bb.yml</code> verdes,
+        EC2 self-hosted runner ativo via SSM, branch protection ligada na <code>main</code>, tag <code>aula-05</code> no remoto.
       </p>
     </section>
 
     <section class="content-block">
-      <h2>Status: em construção</h2>
+      <h2>1. Onde estamos &mdash; e o que ainda dói</h2>
       <p>
-        Este material está sendo redigido e será publicado com pelo menos uma semana de antecedência
-        à data da aula (21/05/2026). A estrutura de seções abaixo antecipa o escopo.
+        Em cinco aulas modelamos o problema (02), desenhamos a arquitetura (03), provisionamos o stack
+        <code>olist-sre-pipeline-lab</code> (04) e amarramos a esteira de CI com <em>white box</em> e <em>black box</em>
+        (05). O sistema está vivo em laboratório, mas três fragilidades continuam mascaradas: o teste de integração ainda
+        mocka o Postgres &mdash; portanto não pega bug de driver, dialeto SQL ou lock; nenhuma falha foi injetada de
+        propósito &mdash; portanto não sabemos como o sistema reage a turbulência; e métricas de qualidade são lidas no
+        relatório de cobertura, mas não derrubam o pipeline. Esta aula fecha as três frentes.
+      </p>
+      <p>
+        Em SRE, dois conceitos sustentam a aula. O primeiro é <strong>paridade de ambiente</strong>: o teste só vale se o
+        que ele exercita se parece com o que vai rodar em produção. O segundo é <strong><em>toil</em></strong>: trabalho
+        manual repetitivo, sem valor duradouro, que escala linearmente com a operação. Código de baixa qualidade vira
+        <em>toil</em> &mdash; cada bug fix custa horas, cada PR pequeno trava em revisão. Medir qualidade é o primeiro
+        passo para tirar <em>toil</em> da conta.
+      </p>
+      <div class="m06-callout">
+        <strong>Tese</strong>
+        <p style="margin: 0;">
+          Mock esconde bug de driver. Sistema sem chaos quebra na produção pela primeira vez. Código sem métrica
+          vira <em>toil</em> permanente. Hoje fechamos os três e amarramos o resultado em CI gate &mdash; sem isso,
+          a Aula 07 herda dívida.
+        </p>
+      </div>
+    </section>
+
+    <section class="content-block">
+      <h2>2. Testcontainers &mdash; infra real, descartável e controlada pelo teste</h2>
+      <p>
+        Testcontainers é uma família de bibliotecas (Java original em 2015, depois Python, Go, .NET, Node) que coloca
+        a suíte de teste no comando do Docker. Em Python usamos <code>testcontainers-python</code>: o teste invoca
+        <code>PostgresContainer("postgres:16-alpine").start()</code>, recebe uma URI dinâmica com porta efêmera,
+        executa o caso, e ao final da fixture o container é destruído. Volume some, dado some, ambiente volta ao zero.
+        Isso ataca duas dores clássicas do mock: discrepância semântica (o mock não conhece todos os <em>edge cases</em>
+        do dialeto) e drift (o mock envelhece, a produção não).
+      </p>
+      <h3>2.1 Quando vale e quando não vale</h3>
+      <p>
+        Mock continua certo na base da pirâmide &mdash; testes unitários puros, lógica sem efeito colateral. Testcontainer
+        entra na faixa de integração: SQL real, transações reais, drivers reais. A regra de bolso é: se o erro só aparece
+        com infra real, o teste tem que ter infra real.
+      </p>
+      <table>
+        <thead><tr><th>Critério</th><th>Mock</th><th>Testcontainer</th></tr></thead>
+        <tbody>
+          <tr><td>Tempo por teste</td><td>1&ndash;5 ms</td><td>200 ms&ndash;2 s (1ª subida)</td></tr>
+          <tr><td>Paridade com produção</td><td>Baixa</td><td>Alta</td></tr>
+          <tr><td>Pega bug de driver/dialeto</td><td>Não</td><td>Sim</td></tr>
+          <tr><td>Dependência de Docker</td><td>Nenhuma</td><td>Obrigatória no runner</td></tr>
+          <tr><td>Custo de manutenção</td><td>Alto (mock vira ficção)</td><td>Médio</td></tr>
+          <tr><td>Faixa adequada</td><td>Unit, lógica pura</td><td>Integration, contract com infra</td></tr>
+        </tbody>
+      </table>
+
+      <h3>2.2 Padrões de fixture &mdash; <code>session</code> vs <code>function</code></h3>
+      <p>
+        O escopo da fixture é o trade-off central. Container por teste é seguro mas explode o tempo total &mdash; cada
+        fixture <em>function-scoped</em> paga 200&ndash;500 ms só para subir. Container compartilhado em <em>session</em>
+        é 10&times; mais rápido, mas exige reset entre testes para evitar acoplamento por estado. A receita do curso:
+        escopo <code>session</code> + <code>TRUNCATE</code> ou <code>ROLLBACK</code> automatizado em fixture
+        <em>function-scoped</em>.
+      </p>
+<pre># tests/integration/conftest.py
+import pytest
+from testcontainers.postgres import PostgresContainer
+from testcontainers.localstack import LocalStackContainer
+
+@pytest.fixture(scope="session")
+def pg():
+    with PostgresContainer("postgres:16-alpine") as c:
+        yield c
+
+@pytest.fixture(scope="session")
+def aws():
+    with LocalStackContainer(image="localstack/localstack:3").with_services(
+        "s3", "ssm"
+    ) as c:
+        yield c
+
+@pytest.fixture
+def db(pg, _truncate_all):
+    return pg.get_connection_url()</pre>
+
+      <h3>2.3 LocalStack como variante</h3>
+      <p>
+        LocalStack emula APIs AWS dentro de um container. Para S3, SSM Parameter Store, SQS e EventBridge a fidelidade
+        é alta &mdash; o teste de integração pode rodar inteiramente local. Para serviços profundos &mdash; IAM com
+        permissions boundary, KMS HSM, redes complexas &mdash; LocalStack não substitui conta real. A regra: use
+        LocalStack para o que cabe e teste em conta real o que LocalStack não simula com fidelidade.
       </p>
 
-      <h3>Estrutura prevista</h3>
+      <h3>2.4 Docker no runner</h3>
+      <p>
+        Sem Docker, fixture vazia. No nosso self-hosted runner (EC2 da Aula 04), o <code>cloud-init</code> precisa
+        instalar o Docker, habilitá-lo no boot e dar permissão ao usuário do runner. Se o pull da imagem
+        <code>postgres:16-alpine</code> for feito a cada job, paga 5&ndash;15 s só de download. Em runner self-hosted
+        com cache local, paga uma vez por boot.
+      </p>
+<pre># cloud-init / userdata da EC2 runner
+yum install -y docker
+systemctl enable --now docker
+usermod -aG docker ec2-user
+docker info | grep -E "Server Version|Storage Driver"
+docker run --rm hello-world</pre>
+    </section>
+
+    <section class="content-block">
+      <h2>3. Chaos engineering &mdash; quebrar de propósito antes que quebre por acidente</h2>
+      <p>
+        Chaos engineering nasceu na Netflix em 2010, quando a empresa migrava do datacenter para a AWS. O Chaos Monkey
+        desligava instâncias EC2 aleatoriamente para forçar a arquitetura a tolerar falhas que aconteciam de qualquer
+        jeito. Em 2014 a prática vira disciplina formal &mdash; <em>principlesofchaos.org</em>. A definição operacional
+        é simples: chaos engineering é a disciplina de experimentar em um sistema para construir confiança na sua
+        capacidade de tolerar condições turbulentas em produção. <strong>É experimento, não teste.</strong> Tem
+        hipótese, observação e conclusão.
+      </p>
+
+      <h3>3.1 Os cinco princípios canônicos</h3>
+      <ol>
+        <li><strong>Hipótese sobre estado estacionário</strong> &mdash; antes do experimento, o sistema é caracterizado
+          por uma métrica observável (SLI). A hipótese diz que o estado estacionário se mantém apesar da falha.</li>
+        <li><strong>Variar eventos do mundo real</strong> &mdash; latência, perda de pacote, kill de processo, disco
+          cheio, queda de zona. Não inventar falha exótica.</li>
+        <li><strong>Rodar em produção</strong> &mdash; com salvaguardas. Por enquanto, no nosso laboratório. A Aula 08
+          discute produção real.</li>
+        <li><strong>Automatizar</strong> &mdash; experimento como código (<code>chaos/experiments/*.yaml</code>).
+          Game day pontual, regressão recorrente.</li>
+        <li><strong>Minimizar o raio de explosão</strong> &mdash; janela curta, área isolada, kill switch obrigatório.</li>
+      </ol>
+
+      <h3>3.2 Métodos &mdash; o que cabe no Learner Lab</h3>
+      <p>
+        AWS FIS (Fault Injection Service) é a oferta gerenciada para chaos. <strong>No Learner Lab a FIS não está
+        habilitada.</strong> Substituímos com SSM Run Command (que distribui comandos para EC2 alvo) e ferramentas
+        Linux instaladas na EC2: Toxiproxy para latência e perda em TCP, <code>tc netem</code> para qdisc do kernel,
+        <code>stress-ng</code> para CPU/memória, <code>fallocate</code> para disco. O efeito é equivalente; muda o
+        empacotamento.
+      </p>
+      <table>
+        <thead><tr><th>ID</th><th>Falha</th><th>Ferramenta</th><th>Loop validado</th></tr></thead>
+        <tbody>
+          <tr><td>CHAOS-01</td><td>Kill de processo ETL</td><td><code>kill -9 $(pgrep etl)</code></td><td>Backpressure / restart</td></tr>
+          <tr><td>CHAOS-02</td><td>Latência ETL &harr; Postgres</td><td>Toxiproxy <code>add_latency</code></td><td>Circuit breaker</td></tr>
+          <tr><td>CHAOS-03</td><td>Perda de pacote 30%</td><td><code>tc qdisc add netem loss</code></td><td>Retry idempotente</td></tr>
+          <tr><td>CHAOS-04</td><td>Disco cheio</td><td><code>fallocate -l 9G /tmp/x</code></td><td>Quarentena de payload</td></tr>
+          <tr><td>CHAOS-05</td><td>CPU saturada</td><td><code>stress-ng --cpu 4</code></td><td>Freeze por error budget</td></tr>
+          <tr><td>CHAOS-06</td><td>Falha de DNS</td><td><code>echo 127.0.0.1 db &gt; /etc/hosts</code></td><td>Drift / circuit breaker</td></tr>
+        </tbody>
+      </table>
+
+      <h3>3.3 Anatomia de um experimento</h3>
+      <div class="m06-mermaid">
+        <pre class="mermaid">
+flowchart LR
+  H["1. Hipótese<br/>(estado estacionário)"]
+  B["2. Baseline<br/>medir SLI normal"]
+  I["3. Injeção<br/>(SSM + Toxiproxy)"]
+  O["4. Observação<br/>(CW Logs + métricas)"]
+  C["5. Conclusão<br/>+ ADR"]
+
+  H --> B --> I --> O --> C
+
+  KS["Kill switch<br/>(CW alarm + ssm cancel)"]
+  I -.->|aborta se SLO crítico| KS
+  KS -.->|stop| O
+        </pre>
+      </div>
+      <p>
+        Cada experimento é um YAML com hipótese, baseline, ações, salvaguardas e critério de aceitação. Forma canônica:
+      </p>
+<pre>id: CHAOS-02
+titulo: Latencia ETL -&gt; Postgres por 60s
+hipotese: |
+  Se a latencia entre ETL e Postgres subir para 2000ms por 60s,
+  o circuit breaker abre em &lt;= 10s e o ETL faz freeze do
+  proximo run sem perder mensagens em flight.
+estado_estacionario:
+  sli: pg_query_p95_ms
+  baseline: "&lt; 80 ms por 5 min"
+acoes:
+  - toxiproxy-cli toxic add -t latency -a latency=2000 etl-pg
+  - sleep 60
+  - toxiproxy-cli toxic remove --toxicName etl-pg-latency etl-pg
+salvaguardas:
+  kill_switch: "alarm SLO_BREACH ON =&gt; ssm cancel-command"
+  blast_radius: "apenas instancia tag Role=etl-lab"
+  duracao_max: 90s
+aceitacao:
+  - circuit_breaker_aberto_em: "&lt;= 10 s"
+  - mensagens_perdidas: "= 0"
+  - retorno_ao_baseline_em: "&lt;= 30 s pos-fim"</pre>
+
+      <h3>3.4 Game day &mdash; a cerimônia</h3>
+      <p>
+        Game day é o ritual em que o time roda chaos junto, na mesma sala (virtual ou física), com papéis claros:
+        <strong>Comandante</strong> (decide go/no-go), <strong>Operador</strong> (injeta a falha),
+        <strong>Observador</strong> (lê CW Logs em tempo real) e <strong>Escriba</strong> (transcreve o que vê).
+        Sem ritual, chaos vira <em>blame</em>. Saída obrigatória: arquivo <code>15_chaos_runs/&lt;timestamp&gt;.md</code>
+        com hipótese, execução, resultado e ADR.
+      </p>
+    </section>
+
+    <section class="content-block">
+      <h2>4. Os cinco closed loops da Aula 03 sob fogo</h2>
+      <p>
+        A arquitetura desenhada na Aula 03 introduziu cinco malhas fechadas de controle &mdash; sensores no CloudWatch,
+        controlador (EventBridge + SSM) e atuadores no ETL e no Postgres. Cada loop foi proposto para resolver um RNF
+        específico. Hoje cada um ganha um experimento que prova que ele reage como prometido. Se algum não reagir,
+        a malha não existe &mdash; é decoração.
+      </p>
+      <div class="m06-mermaid">
+        <pre class="mermaid">
+flowchart LR
+  CTRL(("Controlador SRE<br/>EventBridge + SSM"))
+  L1["Backpressure<br/>RNF-PERF-01"]
+  L2["Circuit breaker<br/>RNF-REL-01"]
+  L3["Freeze por error budget<br/>RNF-SAFE-01"]
+  L4["Quarentena de payload<br/>RNF-REL-02"]
+  L5["Drift / DNS<br/>RNF-MAINT-01"]
+
+  CTRL --- L1
+  CTRL --- L2
+  CTRL --- L3
+  CTRL --- L4
+  CTRL --- L5
+
+  L1 -.->|valida| C1["CHAOS-01<br/>kill ETL"]
+  L2 -.->|valida| C2["CHAOS-02<br/>latência 2s"]
+  L3 -.->|valida| C5["CHAOS-05<br/>CPU 100%"]
+  L4 -.->|valida| C4["CHAOS-04<br/>disco cheio"]
+  L5 -.->|valida| C6["CHAOS-06<br/>DNS quebrado"]
+        </pre>
+      </div>
+      <p>
+        Hoje rodamos apenas <strong>CHAOS-02</strong>. Os outros viram experimentos agendados nas próximas semanas
+        e entram como regressão automática quando o gate de chaos amadurecer.
+      </p>
+    </section>
+
+    <section class="content-block">
+      <h2>5. Qualidade de código mensurada</h2>
+      <p>
+        Engenharia de software produz duas coisas: comportamento e custo de manutenção. Comportamento é exercitado por
+        testes (Aula 05) e por chaos (esta aula). Custo de manutenção é exercitado por métricas que olham o código
+        como artefato &mdash; quantos caminhos ele tem, quão denso é, quanto esforço cognitivo um leitor humano paga
+        para entender. Em SRE, código de baixa qualidade não é estética &mdash; é <em>toil</em> que retorna toda vez
+        que algo precisa mudar.
+      </p>
+
+      <h3>5.1 QM-01 &mdash; Complexidade ciclomática (McCabe, 1976)</h3>
+      <p>
+        McCabe propôs em 1976 a métrica que conta caminhos linearmente independentes pelo grafo de controle de uma
+        função. Em prática, conta os pontos de decisão: cada <code>if</code>, <code>elif</code>, <code>and</code>,
+        <code>or</code>, <code>for</code>, <code>while</code>, <code>except</code>, <code>case</code> incrementa. A
+        fórmula formal é <code>M = E &minus; N + 2P</code> (arestas, nós, componentes conexos), mas equivale a
+        "número de decisões + 1". A leitura prática:
+      </p>
       <ul>
-        <li><strong>Contexto no pipeline Olist</strong> &mdash; do Refined ao warehouse analítico.</li>
-        <li><strong>Evolução do Data Warehouse</strong> &mdash; Kimball vs Inmon, OLAP cubes vs DW em nuvem.</li>
-        <li><strong>Arquitetura MPP e armazenamento colunar</strong> &mdash; leader/compute, compressão, zone maps.</li>
-        <li><strong>Modelagem dimensional</strong> &mdash; star, snowflake, fato, dimensão, SCDs e surrogate keys.</li>
-        <li><strong>Amazon Redshift</strong> &mdash; cluster vs Serverless, distribution styles, sort keys, COPY e Spectrum.</li>
-        <li><strong>Alternativa lakehouse</strong> &mdash; Athena + Apache Iceberg (ACID, time travel, schema evolution).</li>
-        <li><strong>Laboratório prático</strong> &mdash; plano A com Redshift Serverless, plano B com Athena + Iceberg.</li>
+        <li><strong>1&ndash;5</strong> &mdash; baixa, função simples.</li>
+        <li><strong>6&ndash;10</strong> &mdash; média, aceitável.</li>
+        <li><strong>11&ndash;20</strong> &mdash; alta, candidata a refactor.</li>
+        <li><strong>&gt; 20</strong> &mdash; muito alta, dívida explícita.</li>
+      </ul>
+      <p>O gate do curso é <strong>McCabe &le; 10 por função</strong> e <strong>média &le; 8 por arquivo</strong>.</p>
+
+      <h3>5.2 QM-02 &mdash; Cognitive Complexity (SonarSource, 2017)</h3>
+      <p>
+        McCabe não distingue <code>if</code> aninhado de <code>if</code> sequencial &mdash; mas o cérebro humano
+        distingue. Cognitive complexity ajusta McCabe penalizando aninhamento, recursão e quebra de fluxo
+        progressivamente. Cada quebra de fluxo conta +1; cada nível de aninhamento conta +1 extra; sequências de
+        operadores lógicos heterogêneos contam +1; recursão e <code>goto</code> contam +1. O resultado é mais fiel
+        ao tempo que um humano leva para reler a função. Limiar do curso: <strong>&le; 15</strong>.
+      </p>
+
+      <h3>5.3 QM-03 &mdash; Halstead (1977)</h3>
+      <p>
+        Halstead olha a função como texto e conta operadores e operandos &mdash; tipos distintos
+        (<code>n1</code>, <code>n2</code>) e ocorrências totais (<code>N1</code>, <code>N2</code>). A partir disso
+        deriva volume, dificuldade, esforço e tempo estimado. As métricas revelam densidade que McCabe não vê:
+        função curta com vocabulário pesado, função longa com vocabulário pobre.
+      </p>
+      <table>
+        <thead><tr><th>Métrica</th><th>Fórmula</th><th>O que diz</th></tr></thead>
+        <tbody>
+          <tr><td>Vocabulário</td><td><code>n = n1 + n2</code></td><td>Tipos distintos de tokens</td></tr>
+          <tr><td>Comprimento</td><td><code>N = N1 + N2</code></td><td>Total de tokens</td></tr>
+          <tr><td>Volume</td><td><code>V = N · log&#8322;(n)</code></td><td>Tamanho da informação</td></tr>
+          <tr><td>Dificuldade</td><td><code>D = (n1/2) · (N2/n2)</code></td><td>Densidade do código</td></tr>
+          <tr><td>Esforço</td><td><code>E = D · V</code></td><td>Custo cognitivo</td></tr>
+          <tr><td>Tempo (s)</td><td><code>T = E / 18</code></td><td>Estimado para 1 leitor</td></tr>
+        </tbody>
+      </table>
+
+      <h3>5.4 QM-04 &mdash; Maintainability Index</h3>
+      <p>
+        Oman e Hagemeister (1992) compuseram McCabe, Halstead e LOC em uma métrica única, o Maintainability Index.
+        Microsoft popularizou a versão normalizada de 0 a 100 que usamos hoje:
+      </p>
+      <div class="m06-callout">
+        <strong>Fórmula clássica (normalizada 0&ndash;100)</strong>
+        <p style="margin: 8px 0 0; font-family: var(--font-mono);">
+          MI = max(0, (171 &minus; 5.2 &middot; ln(V) &minus; 0.23 &middot; G &minus; 16.2 &middot; ln(LOC)) &middot; 100 / 171)
+        </p>
+      </div>
+      <p>
+        Onde <strong>V</strong> é o volume de Halstead, <strong>G</strong> é a complexidade ciclomática (McCabe) e
+        <strong>LOC</strong> é o número de linhas de código. Acima de 65 é considerado manutenível; abaixo, dívida.
+        Em Python: <code>radon mi src/</code>.
+      </p>
+
+      <h3>5.5 Ferramentas que rodam no nosso CI</h3>
+      <table>
+        <thead><tr><th>Ferramenta</th><th>Métrica</th><th>Saída</th></tr></thead>
+        <tbody>
+          <tr><td><code>radon cc</code></td><td>McCabe</td><td>Grade A&ndash;F por função</td></tr>
+          <tr><td><code>radon mi</code></td><td>Maintainability Index</td><td>0&ndash;100 por arquivo</td></tr>
+          <tr><td><code>radon hal</code></td><td>Halstead</td><td>V, D, E, T por função</td></tr>
+          <tr><td><code>xenon</code></td><td>McCabe gate</td><td>Exit 1 se acima do limiar</td></tr>
+          <tr><td><code>ruff check</code></td><td>Lint</td><td>Estatística por regra</td></tr>
+          <tr><td><code>mypy --strict-equality</code></td><td>Tipos</td><td>Erros semânticos</td></tr>
+          <tr><td><code>madge</code> (Node)</td><td>Deps cíclicas</td><td>Lista de ciclos no grafo</td></tr>
+        </tbody>
+      </table>
+      <p>
+        Em Node, equivalentes diretos são <code>complexity-report</code>, <code>plato</code>, <code>eslint --rule
+        complexity</code> e <code>madge</code>. O conceito é o mesmo; muda a sintaxe.
+      </p>
+
+      <h3>5.6 Política de qualidade do projeto</h3>
+      <ul>
+        <li><strong>McCabe</strong> &le; 10 por função; média &le; 8 por arquivo.</li>
+        <li><strong>Cognitive complexity</strong> &le; 15 por função.</li>
+        <li><strong>MI</strong> &ge; 65 em todo módulo crítico.</li>
+        <li><strong>Duplicação</strong> &le; 5% (regra <code>SIM</code> do ruff).</li>
+        <li><strong>Cobertura unit</strong> &ge; 80% (já vinha da Aula 05).</li>
+      </ul>
+      <p>
+        Cada função crítica é vinculada via RTM a pelo menos um RF ou RNF. Quando ela cruza um limiar, o PR não
+        merge sem ADR <code>QUALITY-NN</code> que justifique e proponha plano de refactor. O refactor é orçado pelo
+        <em>error budget</em> restante &mdash; não pela boa vontade.
+      </p>
+    </section>
+
+    <section class="content-block">
+      <h2>6. Anti-padrões que vamos evitar</h2>
+      <p>Cada item desta lista travou um time real. Eles voltam a aparecer porque são tentadores.</p>
+      <ul>
+        <li><strong>Container persistente entre testes sem reset.</strong> Faz teste 5 passar porque o teste 3 deixou
+          dado lá. Quando rodam isolados, falham. Sintoma: <em>flaky</em> no CI.</li>
+        <li><strong>Pull de imagem em todo job.</strong> Runner gasta 15 s antes de cada execução. Cache local resolve.</li>
+        <li><strong>Mock e Testcontainer misturados sem critério.</strong> O mesmo módulo usa mock em um teste e TC em
+          outro &mdash; o teste com mock vira referência falsa.</li>
+        <li><strong>Chaos sem kill switch.</strong> Algo dá errado, ninguém sabe parar. Por menor que seja a janela,
+          kill switch é obrigatório.</li>
+        <li><strong>Toxiproxy esquecido ligado.</strong> Experimento acaba, ninguém remove o toxic. Daqui a duas
+          horas, todo mundo culpa rede.</li>
+        <li><strong>Experimento sem hipótese.</strong> Quebrar coisa por curiosidade não é chaos engineering &mdash;
+          é vandalismo. A hipótese diz o que esperar.</li>
+        <li><strong>Métrica vista nunca aplicada.</strong> Relatório bonito que ninguém usa para decidir merge.
+          O conteúdo só vira realidade quando vira gate.</li>
+        <li><strong>Limiar negociado por sprint.</strong> Hoje McCabe é 12, semana que vem é 15. Métrica vira piada.</li>
+        <li><strong>Refactor sem orçamento.</strong> "Quando der tempo" nunca dá. Refactor patrocinado pelo error
+          budget é ritual: a equipe vê quanto sobrou e decide o que pagar.</li>
+      </ul>
+    </section>
+
+    <section class="content-block">
+      <h2>7. Roteiro da prática &mdash; 21h00 &ndash; 22h00</h2>
+      <p>
+        A próxima hora é guiada passo a passo. Saímos com <code>tests/integration/</code> migrado para Testcontainers,
+        Toxiproxy provisionado, um chaos run documentado, um relatório de qualidade gerado e um job <code>quality</code>
+        novo no <code>wb.yml</code>. Tudo via CLI &mdash; nada de console AWS.
+      </p>
+
+      <h3>7.1 Passo 1 &mdash; renovar token, branch nova, esqueleto de skills</h3>
+<pre>cd ~/olist-sre-pipeline
+git pull origin main
+git checkout -b aula-06-chaos-quality
+
+# (re)conectar AWS CLI - bloco do Learner Lab
+nano ~/.aws/credentials   # cola access_key, secret, session_token
+aws sts get-caller-identity
+
+# Skeleton de skills e diretorios
+mkdir -p agents/skills chaos/experiments documents/15_chaos_runs
+touch agents/skills/migrate_to_testcontainers.md \
+      agents/skills/design_chaos_experiment.md \
+      agents/skills/measure_quality.md \
+      documents/16_quality_report.md</pre>
+
+      <h3>7.2 Passo 2 &mdash; skill <code>migrate_to_testcontainers</code></h3>
+      <p>
+        A skill instrui o agente Tester a ler o estado atual de <code>tests/integration/</code> e o
+        <code>documents/03_architecture.md</code>, e produzir um diff que substitui mocks por Testcontainers,
+        com seed mínimo do gold dimensional (5 dimensões &times; 50 fatos). A entrada da skill é o estado do repo;
+        a saída é o diff em <code>tests/integration/</code> &mdash; nada além.
+      </p>
+<pre># agents/skills/migrate_to_testcontainers.md
+
+## Quando acionar
+Quando o usuario pedir para sair do mock e usar Postgres real
+em tests/integration/.
+
+## Entrada esperada
+- documents/03_architecture.md  (versao do Postgres alvo)
+- tests/integration/  (estado atual mockado)
+- documents/01_functional_requirements.md  (escopo do gold)
+
+## Passos
+1. Ler a versao do Postgres em documents/03_architecture.md.
+2. Substituir mocks por fixture session-scoped com PostgresContainer.
+3. Carregar seed minimo do gold dimensional (5 dim x 50 fato).
+4. Garantir TRUNCATE entre testes (escopo function).
+5. Ajustar pyproject.toml: testcontainers[postgres] como dev dep.
+
+## Aceitacao
+- pytest tests/integration/ passa sem mock.
+- Tempo total &lt;= 90 s.
+- Nenhum teste depende de outro (ordem livre).</pre>
+
+      <h3>7.3 Passo 3 &mdash; rodar a skill e validar localmente com <code>act</code></h3>
+      <p>
+        Antes de gastar minuto de runner ou quebrar a branch protection, rodamos o workflow no Codespace via
+        <code>act</code>. Ele simula o ambiente do GitHub Actions. Esperado: <code>pytest tests/integration/</code>
+        verde com Postgres real.
+      </p>
+<pre># Instalar act (uma vez)
+curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
+
+# Rodar so o job 'integration' do wb.yml
+act -W .github/workflows/wb.yml -j integration \
+    --container-architecture linux/amd64 \
+    -P self-hosted=catthehacker/ubuntu:act-latest
+
+# Esperado: pytest tests/integration/ verde com Postgres real
+# Tempo aproximado: 60-90 s na primeira run, 20-30 s nas seguintes.</pre>
+
+      <h3>7.4 Passo 4 &mdash; Toxiproxy via CFN ao lado do ETL</h3>
+      <p>
+        Estendemos <code>iac/cloudformation/compute.yaml</code> da Aula 04 com o Toxiproxy rodando como container
+        sidecar na mesma EC2 ETL, ouvindo só na rede interna (<code>127.0.0.1</code>). O ETL passa a falar com o
+        Postgres pela porta <code>5433</code> do Toxiproxy &mdash; em modo normal, é transparente. Quando vamos
+        injetar latência, o Toxiproxy intercepta.
+      </p>
+<pre># Adendo ao compute.yaml (UserData da EC2 ETL)
+docker run -d --name toxiproxy \
+  --restart unless-stopped \
+  -p 127.0.0.1:8474:8474 \
+  -p 127.0.0.1:5433:5433 \
+  ghcr.io/shopify/toxiproxy:latest
+
+docker exec toxiproxy /toxiproxy-cli create -l 0.0.0.0:5433 \
+  -u $PG_HOST:5432 etl-pg
+
+# Re-deploy
+aws cloudformation deploy \
+  --template-file iac/cloudformation/compute.yaml \
+  --stack-name olist-sre-pipeline-lab \
+  --capabilities CAPABILITY_IAM</pre>
+
+      <h3>7.5 Passo 5 &mdash; skill <code>design_chaos_experiment</code></h3>
+      <p>
+        A skill obriga a IA a escrever YAML válido contra <code>chaos/experiments/_schema.json</code>. Sem
+        <code>kill_switch</code>, sem <code>duracao_max</code> e sem <code>blast_radius</code>, a skill recusa.
+      </p>
+<pre># agents/skills/design_chaos_experiment.md
+
+## Quando acionar
+Quando o usuario pedir para desenhar um experimento de chaos.
+
+## Entrada esperada
+- ID do loop a validar (ex.: "circuit breaker do RNF-REL-01")
+- SLI alvo
+- Janela maxima permitida
+
+## Passos
+1. Escrever YAML em chaos/experiments/CHAOS-NN.yaml com:
+   hipotese, baseline, acoes, salvaguardas, aceitacao.
+2. Anexar comando aws ssm send-command para injetar.
+3. Anexar comando de kill switch.
+4. Listar metricas CW que sustentam aceitacao.
+5. Recusar experimento sem kill switch ou sem janela.
+
+## Aceitacao
+- YAML valida contra schema chaos/experiments/_schema.json.
+- duracao_max obrigatoria.
+- blast_radius descrito por tag.</pre>
+
+      <h3>7.6 Passo 6 &mdash; injetar a falha via SSM Run Command</h3>
+      <p>
+        Com o YAML pronto, transformamos a sequência de ações em um <code>aws ssm send-command</code> que distribui
+        para a EC2 alvo (selecionada por tag). O ID do comando volta como variável de ambiente; é ele que usamos no
+        kill switch.
+      </p>
+<pre># Injetar latencia 2000ms por 60s no proxy etl-pg
+CMD_ID=$(aws ssm send-command \
+  --document-name "AWS-RunShellScript" \
+  --targets "Key=tag:Role,Values=etl-lab" \
+  --parameters 'commands=[
+    "docker exec toxiproxy /toxiproxy-cli toxic add -t latency -a latency=2000 etl-pg",
+    "sleep 60",
+    "docker exec toxiproxy /toxiproxy-cli toxic remove --toxicName etl-pg-latency etl-pg"
+  ]' \
+  --query "Command.CommandId" --output text)
+
+echo "$CMD_ID" &gt; /tmp/last_chaos_cmd
+
+# Kill switch (executar se algo sair do controle)
+aws ssm cancel-command --command-id "$CMD_ID"
+
+# Observar
+aws logs tail /aws/ec2/etl-lab --follow --since 2m</pre>
+
+      <h3>7.7 Passo 7 &mdash; registrar o run</h3>
+      <p>Sem registro, o experimento não existiu. Um arquivo por run, datado, com hipótese, execução, resultado e ADR.</p>
+<pre># documents/15_chaos_runs/2026-05-21T2105_CHAOS-02.md
+
+## Hipotese
+Se a latencia ETL -&gt; Postgres subir para 2000ms por 60s,
+o circuit breaker abre em &lt;= 10s e nao perde mensagens.
+
+## Baseline
+pg_query_p95_ms = 42 ms (5 min antes)
+
+## Execucao
+- T-0:    latencia injetada via toxiproxy
+- T+7s:   circuit_breaker_open=true (CW Logs)
+- T+60s:  latencia removida
+- T+78s:  pg_query_p95_ms = 51 ms (volta ao baseline)
+
+## Resultado
+PASSOU. Aceitacao integralmente atendida.
+
+## ADR gerado
+ADR-12 - circuit breaker abre em 7s, dentro do limite de 10s.
+Manter threshold atual. Proximo experimento: latencia 5000ms.</pre>
+
+      <h3>7.8 Passo 8 &mdash; skill <code>measure_quality</code> e relatório</h3>
+      <p>
+        O agente Reviewer roda <code>radon</code>, <code>xenon</code> e <code>ruff</code>, consolida tudo em
+        <code>documents/16_quality_report.md</code> com top-5 funções por complexidade, vínculo de cada item à RTM
+        e plano de refactor priorizado pelo error budget.
+      </p>
+<pre>opencode
+
+&gt; Aplique a skill agents/skills/measure_quality.md em src/.
+&gt; Gere documents/16_quality_report.md com:
+&gt;   - tabela radon cc -s -a (media e grade)
+&gt;   - resultado xenon (gate B-A-A)
+&gt;   - radon mi (MI por arquivo, alerta &lt; 65)
+&gt;   - ruff check --statistics
+&gt;   - top-5 funcoes mais complexas
+&gt;   - plano de refactor com horas estimadas
+&gt;   - vinculo de cada item ao RF/RNF da RTM
+
+# Comandos crus para fallback
+radon cc -s -a src/  &gt; reports/cc.txt
+xenon --max-absolute B --max-modules A --max-average A src/
+radon mi src/        &gt; reports/mi.txt
+ruff check --statistics src/ &gt; reports/ruff.txt</pre>
+
+      <h3>7.9 Passo 9 &mdash; gate de qualidade no <code>wb.yml</code></h3>
+      <p>
+        A métrica só vira realidade quando vira CI gate. PR que cruzar o limiar não merge sem ADR. Adicionamos um
+        job novo, dependente dos jobs <code>unit</code> e <code>integration</code>:
+      </p>
+<pre># .github/workflows/wb.yml (adendo)
+quality:
+  runs-on: [self-hosted, lab]
+  needs: [unit, integration]
+  steps:
+    - uses: actions/checkout@v4
+    - run: pip install radon xenon ruff
+    - name: McCabe gate
+      run: xenon --max-absolute B --max-modules A --max-average A src/
+    - name: MI gate
+      run: |
+        python - &lt;&lt;'EOF'
+        import subprocess, sys, json
+        out = subprocess.check_output(["radon","mi","-j","src/"]).decode()
+        data = json.loads(out)
+        bad = [f for f, m in data.items() if m["mi"] &lt; 65]
+        if bad:
+            print("MI &lt; 65 em:", bad); sys.exit(1)
+        EOF
+    - name: Ruff gate
+      run: ruff check src/</pre>
+
+      <h3>7.10 Passo 10 &mdash; critério de pronto, commit e tag</h3>
+      <p>Antes do <code>git push</code>, cada item verde:</p>
+      <ul>
+        <li><code>tests/integration/</code> migrado para Testcontainers, sem mock.</li>
+        <li>Toxiproxy provisionado e <em>OFF</em> ao final.</li>
+        <li>1 chaos run completo em <code>documents/15_chaos_runs/</code>.</li>
+        <li><code>documents/16_quality_report.md</code> gerado.</li>
+        <li>Job <code>quality</code> verde no <code>wb.yml</code>.</li>
+        <li>3 skills novas em <code>agents/skills/</code>.</li>
+        <li>1 ADR (<code>ADR-NN</code>) por descoberta.</li>
+        <li>Tag <code>aula-06</code> no remoto.</li>
+      </ul>
+<pre>git add tests/integration chaos documents agents .github
+git commit -m "feat(aula-06): testcontainers + chaos run + quality gate"
+git tag aula-06
+git push origin aula-06-chaos-quality --tags</pre>
+    </section>
+
+    <section class="content-block">
+      <h2>8. Restrições duras desta aula</h2>
+      <ul>
+        <li><strong>Sem console AWS.</strong> Tudo via CLI / SSM.</li>
+        <li><strong>Chaos só no stack lab.</strong> Nunca em produção sem ADR específico e janela negociada.</li>
+        <li><strong>Kill switch obrigatório</strong> em todo experimento &mdash; sem ele, a skill recusa.</li>
+        <li><strong>Toxiproxy nunca em prod</strong> sem ADR e sem revisão de blast radius.</li>
+        <li><strong>FIS está bloqueado</strong> no Learner Lab &mdash; usar SSM Run Command como substituto.</li>
+        <li><strong>Métrica de qualidade</strong> não negociável por sprint &mdash; só por ADR <code>QUALITY-NN</code>.</li>
+      </ul>
+    </section>
+
+    <section class="content-block">
+      <h2>9. Continuidade &mdash; ponte para a Aula 07</h2>
+      <p>
+        As métricas medidas hoje (McCabe médio, MI, taxa de chaos passados, tempo médio de retorno ao baseline) viram
+        <strong>SLIs internos</strong> na Aula 07. Entram nos dashboards CloudWatch consolidados e passam a ter SLO
+        próprio. Quando o SLI cair abaixo do SLO, o controlador SRE da Aula 03 dispara &mdash; freeze de feature,
+        prioridade para refactor, escalonamento. O ciclo da Aula 07 é: medir, comparar com meta, decidir trabalho.
+      </p>
+    </section>
+
+    <section class="content-block">
+      <h2>10. Glossário consolidado</h2>
+      <p>
+        Vocabulário usado nesta aula. As três tabelas de glossário em slide são compactas; aqui há descrições mais
+        longas para consulta.
+      </p>
+
+      <h3>10.1 Testes e Testcontainers</h3>
+      <table>
+        <thead><tr><th style="width:18%;">Sigla</th><th>Significado</th></tr></thead>
+        <tbody>
+          <tr><td><strong>TC</strong></td><td>Testcontainer &mdash; container Docker descartável controlado pelo teste.</td></tr>
+          <tr><td><strong>WB</strong></td><td>White Box test &mdash; teste com conhecimento da estrutura interna.</td></tr>
+          <tr><td><strong>BB</strong></td><td>Black Box test &mdash; teste pelo contrato externo do sistema.</td></tr>
+          <tr><td><strong>e2e</strong></td><td>End-to-End &mdash; teste do fluxo completo, ponta a ponta.</td></tr>
+          <tr><td><strong>BDD</strong></td><td>Behavior-Driven Development &mdash; especificação executável (Given/When/Then).</td></tr>
+          <tr><td><strong>SUT</strong></td><td>System Under Test &mdash; o sistema sendo testado.</td></tr>
+          <tr><td><strong>DI</strong></td><td>Dependency Injection &mdash; injetar dependências para facilitar substituição.</td></tr>
+          <tr><td><strong>OCI</strong></td><td>Open Container Initiative &mdash; padrão de imagens e runtime de containers.</td></tr>
+          <tr><td><strong>LS</strong></td><td>LocalStack &mdash; emulador de APIs AWS dentro de container.</td></tr>
+          <tr><td><strong>JDBC</strong></td><td>Java Database Connectivity &mdash; padrão de conexão com bancos.</td></tr>
+          <tr><td><strong>DSN</strong></td><td>Data Source Name &mdash; URI/identificador da conexão.</td></tr>
+          <tr><td><strong>PG</strong></td><td>PostgreSQL &mdash; o nosso banco do gold.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>10.2 Chaos engineering e SRE</h3>
+      <table>
+        <thead><tr><th style="width:18%;">Sigla</th><th>Significado</th></tr></thead>
+        <tbody>
+          <tr><td><strong>FIS</strong></td><td>AWS Fault Injection Service &mdash; gerenciado, mas <strong>não disponível no Learner Lab</strong>.</td></tr>
+          <tr><td><strong>SSM</strong></td><td>AWS Systems Manager &mdash; agrega Run Command, Session Manager, Parameter Store.</td></tr>
+          <tr><td><strong>Toxiproxy</strong></td><td>Proxy TCP que injeta falhas (latência, perda, banda). Mantido pela Shopify.</td></tr>
+          <tr><td><strong>tc</strong></td><td>Linux traffic control &mdash; ferramenta do <code>iproute2</code> para qdisc.</td></tr>
+          <tr><td><strong>netem</strong></td><td>Network emulator do kernel Linux &mdash; latência, perda, reordenamento.</td></tr>
+          <tr><td><strong>Blast radius</strong></td><td>Raio de explosão &mdash; quantos componentes/usuários o experimento afeta.</td></tr>
+          <tr><td><strong>Steady state</strong></td><td>Estado estacionário medido por uma SLI antes do experimento.</td></tr>
+          <tr><td><strong>Game day</strong></td><td>Cerimônia em que o time roda chaos junto com papéis claros.</td></tr>
+          <tr><td><strong>SRE</strong></td><td>Site Reliability Engineering &mdash; disciplina e papel.</td></tr>
+          <tr><td><strong>SLI</strong></td><td>Service Level Indicator &mdash; métrica observável.</td></tr>
+          <tr><td><strong>SLO</strong></td><td>Service Level Objective &mdash; meta interna sobre a SLI.</td></tr>
+          <tr><td><strong>SLA</strong></td><td>Service Level Agreement &mdash; contrato externo, com consequência.</td></tr>
+          <tr><td><strong>MTBF</strong></td><td>Mean Time Between Failures &mdash; tempo médio entre falhas.</td></tr>
+          <tr><td><strong>MTTR</strong></td><td>Mean Time To Recovery &mdash; tempo médio de recuperação.</td></tr>
+          <tr><td><strong>RTO</strong></td><td>Recovery Time Objective &mdash; tempo máximo aceitável para recuperar.</td></tr>
+          <tr><td><strong>RPO</strong></td><td>Recovery Point Objective &mdash; perda máxima de dado aceitável.</td></tr>
+          <tr><td><strong>Toil</strong></td><td>Trabalho repetitivo, sem valor duradouro, que escala com o serviço.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>10.3 Qualidade de código e métricas</h3>
+      <table>
+        <thead><tr><th style="width:18%;">Sigla</th><th>Significado</th></tr></thead>
+        <tbody>
+          <tr><td><strong>McCabe</strong></td><td>Complexidade ciclomática &mdash; caminhos linearmente independentes (1976).</td></tr>
+          <tr><td><strong>CC</strong></td><td>Cyclomatic Complexity &mdash; sigla usual de McCabe.</td></tr>
+          <tr><td><strong>Cognitive</strong></td><td>Cognitive Complexity &mdash; ajuste à McCabe que pesa aninhamento (SonarSource, 2017).</td></tr>
+          <tr><td><strong>MI</strong></td><td>Maintainability Index &mdash; métrica composta, normalizada 0&ndash;100.</td></tr>
+          <tr><td><strong>LOC</strong></td><td>Lines Of Code &mdash; total de linhas, incluindo comentários.</td></tr>
+          <tr><td><strong>SLOC</strong></td><td>Source Lines Of Code &mdash; só linhas com código de fato.</td></tr>
+          <tr><td><strong>QM</strong></td><td>Quality Metric &mdash; ID estável das métricas no curso (QM-NN).</td></tr>
+          <tr><td><strong>RPN</strong></td><td>Risk Priority Number &mdash; do FMEA (Aula 03).</td></tr>
+          <tr><td><strong>ADR</strong></td><td>Architecture Decision Record &mdash; registro de decisão.</td></tr>
+          <tr><td><strong>radon</strong></td><td>Toolkit Python para CC, MI e Halstead.</td></tr>
+          <tr><td><strong>xenon</strong></td><td>Gate sobre radon &mdash; falha o build se cruzar limiar.</td></tr>
+          <tr><td><strong>ruff</strong></td><td>Linter Python rápido (Astral).</td></tr>
+          <tr><td><strong>act</strong></td><td>Roda GitHub Actions localmente em Docker.</td></tr>
+          <tr><td><strong>YAML</strong></td><td>YAML Ain't Markup Language &mdash; formato declarativo.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>10.4 Normas e organizações</h3>
+      <table>
+        <thead><tr><th style="width:18%;">Sigla</th><th>Significado</th></tr></thead>
+        <tbody>
+          <tr><td><strong>ISO/IEC 25010</strong></td><td>Quality model &mdash; atributos de qualidade de software.</td></tr>
+          <tr><td><strong>IEEE 982</strong></td><td>IEEE Standard Dictionary of Measures of the Software Aspects of Dependability.</td></tr>
+          <tr><td><strong>NIST</strong></td><td>National Institute of Standards and Technology (EUA).</td></tr>
+          <tr><td><strong>SonarSource</strong></td><td>Empresa autora do conceito de Cognitive Complexity (white paper 2017).</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="content-block">
+      <h2>11. Referências</h2>
+      <ul>
+        <li>McCabe, T. J. &mdash; <em>A Complexity Measure</em>, IEEE Transactions on Software Engineering, 1976.</li>
+        <li>Halstead, M. &mdash; <em>Elements of Software Science</em>, Elsevier, 1977.</li>
+        <li>Oman, P.; Hagemeister, J. &mdash; <em>Metrics for Assessing a Software System's Maintainability</em>, IEEE ICSM, 1992.</li>
+        <li>SonarSource &mdash; <em>Cognitive Complexity, a new way of measuring understandability</em>, white paper, 2017.</li>
+        <li>Basiri, A. et al. &mdash; <em>Chaos Engineering</em>, IEEE Software, 2016.</li>
+        <li>Rosenthal, C.; Jones, N. et al. &mdash; <em>Chaos Engineering &mdash; System Resiliency in Practice</em>, O'Reilly, 2020.</li>
+        <li>principlesofchaos.org &mdash; <em>Principles of Chaos Engineering</em>.</li>
+        <li>Beyer et al. &mdash; <em>Site Reliability Engineering &mdash; How Google Runs Production Systems</em>, O'Reilly.</li>
+        <li>ISO/IEC 25010:2023 &mdash; <em>Systems and software Quality Requirements and Evaluation</em>.</li>
+        <li>Testcontainers docs &mdash; <code>testcontainers.com</code>; <code>testcontainers-python</code> docs.</li>
+        <li>Toxiproxy &mdash; <code>github.com/Shopify/toxiproxy</code>.</li>
+        <li>radon docs &mdash; <code>radon.readthedocs.io</code>; xenon docs; ruff (Astral) docs.</li>
+        <li>nektos/act &mdash; <code>github.com/nektos/act</code> (rodar workflows GitHub Actions localmente).</li>
+        <li>AWS Systems Manager Run Command &mdash; documentação oficial.</li>
       </ul>
     </section>
 
@@ -49,5 +867,25 @@
     </section>
 
   </main>
+
+  <!-- Mermaid v11 — diagramas (chaos flow + radial loops) -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'neutral',
+      securityLevel: 'loose',
+      flowchart: { htmlLabels: true, curve: 'basis' },
+      themeVariables: {
+        fontFamily: 'JetBrains Mono, ui-monospace, monospace',
+        primaryColor: '#ffffff',
+        primaryBorderColor: '#0f0f0f',
+        primaryTextColor: '#0f0f0f',
+        lineColor: '#5c5c5c',
+        clusterBkg: '#fafaf7',
+        clusterBorder: '#d6d6d1'
+      }
+    });
+  </script>
 </body>
 </html>

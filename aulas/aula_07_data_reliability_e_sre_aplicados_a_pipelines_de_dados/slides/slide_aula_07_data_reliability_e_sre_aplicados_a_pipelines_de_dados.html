@@ -4,8 +4,116 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" />
-  <title>Aula 07 — Data Reliability e SRE aplicados a pipelines de dados</title>
+  <title>Aula 07 — SRE aplicado: observabilidade, runbooks automatizados e gestão distribuída via CloudFormation</title>
   <link href="../../../assets/slides.css" rel="stylesheet">
+  <style data-aula07-local>
+    /* Tokens base vêm de assets/slides.css. Aqui ficam apenas
+       utilitários scoped à Aula 07 (compactação para viewport baixo,
+       grid de 3 colunas, tabela compacta, prompt/code box, mermaid). */
+
+    @media (max-height: 900px) {
+      .deck-shell { min-height: 520px; padding: 32px 44px; margin: 14px; gap: 16px; }
+      .deck-shell .deck-title { font-size: 2.1em; }
+      .deck-shell .deck-year  { font-size: 3em; margin: 4px 0; }
+      .deck-shell .deck-summary { margin-bottom: 6px; }
+      .deck-shell h2.deck-title { margin-bottom: 4px; }
+    }
+    @media (max-height: 820px) {
+      .deck-shell { min-height: 480px; padding: 26px 40px; margin: 10px; gap: 12px; }
+      .deck-shell .deck-title { font-size: 1.95em; }
+      .deck-shell .deck-year  { font-size: 2.6em; }
+    }
+
+    .a07-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .a07-grid-3 .deck-card { padding: 18px 20px; }
+    .a07-grid-3 .deck-card h3 { font-size: 1.05em; }
+    .a07-grid-3 .deck-card ul { margin: 8px 0 0; }
+    .a07-grid-3 .deck-card li { margin-bottom: 4px; font-size: .95em; }
+    @media (max-width: 1100px) {
+      .a07-grid-3 { grid-template-columns: 1fr; }
+    }
+
+    .a07-compact .deck-card { padding: 16px 18px; }
+    .a07-compact .deck-card h3 { font-size: 1em; margin-bottom: 6px; }
+    .a07-compact .deck-card ul { margin: 6px 0 0; }
+    .a07-compact .deck-card li { margin-bottom: 4px; font-size: .92em; line-height: 1.45; }
+    .a07-compact .deck-panel { padding: 16px 18px; }
+    .a07-compact .deck-panel li { margin-bottom: 4px; font-size: .92em; line-height: 1.45; }
+    .a07-compact .deck-summary { margin-bottom: 10px; }
+    .a07-compact .deck-callout { padding: 16px 20px; }
+    .a07-compact .deck-callout li,
+    .a07-compact .deck-callout ol li { margin-bottom: 4px; }
+
+    .a07-table-compact .deck-table th,
+    .a07-table-compact .deck-table td {
+      padding: 7px 10px;
+      font-size: .92em;
+      line-height: 1.4;
+    }
+
+    .a07-mermaid {
+      background: var(--deck-panel);
+      border: 1px solid var(--deck-line);
+      border-radius: 4px;
+      padding: 18px;
+      margin-top: 8px;
+      overflow: auto;
+    }
+    .a07-mermaid pre.mermaid {
+      background: transparent !important;
+      color: var(--deck-text) !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      box-shadow: none !important;
+      border: none !important;
+      border-radius: 0 !important;
+      overflow: visible;
+    }
+    .a07-mermaid pre.mermaid::before { display: none !important; }
+    .a07-mermaid svg {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+      background: transparent;
+    }
+    .a07-prompt {
+      background: #0d1117;
+      color: #e6edf3;
+      padding: 14px 16px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: .88rem;
+      line-height: 1.6;
+      overflow-x: auto;
+      margin: 10px 0 0;
+    }
+    .a07-prompt-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--deck-muted);
+      margin-bottom: 4px;
+      display: block;
+    }
+    .a07-pill {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--deck-muted);
+      border: 1px solid var(--deck-line);
+      padding: 2px 8px;
+      border-radius: 3px;
+      margin-right: 6px;
+    }
+  </style>
 </head>
 <body>
   <div class="slide-container">
@@ -18,10 +126,10 @@
         <div>
           <img class="deck-logo-full" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_e4vyyw.png" alt="Universidade Presbiteriana Mackenzie" />
           <span class="deck-kicker">Cloud Computing e SRE &middot; MBA Engenharia de Dados</span>
-          <h1 class="deck-title">Data Reliability e SRE aplicados a pipelines de dados</h1>
+          <h1 class="deck-title">SRE aplicado: observabilidade, runbooks automatizados e gestão distribuída via CloudFormation</h1>
           <p class="deck-meta">Aula 07 &nbsp;&bull;&nbsp; 28/05/2026 &nbsp;&bull;&nbsp; 19h00 &ndash; 22h00</p>
           <p class="deck-year">2026</p>
-          <p class="deck-subtitle">SLI, SLO, error budget e chaos engineering aplicados ao pipeline Olist &mdash; confiabilidade como propriedade do sistema.</p>
+          <p class="deck-subtitle">O pipeline ganha olhos e mãos &mdash; CloudWatch enxerga, EventBridge + SSM agem. Closed loops desenhados na Aula 03 saem do markdown e viram código.</p>
         </div>
       </div>
     </div>
@@ -34,25 +142,30 @@
         <div>
           <span class="deck-kicker">Agenda</span>
           <h2 class="deck-title">O que vai acontecer nesta aula</h2>
-          <p class="deck-summary">Conteúdo em construção. Esta seção será refinada antes de 28/05/2026.</p>
+          <p class="deck-summary">Duas horas de teoria sobre SRE em produção e uma hora de prática guiada criando observability stack via IaC, EMF no ETL e runbook automatizado para o closed loop alarm &rarr; EventBridge &rarr; SSM.</p>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
-            <h3>19h00 &ndash; 20h30 &middot; Teoria</h3>
+            <h3>19h00 &ndash; 21h00 &middot; Teoria</h3>
             <ul>
-              <li>TODO &mdash; SRE aplicado a dados: DataOps e DORA metrics.</li>
-              <li>TODO &mdash; SLI, SLO, SLA e error budget para pipelines.</li>
-              <li>TODO &mdash; observabilidade: logs, métricas e traces.</li>
-              <li>TODO &mdash; padrões de resiliência e orquestração.</li>
+              <li>Recap Aulas 03 a 06 e o que ainda falta</li>
+              <li>Pilares SRE: SLI/SLO/SLA, error budget, toil, IR, postmortem</li>
+              <li>CloudWatch como sistema nervoso (logs, metrics, alarms, EMF)</li>
+              <li>X-Ray e Synthetics no Learner Lab</li>
+              <li>EventBridge + SSM &mdash; coração do closed loop</li>
+              <li>Gestão distribuída de fleet &mdash; SSM, Patch, State Manager</li>
+              <li>Tudo via CloudFormation. Zero clique no console</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>20h30 &ndash; 22h00 &middot; Prática</h3>
+            <h3>21h00 &ndash; 22h00 &middot; Prática guiada</h3>
             <ul>
-              <li>TODO &mdash; CloudWatch Alarms sobre métricas do Glue Job.</li>
-              <li>TODO &mdash; DLQ e retries na Lambda consumer de streaming.</li>
-              <li>TODO &mdash; Step Functions orquestrando o pipeline com retry.</li>
-              <li>TODO &mdash; injetar falha e observar o comportamento.</li>
+              <li>Renovar session token e criar skill nova</li>
+              <li>Gerar <code>iac/cloudformation/observability.yaml</code></li>
+              <li>EMF no <code>src/etl/main.py</code> e canário Synthetics</li>
+              <li>Runbook <code>RetryEtlOnce</code> com dry-run</li>
+              <li>Simulação de incidente e postmortem</li>
+              <li>Tag <code>aula-07</code> no repo</li>
             </ul>
           </article>
         </div>
@@ -60,125 +173,34 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 3 - EM CONSTRUCAO                                      -->
+    <!-- SLIDE 3 - RECAP                                              -->
     <!-- ============================================================ -->
     <div class="slide">
-      <div class="deck-shell">
+      <div class="deck-shell a07-compact">
         <div>
-          <span class="deck-kicker">Status &middot; Placeholder</span>
-          <h2 class="deck-title">Aula em construção</h2>
-          <p class="deck-summary">Este deck é um esqueleto no novo design system. O conteúdo será preenchido incrementalmente nas próximas semanas.</p>
-        </div>
-        <div class="deck-callout">
-          <strong>O que já está definido</strong>
-          <ul>
-            <li>Tema central: confiabilidade e SRE aplicados ao pipeline Olist.</li>
-            <li>Datas e duração: 28/05/2026, 19h00 &ndash; 22h00.</li>
-            <li>Posição no arco do curso: Aula 07 de 8.</li>
-            <li>Pré-requisitos: pipeline funcional das Aulas 04, 05 e 06 (streaming, ETL serverless e Data Warehouse).</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 4 - PLACEHOLDER TEORIA (TABELA)                        -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Teoria &middot; Placeholder</span>
-          <h2 class="deck-title">SLI, SLO, SLA e error budget em uma tabela</h2>
-          <p class="deck-summary">Estrutura de tabela editorial que será preenchida com definições, exemplos aplicados ao pipeline Olist e consequências operacionais.</p>
-        </div>
-        <table class="deck-table">
-          <thead>
-            <tr>
-              <th>Conceito</th>
-              <th>Definição</th>
-              <th>Exemplo no pipeline Olist</th>
-              <th>Quem consome</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>SLI</td><td>TODO</td><td>TODO</td><td>TODO</td></tr>
-            <tr><td>SLO</td><td>TODO</td><td>TODO</td><td>TODO</td></tr>
-            <tr><td>SLA</td><td>TODO</td><td>TODO</td><td>TODO</td></tr>
-            <tr><td>Error budget</td><td>TODO</td><td>TODO</td><td>TODO</td></tr>
-            <tr><td>Burn rate</td><td>TODO</td><td>TODO</td><td>TODO</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 5 - PLACEHOLDER TEORIA (GRID DE CARDS)                 -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Teoria &middot; Placeholder</span>
-          <h2 class="deck-title">Quatro pilares da observabilidade</h2>
-          <p class="deck-summary">Grid de cards que será preenchido com definições, serviços AWS correspondentes e exemplos aplicados a pipelines de dados.</p>
-        </div>
-        <div class="deck-grid">
-          <article class="deck-card">
-            <h3>Logs</h3>
-            <ul>
-              <li>TODO &mdash; definição e casos de uso.</li>
-              <li>TODO &mdash; serviço AWS correspondente.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Métricas</h3>
-            <ul>
-              <li>TODO &mdash; definição e casos de uso.</li>
-              <li>TODO &mdash; serviço AWS correspondente.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Traces</h3>
-            <ul>
-              <li>TODO &mdash; definição e casos de uso.</li>
-              <li>TODO &mdash; serviço AWS correspondente.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Linhagem de dados</h3>
-            <ul>
-              <li>TODO &mdash; definição e casos de uso.</li>
-              <li>TODO &mdash; serviço AWS correspondente.</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 6 - PLACEHOLDER TEORIA (2 COLUNAS)                     -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Teoria &middot; Placeholder</span>
-          <h2 class="deck-title">Reativo vs proativo &mdash; MTTR vs MTBF</h2>
-          <p class="deck-summary">Duas colunas comparando posturas de operação e como cada uma se manifesta em um pipeline de dados.</p>
+          <span class="deck-kicker">Abertura &middot; Recap</span>
+          <h2 class="deck-title">Cinco aulas para chegar até aqui</h2>
+          <p class="deck-summary">Tudo o que está no repo até a Aula 06 sustenta o que vamos fazer hoje. SRE não nasce do nada &mdash; nasce de modelagem, infra, CI e chaos já validados.</p>
         </div>
         <div class="deck-columns">
           <div class="deck-panel">
-            <strong>Reativo &middot; foco em MTTR</strong>
+            <strong>O que já está pronto</strong>
             <ul>
-              <li>TODO &mdash; o que significa minimizar tempo de recuperação.</li>
-              <li>TODO &mdash; papel de runbooks e postmortem blameless.</li>
-              <li>TODO &mdash; ferramentas AWS para reagir rápido.</li>
+              <li>Aula 02 &mdash; Codespace, OpenCode, Gemini CLI, repo, <code>spec/</code>.</li>
+              <li>Aula 03 &mdash; <code>documents/01..09</code>, system design com closed loops.</li>
+              <li>Aula 04 &mdash; squad de agentes, CFN templates, stack <code>olist-sre-pipeline-lab</code>.</li>
+              <li>Aula 05 &mdash; CI white box e black box, runner self-hosted, branch protection.</li>
+              <li>Aula 06 &mdash; Testcontainers, chaos via Toxiproxy, gate de qualidade.</li>
             </ul>
           </div>
           <div class="deck-panel">
-            <strong>Proativo &middot; foco em MTBF</strong>
+            <strong>O que falta para fechar SRE</strong>
             <ul>
-              <li>TODO &mdash; o que significa maximizar tempo entre falhas.</li>
-              <li>TODO &mdash; padrões de resiliência aplicados ao pipeline.</li>
-              <li>TODO &mdash; data quality como prevenção (DQDL, Great Expectations).</li>
+              <li>O pipeline ainda não <strong>se observa</strong> &mdash; logs estão crus.</li>
+              <li>O pipeline ainda não <strong>se repara</strong> &mdash; alertas só mandam e-mail.</li>
+              <li>Os closed loops do system design ainda <strong>não viraram código</strong>.</li>
+              <li>Não existe runbook nem postmortem.</li>
+              <li>Não existe dashboard único em CloudWatch.</li>
             </ul>
           </div>
         </div>
@@ -186,56 +208,1469 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 7 - PLACEHOLDER PRATICA                                -->
+    <!-- SLIDE 4 - TESE DA AULA                                       -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; 20h30 &ndash; 22h00</span>
-          <h2 class="deck-title">Laboratório: injetar falha e observar o pipeline</h2>
-          <p class="deck-summary">O roteiro prático será detalhado com comandos AWS CLI, prints do console e definições de DQDL antes da aula.</p>
+          <span class="deck-kicker">Tese da aula</span>
+          <h2 class="deck-title">SRE é o pipeline se observando e se reparando dentro do error budget</h2>
+          <p class="deck-summary">Pager humano só quando o budget esgota. Tudo abaixo disso é responsabilidade da malha fechada &mdash; e da malha fechada em <em>código</em>, versionada via CloudFormation, com runbook validado em dry-run.</p>
         </div>
-        <div class="deck-panel">
-          <strong>Esqueleto dos passos</strong>
-          <ol>
-            <li>TODO &mdash; configurar CloudWatch Alarm sobre métricas do Glue Job (tempo decorrido e tasks falhas) com notificação via SNS.</li>
-            <li>TODO &mdash; adicionar DLQ na Lambda consumer da Aula 04 e testar mensagens com payload inválido.</li>
-            <li>TODO &mdash; criar workflow Step Functions orquestrando crawler, Glue raw&rarr;silver, silver&rarr;gold e Data Quality check.</li>
-            <li>TODO &mdash; configurar retry com backoff exponencial e Catch states para cada task.</li>
-            <li>TODO &mdash; induzir falha proposital (schema quebrado, role sem permissão) e observar retries no console.</li>
-            <li>TODO &mdash; registrar incidente no DynamoDB e redigir postmortem blameless curto.</li>
+        <div class="deck-callout">
+          <strong>Cinco regras da Aula 07</strong>
+          <ol style="margin:12px 0 0; padding-left:22px;">
+            <li>Sem console AWS. Tudo via CFN e CLI &mdash; revisável em diff.</li>
+            <li>Alarm sem runbook é alarm-fadiga. Toda regra <code>AWS::CloudWatch::Alarm</code> aponta para um runbook.</li>
+            <li>Runbook sempre tem <em>dry-run</em> antes do <em>enable</em>. Auto-remediação cega quebra mais do que conserta.</li>
+            <li>Toda métrica tem <strong>unidade</strong> e <strong>janela</strong>. Métrica sem unidade é número decorativo.</li>
+            <li>Todo incidente vira postmortem blameless em <code>documents/17_postmortems/</code>. Sem culpado &mdash; com contributing factors e dono.</li>
           </ol>
         </div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 8 - FECHAMENTO E PONTE PARA AULA 08                    -->
+    <!-- SLIDE 5 - PILARES SRE                                        -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a07-compact">
+        <div>
+          <span class="deck-kicker">SRE &middot; Pilares</span>
+          <h2 class="deck-title">Pilares SRE &mdash; Beyer, Jones, Petoff, Murphy (Google)</h2>
+          <p class="deck-summary">Os mesmos pilares do livro azul, mapeados para um pipeline de dados. Nenhum é folclore: cada um é prática operacional concreta.</p>
+        </div>
+        <div class="a07-grid-3">
+          <article class="deck-card">
+            <h3>SLI / SLO / Error budget</h3>
+            <ul>
+              <li>SLI &mdash; indicador medido (freshness, completeness).</li>
+              <li>SLO &mdash; meta interna por janela.</li>
+              <li>Budget &mdash; <code>1 &minus; SLO</code>; quando esgota, freeze.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Toil</h3>
+            <ul>
+              <li>Trabalho manual repetitivo, sem valor durável.</li>
+              <li>Meta clássica do Google: &lt; 50% do tempo do time.</li>
+              <li>Reduzir toil &equiv; automatizar runbook.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Incident response</h3>
+            <ul>
+              <li>Roles definidos: IC, ops, comms.</li>
+              <li>Status page interna, escalation clara.</li>
+              <li>Comunicação assíncrona &gt; reuniões de pânico.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Postmortem blameless</h3>
+            <ul>
+              <li>Timeline factual, não narrativa heróica.</li>
+              <li>Contributing factors, não culpado.</li>
+              <li>Action items com dono, prazo, status.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Releases progressivos</h3>
+            <ul>
+              <li>Canário, blue/green, feature flags.</li>
+              <li>Reduz blast radius de mudança.</li>
+              <li>Combina com error budget para gating.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Automação no lugar de heroísmo</h3>
+            <ul>
+              <li>Runbook executável bate procedimento em PDF.</li>
+              <li>SSM + EventBridge resolvem 80% dos casos rotineiros.</li>
+              <li>Pager só para o que realmente exige humano.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 6 - SLI PARA PIPELINES                                 -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a07-table-compact">
+        <div>
+          <span class="deck-kicker">SLO &middot; Aplicação</span>
+          <h2 class="deck-title">Cinco SLIs canônicos para pipelines de dados</h2>
+          <p class="deck-summary">Eles ancoram os alarms da aula. Cada um tem ID estável (<code>SLO-NN</code>), unidade, janela e fonte de medição. Nenhum é abstrato.</p>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr><th>ID</th><th>SLI</th><th>SLO &mdash; meta</th><th>Fonte</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>SLO-01</td><td>Freshness &mdash; idade do último registro carregado</td><td>p95 &le; 30 min, janela 24h</td><td>EMF <code>OlistETL/Freshness</code></td></tr>
+            <tr><td>SLO-02</td><td>Completeness &mdash; linhas processadas vs esperadas</td><td>&ge; 99.5%, janela diária</td><td>EMF <code>OlistETL/RowsProcessed</code></td></tr>
+            <tr><td>SLO-03</td><td>Accuracy &mdash; linhas válidas vs total</td><td>&ge; 99.0%, janela diária</td><td>EMF <code>OlistETL/InvalidRows</code></td></tr>
+            <tr><td>SLO-04</td><td>Availability &mdash; pipeline rodou no horário</td><td>&ge; 99.0% das janelas</td><td>EventBridge schedule</td></tr>
+            <tr><td>SLO-05</td><td>Latency &mdash; tempo total da execução</td><td>p95 &le; 30 min, 30 dias</td><td>EMF <code>OlistETL/Latency</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 7 - TOIL                                               -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Fechamento &middot; Placeholder</span>
-          <h2 class="deck-title">O que levamos e o que vem</h2>
-          <p class="deck-summary">Resumo e ponte para a Aula 08 (Segurança de dados, FinOps e projeto final integrado), em 11/06/2026.</p>
+          <span class="deck-kicker">SRE &middot; Toil</span>
+          <h2 class="deck-title">Toil &mdash; o inimigo silencioso</h2>
+          <p class="deck-summary">Toil não é "trabalho difícil". É trabalho <em>manual, repetitivo, automatizável e sem valor durável</em>. Quanto mais toil, menos engenharia. Quanto mais runbook automatizado, menos toil.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Sintomas de toil no pipeline</strong>
+            <ul>
+              <li>Restart manual de ETL todas as manhãs.</li>
+              <li>SSH no Postgres para limpar tabela de quarentena.</li>
+              <li>Subir agente de log à mão em cada nova EC2.</li>
+              <li>Reabrir alarm que toca no fim de semana.</li>
+              <li>Copiar-colar comando de uma página de Notion.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Cura</strong>
+            <ul>
+              <li>Cada toil identificado vira ticket de automação.</li>
+              <li>Runbook escrito em SSM Document, não em Notion.</li>
+              <li>State Manager garante configuração contínua.</li>
+              <li>Patch Manager aplica patches sem clicar.</li>
+              <li>Meta: &lt; 50% do tempo do time em toil.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 8 - INCIDENT RESPONSE                                  -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a07-table-compact">
+        <div>
+          <span class="deck-kicker">SRE &middot; Incident Response</span>
+          <h2 class="deck-title">Roles de IR &mdash; quem faz o quê</h2>
+          <p class="deck-summary">Em incidente, papéis explícitos previnem caos. Mesmo em time pequeno, separar Incident Commander de quem está com a mão na massa.</p>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr><th>Role</th><th>Responsabilidade</th><th>Não faz</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>IC</strong> &mdash; Incident Commander</td><td>Coordena, decide, garante comunicação fluindo.</td><td>Não debuga código durante o incidente.</td></tr>
+            <tr><td><strong>Ops</strong> &mdash; Operations Lead</td><td>Mão na massa: investiga logs, executa runbooks, aplica fix.</td><td>Não comunica externamente.</td></tr>
+            <tr><td><strong>Comms</strong> &mdash; Communications</td><td>Atualiza status page, escreve updates a cada 15&ndash;30 min.</td><td>Não toma decisões técnicas.</td></tr>
+            <tr><td><strong>Scribe</strong></td><td>Registra timeline em tempo real, base do postmortem.</td><td>Não opera, só observa e anota.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 9 - POSTMORTEM BLAMELESS                               -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a07-compact">
+        <div>
+          <span class="deck-kicker">SRE &middot; Postmortem</span>
+          <h2 class="deck-title">Postmortem blameless &mdash; estrutura mínima</h2>
+          <p class="deck-summary">Documento curto. 1 página é melhor que 5. O ponto não é narrativa &mdash; é aprendizado acionável.</p>
+        </div>
+        <div class="a07-grid-3">
+          <article class="deck-card">
+            <h3>Cabeçalho</h3>
+            <ul>
+              <li>ID do incidente, severidade, datas.</li>
+              <li>IC, Ops, Comms.</li>
+              <li>Resumo de 3 linhas.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Timeline</h3>
+            <ul>
+              <li>Eventos com timestamp UTC.</li>
+              <li>Detect &middot; ack &middot; mitigate &middot; resolve.</li>
+              <li>MTTR e error budget consumido.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Contributing factors</h3>
+            <ul>
+              <li>Falhas técnicas plausíveis.</li>
+              <li>Falhas de processo.</li>
+              <li>Sinais que foram ignorados.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>What went well</h3>
+            <ul>
+              <li>O que funcionou e por quê.</li>
+              <li>Não é elogio &mdash; é insumo para repetir.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Action items</h3>
+            <ul>
+              <li>1 frase, 1 dono, 1 prazo, 1 link de ticket.</li>
+              <li>Sem AI &equiv; sem ação.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Blameless</h3>
+            <ul>
+              <li>Pessoas agem racionalmente dado contexto.</li>
+              <li>Foco em <em>sistema</em> que permitiu o erro.</li>
+              <li>Linguagem despessoal: "o deploy foi feito".</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 10 - 3 PILARES OBSERVABILIDADE                         -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Observabilidade</span>
+          <h2 class="deck-title">Três pilares &mdash; logs, métricas, traces</h2>
+          <p class="deck-summary">Cada um responde uma pergunta diferente. Pipeline maduro tem os três e os correlaciona por <em>request id</em> ou <em>execution id</em>.</p>
+        </div>
+        <div class="a07-grid-3">
+          <article class="deck-card">
+            <h3>Logs</h3>
+            <ul>
+              <li>Eventos discretos com contexto.</li>
+              <li>Pergunta: <em>o que aconteceu aqui?</em></li>
+              <li>CW Logs: log groups, streams, retention.</li>
+              <li>JSON estruturado &gt; texto solto.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Métricas</h3>
+            <ul>
+              <li>Séries numéricas com dimensões.</li>
+              <li>Pergunta: <em>como está, agora e antes?</em></li>
+              <li>CW Metrics: namespace + dimensions.</li>
+              <li>Agregação 1 / 5 / 15 min &mdash; escolher conscientemente.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Traces</h3>
+            <ul>
+              <li>Cadeia causal entre componentes.</li>
+              <li>Pergunta: <em>onde está o gargalo?</em></li>
+              <li>X-Ray: segments, subsegments, anotações.</li>
+              <li>Sampling agressivo para custo.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 11 - CLOUDWATCH LOGS                                   -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a07-compact">
+        <div>
+          <span class="deck-kicker">CloudWatch &middot; Logs</span>
+          <h2 class="deck-title">CW Logs &mdash; pipeline padrão</h2>
+          <p class="deck-summary">Log group por componente, retenção definida, metric filter onde precisar de alarm e subscription filter onde precisar de processamento.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Anatomia</strong>
+            <ul>
+              <li><strong>Log group</strong> &mdash; container nomeado por aplicação.</li>
+              <li><strong>Log stream</strong> &mdash; uma instância ou execução.</li>
+              <li><strong>Retention policy</strong> &mdash; em dias (1, 7, 30, 90, 365).</li>
+              <li><strong>Metric filter</strong> &mdash; pattern &rarr; CW metric.</li>
+              <li><strong>Subscription filter</strong> &mdash; pattern &rarr; Lambda/Kinesis.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Padrão Olist</strong>
+            <ul>
+              <li><code>/olist/etl</code> &mdash; runs do ETL.</li>
+              <li><code>/olist/postgres</code> &mdash; logs do Postgres.</li>
+              <li><code>/olist/grafana</code> &mdash; access log do dashboard.</li>
+              <li><code>/olist/runbooks</code> &mdash; execução de SSM Documents.</li>
+              <li>Retention 30 dias &mdash; budget do Learner Lab.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 12 - CLOUDWATCH METRICS                                -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a07-table-compact">
+        <div>
+          <span class="deck-kicker">CloudWatch &middot; Metrics</span>
+          <h2 class="deck-title">CW Metrics &mdash; namespace, dimensão, estatística</h2>
+          <p class="deck-summary">Métrica é endereçada por <em>namespace</em>, identificada por <em>dimensions</em> e consumida por <em>statistic</em>. Errar isso quebra o alarm silenciosamente.</p>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr><th>Conceito</th><th>Significado</th><th>Olist &mdash; exemplo</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Namespace</td><td>Bucket lógico (ex.: <code>AWS/EC2</code> ou customizado)</td><td><code>OlistETL</code></td></tr>
+            <tr><td>Metric name</td><td>Nome do indicador</td><td><code>RowsProcessed</code></td></tr>
+            <tr><td>Dimensions</td><td>Pares chave-valor que segmentam</td><td><code>Stage=raw</code>, <code>Env=lab</code></td></tr>
+            <tr><td>Unit</td><td>Unidade canônica do CW</td><td><code>Count</code>, <code>Seconds</code>, <code>Bytes</code></td></tr>
+            <tr><td>Statistic</td><td>Função sobre a janela</td><td><code>Sum</code>, <code>Average</code>, <code>p95</code></td></tr>
+            <tr><td>Period</td><td>Granularidade da agregação</td><td>60s, 300s, 900s</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 13 - EMF                                               -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">CloudWatch &middot; EMF</span>
+          <h2 class="deck-title">Embedded Metric Format &mdash; log JSON vira métrica</h2>
+          <p class="deck-summary">Padrão atual da AWS para apps. Você emite um log estruturado em JSON; o CW reconhece o bloco <code>_aws</code> e <em>publica métricas automaticamente</em>, sem PutMetricData. Custa 1 PutLogEvents.</p>
+        </div>
+<pre class="a07-prompt">{
+  "_aws": {
+    "Timestamp": 1716902400000,
+    "CloudWatchMetrics": [{
+      "Namespace": "OlistETL",
+      "Dimensions": [["Stage", "Env"]],
+      "Metrics": [
+        {"Name": "RowsProcessed", "Unit": "Count"},
+        {"Name": "Latency",       "Unit": "Seconds"},
+        {"Name": "InvalidRows",   "Unit": "Count"}
+      ]
+    }]
+  },
+  "Stage": "raw",
+  "Env": "lab",
+  "RowsProcessed": 102345,
+  "Latency": 1742.5,
+  "InvalidRows": 27,
+  "RunId": "etl-2026-05-28T03:00:00Z"
+}</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 14 - ALARMS                                            -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a07-compact">
+        <div>
+          <span class="deck-kicker">CloudWatch &middot; Alarms</span>
+          <h2 class="deck-title">Alarms &mdash; threshold, anomaly, composite</h2>
+          <p class="deck-summary">Três variantes. Estados <code>OK</code>, <code>ALARM</code>, <code>INSUFFICIENT_DATA</code>. Cada alarm aponta para um runbook &mdash; sem exceção.</p>
+        </div>
+        <div class="a07-grid-3">
+          <article class="deck-card">
+            <h3>Threshold</h3>
+            <ul>
+              <li>Compara estatística contra valor fixo.</li>
+              <li>Ex.: <em>Freshness p95 &gt; 30min por 2 datapoints de 5min</em>.</li>
+              <li>Simples, defensável, auditável.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Anomaly detection</h3>
+            <ul>
+              <li>Modelo aprende baseline da métrica.</li>
+              <li>Ex.: <em>throughput cai 3&sigma; abaixo do esperado</em>.</li>
+              <li>Útil para sazonais; cuidado com falsos positivos.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Composite</h3>
+            <ul>
+              <li>Combina alarms via expressão booleana.</li>
+              <li>Ex.: <em>Freshness E Completeness violados</em>.</li>
+              <li>Reduz alarm-fadiga em incidentes correlacionados.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 15 - DASHBOARDS                                        -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a07-compact">
+        <div>
+          <span class="deck-kicker">CloudWatch &middot; Dashboards</span>
+          <h2 class="deck-title">Dashboards &mdash; widget JSON e mathExpression</h2>
+          <p class="deck-summary">Dashboard é JSON. Vai versionado no repo, junto do CFN. Dashboard sem dono morre &mdash; cada um da turma fica com o seu.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Widgets úteis</strong>
+            <ul>
+              <li><code>metric</code> &mdash; gráfico de série temporal.</li>
+              <li><code>singleValue</code> &mdash; KPI grande.</li>
+              <li><code>log</code> &mdash; tabela de Logs Insights.</li>
+              <li><code>alarm</code> &mdash; status visual.</li>
+              <li><code>text</code> &mdash; markdown com link de runbook.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>mathExpression</strong>
+            <ul>
+              <li>SLI derivado: <code>m1 / m2 * 100</code>.</li>
+              <li>Ex.: completeness = <code>RowsProcessed / RowsExpected * 100</code>.</li>
+              <li>Permite alarm em SLI calculado.</li>
+              <li>Versão única da verdade entre dashboard e alarm.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 16 - LOGS INSIGHTS                                     -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">CloudWatch &middot; Logs Insights</span>
+          <h2 class="deck-title">Logs Insights &mdash; query estruturada em logs</h2>
+          <p class="deck-summary">Linguagem SQL-like sobre log groups. Bom para investigação durante incidente. Queries salvas viram parte do runbook.</p>
+        </div>
+<pre class="a07-prompt">fields @timestamp, @message, RunId, Stage, RowsProcessed, InvalidRows
+| filter Stage = "raw"
+| filter @timestamp &gt; ago(1h)
+| stats sum(RowsProcessed) as total_rows,
+        sum(InvalidRows)   as total_invalid,
+        max(Latency)       as worst_latency
+        by RunId
+| sort worst_latency desc
+| limit 20</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 17 - X-RAY                                             -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a07-compact">
+        <div>
+          <span class="deck-kicker">Tracing &middot; X-Ray</span>
+          <h2 class="deck-title">X-Ray &mdash; tracing distribuído</h2>
+          <p class="deck-summary">No Learner Lab funciona via SDK em EC2. Vamos instrumentar o ETL para enxergar onde o tempo é gasto entre <em>read S3</em>, <em>transform</em>, <em>write Postgres</em>.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Conceitos</strong>
+            <ul>
+              <li><strong>Trace</strong> &mdash; árvore completa de uma request.</li>
+              <li><strong>Segment</strong> &mdash; trabalho num componente.</li>
+              <li><strong>Subsegment</strong> &mdash; chamada interna.</li>
+              <li><strong>Annotation</strong> &mdash; chave indexada (<code>RunId</code>).</li>
+              <li><strong>Metadata</strong> &mdash; chave não indexada.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Sampling no Learner Lab</strong>
+            <ul>
+              <li>Sampling 1.0 só em dev curto.</li>
+              <li>Default 5% + reservoir 1/s evita estouro de custo.</li>
+              <li>Sampling rule via CFN: <code>AWS::XRay::SamplingRule</code>.</li>
+              <li>Anotação <code>RunId</code> facilita correlacionar trace e log.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 18 - SYNTHETICS                                        -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">CloudWatch &middot; Synthetics</span>
+          <h2 class="deck-title">Synthetics &mdash; canários sintéticos</h2>
+          <p class="deck-summary">Lambda gerenciado que executa script (Node ou Python) a cada N minutos. Saída vira métrica e screenshot. É o primeiro SLI <em>black box</em> do dashboard &mdash; o ponto de vista do cliente.</p>
+        </div>
+        <div class="deck-callout">
+          <strong>Canários úteis para o Olist</strong>
+          <ul style="margin:10px 0 0; padding-left:22px;">
+            <li><strong>Heartbeat HTTP</strong> &mdash; bate em <code>/api/health</code> do Grafana a cada 5 min.</li>
+            <li><strong>API canário</strong> &mdash; consulta um KPI do dashboard e valida shape do JSON.</li>
+            <li><strong>Visual canário</strong> &mdash; screenshot do dashboard, diff visual contra baseline.</li>
+            <li>Falhar 2 datapoints &rarr; alarm composite junto com SLO de freshness.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 19 - EVENTBRIDGE + SSM CORE                            -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Closed loop &middot; Núcleo</span>
+          <h2 class="deck-title">EventBridge + SSM &mdash; o coração do closed loop</h2>
+          <p class="deck-summary">Alarm CW dispara evento no EventBridge. EventBridge chama SSM Run Command. SSM executa script de remediação na EC2. Tudo em código, tudo auditável, tudo sem clique.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>EventBridge &mdash; o roteador</strong>
+            <ul>
+              <li>Bus default + buses customizados.</li>
+              <li><strong>Rule</strong> com <code>EventPattern</code> ou <code>ScheduleExpression</code>.</li>
+              <li>Targets: SSM, Lambda, SNS, Step Functions, ECS.</li>
+              <li>InputTransformer formata payload para o target.</li>
+              <li>DLQ por target (SQS) para falha.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>SSM &mdash; o atuador</strong>
+            <ul>
+              <li><strong>Documents</strong>: <code>AWS-RunShellScript</code>, <code>AWS-RunPowerShellScript</code>, customizados.</li>
+              <li><strong>Run Command</strong>: imperativo, uma vez.</li>
+              <li><strong>State Manager</strong>: idempotente, recorrente.</li>
+              <li><strong>Automation</strong>: workflow multi-passo com aprovação.</li>
+              <li>Audit em CloudTrail + log do Run Command em CW.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 20 - CLOSED LOOP DIAGRAMA                              -->
+    <!-- ============================================================ -->
+    <div class="slide" data-slide="closed-loop">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Closed loop &middot; Sequência</span>
+          <h2 class="deck-title">Alarm &rarr; EventBridge &rarr; SSM &rarr; aplicação</h2>
+          <p class="deck-summary">A malha fechada na sequência real. Cinco atores, cada um faz pouco, ninguém faz nada que não esteja no template CFN versionado.</p>
+        </div>
+        <div class="a07-mermaid">
+          <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    participant ETL as EC2 ETL
+    participant CW as CloudWatch
+    participant ALM as Alarm OlistETL-FreshnessBreach
+    participant EB as EventBridge Rule
+    participant SSM as SSM Document RetryEtlOnce
+    ETL->>CW: emite EMF (Freshness, Latency, RowsProcessed)
+    CW-->>ALM: avalia threshold p95 > 30min
+    ALM->>EB: state=ALARM publica evento
+    EB->>SSM: target = StartAutomationExecution
+    SSM->>ETL: aws-runShellScript (retry idempotente)
+    ETL->>CW: nova métrica Freshness
+    CW-->>ALM: state=OK ou continua ALARM
+    Note over ALM,SSM: se state=ALARM persistir, freeze deploy via tag
+          </pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 21 - SSM DOCUMENTS                                     -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a07-table-compact">
+        <div>
+          <span class="deck-kicker">SSM &middot; Documents</span>
+          <h2 class="deck-title">SSM Documents &mdash; tipos e quando usar</h2>
+          <p class="deck-summary">Document é YAML/JSON declarativo. Vive no SSM como recurso versionado. Cinco tipos cobrem 95% dos casos do Olist.</p>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr><th>Tipo</th><th>Quando usar</th><th>Exemplo no Olist</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>Command</code></td><td>Executar script ad-hoc em frota</td><td><code>RetryEtlOnce</code></td></tr>
+            <tr><td><code>Automation</code></td><td>Workflow multi-passo com branching</td><td><code>FreezeDeployOnBudgetBurn</code></td></tr>
+            <tr><td><code>Session</code></td><td>Acesso interativo via Session Manager</td><td>Debug de Postgres</td></tr>
+            <tr><td><code>Package</code></td><td>Distribuir software</td><td>Distribuir agent CW de log</td></tr>
+            <tr><td><code>Policy</code></td><td>State Manager &mdash; configuração contínua</td><td>Garantir agent SSM ligado</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 22 - PADROES DE AUTO-REMEDIATION                       -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a07-compact">
+        <div>
+          <span class="deck-kicker">Closed loop &middot; Padrões</span>
+          <h2 class="deck-title">Padrões de auto-remediation</h2>
+          <p class="deck-summary">Cinco padrões cobrem o repertório clássico. Cada um tem trigger, ação, salvaguarda e critério de stop.</p>
+        </div>
+        <div class="a07-grid-3">
+          <article class="deck-card">
+            <h3>Restart serviço</h3>
+            <ul>
+              <li>Trigger: heartbeat falhou.</li>
+              <li>Ação: <code>systemctl restart</code>.</li>
+              <li>Stop: 3 retries em 15 min.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Scale out</h3>
+            <ul>
+              <li>Trigger: latência subiu.</li>
+              <li>Ação: ASG +1 instância.</li>
+              <li>Stop: cap absoluto + budget.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Circuit breaker</h3>
+            <ul>
+              <li>Trigger: erros 5xx &gt; threshold.</li>
+              <li>Ação: param flag <code>etl_paused=true</code>.</li>
+              <li>Stop: cooldown e half-open.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Freeze deploy</h3>
+            <ul>
+              <li>Trigger: error budget esgotou.</li>
+              <li>Ação: tag <code>deploy=frozen</code> bloqueia CI.</li>
+              <li>Stop: humano remove tag após postmortem.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Rollback</h3>
+            <ul>
+              <li>Trigger: SLO degradado pós-deploy.</li>
+              <li>Ação: deploy versão anterior.</li>
+              <li>Stop: 1 vez automático, 2&ordf; é humano.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Quarentena</h3>
+            <ul>
+              <li>Trigger: linhas inválidas &gt; 0.5%.</li>
+              <li>Ação: rota para tabela dlq.</li>
+              <li>Stop: backpressure no upstream.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 23 - GESTAO DE FLEET                                   -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a07-compact">
+        <div>
+          <span class="deck-kicker">SSM &middot; Fleet</span>
+          <h2 class="deck-title">Gestão distribuída &mdash; Inventory, Patch, State Manager</h2>
+          <p class="deck-summary">SSM agente já vem em quase toda AMI moderna. Sem agente extra, você ganha visibilidade, patching e configuração contínua de toda a frota.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Capabilities</strong>
+            <ul>
+              <li><strong>Inventory</strong> &mdash; pacotes, network, processos.</li>
+              <li><strong>Patch Manager</strong> &mdash; baselines + maintenance window.</li>
+              <li><strong>State Manager</strong> &mdash; associations idempotentes.</li>
+              <li><strong>Run Command</strong> &mdash; execução pontual em fleet.</li>
+              <li><strong>Compliance</strong> &mdash; relatório de drift agregado.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Aplicação no Olist</strong>
+            <ul>
+              <li>Inventory mostra que EC2 ETL está com Python certo.</li>
+              <li>Patch Manager aplica security patch domingo 03h.</li>
+              <li>State Manager garante CW agent rodando.</li>
+              <li>Run Command executa runbook <code>RetryEtlOnce</code>.</li>
+              <li>Config Rule alerta se EC2 perder encryption.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 24 - TUDO VIA CFN                                      -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a07-table-compact">
+        <div>
+          <span class="deck-kicker">IaC &middot; CloudFormation</span>
+          <h2 class="deck-title">Tudo via CFN &mdash; recursos da observability stack</h2>
+          <p class="deck-summary">Cada serviço novo nasce com observabilidade embutida. Stack <code>olist-observability</code> declara o sistema nervoso completo.</p>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr><th>Tipo CFN</th><th>O que provisiona</th><th>Olist &mdash; uso</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>AWS::Logs::LogGroup</code></td><td>Log group nomeado com retention</td><td><code>/olist/etl</code>, <code>/olist/runbooks</code></td></tr>
+            <tr><td><code>AWS::Logs::MetricFilter</code></td><td>Pattern em log &rarr; CW metric</td><td>Conta linhas com <code>level=ERROR</code></td></tr>
+            <tr><td><code>AWS::CloudWatch::Alarm</code></td><td>Alarm threshold/composite</td><td><code>OlistETL-FreshnessBreach</code></td></tr>
+            <tr><td><code>AWS::CloudWatch::Dashboard</code></td><td>Dashboard com widget JSON</td><td><code>olist-sre</code></td></tr>
+            <tr><td><code>AWS::Events::Rule</code></td><td>Regra EventBridge com targets</td><td>Alarm &rarr; SSM Run Command</td></tr>
+            <tr><td><code>AWS::SSM::Document</code></td><td>Runbook automatizado</td><td><code>RetryEtlOnce</code></td></tr>
+            <tr><td><code>AWS::SSM::Association</code></td><td>State Manager idempotente</td><td>Garantir CW agent ligado</td></tr>
+            <tr><td><code>AWS::Synthetics::Canary</code></td><td>Canário Lambda gerenciado</td><td>Heartbeat do Grafana</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 25 - DASHBOARD MAP                                     -->
+    <!-- ============================================================ -->
+    <div class="slide" data-slide="dashboard-map">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Dashboard &middot; Mapa</span>
+          <h2 class="deck-title">Mapa do dashboard CW &mdash; widgets &rarr; SLIs da Aula 03</h2>
+          <p class="deck-summary">Cada widget do dashboard <code>olist-sre</code> aponta para um SLI definido na Aula 03. Versão visual da RTM &mdash; com IDs <code>SLO-NN</code> e <code>ALARM-NN</code> estáveis.</p>
+        </div>
+        <div class="a07-mermaid">
+          <pre class="mermaid">
+flowchart LR
+  subgraph DASH["Dashboard olist-sre (CFN)"]
+    W1["W1 Freshness p95"]
+    W2["W2 Completeness %"]
+    W3["W3 Accuracy %"]
+    W4["W4 Availability"]
+    W5["W5 Latency p95"]
+    W6["W6 Error log lines"]
+    W7["W7 Synthetics canary"]
+    W8["W8 Alarm status grid"]
+  end
+  subgraph SLO["SLOs da Aula 03"]
+    S1["SLO-01 Freshness"]
+    S2["SLO-02 Completeness"]
+    S3["SLO-03 Accuracy"]
+    S4["SLO-04 Availability"]
+    S5["SLO-05 Latency"]
+  end
+  subgraph ALM["Alarms (CFN)"]
+    A1["ALARM-01 FreshnessBreach"]
+    A2["ALARM-02 CompletenessBreach"]
+    A3["ALARM-03 AccuracyBreach"]
+    A4["ALARM-04 AvailabilityBreach"]
+    A5["ALARM-05 LatencyBreach"]
+    A6["ALARM-06 SyntheticsDown"]
+  end
+
+  W1 --> S1 --> A1
+  W2 --> S2 --> A2
+  W3 --> S3 --> A3
+  W4 --> S4 --> A4
+  W5 --> S5 --> A5
+  W7 --> A6
+  W6 -.-> A1
+  A1 ==> RUN["EventBridge + SSM RetryEtlOnce"]
+  A2 ==> RUN
+  A6 ==> RUN
+          </pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 26 - ANTI-PADROES                                      -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a07-table-compact">
+        <div>
+          <span class="deck-kicker">Anti-padrões</span>
+          <h2 class="deck-title">O que <em>não</em> fazer &mdash; e por quê</h2>
+          <p class="deck-summary">Cada anti-padrão abaixo corrompe a malha fechada. Reconhecer cedo evita reescrever a stack semana que vem.</p>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr><th>Anti-padrão</th><th>Sintoma</th><th>Cura</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Dashboard sem dono</td><td>Widget quebrado há 3 semanas, ninguém viu</td><td>Tag de owner; revisão semanal</td></tr>
+            <tr><td>Alarm sem runbook</td><td>Sai do <code>OK</code> e ninguém sabe o que fazer</td><td>Description aponta para SSM Document</td></tr>
+            <tr><td>Runbook sem dry-run</td><td>Auto-remediation derruba prod no 1&ordm; uso</td><td>Sempre <code>--dry-run</code> antes de <em>enable</em></td></tr>
+            <tr><td>Métrica sem unidade</td><td>Não sabe se é seg, ms ou min</td><td>Campo <code>Unit</code> obrigatório no EMF</td></tr>
+            <tr><td>Incident sem postmortem</td><td>Mesma falha repete em 3 meses</td><td>PR de postmortem no <code>main</code> antes de fechar</td></tr>
+            <tr><td>Console-driven ops</td><td>Nada é reproduzível, ninguém revisa</td><td>Tudo CFN; console só leitura</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 27 - PONTE PARA PRATICA                                -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a07-compact">
+        <div>
+          <span class="deck-kicker">Prática &middot; 21h00 &ndash; 22h00</span>
+          <h2 class="deck-title">Da teoria para o laboratório</h2>
+          <p class="deck-summary">Próxima hora guiada. Toda a turma sai com dashboard CW vivo, alarms ligados a SLOs, 1 runbook executado em dry-run e 1 postmortem fechado.</p>
+        </div>
+        <div class="deck-panel">
+          <strong>Sequência da prática</strong>
+          <ol>
+            <li>Renovar session token do Learner Lab.</li>
+            <li>Skill nova <code>gen_observability_stack</code> &mdash; agente DevOps escreve <code>iac/cloudformation/observability.yaml</code>.</li>
+            <li><code>aws cloudformation deploy</code> da stack <code>olist-observability</code>.</li>
+            <li>Skill <code>wire_emf_logging</code> &mdash; instrumenta <code>src/etl/main.py</code> com EMF.</li>
+            <li>Canário Synthetics no Grafana via CFN.</li>
+            <li>Runbook <code>RetryEtlOnce</code> &mdash; <em>dry-run</em> e log no CW.</li>
+            <li>Simulação de incidente: chaos da Aula 06 + alarm + runbook.</li>
+            <li>Postmortem em <code>documents/17_postmortems/</code>; tag <code>aula-07</code>.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 28 - PASSO 1 SESSION TOKEN                             -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; Passo 1</span>
+          <h2 class="deck-title">Renovar session token e validar handshake</h2>
+          <p class="deck-summary">O token expira a cada ~3h. Sempre o primeiro passo de qualquer prática &mdash; senão o <code>cloudformation deploy</code> falha calado.</p>
+        </div>
+<pre class="a07-prompt"># 1) Learner Lab -&gt; Start Lab -&gt; AWS Details -&gt; Show -&gt; copiar bloco "AWS CLI"
+cat &gt; ~/.aws/credentials &lt;&lt;'EOF'
+[default]
+aws_access_key_id=ASIA...
+aws_secret_access_key=...
+aws_session_token=...
+EOF
+chmod 600 ~/.aws/credentials
+
+# 2) Validar
+aws sts get-caller-identity
+aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE UPDATE_COMPLETE \
+  --query "StackSummaries[?StackName=='olist-sre-pipeline-lab'].StackName" \
+  --output text</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 29 - PASSO 2 SKILL OBSERVABILITY                       -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; Passo 2</span>
+          <h2 class="deck-title">Skill <code>gen_observability_stack</code></h2>
+          <p class="deck-summary">A skill lê os SLOs do <code>02_non_functional_requirements.md</code> e gera o template CFN. Saída revisável em diff &mdash; nunca colada cega.</p>
+        </div>
+<pre class="a07-prompt"># agents/skills/gen_observability_stack.md
+
+## Quando usar
+Quando o usuario pedir para gerar/atualizar a observability stack.
+
+## Entrada
+- documents/02_non_functional_requirements.md  (SLOs SLO-01..05)
+- documents/03_architecture.md                 (componentes)
+- iac/cloudformation/                          (templates existentes)
+
+## Passos
+1. Ler os 5 SLOs e mapear cada um para 1 metric + 1 alarm.
+2. Para cada componente da arquitetura, criar log group dedicado.
+3. Criar dashboard olist-sre com 8 widgets (1 por SLI + canary + alarms grid).
+4. Criar EventBridge rule por alarm critico apontando para SSM Document.
+5. Criar SSM Document RetryEtlOnce (Command, AWS-RunShellScript).
+6. Adicionar Outputs com ARNs do dashboard, alarms e do SSM Document.
+
+## Saida
+- iac/cloudformation/observability.yaml
+- IDs estaveis ALARM-NN amarrados a SLO-NN.
+- Tags Owner=&lt;aluno&gt;, Aula=07, Stack=olist-observability.
+
+## Criterios de aceitacao
+- aws cloudformation validate-template passa.
+- 5 alarms apontam para 5 SLOs distintos.
+- Cada alarm tem AlarmDescription com link para runbook.</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 30 - PASSO 3 DEPLOY                                    -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; Passo 3</span>
+          <h2 class="deck-title">Deploy da stack e validação CLI</h2>
+          <p class="deck-summary">Sem console. Tudo via <code>aws</code>. Se algo falhar, o CFN dá rollback &mdash; revisamos diff e tentamos de novo.</p>
+        </div>
+<pre class="a07-prompt"># Validar template antes
+aws cloudformation validate-template \
+  --template-body file://iac/cloudformation/observability.yaml
+
+# Deploy
+aws cloudformation deploy \
+  --stack-name olist-observability \
+  --template-file iac/cloudformation/observability.yaml \
+  --parameter-overrides Owner=$USER \
+  --capabilities CAPABILITY_NAMED_IAM \
+  --tags Aula=07 Stack=olist-observability
+
+# Conferir tudo via CLI
+aws cloudwatch describe-alarms \
+  --query "MetricAlarms[].AlarmName"
+aws cloudwatch list-dashboards \
+  --query "DashboardEntries[].DashboardName"
+aws events list-rules \
+  --query "Rules[?starts_with(Name,'olist-')].Name"
+aws ssm list-documents \
+  --filters Key=Owner,Values=Self \
+  --query "DocumentIdentifiers[].Name"</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 31 - PASSO 4 EMF NO ETL                                -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; Passo 4</span>
+          <h2 class="deck-title">Skill <code>wire_emf_logging</code> &mdash; EMF no ETL</h2>
+          <p class="deck-summary">O ETL para de emitir log de texto solto. Passa a emitir EMF JSON. CW reconhece e publica métricas <em>sem</em> PutMetricData. RowsProcessed, Latency e InvalidRows ganham vida.</p>
+        </div>
+<pre class="a07-prompt"># Em src/etl/main.py
+import json, time, logging
+log = logging.getLogger("olist")
+
+def emit_emf(stage: str, rows: int, latency_s: float, invalid: int, run_id: str):
+    payload = {
+      "_aws": {
+        "Timestamp": int(time.time() * 1000),
+        "CloudWatchMetrics": [{
+          "Namespace": "OlistETL",
+          "Dimensions": [["Stage", "Env"]],
+          "Metrics": [
+            {"Name": "RowsProcessed", "Unit": "Count"},
+            {"Name": "Latency",       "Unit": "Seconds"},
+            {"Name": "InvalidRows",   "Unit": "Count"}
+          ]
+        }]
+      },
+      "Stage": stage, "Env": "lab",
+      "RowsProcessed": rows, "Latency": latency_s, "InvalidRows": invalid,
+      "RunId": run_id,
+    }
+    log.info(json.dumps(payload))</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 32 - PASSO 5 SYNTHETICS                                -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; Passo 5</span>
+          <h2 class="deck-title">Canário Synthetics via CFN</h2>
+          <p class="deck-summary">Heartbeat de 5 min no Grafana. Falhar 2 datapoints &rarr; alarm <code>ALARM-06 SyntheticsDown</code>. Primeiro SLI black box do dashboard.</p>
+        </div>
+<pre class="a07-prompt"># Trecho de iac/cloudformation/observability.yaml
+GrafanaCanary:
+  Type: AWS::Synthetics::Canary
+  Properties:
+    Name: olist-grafana-heartbeat
+    ArtifactS3Location: !Sub "s3://${ArtifactsBucket}/canary"
+    ExecutionRoleArn: !GetAtt CanaryRole.Arn
+    RuntimeVersion: syn-nodejs-puppeteer-7.0
+    Schedule: { Expression: "rate(5 minutes)" }
+    StartCanaryAfterCreation: true
+    Code:
+      Handler: index.handler
+      Script: |
+        const synthetics = require('Synthetics');
+        exports.handler = async () =&gt; {
+          await synthetics.executeHttpStep(
+            'grafana-health',
+            { url: 'http://&lt;ec2-grafana&gt;:3000/api/health',
+              method: 'GET' },
+            r =&gt; r.statusCode === 200);
+        };</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 33 - PASSO 6 RUNBOOK                                   -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; Passo 6</span>
+          <h2 class="deck-title">Runbook <code>RetryEtlOnce</code> &mdash; SSM Document</h2>
+          <p class="deck-summary">Document <code>Command</code> simples e idempotente. Roda no host do ETL via Run Command. Bem comentado &mdash; runbook mal escrito é runbook não rodado.</p>
+        </div>
+<pre class="a07-prompt"># runbooks/RetryEtlOnce.yaml
+schemaVersion: "2.2"
+description: |
+  RUNBOOK-01 - Retry idempotente do ETL Olist quando ALARM-01
+  (FreshnessBreach) entra em ALARM. Stop apos 1 tentativa: se
+  ainda falhar, sobe para humano via SNS.
+parameters:
+  RunId:
+    type: String
+    default: "auto-{{global:DATE_TIME}}"
+mainSteps:
+  - action: aws:runShellScript
+    name: retryEtl
+    inputs:
+      runCommand:
+        - set -euo pipefail
+        - cd /opt/olist
+        - echo "[runbook] retry RunId={{ RunId }}"
+        - python -m etl.main --idempotent --run-id "{{ RunId }}"
+        - echo "[runbook] done"</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 34 - PASSO 7 DRY-RUN                                   -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; Passo 7</span>
+          <h2 class="deck-title">Dry-run do runbook antes do enable</h2>
+          <p class="deck-summary">Regra dura: nenhum runbook entra em produção sem dry-run. Validamos parâmetros, role, conectividade e log antes da regra do EventBridge ficar com <code>State=ENABLED</code>.</p>
+        </div>
+<pre class="a07-prompt"># Executar runbook MANUALMENTE primeiro
+INSTANCE=$(aws ec2 describe-instances \
+  --filters "Name=tag:Role,Values=etl" \
+  --query "Reservations[].Instances[].InstanceId" --output text)
+
+aws ssm send-command \
+  --document-name "RetryEtlOnce" \
+  --instance-ids $INSTANCE \
+  --parameters 'RunId=dryrun-2026-05-28' \
+  --comment "Aula 07 - dry-run do runbook"
+
+# Esperar status e ver log
+CMDID=$(aws ssm list-commands --query "Commands[0].CommandId" --output text)
+aws ssm get-command-invocation \
+  --command-id $CMDID --instance-id $INSTANCE \
+  --query "{Status:Status, Stdout:StandardOutputContent}"
+
+# Soh DEPOIS, habilitar a regra do EventBridge
+aws events enable-rule --name olist-alarm-retry-etl</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 35 - PASSO 8 SIMULACAO INCIDENTE                       -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; Passo 8</span>
+          <h2 class="deck-title">Simulação de incidente &mdash; latência alta</h2>
+          <p class="deck-summary">Reusamos o chaos da Aula 06 (Toxiproxy + SSM). Injetamos latência no Postgres, observamos alarm, vemos runbook executar, registramos timeline. Kill switch sempre claro.</p>
+        </div>
+<pre class="a07-prompt"># 1) Kill switch &mdash; janela maxima 10 min
+aws ssm send-command \
+  --document-name "AWS-RunShellScript" \
+  --instance-ids $INSTANCE \
+  --parameters 'commands=[
+    "toxiproxy-cli toxic add postgres -t latency -a latency=8000",
+    "(sleep 600 && toxiproxy-cli toxic remove postgres -n latency_downstream) &"
+  ]'
+
+# 2) Observar
+watch -n 30 'aws cloudwatch describe-alarms \
+  --alarm-names OlistETL-FreshnessBreach \
+  --query "MetricAlarms[].StateValue"'
+
+# 3) Quando ALARM, EventBridge dispara SSM. Conferir logs:
+aws logs tail /olist/runbooks --since 10m --follow
+
+# 4) Postmortem
+mkdir -p documents/17_postmortems
+$EDITOR documents/17_postmortems/2026-05-28-freshness-breach.md</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 36 - PASSO 9 POSTMORTEM TEMPLATE                       -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; Passo 9</span>
+          <h2 class="deck-title">Template do postmortem blameless</h2>
+          <p class="deck-summary">Template enxuto que vive em <code>documents/17_postmortems/</code>. A Aula 07 fecha com <em>1</em> postmortem completo.</p>
+        </div>
+<pre class="a07-prompt"># INC-2026-05-28-01 &middot; Freshness breach (latencia injetada)
+
+- Severity: SEV-3 (chaos planejado)
+- IC / Ops / Comms / Scribe: &lt;nomes&gt;
+- Detect / Ack / Mitigate / Resolve: 21h12 / 21h13 / 21h14 / 21h21 UTC-3
+- MTTR: 9 min &middot; Error budget consumido (mes): 0.4%
+
+## Resumo
+Latencia injetada no Postgres elevou Freshness p95 acima de 30min.
+ALARM-01 disparou, EventBridge acionou SSM RunbookOnce, ETL re-rodou
+em modo idempotente, Freshness retornou ao normal.
+
+## Timeline (UTC-3)
+21:12 - chaos iniciado (Toxiproxy +8s)
+21:13 - ALARM-01 OK -&gt; ALARM
+21:13 - EventBridge -&gt; SSM RetryEtlOnce
+21:18 - ETL retry concluido
+21:21 - ALARM-01 ALARM -&gt; OK
+
+## Contributing factors
+- Latencia upstream nao tinha guard rail.
+- Sem circuit breaker no client do Postgres.
+
+## What went well
+- EMF emitiu metrica em &lt; 1 min.
+- Runbook idempotente nao duplicou linhas.
+- Kill switch automatico desfez chaos em 10 min.
+
+## Action items
+- AI-1 owner=@a, due=2026-06-04: adicionar circuit breaker no client.
+- AI-2 owner=@b, due=2026-06-04: composite alarm SLO-01 + SLO-05.
+- AI-3 owner=@c, due=2026-05-30: registrar runbook em 18_runbook_catalog.md.</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 37 - CRITERIO DE PRONTO                                -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a07-compact">
+        <div>
+          <span class="deck-kicker">Prática &middot; Critério</span>
+          <h2 class="deck-title">Critério de pronto e commit</h2>
+          <p class="deck-summary">Antes do <code>git push</code>, cada item verde. Tudo é validável via <code>aws</code> &mdash; nada via console.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Stack e dashboard</strong>
+            <ul>
+              <li><code>describe-stacks</code> retorna <code>CREATE_COMPLETE</code>.</li>
+              <li>Dashboard <code>olist-sre</code> existe e tem 8 widgets.</li>
+              <li>5 alarms com <code>AlarmDescription</code> apontando para runbook.</li>
+              <li>Canário Synthetics <code>RUNNING</code> e p&aacute;ginas verdes.</li>
+              <li>EMF chegando ao <code>OlistETL</code> namespace.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Runbook e postmortem</strong>
+            <ul>
+              <li>SSM Document <code>RetryEtlOnce</code> com 1 dry-run verde.</li>
+              <li>EventBridge rule <code>ENABLED</code> apontando para o Document.</li>
+              <li>1 postmortem em <code>documents/17_postmortems/</code>.</li>
+              <li><code>18_runbook_catalog.md</code> com 3 runbooks listados.</li>
+              <li>Tag <code>aula-07</code> empurrada para origem.</li>
+            </ul>
+          </div>
+        </div>
+<pre class="a07-prompt" style="margin-top:14px;">git add iac/ src/etl/main.py runbooks/ documents/17_postmortems/ documents/18_runbook_catalog.md agents/skills/
+git commit -m "feat(aula-07): observability stack, EMF, runbook automatizado e postmortem"
+git tag aula-07
+git push origin main --tags</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 38 - RESUMO DA AULA                                    -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Fechamento</span>
+          <h2 class="deck-title">O que fica desta aula</h2>
+          <p class="deck-summary">O pipeline Olist agora se observa e se repara dentro do error budget. Os closed loops da Aula 03 saíram do markdown e viraram CFN deployado. Pager humano só onde realmente precisa.</p>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
-            <h3>O que fica desta aula</h3>
+            <h3>Entregas no repo</h3>
             <ul>
-              <li>TODO &mdash; pipeline Olist com SLOs declarados e error budget visível.</li>
-              <li>TODO &mdash; alarmes, DLQ e retries cobrindo os pontos críticos.</li>
-              <li>TODO &mdash; data quality automatizado e postmortem como prática.</li>
+              <li><code>iac/cloudformation/observability.yaml</code></li>
+              <li><code>src/etl/main.py</code> com EMF</li>
+              <li><code>runbooks/RetryEtlOnce.yaml</code> + 2 outros</li>
+              <li>3 skills novas em <code>agents/skills/</code></li>
+              <li><code>documents/17_postmortems/</code> com 1 postmortem</li>
+              <li><code>documents/18_runbook_catalog.md</code></li>
+              <li>Dashboard CW <code>olist-sre</code> validável via CLI</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>Aula 08 &middot; 11/06/2026</h3>
+            <h3>Próxima aula &middot; 11/06/2026</h3>
             <ul>
-              <li>Segurança de dados, FinOps e projeto final integrado.</li>
-              <li>TODO &mdash; expectativas de governança e custo sobre o Olist.</li>
-              <li>TODO &mdash; entregável final do curso.</li>
+              <li>Aula 08 &mdash; <strong>projeto final em sala</strong>.</li>
+              <li>Análise de série temporal 100% AWS Student.</li>
+              <li>Repositório novo no padrão <code>tsa-{iniciais}-{tema}</code>.</li>
+              <li>Front em Streamlit/Dash; stack mínimo via CFN.</li>
+              <li>Tarefa de casa começa <em>hoje à noite</em>.</li>
             </ul>
           </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 39 - ANUNCIO AULA 08 (1/2)                             -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Aula 08 &middot; Anúncio</span>
+          <h2 class="deck-title">Aula 08 &mdash; projeto final em sala (11/06/2026)</h2>
+          <p class="deck-summary">Última aula da disciplina é <em>execução</em>. Três horas em sala, sem prep individual prévio: você chega com dataset escolhido e a gente constrói o projeto da estaca zero, com IA, no Codespace, deployando na conta do Student Lab.</p>
+        </div>
+        <div class="deck-callout">
+          <strong>Tema &middot; análise de série temporal 100% AWS Student</strong>
+          <ul style="margin:12px 0 0; padding-left:22px;">
+            <li>Repositório novo no padrão <code>tsa-{iniciais}-{tema}</code> &mdash; TSA = Time Series Analysis.</li>
+            <li>Front em <strong>Streamlit</strong> ou <strong>Plotly Dash</strong>, com 3 abas:
+              <em>histórico</em>, <em>decomposição STL</em>, <em>forecast 30 dias</em>.</li>
+            <li>Stack mínimo: 1 EC2 + S3 + dashboard CloudWatch &mdash; tudo via CloudFormation, zero clique no console.</li>
+            <li>Sem código pronto antes da aula. A aula é integralmente em sala com IA no Codespace.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 40 - ANUNCIO AULA 08 (2/2) - TAREFA                    -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a07-compact">
+        <div>
+          <span class="deck-kicker">Aula 08 &middot; Tarefa de casa</span>
+          <h2 class="deck-title">Tarefa de casa para a Aula 08 &mdash; <em>hoje à noite</em></h2>
+          <p class="deck-summary">Cada aluno escolhe e baixa um dataset de série temporal do Kaggle, abre repositório novo e documenta a hipótese. Sem código. Apenas dataset, repo e issue.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Datasets sugeridos no Kaggle</strong>
+            <ul>
+              <li><em>Bitcoin Historical Data</em></li>
+              <li><em>Walmart Sales Forecasting</em></li>
+              <li><em>Air Passengers (classic)</em></li>
+              <li><em>Hourly Energy Consumption</em></li>
+              <li><em>NYC Taxi Trip Duration</em> (filtre por time bucket)</li>
+              <li><em>Daily Climate Time Series</em></li>
+            </ul>
+            <p style="margin:8px 0 0; font-size:.9em;"><strong>Critério:</strong> <code>timestamp</code> + 1 série numérica de &ge; 1000 pontos.</p>
+          </div>
+          <div class="deck-panel">
+            <strong>O que entregar antes de 11/06</strong>
+            <ul>
+              <li>Repositório <code>tsa-{iniciais}-{slug-curto}</code> aberto no GitHub.</li>
+              <li>Dataset commitado em branch <code>data/</code> (Git LFS opcional para arquivo grande).</li>
+              <li>Issue documentando: <em>fonte</em>, <em>periodicidade</em>, <em>hipótese inicial</em>.</li>
+              <li><strong>Não codar nada antes.</strong> A Aula 08 começa na issue.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE GLOSSARIO 1/3 - SRE E OBSERVABILIDADE                  -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a07-table-compact a07-compact">
+        <div>
+          <span class="deck-kicker">Glossário &middot; 1 / 3</span>
+          <h2 class="deck-title">Siglas &mdash; SRE e observabilidade</h2>
+          <p class="deck-summary">Vocabulário do bloco de SRE, SLOs e observabilidade.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>SRE &middot; confiabilidade</strong>
+            <table class="deck-table">
+              <tbody>
+                <tr><td><strong>SRE</strong></td><td>Site Reliability Engineering</td></tr>
+                <tr><td><strong>SLI</strong></td><td>Service Level Indicator</td></tr>
+                <tr><td><strong>SLO</strong></td><td>Service Level Objective</td></tr>
+                <tr><td><strong>SLA</strong></td><td>Service Level Agreement</td></tr>
+                <tr><td><strong>MTTR</strong></td><td>Mean Time To Recovery</td></tr>
+                <tr><td><strong>MTBF</strong></td><td>Mean Time Between Failures</td></tr>
+                <tr><td><strong>RTO</strong></td><td>Recovery Time Objective</td></tr>
+                <tr><td><strong>RPO</strong></td><td>Recovery Point Objective</td></tr>
+                <tr><td><strong>IC</strong></td><td>Incident Commander</td></tr>
+                <tr><td><strong>IR</strong></td><td>Incident Response</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="deck-panel">
+            <strong>Observabilidade &middot; CloudWatch</strong>
+            <table class="deck-table">
+              <tbody>
+                <tr><td><strong>EMF</strong></td><td>Embedded Metric Format</td></tr>
+                <tr><td><strong>CW</strong></td><td>Amazon CloudWatch</td></tr>
+                <tr><td><strong>X-Ray</strong></td><td>AWS distributed tracing</td></tr>
+                <tr><td><strong>p95 / p99</strong></td><td>Percentil 95 / 99</td></tr>
+                <tr><td><strong>DORA</strong></td><td>DevOps Research &amp; Assessment</td></tr>
+                <tr><td><strong>Toil</strong></td><td>Trabalho manual repetitivo, automatizável</td></tr>
+                <tr><td><strong>SEV-1..4</strong></td><td>Severity de incidente (1 maior)</td></tr>
+                <tr><td><strong>DLQ</strong></td><td>Dead Letter Queue</td></tr>
+                <tr><td><strong>STL</strong></td><td>Seasonal-Trend decomposition (Aula 08)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE GLOSSARIO 2/3 - AWS, EVENTBRIDGE, SSM                  -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a07-table-compact a07-compact">
+        <div>
+          <span class="deck-kicker">Glossário &middot; 2 / 3</span>
+          <h2 class="deck-title">Siglas &mdash; AWS, automação e fleet</h2>
+          <p class="deck-summary">Vocabulário do bloco de EventBridge, SSM e gestão distribuída.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>AWS &middot; serviços</strong>
+            <table class="deck-table">
+              <tbody>
+                <tr><td><strong>EventBridge</strong></td><td>Bus de eventos serverless da AWS</td></tr>
+                <tr><td><strong>SSM</strong></td><td>AWS Systems Manager</td></tr>
+                <tr><td><strong>SNS</strong></td><td>Simple Notification Service</td></tr>
+                <tr><td><strong>SQS</strong></td><td>Simple Queue Service</td></tr>
+                <tr><td><strong>EC2</strong></td><td>Elastic Compute Cloud</td></tr>
+                <tr><td><strong>S3</strong></td><td>Simple Storage Service</td></tr>
+                <tr><td><strong>IAM</strong></td><td>Identity and Access Management</td></tr>
+                <tr><td><strong>STS</strong></td><td>Security Token Service</td></tr>
+                <tr><td><strong>CFN</strong></td><td>CloudFormation</td></tr>
+                <tr><td><strong>ARN</strong></td><td>Amazon Resource Name</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="deck-panel">
+            <strong>SSM &middot; capabilities</strong>
+            <table class="deck-table">
+              <tbody>
+                <tr><td><strong>Run Command</strong></td><td>Execução pontual em fleet</td></tr>
+                <tr><td><strong>State Manager</strong></td><td>Configuração contínua idempotente</td></tr>
+                <tr><td><strong>Patch Manager</strong></td><td>Patching declarativo</td></tr>
+                <tr><td><strong>Inventory</strong></td><td>Visibilidade de software/host</td></tr>
+                <tr><td><strong>Automation</strong></td><td>Workflow multi-passo SSM</td></tr>
+                <tr><td><strong>Synthetics</strong></td><td>Canários sintéticos do CW</td></tr>
+                <tr><td><strong>EMF</strong></td><td>Embedded Metric Format</td></tr>
+                <tr><td><strong>Logs Insights</strong></td><td>Query SQL-like sobre log groups</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE GLOSSARIO 3/3 - IaC, DEV E NORMAS                      -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a07-table-compact a07-compact">
+        <div>
+          <span class="deck-kicker">Glossário &middot; 3 / 3</span>
+          <h2 class="deck-title">Siglas &mdash; IaC, dev e normas</h2>
+          <p class="deck-summary">Vocabulário da prática guiada e padrões citados.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>IaC &middot; dev</strong>
+            <table class="deck-table">
+              <tbody>
+                <tr><td><strong>IaC</strong></td><td>Infrastructure as Code</td></tr>
+                <tr><td><strong>CFN</strong></td><td>AWS CloudFormation</td></tr>
+                <tr><td><strong>YAML</strong></td><td>YAML Ain't Markup Language</td></tr>
+                <tr><td><strong>JSON</strong></td><td>JavaScript Object Notation</td></tr>
+                <tr><td><strong>CI / CD</strong></td><td>Continuous Integration / Delivery</td></tr>
+                <tr><td><strong>SDK</strong></td><td>Software Development Kit</td></tr>
+                <tr><td><strong>API</strong></td><td>Application Programming Interface</td></tr>
+                <tr><td><strong>CLI</strong></td><td>Command Line Interface</td></tr>
+                <tr><td><strong>TSA</strong></td><td>Time Series Analysis (tema da Aula 08)</td></tr>
+                <tr><td><strong>STL</strong></td><td>Seasonal-Trend Loess decomposition</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="deck-panel">
+            <strong>Padrões &middot; normas</strong>
+            <table class="deck-table">
+              <tbody>
+                <tr><td><strong>Beyer et al.</strong></td><td>Site Reliability Engineering &mdash; Google book</td></tr>
+                <tr><td><strong>DORA</strong></td><td>DevOps Research and Assessment metrics</td></tr>
+                <tr><td><strong>OpenTelemetry</strong></td><td>Padrão aberto de telemetria (logs/metrics/traces)</td></tr>
+                <tr><td><strong>ISO/IEC 25010</strong></td><td>Quality model (Aula 03)</td></tr>
+                <tr><td><strong>ITIL</strong></td><td>Information Technology Infrastructure Library</td></tr>
+                <tr><td><strong>NIST</strong></td><td>Nat. Inst. of Standards and Technology</td></tr>
+                <tr><td><strong>RM-ODP</strong></td><td>Reference Model for Open Distributed Processing</td></tr>
+                <tr><td><strong>EMF</strong></td><td>Embedded Metric Format (CloudWatch)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE FINAL - REFERENCIAS                                    -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Bibliografia</span>
+          <h2 class="deck-title">Referências e leituras</h2>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Primárias</strong>
+            <ul>
+              <li>Beyer, B.; Jones, C.; Petoff, J.; Murphy, N. &mdash; <em>Site Reliability Engineering</em>, O'Reilly.</li>
+              <li>Beyer, B. et al. &mdash; <em>The Site Reliability Workbook</em>, O'Reilly.</li>
+              <li>Sridharan, C. &mdash; <em>Distributed Systems Observability</em>, O'Reilly.</li>
+              <li>Majors, C.; Fong-Jones, L.; Miranda, G. &mdash; <em>Observability Engineering</em>, O'Reilly.</li>
+              <li>Hellerstein, J. et al. &mdash; <em>Feedback Control of Computing Systems</em>.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Operacionais &middot; AWS</strong>
+            <ul>
+              <li>AWS Well-Architected &mdash; Operational Excellence Pillar.</li>
+              <li>AWS Builders' Library &mdash; <em>Amazon's approach to high-availability deployment</em>.</li>
+              <li>AWS docs &mdash; CloudWatch EMF, Synthetics, X-Ray.</li>
+              <li>AWS docs &mdash; SSM Documents, EventBridge Rules, CFN reference.</li>
+              <li>OpenTelemetry &mdash; <code>opentelemetry.io</code>.</li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
@@ -265,12 +1700,63 @@
     const slides = document.querySelectorAll('.slide');
     const totalSlides = slides.length;
     document.getElementById('total-slides').textContent = totalSlides;
-    function showSlide(i) { slides.forEach(s => s.classList.remove('active')); slides[i].classList.add('active'); currentSlide = i; document.getElementById('current-slide').textContent = i + 1; document.getElementById('prev-btn').disabled = i === 0; document.getElementById('next-btn').disabled = i === totalSlides - 1; }
+    function showSlide(i) {
+      slides.forEach(s => s.classList.remove('active'));
+      slides[i].classList.add('active');
+      currentSlide = i;
+      document.getElementById('current-slide').textContent = i + 1;
+      document.getElementById('prev-btn').disabled = i === 0;
+      document.getElementById('next-btn').disabled = i === totalSlides - 1;
+    }
     function nextSlide() { if (currentSlide < totalSlides - 1) showSlide(currentSlide + 1); }
     function previousSlide() { if (currentSlide > 0) showSlide(currentSlide - 1); }
     function toggleFullScreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
-    document.addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); } else if (e.key === 'ArrowLeft') { e.preventDefault(); previousSlide(); } else if (e.key.toLowerCase() === 'f') toggleFullScreen(); });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); previousSlide(); }
+      else if (e.key.toLowerCase() === 'f') toggleFullScreen();
+    });
     showSlide(0);
+  </script>
+
+  <!-- Mermaid v11 — render lazily on slide activation -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'neutral',
+      securityLevel: 'loose',
+      flowchart: { htmlLabels: true, curve: 'basis' },
+      sequence: { showSequenceNumbers: false, mirrorActors: false },
+      themeVariables: {
+        fontFamily: 'JetBrains Mono, ui-monospace, monospace',
+        primaryColor: '#ffffff',
+        primaryBorderColor: '#0f0f0f',
+        primaryTextColor: '#0f0f0f',
+        lineColor: '#5c5c5c',
+        clusterBkg: '#fafaf7',
+        clusterBorder: '#d6d6d1'
+      }
+    });
+
+    const targets = Array.from(document.querySelectorAll('[data-slide]'));
+    const renderedSet = new WeakSet();
+    async function renderIfNeeded(target) {
+      if (renderedSet.has(target)) return;
+      if (!target.classList.contains('active')) return;
+      renderedSet.add(target);
+      try {
+        await mermaid.run({ nodes: target.querySelectorAll('pre.mermaid') });
+      } catch (e) {
+        renderedSet.delete(target);
+        console.warn('Mermaid render falhou:', e);
+      }
+    }
+    for (const t of targets) {
+      const obs = new MutationObserver(() => renderIfNeeded(t));
+      obs.observe(t, { attributes: true, attributeFilter: ['class'] });
+      renderIfNeeded(t);
+    }
   </script>
 </body>
 </html>

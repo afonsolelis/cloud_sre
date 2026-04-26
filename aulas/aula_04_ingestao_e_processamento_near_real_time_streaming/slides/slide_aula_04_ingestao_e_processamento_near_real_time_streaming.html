@@ -4,8 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" />
-  <title>Aula 04 — Ingestão e processamento near real-time com streaming</title>
+  <title>Aula 04 — Equipe de agentes IA + CloudFormation: do markdown ao stack provisionado</title>
   <link href="../../../assets/slides.css" rel="stylesheet">
+  <style data-aula04-local>
+    /* Estilos scoped da Aula 04 — utilidades de layout, prompts e Mermaid.
+       Tokens e componentes base vêm de assets/slides.css. */
+
+    /* Em viewport curto (laptop padrão), afrouxa min-height/padding do shell
+       e reduz tipografia da capa para evitar overflow vertical. */
+    @media (max-height: 900px) {
+      .deck-shell { min-height: 520px; padding: 32px 44px; margin: 14px; gap: 16px; }
+      .deck-shell .deck-title { font-size: 2.1em; }
+      .deck-shell .deck-year  { font-size: 3em; margin: 4px 0; }
+      .deck-shell .deck-summary { margin-bottom: 6px; }
+      .deck-shell h2.deck-title { margin-bottom: 4px; }
+    }
+    @media (max-height: 820px) {
+      .deck-shell { min-height: 480px; padding: 26px 40px; margin: 10px; gap: 12px; }
+      .deck-shell .deck-title { font-size: 1.95em; }
+      .deck-shell .deck-year  { font-size: 2.6em; }
+    }
+
+    /* Grid de 3 colunas para slides com 3 cards (evita quebra do .deck-grid 2-col) */
+    .a04-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .a04-grid-3 .deck-card { padding: 18px 20px; }
+    .a04-grid-3 .deck-card h3 { font-size: 1.05em; }
+    .a04-grid-3 .deck-card ul { margin: 8px 0 0; }
+    .a04-grid-3 .deck-card li { margin-bottom: 4px; font-size: .95em; }
+    @media (max-width: 1100px) {
+      .a04-grid-3 { grid-template-columns: 1fr; }
+    }
+
+    /* Versão compacta do .deck-grid e .deck-card para slides densos */
+    .a04-compact .deck-card { padding: 16px 18px; }
+    .a04-compact .deck-card h3 { font-size: 1em; margin-bottom: 6px; }
+    .a04-compact .deck-card ul { margin: 6px 0 0; }
+    .a04-compact .deck-card li { margin-bottom: 4px; font-size: .92em; line-height: 1.45; }
+    .a04-compact .deck-panel { padding: 16px 18px; }
+    .a04-compact .deck-panel li { margin-bottom: 4px; font-size: .92em; line-height: 1.45; }
+    .a04-compact .deck-summary { margin-bottom: 10px; }
+    .a04-compact .deck-callout { padding: 16px 20px; }
+    .a04-compact .deck-callout li,
+    .a04-compact .deck-callout ol li { margin-bottom: 4px; }
+
+    /* Tabela compacta para slides com tabelas grandes */
+    .a04-table-compact .deck-table th,
+    .a04-table-compact .deck-table td {
+      padding: 7px 10px;
+      font-size: .92em;
+      line-height: 1.4;
+    }
+
+    .a04-mermaid {
+      background: var(--deck-panel);
+      border: 1px solid var(--deck-line);
+      border-radius: 4px;
+      padding: 18px;
+      margin-top: 8px;
+      overflow: auto;
+    }
+    .a04-mermaid pre.mermaid {
+      background: transparent !important;
+      color: var(--deck-text) !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      box-shadow: none !important;
+      border: none !important;
+      border-radius: 0 !important;
+      overflow: visible;
+    }
+    .a04-mermaid pre.mermaid::before { display: none !important; }
+    .a04-mermaid svg {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+      background: transparent;
+    }
+    .a04-prompt {
+      background: #0d1117;
+      color: #e6edf3;
+      padding: 14px 16px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: .9rem;
+      line-height: 1.6;
+      overflow-x: auto;
+      margin: 10px 0 0;
+    }
+    .a04-prompt-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--deck-muted);
+      margin-bottom: 4px;
+      display: block;
+    }
+  </style>
 </head>
 <body>
   <div class="slide-container">
@@ -18,10 +118,10 @@
         <div>
           <img class="deck-logo-full" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_e4vyyw.png" alt="Universidade Presbiteriana Mackenzie" />
           <span class="deck-kicker">Cloud Computing e SRE &middot; MBA Engenharia de Dados</span>
-          <h1 class="deck-title">Ingestão e processamento near real-time com streaming</h1>
+          <h1 class="deck-title">Equipe de agentes IA + CloudFormation</h1>
           <p class="deck-meta">Aula 04 &nbsp;&bull;&nbsp; 07/05/2026 &nbsp;&bull;&nbsp; 19h00 &ndash; 22h00</p>
           <p class="deck-year">2026</p>
-          <p class="deck-subtitle">De batch para eventos: ingerir o Olist em tempo quase real e entregar ao Data Lake com garantias.</p>
+          <p class="deck-subtitle">Do markdown ao stack provisionado &mdash; squad de papéis, IaC declarativa, zero clique no console.</p>
         </div>
       </div>
     </div>
@@ -30,155 +130,68 @@
     <!-- SLIDE 2 - AGENDA                                             -->
     <!-- ============================================================ -->
     <div class="slide">
-      <div class="deck-shell">
+      <div class="deck-shell a04-compact">
         <div>
           <span class="deck-kicker">Agenda</span>
           <h2 class="deck-title">O que vai acontecer nesta aula</h2>
-          <p class="deck-summary">Conteúdo em construção. Esta seção será refinada antes de 07/05/2026.</p>
+          <p class="deck-summary">Duas horas de teoria sobre orquestração de agentes e CloudFormation; uma hora de prática provisionando o stack do Olist via CLI.</p>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
-            <h3>19h00 &ndash; 20h30 &middot; Teoria</h3>
+            <h3>19h00 &ndash; 21h00 &middot; Teoria</h3>
             <ul>
-              <li>TODO &mdash; batch vs micro-batch vs streaming.</li>
-              <li>TODO &mdash; produtor, broker e consumidor (metáfora do avião).</li>
-              <li>TODO &mdash; janelas, event time e watermarks.</li>
-              <li>TODO &mdash; garantias de entrega e idempotência.</li>
+              <li>Recap Aula 03 e salto para infraestrutura</li>
+              <li>Por que multi-agente: limites do prompt único</li>
+              <li>Padrões: planner, hierárquico, blackboard, swarm</li>
+              <li>Squad: Architect, DevOps, Tester, Reviewer</li>
+              <li>AIOX e alternativas no Codespace</li>
+              <li>CFN 101: anatomia, lifecycle, drift, capabilities</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>20h30 &ndash; 22h00 &middot; Prática</h3>
+            <h3>21h00 &ndash; 22h00 &middot; Prática</h3>
             <ul>
-              <li>TODO &mdash; criar Kinesis Data Stream para eventos Olist.</li>
-              <li>TODO &mdash; produtor Python simulando clickstream.</li>
-              <li>TODO &mdash; Firehose entregando Parquet no S3 Raw.</li>
-              <li>TODO &mdash; Lambda consumer agregando em DynamoDB.</li>
+              <li>Renovar session token, instalar a squad</li>
+              <li>Architect &rarr; <code>PLAN.md</code></li>
+              <li>DevOps &rarr; templates em <code>iac/cloudformation/</code></li>
+              <li>Tester e Reviewer fecham o loop</li>
+              <li><code>aws cloudformation deploy</code></li>
+              <li>Smoke test, drift, tag <code>aula-04</code></li>
             </ul>
           </article>
         </div>
+        <p style="margin-top:10px; font-size:.84em; color: var(--deck-muted);"><strong>Restrições:</strong> sem console AWS &middot; sem secrets em template &middot; sem Glue/Redshift/SageMaker &middot; tudo idempotente.</p>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 3 - EM CONSTRUCAO                                      -->
+    <!-- SLIDE 3 - RECAP AULA 03                                      -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Status &middot; Placeholder</span>
-          <h2 class="deck-title">Aula em construção</h2>
-          <p class="deck-summary">Este deck é um esqueleto no novo design system. O conteúdo será preenchido incrementalmente nas próximas semanas.</p>
-        </div>
-        <div class="deck-callout">
-          <strong>O que já está definido</strong>
-          <ul>
-            <li>Tema central: ingestão near real-time de eventos do Olist para o Data Lake.</li>
-            <li>Datas e duração: 07/05/2026, 19h00 &ndash; 22h00.</li>
-            <li>Posição no arco do curso: Aula 04 de 8.</li>
-            <li>Pré-requisitos: fontes conectadas na Aula 03, bucket Raw das Aulas 01 e 02.</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 4 - PLACEHOLDER TEORIA (TABELA)                        -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Teoria &middot; Placeholder</span>
-          <h2 class="deck-title">Batch vs streaming em uma tabela</h2>
-          <p class="deck-summary">Estrutura de tabela editorial que será preenchida com critérios comparativos entre os dois modelos.</p>
-        </div>
-        <table class="deck-table">
-          <thead>
-            <tr>
-              <th>Dimensão</th>
-              <th>Batch</th>
-              <th>Streaming</th>
-              <th>Escolha quando</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>Latência</td><td>TODO</td><td>TODO</td><td>TODO</td></tr>
-            <tr><td>Throughput</td><td>TODO</td><td>TODO</td><td>TODO</td></tr>
-            <tr><td>Complexidade operacional</td><td>TODO</td><td>TODO</td><td>TODO</td></tr>
-            <tr><td>Garantias de entrega</td><td>TODO</td><td>TODO</td><td>TODO</td></tr>
-            <tr><td>Custo na AWS</td><td>TODO</td><td>TODO</td><td>TODO</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 5 - PLACEHOLDER TEORIA (GRID DE CARDS)                 -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Teoria &middot; Placeholder</span>
-          <h2 class="deck-title">Quatro decisões críticas em streaming</h2>
-          <p class="deck-summary">Grid de cards que será preenchido com o racional por trás de cada decisão de projeto.</p>
-        </div>
-        <div class="deck-grid">
-          <article class="deck-card">
-            <h3>Ordem</h3>
-            <ul>
-              <li>TODO &mdash; event time vs processing time.</li>
-              <li>TODO &mdash; partition key e shard no Kinesis.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Duplicidade</h3>
-            <ul>
-              <li>TODO &mdash; at-most-once vs at-least-once vs exactly-once.</li>
-              <li>TODO &mdash; trade-offs para o pipeline Olist.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Janela</h3>
-            <ul>
-              <li>TODO &mdash; tumbling, sliding e session windows.</li>
-              <li>TODO &mdash; watermarks e dados atrasados.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Idempotência</h3>
-            <ul>
-              <li>TODO &mdash; consumidores idempotentes e backpressure.</li>
-              <li>TODO &mdash; padrões de retry seguro.</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 6 - PLACEHOLDER TEORIA (2 COLUNAS)                     -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Teoria &middot; Placeholder</span>
-          <h2 class="deck-title">Producer vs Consumer &mdash; responsabilidades</h2>
-          <p class="deck-summary">Duas colunas delimitando o que cabe a cada lado do pipeline de eventos.</p>
+          <span class="deck-kicker">Abertura &middot; Recap</span>
+          <h2 class="deck-title">De onde viemos &mdash; Aula 03</h2>
+          <p class="deck-summary">Na aula passada modelamos a arquitetura. Hoje saímos do markdown e entramos na conta AWS &mdash; mas com regras: nada manual, tudo declarativo, tudo idempotente.</p>
         </div>
         <div class="deck-columns">
           <div class="deck-panel">
-            <strong>Producer</strong>
+            <strong>O que já temos no repo</strong>
             <ul>
-              <li>TODO &mdash; escolha da partition key.</li>
-              <li>TODO &mdash; serialização e tamanho do record.</li>
-              <li>TODO &mdash; retry, buffering e controle de taxa.</li>
+              <li><code>/documents/01..09</code> &mdash; RF, RNF, arquitetura, RTM, planos de teste, system design.</li>
+              <li><code>/documents/agents/</code> &mdash; <code>AGENTS.md</code>, <code>GEMINI.md</code> e 6 skills.</li>
+              <li>Closed loop CW &rarr; Controlador SRE &rarr; ETL/Postgres já desenhado.</li>
+              <li>AWS CLI conectado por session token (us-east-1).</li>
+              <li>Tag <code>aula-03</code> no git.</li>
             </ul>
           </div>
           <div class="deck-panel">
-            <strong>Consumer</strong>
+            <strong>O que está faltando</strong>
             <ul>
-              <li>TODO &mdash; checkpoint e posição no shard.</li>
-              <li>TODO &mdash; idempotência e deduplicação.</li>
-              <li>TODO &mdash; entrega downstream (S3, DynamoDB, Redshift).</li>
+              <li>Infra de verdade: VPC, S3, EC2, IAM, CW, EventBridge, SSM.</li>
+              <li>Templates IaC versionados &mdash; o desenho ainda é só prosa.</li>
+              <li>Squad de agentes para tarefas paralelas (gerar, lintar, revisar).</li>
+              <li>Critério de pronto que envolva o stack rodando, não o markdown bonito.</li>
             </ul>
           </div>
         </div>
@@ -186,56 +199,1160 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 7 - PLACEHOLDER PRATICA                                -->
+    <!-- SLIDE 4 - TESE DA AULA                                       -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; 20h30 &ndash; 22h00</span>
-          <h2 class="deck-title">Laboratório: pipeline near real-time com Kinesis</h2>
-          <p class="deck-summary">O roteiro prático será detalhado com comandos AWS CLI, snippets boto3 e prints do console antes da aula.</p>
+          <span class="deck-kicker">Tese da aula</span>
+          <h2 class="deck-title">Squad de IAs propõe; CloudFormation provisiona</h2>
+          <p class="deck-summary">Um único agente longo perde contexto, mistura papéis e alucina. Uma squad com papéis bem cortados acelera, audita e cruza pontos cegos. O console AWS some &mdash; entram CLI e templates declarativos.</p>
         </div>
-        <div class="deck-panel">
-          <strong>Esqueleto dos passos</strong>
-          <ol>
-            <li>TODO &mdash; criar Kinesis Data Stream <code>olist-eventos</code> com 1 shard.</li>
-            <li>TODO &mdash; rodar produtor Python que simula clickstream a partir do Olist order_items.</li>
-            <li>TODO &mdash; configurar Firehose entregando Parquet particionado por hora no bucket Raw.</li>
-            <li>TODO &mdash; validar os eventos chegando via Athena no database <code>olist_streaming</code>.</li>
-            <li>TODO &mdash; Lambda consumer agregando contagem por categoria em DynamoDB.</li>
-            <li>TODO &mdash; monitorar o stream no CloudWatch (IncomingRecords, IteratorAge).</li>
+        <div class="deck-callout">
+          <strong>Cinco regras desta aula</strong>
+          <ol style="margin:12px 0 0; padding-left:22px;">
+            <li>Toda decisão de infra é arquivo YAML versionado &mdash; nada de cliques.</li>
+            <li>Quatro papéis distintos na squad: Architect, DevOps, Tester, Reviewer.</li>
+            <li>Cada recurso provisionado nasce com tag, log group e métrica.</li>
+            <li>Re-rodar o deploy não pode mudar estado &mdash; idempotência ou nada.</li>
+            <li>Recurso sem caminho de remediação no closed loop não entra no stack.</li>
           </ol>
         </div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 8 - FECHAMENTO E PONTE PARA AULA 05                    -->
+    <!-- SLIDE 5 - PORQUE MULTI-AGENTE                                -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Fechamento &middot; Placeholder</span>
-          <h2 class="deck-title">O que levamos e o que vem</h2>
-          <p class="deck-summary">Resumo e ponte para a Aula 05 (Integração, ETL serverless e catálogo de dados), em 14/05/2026.</p>
+          <span class="deck-kicker">Teoria &middot; Multi-agente</span>
+          <h2 class="deck-title">Por que sair do prompt único</h2>
+          <p class="deck-summary">Conforme o contexto cresce, o agente solitário começa a esquecer regras, misturar saídas e propagar alucinações. Dividir cognição é dividir risco.</p>
+        </div>
+        <div class="a04-grid-3">
+          <article class="deck-card">
+            <h3>Limites do prompt único</h3>
+            <ul>
+              <li>Contexto longo &rarr; perda de aderência.</li>
+              <li>Saídas genéricas misturadas (CFN+teste+ADR).</li>
+              <li>Difícil auditar onde a decisão nasceu.</li>
+              <li>Erro de uma etapa contamina as próximas.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Ganhos da squad</h3>
+            <ul>
+              <li>Cada papel tem prompt curto e auditável.</li>
+              <li>Saídas separadas, comparáveis, comitáveis.</li>
+              <li>Revisor age como devil's advocate.</li>
+              <li>Reduz alucinação cruzada entre artefatos.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Custos novos</h3>
+            <ul>
+              <li>Orquestração precisa estado mínimo.</li>
+              <li>Mais arquivos para versionar.</li>
+              <li>Latência soma se não houver paralelismo.</li>
+              <li>Conflito entre papéis exige árbitro humano.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 6 - PADROES DE ORQUESTRACAO                            -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a04-table-compact">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Padrões</span>
+          <h2 class="deck-title">Padrões de orquestração de agentes</h2>
+          <p class="deck-summary">Quatro arquétipos comuns. Hoje rodamos um híbrido planner+executor com revisão humana &mdash; é o que cabe na hora prática.</p>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr><th>Padrão</th><th>Como funciona</th><th>Quando usar</th><th>Risco</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Planner + Executor</td><td>Um agente planeja, outro(s) executam tarefas pequenas.</td><td>Pipeline previsível com etapas claras.</td><td>Plano ruim se propaga.</td></tr>
+            <tr><td>Hierárquico</td><td>Manager delega para sub-agentes especializados.</td><td>Tarefas com dependências fortes entre subtarefas.</td><td>Latência cumulativa.</td></tr>
+            <tr><td>Blackboard</td><td>Agentes leem e escrevem em quadro comum.</td><td>Problemas exploratórios, sem ordem fixa.</td><td>Difícil auditar quem mudou o quê.</td></tr>
+            <tr><td>Swarm</td><td>Vários agentes paralelos, sem coordenador central.</td><td>Geração de variantes, brainstorming.</td><td>Pode divergir; precisa redutor.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 7 - SQUAD CANONICA                                     -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a04-compact">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Squad</span>
+          <h2 class="deck-title">A squad canônica desta aula</h2>
+          <p class="deck-summary">Quatro papéis. Cada um com escopo de leitura, escrita e aceitação próprios &mdash; nenhum invade o outro.</p>
+        </div>
+        <div class="deck-grid">
+          <article class="deck-card">
+            <h3>Architect</h3>
+            <ul>
+              <li>Lê <code>03_architecture.md</code>.</li>
+              <li>Decompõe em módulos CFN.</li>
+              <li>Saída: <code>PLAN.md</code>.</li>
+              <li>Não escreve YAML.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>DevOps</h3>
+            <ul>
+              <li>Recebe <code>PLAN.md</code>.</li>
+              <li>Gera <code>root.yaml</code> + módulos.</li>
+              <li>Skill <code>gen_cfn_template</code>.</li>
+              <li>Tags + Outputs obrigatórios.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Tester</h3>
+            <ul>
+              <li>Gera <code>test_templates.py</code>.</li>
+              <li><code>cfn-lint</code> + asserts.</li>
+              <li>Skill <code>lint_cfn</code>.</li>
+              <li>Falha = blocker.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Reviewer</h3>
+            <ul>
+              <li>ATAM enxuto no template.</li>
+              <li>Skill <code>review_cfn</code>.</li>
+              <li>Riscos, sensibilidades, trade-offs.</li>
+              <li>Veto explícito antes do deploy.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 8 - AIOX E ALTERNATIVAS                                -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a04-compact">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Framework</span>
+          <h2 class="deck-title">AIOX e alternativas pragmáticas</h2>
+          <p class="deck-summary">AIOX é o framework de orquestração CLI que vamos adotar. Se a turma não conseguir instalar (caches, rede do Codespace), o plano B é equivalente em comportamento &mdash; mesmo squad, outra runtime.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>AIOX &mdash; o que esperamos</strong>
+            <ul>
+              <li>CLI que lê <code>agents/squad.yml</code>.</li>
+              <li>Cada papel é um agente com skills focadas.</li>
+              <li>Roda no Codespace, sem stack pesada.</li>
+              <li>Logs auditáveis por papel/turno.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Plano B equivalente</strong>
+            <ul>
+              <li><strong>CrewAI</strong> &mdash; Python, fluxo declarativo.</li>
+              <li><strong>AutoGen</strong> &mdash; multi-agent dialog.</li>
+              <li><strong>LangGraph CLI</strong> &mdash; grafo de estados.</li>
+              <li><strong>Caseiro</strong> &mdash; <code>make</code> chamando Gemini/OpenCode com skills.</li>
+            </ul>
+          </div>
+        </div>
+        <p style="margin-top:10px; font-size:.92em;"><em>Critério de escolha hoje:</em> roda no Codespace sem chave paga, lê markdown como input, escreve markdown e YAML como saída, deixa rastro no <code>git</code>.</p>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 9 - DIAGRAMA DA SQUAD                                  -->
+    <!-- ============================================================ -->
+    <div class="slide" data-slide="squad-flow">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Fluxo</span>
+          <h2 class="deck-title">Da arquitetura ao stack &mdash; fluxo da squad</h2>
+          <p class="deck-summary">Cada agente lê um insumo, produz um artefato versionado e passa adiante. O humano é o árbitro &mdash; e o único que aciona <code>aws cloudformation deploy</code>.</p>
+        </div>
+        <div class="a04-mermaid">
+          <pre class="mermaid">
+flowchart LR
+  subgraph IN["Insumos (Aula 03)"]
+    ARCH["documents/<br/>03_architecture.md"]
+    AGENTS["documents/agents/<br/>AGENTS.md + skills"]
+  end
+
+  subgraph SQUAD["Squad (Aula 04)"]
+    A["Architect<br/>plano de modulos"]
+    D["DevOps<br/>gera CFN YAML"]
+    T["Tester<br/>cfn-lint + asserts"]
+    R["Reviewer<br/>ATAM no template"]
+  end
+
+  subgraph OUT["Artefatos versionados"]
+    PLAN["iac/.../PLAN.md"]
+    YAML["iac/cloudformation/<br/>root.yaml + modulos"]
+    TESTS["tests/iac/<br/>test_templates.py"]
+    LOG["documents/<br/>10_deploy_log.md"]
+  end
+
+  subgraph AWS["AWS Student Lab"]
+    STACK["CloudFormation Stack<br/>olist-sre-pipeline-lab"]
+    RES["S3 + EC2 + IAM + CW<br/>EventBridge + SSM"]
+  end
+
+  ARCH --> A
+  AGENTS --> A
+  AGENTS --> D
+  AGENTS --> T
+  AGENTS --> R
+  A --> PLAN --> D
+  D --> YAML --> T
+  T --> R
+  R ==> |"veto / ok"| HUMAN["Humano (voce)"]
+  HUMAN ==> |"aws cfn deploy"| STACK
+  STACK --> RES
+  STACK -.-> LOG
+          </pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 10 - CFN ANATOMIA                                      -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a04-table-compact">
+        <div>
+          <span class="deck-kicker">Teoria &middot; CloudFormation 101</span>
+          <h2 class="deck-title">Anatomia de um template CFN</h2>
+          <p class="deck-summary">Sete seções. Saber para que serve cada uma é pré-requisito para revisar o YAML que a IA gera.</p>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr><th>Seção</th><th>Para que serve</th><th>Obrigatória?</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>AWSTemplateFormatVersion</code></td><td>Versão do schema (sempre <code>2010-09-09</code>).</td><td>Recomendada</td></tr>
+            <tr><td><code>Description</code></td><td>O que o template provisiona, em uma frase.</td><td>Recomendada</td></tr>
+            <tr><td><code>Parameters</code></td><td>Entradas do stack (env, iniciais, sizing).</td><td>Não</td></tr>
+            <tr><td><code>Mappings</code></td><td>Tabelas estáticas (ex.: AMI por região).</td><td>Não</td></tr>
+            <tr><td><code>Conditions</code></td><td>Liga/desliga recursos por env.</td><td>Não</td></tr>
+            <tr><td><code>Resources</code></td><td>O que vai existir na conta.</td><td>Sim</td></tr>
+            <tr><td><code>Outputs</code></td><td>Valores expostos pelo stack (ARNs, URLs).</td><td>Recomendada</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 11 - CFN INTRINSIC                                     -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a04-table-compact">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Funções intrínsecas</span>
+          <h2 class="deck-title">Funções intrínsecas que você vai ler hoje</h2>
+          <p class="deck-summary">A IA vai gerar template recheado disso. Saber decodificar é diferença entre revisar e copiar cego.</p>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr><th>Função</th><th>Para quê</th><th>Exemplo</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>!Ref</code></td><td>Referencia parâmetro ou resource.</td><td><code>!Ref BucketRaw</code></td></tr>
+            <tr><td><code>!Sub</code></td><td>Interpola variável em string.</td><td><code>!Sub "${Iniciais}-raw"</code></td></tr>
+            <tr><td><code>!GetAtt</code></td><td>Lê atributo de outro resource.</td><td><code>!GetAtt MyEC2.PublicIp</code></td></tr>
+            <tr><td><code>!ImportValue</code></td><td>Lê Output exportado por outro stack.</td><td><code>!ImportValue VpcId-lab</code></td></tr>
+            <tr><td><code>!Join</code></td><td>Concatena lista com separador.</td><td><code>!Join ["/", [a, b]]</code></td></tr>
+            <tr><td><code>!If</code></td><td>Condicional baseado em Conditions.</td><td><code>!If [IsProd, t3.large, t3.micro]</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 12 - LIFECYCLE DE STACK                                -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a04-table-compact">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Lifecycle</span>
+          <h2 class="deck-title">Lifecycle de um stack</h2>
+          <p class="deck-summary">CFN tem máquina de estados explícita. Conhecer os estados é condição para depurar deploy travado sem chutar.</p>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr><th>Operação</th><th>Estados principais</th><th>Quando ocorre</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>CREATE</td><td>CREATE_IN_PROGRESS &rarr; CREATE_COMPLETE</td><td>Primeiro <code>deploy</code> com stack inexistente.</td></tr>
+            <tr><td>CREATE c/ falha</td><td>CREATE_FAILED &rarr; ROLLBACK_IN_PROGRESS &rarr; ROLLBACK_COMPLETE</td><td>Recurso falha; tudo é desfeito.</td></tr>
+            <tr><td>UPDATE</td><td>UPDATE_IN_PROGRESS &rarr; UPDATE_COMPLETE</td><td>Template muda; aplica diff.</td></tr>
+            <tr><td>UPDATE c/ falha</td><td>UPDATE_ROLLBACK_IN_PROGRESS &rarr; UPDATE_ROLLBACK_COMPLETE</td><td>Reverte para estado anterior.</td></tr>
+            <tr><td>DELETE</td><td>DELETE_IN_PROGRESS &rarr; DELETE_COMPLETE</td><td><code>delete-stack</code> respeita DeletionPolicy.</td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top:10px; font-size:.92em;"><em>Change set</em>: simulação do diff antes do UPDATE. Recomendado em ambiente real, opcional aqui pelo escopo da aula.</p>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 13 - CAPABILITIES E POLICIES                           -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a04-compact">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Guard rails</span>
+          <h2 class="deck-title">Capabilities, Stack Policy, DeletionPolicy</h2>
+          <p class="deck-summary">Três mecanismos que o CFN usa para impedir o "ops" silencioso. Entrar com elas no template ligadas é higiene de SRE.</p>
+        </div>
+        <div class="a04-grid-3">
+          <article class="deck-card">
+            <h3><code>Capabilities</code></h3>
+            <ul>
+              <li><code>CAPABILITY_IAM</code> &mdash; aceita criar IAM Roles.</li>
+              <li><code>CAPABILITY_NAMED_IAM</code> &mdash; aceita nome customizado.</li>
+              <li>Sem isso, deploy falha por segurança.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>Stack Policy</h3>
+            <ul>
+              <li>JSON inline que protege resources contra UPDATE acidental.</li>
+              <li>Útil para banco de dados e buckets de raw.</li>
+            </ul>
+          </article>
+          <article class="deck-card">
+            <h3>DeletionPolicy</h3>
+            <ul>
+              <li><code>Delete</code> &middot; <code>Retain</code> &middot; <code>Snapshot</code>.</li>
+              <li>Bucket S3 e RDS nunca devem ser <code>Delete</code> em prod.</li>
+              <li>No Lab, usamos <code>Retain</code> só para raw.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 14 - DRIFT DETECTION                                   -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Drift</span>
+          <h2 class="deck-title">Drift detection &mdash; IaC perde valor sem isso</h2>
+          <p class="deck-summary">Se alguém abre o console e edita um SG "só para ver", o template mente. Drift é a diferença entre o que está no template e o que está vivo na conta.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>O que CFN considera drift</strong>
+            <ul>
+              <li>Propriedade alterada fora do CFN.</li>
+              <li>Recurso deletado manualmente.</li>
+              <li>Tag adicionada/removida no console.</li>
+              <li><strong>Não detecta</strong>: dados dentro de S3/RDS.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Comandos da prática</strong>
+            <ul>
+              <li><code>aws cloudformation detect-stack-drift</code></li>
+              <li><code>... describe-stack-drift-detection-status</code></li>
+              <li><code>... describe-stack-resource-drifts</code></li>
+              <li>Resultado vai no <code>11_drift_runbook.md</code>.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 15 - COMPOSICAO NESTED                                 -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Composição</span>
+          <h2 class="deck-title">Nested stacks e cross-stack references</h2>
+          <p class="deck-summary">Stack único e gigante é difícil de revisar e ainda mais difícil de atualizar. Quebrar em módulos por domínio é o padrão &mdash; do mesmo jeito que dividimos a squad.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Nested stacks</strong>
+            <ul>
+              <li>Pai inclui filhos via <code>AWS::CloudFormation::Stack</code>.</li>
+              <li>Atualização do pai propaga.</li>
+              <li>Bom quando o ciclo de vida é compartilhado.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Cross-stack via Outputs/Exports</strong>
+            <ul>
+              <li>Stack A exporta valor; Stack B faz <code>!ImportValue</code>.</li>
+              <li>Ciclos de vida independentes.</li>
+              <li>Cuidado: Export usado não pode mudar nome.</li>
+            </ul>
+          </div>
+        </div>
+        <p style="margin-top:10px; font-size:.92em;"><em>Nesta aula</em>: usamos <strong>nested stacks</strong> com <code>root.yaml</code> incluindo <code>network</code>, <code>storage</code>, <code>compute</code>, <code>observability</code> e <code>sre-loop</code>. Ciclo de vida único: o stack do laboratório.</p>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 16 - CFN VS TF VS CDK                                  -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a04-table-compact">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Comparação</span>
+          <h2 class="deck-title">CloudFormation vs Terraform vs CDK</h2>
+          <p class="deck-summary">Por que CFN é o default da disciplina? Porque é o que cabe no Learner Lab sem instalar nada além do AWS CLI.</p>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr><th>Critério</th><th>CloudFormation</th><th>Terraform</th><th>CDK</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Linguagem</td><td>YAML/JSON declarativo</td><td>HCL declarativo</td><td>TS/Python imperativo</td></tr>
+            <tr><td>Estado</td><td>Gerenciado pela AWS</td><td>State file externo (S3 + lock)</td><td>Sintetiza CFN; usa state da AWS</td></tr>
+            <tr><td>Multi-cloud</td><td>Não</td><td>Sim</td><td>Não</td></tr>
+            <tr><td>No Learner Lab</td><td>Funciona out-of-the-box</td><td>Exige bucket de state &mdash; complica</td><td>Funciona, exige Node/Python e bootstrap</td></tr>
+            <tr><td>Curva</td><td>Média (YAML longo)</td><td>Média (HCL+providers)</td><td>Alta (modelo OOP)</td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top:10px; font-size:.92em;"><em>Decisão da disciplina:</em> CFN puro nesta aula. CDK fica como leitura complementar para quem já programa em TS/Python.</p>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 17 - SRE NA INFRA                                      -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a04-compact">
+        <div>
+          <span class="deck-kicker">Teoria &middot; SRE</span>
+          <h2 class="deck-title">SRE começa no template, não no alarme</h2>
+          <p class="deck-summary">Cada recurso provisionado já nasce com tag de SLO, log group e métrica. Observabilidade adicionada depois é dívida garantida.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Higiene mínima por recurso</strong>
+            <ul>
+              <li>Tags <code>Project</code>, <code>Env</code>, <code>SLO</code>, <code>Owner</code>.</li>
+              <li>Log group dedicado quando aplicável.</li>
+              <li>Métricas customizadas via CW Embedded Metric Format.</li>
+              <li><code>DeletionPolicy</code> e <code>UpdateReplacePolicy</code> escolhidos.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Closed loop herdado da Aula 03</strong>
+            <ul>
+              <li>Sensor: CW alarm de frescor.</li>
+              <li>Comparador/Controlador: EventBridge rule.</li>
+              <li>Atuador: SSM Run Command (retry no ETL).</li>
+              <li>Audit: log group do controlador.</li>
+              <li><strong>Tudo entra no <code>sre-loop.yaml</code>.</strong></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 18 - ANTI-PADROES                                      -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a04-table-compact">
+        <div>
+          <span class="deck-kicker">Teoria &middot; Anti-padrões</span>
+          <h2 class="deck-title">Anti-padrões em template CFN</h2>
+          <p class="deck-summary">A IA vai acertar 80%. Os 20% restantes geralmente são variações destes erros. Reviewer existe para pegá-los.</p>
+        </div>
+        <table class="deck-table">
+          <thead>
+            <tr><th>Anti-padrão</th><th>Por que dói</th><th>Como evitar</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Secret no template</td><td>Vai parar no git e nos logs do stack.</td><td>SSM Parameter Store + <code>!Sub</code>.</td></tr>
+            <tr><td>IAM com <code>Action: '*'</code></td><td>Privilege escalation pronta.</td><td>Action mínimo + Resource mínimo.</td></tr>
+            <tr><td>Sem <code>DeletionPolicy</code></td><td>Bucket de raw some no <code>delete-stack</code>.</td><td>Definir explícito por resource crítico.</td></tr>
+            <tr><td>ARN hardcoded</td><td>Quebra ao trocar de conta/região.</td><td><code>!Sub</code> com <code>${AWS::AccountId}</code> e <code>${AWS::Region}</code>.</td></tr>
+            <tr><td>Sem Outputs</td><td>Outros stacks não conseguem consumir.</td><td>Exportar IDs e ARNs relevantes.</td></tr>
+            <tr><td>Tags ausentes</td><td>FinOps cego, SLO sem dono.</td><td>Tags obrigatórias no padrão da turma.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 19 - PONTE PARA PRATICA                                -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a04-compact">
+        <div>
+          <span class="deck-kicker">Prática &middot; 21h00 &ndash; 22h00</span>
+          <h2 class="deck-title">Da teoria para o stack provisionado</h2>
+          <p class="deck-summary">Próxima hora guiada. Toda a turma sai com squad rodando, templates gerados, stack vivo no Learner Lab e drift detection rodada.</p>
+        </div>
+        <div class="deck-panel">
+          <strong>Sequência da prática</strong>
+          <ol>
+            <li>Renovar credenciais AWS no Codespace.</li>
+            <li>Instalar a squad de agentes (AIOX ou plano B).</li>
+            <li>Criar <code>agents/squad.yml</code> e três skills novas.</li>
+            <li>Architect &rarr; <code>iac/cloudformation/PLAN.md</code>.</li>
+            <li>DevOps &rarr; <code>root.yaml</code> + módulos.</li>
+            <li>Tester &rarr; <code>cfn-lint</code> + asserts.</li>
+            <li>Reviewer &rarr; ATAM no template; veto ou ok.</li>
+            <li><code>aws cloudformation validate-template</code> e <code>deploy</code>.</li>
+            <li>Verificação por CLI (<code>describe-stacks</code>).</li>
+            <li>Smoke test, drift, commit, tag <code>aula-04</code>.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 20 - PASSO 1 RENOVAR CREDS                             -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; Passo 1</span>
+          <h2 class="deck-title">Renovar credenciais AWS</h2>
+          <p class="deck-summary">O session token do Learner Lab dura ~3h. Toda aula começa colando o bloco novo. Sem isso, tudo dá <code>ExpiredToken</code>.</p>
+        </div>
+<pre class="a04-prompt"># 1) AWS Academy: Start Lab -&gt; AWS Details -&gt; Show -&gt; copiar bloco "AWS CLI"
+
+# 2) No Codespace, sobrescrever credenciais
+cat &gt; ~/.aws/credentials &lt;&lt;'EOF'
+[default]
+aws_access_key_id=ASIA...
+aws_secret_access_key=...
+aws_session_token=...
+EOF
+chmod 600 ~/.aws/credentials
+
+# 3) Validar
+aws sts get-caller-identity
+aws cloudformation list-stacks --query "StackSummaries[?StackStatus!='DELETE_COMPLETE'].StackName"</pre>
+        <div class="deck-callout" style="margin-top:14px;">
+          <strong>Cuidado</strong>
+          <p style="margin:8px 0 0;">Se <code>get-caller-identity</code> retornar erro, pare e renove o token. Não tente debugar o stack com sessão expirada.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 21 - PASSO 2 INSTALAR SQUAD                            -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; Passo 2</span>
+          <h2 class="deck-title">Instalar a squad de agentes</h2>
+          <p class="deck-summary">AIOX como default. Se falhar, caímos no plano B. O importante é a forma da squad &mdash; não o nome do binário.</p>
+        </div>
+<pre class="a04-prompt"># Tentativa 1 - AIOX
+pipx install aiox || pip install --user aiox
+aiox --version
+
+# Plano B (se AIOX nao existir/instalar)
+pip install --user crewai || pip install --user pyautogen
+# ou orquestrador caseiro com Makefile chamando gemini/opencode
+
+# Validar que cfn-lint esta disponivel para o Tester
+pipx install cfn-lint || pip install --user cfn-lint
+cfn-lint --version</pre>
+        <p style="margin-top:14px; font-size:.92em;"><em>Critério</em>: <code>--version</code> retorna sem erro nas duas ferramentas (orquestrador + <code>cfn-lint</code>). Caso contrário, prática segue com o plano B.</p>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 22 - PASSO 3 SQUAD YML                                 -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; Passo 3</span>
+          <h2 class="deck-title">Criar <code>agents/squad.yml</code></h2>
+          <p class="deck-summary">Configuração declarativa da squad. Mesmo formato funciona em AIOX, CrewAI e no orquestrador caseiro &mdash; o que muda é só o runner.</p>
+        </div>
+<pre class="a04-prompt"># agents/squad.yml
+shared_context:
+  - documents/agents/AGENTS.md
+  - documents/03_architecture.md
+
+roles:
+  architect:
+    reads:  [documents/03_architecture.md]
+    writes: [iac/cloudformation/PLAN.md]
+    skills: [review_architecture]
+
+  devops:
+    reads:  [iac/cloudformation/PLAN.md]
+    writes: [iac/cloudformation/*.yaml]
+    skills: [gen_cfn_template]
+
+  tester:
+    reads:  [iac/cloudformation/*.yaml]
+    writes: [tests/iac/test_templates.py]
+    skills: [lint_cfn]
+
+  reviewer:
+    reads:  [iac/cloudformation/*.yaml, tests/iac/]
+    writes: [documents/10_deploy_log.md]
+    skills: [review_cfn, review_architecture]</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 23 - PASSO 4 SKILLS NOVAS                              -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; Passo 4</span>
+          <h2 class="deck-title">Skills novas &mdash; <code>gen_cfn_template</code></h2>
+          <p class="deck-summary">Mesmo padrão das skills da Aula 03: nome verbo+objeto, quando usar, entrada, passos, saída, critério de aceitação. Faça também <code>lint_cfn</code> e <code>review_cfn</code> análogas.</p>
+        </div>
+<pre class="a04-prompt"># documents/agents/skills/gen_cfn_template.md
+
+## Quando usar
+Quando existir iac/cloudformation/PLAN.md descrevendo modulos.
+
+## Entrada
+- iac/cloudformation/PLAN.md
+- documents/03_architecture.md
+
+## Passos
+1. Para cada modulo do PLAN.md, gere um YAML em iac/cloudformation/.
+2. Inclua AWSTemplateFormatVersion, Description, Parameters, Resources, Outputs.
+3. Tags obrigatorias: Project=olist-sre, Env=!Ref Env, Owner=!Ref Iniciais, SLO=...
+4. DeletionPolicy: Retain em S3 raw; Delete no resto do Lab.
+5. Sem secrets. Sem Action:'*' em IAM. Sem ARN hardcoded.
+6. root.yaml inclui modulos via AWS::CloudFormation::Stack.
+
+## Saida
+- iac/cloudformation/{root,network,storage,compute,observability,sre-loop}.yaml
+
+## Aceitacao
+- cfn-lint passa em todos os arquivos.
+- Cada modulo tem ao menos 1 Output.
+- Tags presentes em 100% dos resources tagueaveis.</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 24 - PASSO 5 ARCHITECT                                 -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; Passo 5</span>
+          <h2 class="deck-title">Architect &rarr; <code>PLAN.md</code></h2>
+          <p class="deck-summary">Primeiro turno da squad. O Architect lê a arquitetura RM-ODP da Aula 03 e devolve um plano de módulos &mdash; sem escrever uma linha de YAML.</p>
+        </div>
+        <span class="a04-prompt-label">Terminal &middot; turno do Architect</span>
+<pre class="a04-prompt">aiox run architect \
+  --shared documents/agents/AGENTS.md \
+  --input  documents/03_architecture.md \
+  --output iac/cloudformation/PLAN.md \
+  --task   "Decomponha a arquitetura em modulos CFN.
+            Para cada modulo: nome, recursos, parametros,
+            outputs esperados, qual RF/RNF ele atende e
+            qual ramo do closed loop ele toca.
+            Modulos esperados: network, storage, compute,
+            observability, sre-loop."
+
+# Plano B (caseiro com Gemini)
+gemini -p "Aplique review_architecture sobre
+documents/03_architecture.md. Em seguida produza
+iac/cloudformation/PLAN.md no formato acima."</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 25 - PASSO 6 DEVOPS                                    -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; Passo 6</span>
+          <h2 class="deck-title">DevOps &rarr; templates CFN</h2>
+          <p class="deck-summary">A partir do plano, geramos seis arquivos. <code>root.yaml</code> orquestra os outros via nested stacks. Toda saída entra como diff revisável no git.</p>
+        </div>
+<pre class="a04-prompt">aiox run devops \
+  --shared documents/agents/AGENTS.md,iac/cloudformation/PLAN.md \
+  --skill  gen_cfn_template \
+  --output iac/cloudformation/
+
+# Estrutura esperada apos o turno
+iac/cloudformation/
+├── PLAN.md
+├── root.yaml          # nested stacks orchestrator
+├── network.yaml       # VPC default + SG
+├── storage.yaml       # S3 raw / trusted / refined
+├── compute.yaml       # EC2 ETL (tag Role=runner)
+├── observability.yaml # CW log groups + alarms + EventBridge
+└── sre-loop.yaml      # SSM Document + role do controlador
+
+git status iac/
+git diff  iac/cloudformation/</pre>
+        <p style="margin-top:14px; font-size:.92em;"><em>Reviewer humano</em>: leia 1 template antes de seguir. Se algo assustar (IAM larga, ARN fixo), <strong>volte um turno</strong>.</p>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 26 - PASSO 7 TESTER                                    -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; Passo 7</span>
+          <h2 class="deck-title">Tester &rarr; lint + asserts em Outputs</h2>
+          <p class="deck-summary">Antes de gastar token de deploy, validamos localmente. <code>cfn-lint</code> pega 90% dos erros bobos e o pytest cobre o que importa para o stack do Olist.</p>
+        </div>
+<pre class="a04-prompt">aiox run tester \
+  --shared documents/agents/AGENTS.md \
+  --input  iac/cloudformation/ \
+  --skill  lint_cfn \
+  --output tests/iac/test_templates.py
+
+# Rodar localmente
+cfn-lint iac/cloudformation/*.yaml
+python -m pytest tests/iac/test_templates.py -v
+
+# Asserts que esperamos no test_templates.py
+# - cada YAML tem Description nao vazio
+# - cada YAML tem ao menos 1 Output
+# - root.yaml referencia os 5 modulos
+# - nenhum recurso usa Action:"*" em IAM
+# - bucket S3 raw tem DeletionPolicy: Retain</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 27 - PASSO 8 REVIEWER                                  -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; Passo 8</span>
+          <h2 class="deck-title">Reviewer &rarr; ATAM enxuto no template</h2>
+          <p class="deck-summary">Antes do deploy, último crivo. Reusa a skill <code>review_architecture</code> da Aula 03 e a nova <code>review_cfn</code> &mdash; agora sobre YAML, não sobre prosa.</p>
+        </div>
+<pre class="a04-prompt">aiox run reviewer \
+  --shared documents/agents/AGENTS.md \
+  --input  iac/cloudformation/,tests/iac/ \
+  --skills review_cfn,review_architecture \
+  --task   "Liste 5 riscos, 3 sensibilidades e 2 trade-offs
+            do template. Marque qualquer recurso sem
+            DeletionPolicy, Tag ou Output. Decida:
+            APROVADO PARA DEPLOY ou VETO + razao."
+
+# Saida vai para documents/10_deploy_log.md (secao 'pre-deploy')</pre>
+        <div class="deck-callout" style="margin-top:14px;">
+          <strong>Regra de veto</strong>
+          <p style="margin:8px 0 0;">Reviewer marcou VETO &rArr; voltamos para DevOps com a lista. Não dá deploy "para ver no que dá". Custo de errar no Lab é tempo, mas a disciplina é hábito.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 28 - PASSO 9 VALIDATE                                  -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; Passo 9</span>
+          <h2 class="deck-title">Validar template no servidor antes do deploy</h2>
+          <p class="deck-summary"><code>validate-template</code> roda no lado da AWS. Pega erro de schema/intrinsic function que o lint local pode não cobrir.</p>
+        </div>
+<pre class="a04-prompt">for f in iac/cloudformation/*.yaml; do
+  echo "==== $f ===="
+  aws cloudformation validate-template \
+    --template-body "file://$f" \
+    --query "Description" --output text
+done
+
+# Empacotar nested stacks (sobe filhos para S3)
+aws s3 mb s3://${INICIAIS}-cfn-artifacts-lab 2&gt;/dev/null || true
+
+aws cloudformation package \
+  --template-file iac/cloudformation/root.yaml \
+  --s3-bucket    ${INICIAIS}-cfn-artifacts-lab \
+  --output-template-file iac/cloudformation/root.packaged.yaml</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 29 - PASSO 10 DEPLOY                                   -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; Passo 10</span>
+          <h2 class="deck-title">Deploy do stack &mdash; momento da verdade</h2>
+          <p class="deck-summary">Único comando que cria recursos hoje. Acompanhe pela CLI; se quiser ver eventos, use <code>describe-stack-events</code> &mdash; <strong>nada de console</strong>.</p>
+        </div>
+<pre class="a04-prompt">export INICIAIS=afn   # suas iniciais
+
+aws cloudformation deploy \
+  --stack-name olist-sre-pipeline-lab \
+  --template-file iac/cloudformation/root.packaged.yaml \
+  --capabilities CAPABILITY_IAM \
+  --parameter-overrides \
+      Env=lab \
+      Iniciais=${INICIAIS} \
+  --tags Project=olist-sre Env=lab Owner=${INICIAIS}
+
+# Acompanhar (em outro shell)
+aws cloudformation describe-stack-events \
+  --stack-name olist-sre-pipeline-lab \
+  --max-items 20 \
+  --query "StackEvents[].[Timestamp,LogicalResourceId,ResourceStatus]" \
+  --output table</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 30 - PASSO 11 VERIFICAR                                -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; Passo 11</span>
+          <h2 class="deck-title">Verificar o stack pela CLI</h2>
+          <p class="deck-summary">Três comandos para fechar o loop e gerar input do <code>10_deploy_log.md</code>. Tudo que veria no console aparece aqui &mdash; e em formato versionável.</p>
+        </div>
+<pre class="a04-prompt">aws cloudformation describe-stacks \
+  --stack-name olist-sre-pipeline-lab \
+  --query "Stacks[0].[StackStatus,Outputs]" \
+  --output json | tee documents/10_deploy_log.md.tmp
+
+aws cloudformation describe-stack-resources \
+  --stack-name olist-sre-pipeline-lab \
+  --query "StackResources[].[LogicalResourceId,ResourceType,ResourceStatus]" \
+  --output table
+
+aws cloudformation list-exports \
+  --query "Exports[?starts_with(Name, 'olist-')].[Name,Value]" \
+  --output table</pre>
+        <p style="margin-top:14px; font-size:.92em;"><em>Critério</em>: <code>StackStatus = CREATE_COMPLETE</code>; pelo menos 1 EC2 com tag <code>Role=runner</code> nos resources (ponte para a Aula 05).</p>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 31 - PASSO 12 SMOKE TEST                               -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; Passo 12</span>
+          <h2 class="deck-title">Smoke test &mdash; ETL dummy escreve no S3 raw</h2>
+          <p class="deck-summary">Stack pronto não vale nada se ninguém escreve dado. Smoke test mínimo: copiar 1 CSV no bucket raw e ver os logs do controlador SRE.</p>
+        </div>
+<pre class="a04-prompt"># Ler o nome do bucket diretamente do Output do stack
+RAW=$(aws cloudformation describe-stacks \
+  --stack-name olist-sre-pipeline-lab \
+  --query "Stacks[0].Outputs[?OutputKey=='BucketRaw'].OutputValue" \
+  --output text)
+
+echo "id,event_ts" &gt; /tmp/dummy.csv
+echo "1,$(date -u +%FT%TZ)" &gt;&gt; /tmp/dummy.csv
+
+aws s3 cp /tmp/dummy.csv s3://${RAW}/smoke/dummy.csv
+
+# Ver os logs do controlador SRE
+aws logs describe-log-groups \
+  --log-group-name-prefix "/olist-sre" \
+  --query "logGroups[].logGroupName" --output table</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 32 - PASSO 13 DRIFT                                    -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Prática &middot; Passo 13</span>
+          <h2 class="deck-title">Drift detection &mdash; foto vs realidade</h2>
+          <p class="deck-summary">Roda agora, antes que alguém edite um SG no console. O resultado vai para <code>11_drift_runbook.md</code> como referência da próxima aula.</p>
+        </div>
+<pre class="a04-prompt">DRIFT_ID=$(aws cloudformation detect-stack-drift \
+  --stack-name olist-sre-pipeline-lab \
+  --query "StackDriftDetectionId" --output text)
+
+# Aguardar a deteccao terminar
+while true; do
+  STATUS=$(aws cloudformation describe-stack-drift-detection-status \
+    --stack-drift-detection-id $DRIFT_ID \
+    --query "DetectionStatus" --output text)
+  [ "$STATUS" = "DETECTION_COMPLETE" ] && break
+  [ "$STATUS" = "DETECTION_FAILED" ]   && break
+  sleep 5
+done
+
+aws cloudformation describe-stack-resource-drifts \
+  --stack-name olist-sre-pipeline-lab \
+  --query "StackResourceDrifts[].[LogicalResourceId,StackResourceDriftStatus]" \
+  --output table</pre>
+        <p style="margin-top:14px; font-size:.92em;"><em>Esperado hoje</em>: <code>IN_SYNC</code> em todos os recursos. Se aparecer <code>MODIFIED</code>, alguém clicou no console e o ciclo do template já está quebrado.</p>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 33 - CRITERIO DE PRONTO                                -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a04-compact">
+        <div>
+          <span class="deck-kicker">Prática &middot; Critério</span>
+          <h2 class="deck-title">Critério de pronto e commit</h2>
+          <p class="deck-summary">Antes do <code>git push</code>, cada item verde. Se faltar, próxima aula herda dívida &mdash; e a Aula 05 começa quebrada.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Squad &amp; templates</strong>
+            <ul>
+              <li><code>agents/squad.yml</code> com 4 papéis.</li>
+              <li>3 skills novas em <code>documents/agents/skills/</code>.</li>
+              <li><code>iac/cloudformation/</code> com <code>root</code> + 5 módulos.</li>
+              <li><code>tests/iac/test_templates.py</code> passando.</li>
+              <li><code>cfn-lint</code> sem erro.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>Stack vivo</strong>
+            <ul>
+              <li><code>StackStatus = CREATE_COMPLETE</code>.</li>
+              <li>Ao menos 1 EC2 com tag <code>Role=runner</code>.</li>
+              <li>Smoke test no S3 raw OK.</li>
+              <li>Drift = <code>IN_SYNC</code>.</li>
+              <li><code>10_deploy_log.md</code> e <code>11_drift_runbook.md</code> commitados.</li>
+            </ul>
+          </div>
+        </div>
+<pre class="a04-prompt" style="margin-top:14px;">git add iac/ agents/ tests/iac/ documents/10_deploy_log.md documents/11_drift_runbook.md
+git commit -m "feat(aula-04): squad CFN + stack olist-sre-pipeline-lab provisionado"
+git tag aula-04
+git push origin main --tags</pre>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 34 - RESUMO E PROXIMA AULA                             -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Fechamento</span>
+          <h2 class="deck-title">Resumo e ponte para a Aula 05</h2>
+          <p class="deck-summary">A arquitetura modelada virou stack vivo. Próxima aula transforma o repo em pipeline de CI/CD &mdash; usando o EC2 com tag <code>Role=runner</code> que provisionamos hoje.</p>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
             <h3>O que fica desta aula</h3>
             <ul>
-              <li>TODO &mdash; compreensão dos trade-offs entre batch e streaming.</li>
-              <li>TODO &mdash; pipeline de eventos Olist funcionando no Learner Lab.</li>
-              <li>TODO &mdash; camada raw de streaming paralela ao batch.</li>
+              <li>Squad de 4 papéis + 3 skills novas em <code>agents/</code>.</li>
+              <li>6 templates CFN versionados em <code>iac/cloudformation/</code>.</li>
+              <li>Stack <code>olist-sre-pipeline-lab</code> em <code>CREATE_COMPLETE</code>.</li>
+              <li>Smoke test no S3 raw e drift detection rodada.</li>
+              <li><code>documents/10_deploy_log.md</code> e <code>11_drift_runbook.md</code>.</li>
+              <li>Tag <code>aula-04</code> no git.</li>
             </ul>
           </article>
           <article class="deck-card">
             <h3>Aula 05 &middot; 14/05/2026</h3>
             <ul>
-              <li>Integração, ETL serverless e catálogo de dados.</li>
-              <li>TODO &mdash; expectativas de Glue e catálogo sobre o Olist.</li>
-              <li>TODO &mdash; entregável da Aula 05.</li>
+              <li>Integração ETL serverless e catálogo de dados.</li>
+              <li>EC2 com tag <code>Role=runner</code> vira <em>self-hosted runner</em> do GitHub Actions.</li>
+              <li>Pipeline de CI valida templates a cada PR.</li>
+              <li>RTM ganha casos de teste automatizados.</li>
             </ul>
           </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE GLOSSARIO 1/3 - AGENTES E ORQUESTRACAO                 -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a04-table-compact a04-compact">
+        <div>
+          <span class="deck-kicker">Glossário &middot; 1 / 3</span>
+          <h2 class="deck-title">Siglas &mdash; agentes e orquestração</h2>
+          <p class="deck-summary">Vocabulário do bloco de teoria sobre multi-agente e da prática com a squad.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Agentes &middot; runtime</strong>
+            <table class="deck-table">
+              <tbody>
+                <tr><td><strong>AIOX</strong></td><td>Orquestrador CLI multi-agente da disciplina</td></tr>
+                <tr><td><strong>CrewAI</strong></td><td>Framework Python de squads de agentes</td></tr>
+                <tr><td><strong>AutoGen</strong></td><td>Framework Microsoft de multi-agent dialog</td></tr>
+                <tr><td><strong>LangGraph</strong></td><td>Grafo de estados para LLM workflows</td></tr>
+                <tr><td><strong>CLI</strong></td><td>Command Line Interface</td></tr>
+                <tr><td><strong>SDK</strong></td><td>Software Development Kit</td></tr>
+                <tr><td><strong>YAML</strong></td><td>YAML Ain't Markup Language</td></tr>
+                <tr><td><strong>JSON</strong></td><td>JavaScript Object Notation</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="deck-panel">
+            <strong>Padrões &middot; modelagem</strong>
+            <table class="deck-table">
+              <tbody>
+                <tr><td><strong>ATAM</strong></td><td>Architecture Tradeoff Analysis Method</td></tr>
+                <tr><td><strong>SDD</strong></td><td>Spec-Driven Development</td></tr>
+                <tr><td><strong>RM-ODP</strong></td><td>Reference Model for Open Distributed Processing</td></tr>
+                <tr><td><strong>OOP</strong></td><td>Object-Oriented Programming</td></tr>
+                <tr><td><strong>HCL</strong></td><td>HashiCorp Configuration Language</td></tr>
+                <tr><td><strong>OIDC</strong></td><td>OpenID Connect</td></tr>
+                <tr><td><strong>RTM</strong></td><td>Requirements Traceability Matrix</td></tr>
+                <tr><td><strong>ADR</strong></td><td>Architecture Decision Record</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE GLOSSARIO 2/3 - CFN E IaC                              -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a04-table-compact a04-compact">
+        <div>
+          <span class="deck-kicker">Glossário &middot; 2 / 3</span>
+          <h2 class="deck-title">Siglas &mdash; CloudFormation e IaC</h2>
+          <p class="deck-summary">Vocabulário do bloco de CloudFormation e dos comandos da prática.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>IaC &middot; ferramentas</strong>
+            <table class="deck-table">
+              <tbody>
+                <tr><td><strong>IaC</strong></td><td>Infrastructure as Code</td></tr>
+                <tr><td><strong>CFN</strong></td><td>CloudFormation</td></tr>
+                <tr><td><strong>CDK</strong></td><td>Cloud Development Kit</td></tr>
+                <tr><td><strong>TF</strong></td><td>Terraform (HashiCorp)</td></tr>
+                <tr><td><strong>cfn-lint</strong></td><td>Linter open-source para templates CFN</td></tr>
+                <tr><td><strong>CI / CD</strong></td><td>Continuous Integration / Delivery</td></tr>
+                <tr><td><strong>PR</strong></td><td>Pull Request</td></tr>
+                <tr><td><strong>SCM</strong></td><td>Source Code Management</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="deck-panel">
+            <strong>Conceitos CFN</strong>
+            <table class="deck-table">
+              <tbody>
+                <tr><td><strong>Stack</strong></td><td>Conjunto de resources gerenciados juntos</td></tr>
+                <tr><td><strong>Change Set</strong></td><td>Diff simulado antes do UPDATE</td></tr>
+                <tr><td><strong>Drift</strong></td><td>Diferença entre template e realidade</td></tr>
+                <tr><td><strong>Nested Stack</strong></td><td>Stack incluído por outro</td></tr>
+                <tr><td><strong>Output</strong></td><td>Valor exposto pelo stack</td></tr>
+                <tr><td><strong>Export</strong></td><td>Output cross-stack</td></tr>
+                <tr><td><strong>Parameter</strong></td><td>Entrada do template</td></tr>
+                <tr><td><strong>Capability</strong></td><td>Permissão explícita ao deploy</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE GLOSSARIO 3/3 - AWS E SRE                              -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a04-table-compact a04-compact">
+        <div>
+          <span class="deck-kicker">Glossário &middot; 3 / 3</span>
+          <h2 class="deck-title">Siglas &mdash; AWS e SRE</h2>
+          <p class="deck-summary">Serviços e conceitos AWS que aparecem no template e siglas SRE/observabilidade da aula.</p>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>AWS &middot; serviços</strong>
+            <table class="deck-table">
+              <tbody>
+                <tr><td><strong>AWS</strong></td><td>Amazon Web Services</td></tr>
+                <tr><td><strong>ARN</strong></td><td>Amazon Resource Name</td></tr>
+                <tr><td><strong>IAM</strong></td><td>Identity and Access Management</td></tr>
+                <tr><td><strong>EC2</strong></td><td>Elastic Compute Cloud</td></tr>
+                <tr><td><strong>S3</strong></td><td>Simple Storage Service</td></tr>
+                <tr><td><strong>CW</strong></td><td>CloudWatch</td></tr>
+                <tr><td><strong>SSM</strong></td><td>Systems Manager</td></tr>
+                <tr><td><strong>VPC / SG</strong></td><td>VPC + Security Group</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="deck-panel">
+            <strong>SRE &middot; observabilidade</strong>
+            <table class="deck-table">
+              <tbody>
+                <tr><td><strong>SRE</strong></td><td>Site Reliability Engineering</td></tr>
+                <tr><td><strong>SLI</strong></td><td>Service Level Indicator</td></tr>
+                <tr><td><strong>SLO</strong></td><td>Service Level Objective</td></tr>
+                <tr><td><strong>SLA</strong></td><td>Service Level Agreement</td></tr>
+                <tr><td><strong>MTTR</strong></td><td>Mean Time To Recovery</td></tr>
+                <tr><td><strong>EMF</strong></td><td>Embedded Metric Format (CW)</td></tr>
+                <tr><td><strong>ETL</strong></td><td>Extract, Transform, Load</td></tr>
+                <tr><td><strong>FinOps</strong></td><td>Disciplina financeira de cloud</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 38 - REFERENCIAS                                       -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Bibliografia</span>
+          <h2 class="deck-title">Referências e leituras</h2>
+        </div>
+        <div class="deck-columns">
+          <div class="deck-panel">
+            <strong>Multi-agente &amp; orquestração</strong>
+            <ul>
+              <li>Park, J. et al. &mdash; <em>Generative Agents: Interactive Simulacra of Human Behavior</em>.</li>
+              <li>Microsoft Research &mdash; <em>AutoGen: Enabling Next-Gen LLM Apps via Multi-Agent Conversation</em>.</li>
+              <li>LangGraph docs &mdash; <em>State machines for LLM apps</em>.</li>
+              <li>CrewAI docs &mdash; <em>Role-based agent orchestration</em>.</li>
+              <li>Spec Kit &middot; AGENTS.md spec &middot; Gemini CLI &middot; OpenCode docs.</li>
+            </ul>
+          </div>
+          <div class="deck-panel">
+            <strong>CloudFormation &amp; SRE</strong>
+            <ul>
+              <li>AWS &mdash; <em>CloudFormation User Guide</em> (Template Reference).</li>
+              <li>AWS &mdash; <em>Drift Detection</em> e <em>Change Sets</em>.</li>
+              <li>HashiCorp &mdash; <em>Terraform vs CloudFormation</em> (technical comparison).</li>
+              <li>AWS &mdash; <em>CDK Best Practices</em>.</li>
+              <li>Beyer et al. &mdash; <em>Site Reliability Engineering</em> (Google), cap. de Configuration.</li>
+              <li>Burns &amp; Beda &mdash; <em>Designing Distributed Systems</em>.</li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
@@ -271,6 +1388,45 @@
     function toggleFullScreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
     document.addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); } else if (e.key === 'ArrowLeft') { e.preventDefault(); previousSlide(); } else if (e.key.toLowerCase() === 'f') toggleFullScreen(); });
     showSlide(0);
+  </script>
+
+  <!-- Mermaid v11 — squad flow diagram (slide 9, lazy render on activation) -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'neutral',
+      securityLevel: 'loose',
+      flowchart: { htmlLabels: true, curve: 'basis' },
+      themeVariables: {
+        fontFamily: 'JetBrains Mono, ui-monospace, monospace',
+        primaryColor: '#ffffff',
+        primaryBorderColor: '#0f0f0f',
+        primaryTextColor: '#0f0f0f',
+        lineColor: '#5c5c5c',
+        clusterBkg: '#fafaf7',
+        clusterBorder: '#d6d6d1'
+      }
+    });
+
+    const target = document.querySelector('[data-slide="squad-flow"]');
+    let rendered = false;
+    async function renderIfNeeded() {
+      if (rendered) return;
+      if (!target || !target.classList.contains('active')) return;
+      rendered = true;
+      try {
+        await mermaid.run({ nodes: target.querySelectorAll('pre.mermaid') });
+      } catch (e) {
+        rendered = false;
+        console.warn('Mermaid render falhou:', e);
+      }
+    }
+    if (target) {
+      const obs = new MutationObserver(renderIfNeeded);
+      obs.observe(target, { attributes: true, attributeFilter: ['class'] });
+      renderIfNeeded();
+    }
   </script>
 </body>
 </html>

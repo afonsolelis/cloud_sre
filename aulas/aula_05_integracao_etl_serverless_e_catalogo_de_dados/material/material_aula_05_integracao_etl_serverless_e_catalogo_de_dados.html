@@ -4,39 +4,1084 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/png" href="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" />
-  <title>Material Aula 05 — Integração, ETL serverless e catálogo de dados</title>
+  <title>Material Aula 05 — Pipeline de testes white box + black box: GitHub Actions com EC2 distribuído</title>
   <link rel="stylesheet" href="../../../assets/styles.css" />
+  <link rel="stylesheet" href="../../../assets/slides.css" />
+  <style data-material05-local>
+    /* Material is a long-form document — neutralize the height/overflow rules
+       that slides.css applies to html, body. */
+    html, body.material {
+      height: auto !important;
+      min-height: 100%;
+      overflow: visible !important;
+    }
+    body.material .page { max-width: 980px; }
+    body.material pre {
+      background: #0d1117;
+      color: #e6edf3;
+      padding: 16px 18px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: .92rem;
+      line-height: 1.65;
+      overflow-x: auto;
+      margin: 14px 0;
+    }
+    body.material code {
+      background: var(--deck-surface);
+      border: 1px solid var(--deck-line-soft);
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-family: var(--font-mono);
+      font-size: .9em;
+    }
+    body.material pre code { background: transparent; border: none; padding: 0; }
+    body.material table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: .95rem;
+    }
+    body.material thead th {
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-size: .82rem;
+      text-align: left;
+      padding: 10px 12px;
+      border-top: 1px solid #0f0f0f;
+      border-bottom: 1px solid #0f0f0f;
+      background: var(--deck-surface);
+    }
+    body.material tbody td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--deck-line-soft);
+      vertical-align: top;
+    }
+    body.material tbody tr:last-child td { border-bottom: 1px solid #0f0f0f; }
+    .m05-callout {
+      border-left: 3px solid #0f0f0f;
+      background: var(--deck-surface);
+      padding: 18px 22px;
+      margin: 18px 0;
+      border-radius: 0 4px 4px 0;
+    }
+    .m05-callout strong:first-child { display: block; margin-bottom: 6px; }
+    .m05-mermaid {
+      background: var(--deck-panel, #ffffff);
+      border: 1px solid var(--deck-line, #d6d6d1);
+      border-radius: 4px;
+      padding: 18px;
+      margin: 18px 0;
+      overflow: auto;
+    }
+    .m05-mermaid pre.mermaid {
+      background: transparent !important;
+      color: var(--deck-text, #0f0f0f) !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      box-shadow: none !important;
+      border: none !important;
+      border-radius: 0 !important;
+      overflow: visible;
+    }
+    .m05-mermaid pre.mermaid::before { display: none !important; }
+    .m05-mermaid svg {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+      background: transparent;
+    }
+    .m05-tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--deck-muted);
+      padding: 2px 8px;
+      border: 1px solid var(--deck-line);
+      border-radius: 3px;
+      margin-right: 6px;
+    }
+  </style>
 </head>
 <body class="material">
   <main class="page">
 
     <section class="content-block">
       <p class="meta">Aula 05 &nbsp;&bull;&nbsp; 14/05/2026 &nbsp;&bull;&nbsp; 19h00 &ndash; 22h00</p>
-      <h1>Integração, ETL serverless e catálogo de dados</h1>
+      <h1>Pipeline de testes white box + black box: GitHub Actions com EC2 distribuído</h1>
       <p class="summary">
         Este material acompanha a Aula 05 da disciplina <strong>Cloud Computing e SRE &mdash; Visão Prática com AWS</strong>
-        do MBA em Engenharia de Dados. Nele discutiremos como orquestrar, transformar e catalogar o dataset
-        Olist em uma stack serverless, levando os dados do CSV bruto até um modelo analítico publicável.
+        do MBA em Engenharia de Dados. A aula constrói o primeiro <em>closed loop humano</em> do projeto Olist:
+        um pipeline de Continuous Integration que <em>quebra</em> o pull request quando o código viola um RF, um RNF
+        ou um contrato de dashboard. O pipeline é distribuído entre runner público da GitHub (white box, determinístico)
+        e o EC2 marcado <code>Role=runner</code> da Aula 04 (black box, dentro da VPC). A conexão entre o EC2 e o
+        GitHub é feita por SSM Run Command &mdash; sem console, sem SSH, sem IP exposto.
+      </p>
+      <p>
+        <span class="m05-tag">Pré-requisitos</span> Aula 04 entregue: stack <code>olist-sre-pipeline-lab</code> ativo,
+        templates CFN versionados em <code>iac/cloudformation/</code>, EC2 candidato com tag <code>Role=runner</code>,
+        squad de agentes de IA configurada (Architect, DevOps, Tester, Reviewer), tag <code>aula-04</code> no git.
       </p>
     </section>
 
+    <!-- ==================================================================== -->
+    <!-- 1. Recap e tese                                                       -->
+    <!-- ==================================================================== -->
+
     <section class="content-block">
-      <h2>Status: em construção</h2>
+      <h2>1. De onde viemos &mdash; recap das aulas anteriores</h2>
       <p>
-        Este material está sendo redigido e será publicado com pelo menos uma semana de antecedência
-        à data da aula (14/05/2026). A estrutura de seções abaixo antecipa o escopo.
+        Cada aula do curso é um andar do prédio. A Aula 02 entregou o problema (<code>spec/00_problem.md</code>),
+        o Codespace, OpenCode e Gemini CLI. A Aula 03 cobriu a modelagem completa em markdown &mdash; RF, RNF, RTM,
+        planos de teste, system design Mermaid &mdash; e o AWS CLI conectado por session token. A Aula 04 saiu do
+        papel: a squad de agentes de IA escreveu CloudFormation, o stack <code>olist-sre-pipeline-lab</code>
+        provisionou rede, storage e compute, drift detection ficou ativo. Ficou um detalhe: uma instância EC2
+        marcada <code>Role=runner</code>, esperando para virar runner self-hosted do GitHub Actions.
       </p>
 
-      <h3>Estrutura prevista</h3>
+      <h3>1.1 O estado vivo do stack</h3>
+      <table>
+        <thead><tr><th>Componente</th><th>Estado pós-Aula 04</th></tr></thead>
+        <tbody>
+          <tr><td>Repositório <code>olist-sre-pipeline</code></td><td>Tag <code>aula-04</code>; <code>iac/cloudformation/</code> e <code>documents/</code> versionados</td></tr>
+          <tr><td>Stack CFN</td><td><code>olist-sre-pipeline-lab</code> em <code>UPDATE_COMPLETE</code>, drift detection rodando</td></tr>
+          <tr><td>EC2 ETL</td><td>Escreve dummy parquet em <code>s3://...-raw/</code> a cada hora</td></tr>
+          <tr><td>EC2 runner</td><td>Tag <code>Role=runner</code>; SSM Agent ativo; <strong>sem agente de runner ainda</strong></td></tr>
+          <tr><td>Squad IA</td><td>4 skills: Architect, DevOps, Tester, Reviewer</td></tr>
+          <tr><td>Pipeline CI</td><td><strong>Inexistente &mdash; é o que esta aula vai construir</strong></td></tr>
+        </tbody>
+      </table>
+
+      <h3>1.2 A tese desta aula</h3>
+      <p>
+        Sistemas distribuídos exigem closed loops &mdash; sensor mede, comparador avalia, controlador decide,
+        atuador executa. A Aula 03 mapeou cinco loops automáticos (backpressure, circuit breaker, quarentena
+        reentrante, freeze por error budget, drift de dados). A Aula 04 acendeu o primeiro deles (drift detection).
+        Hoje montamos o sexto loop, que tem uma diferença importante: o atuador é <em>humano</em>. O CI é a
+        primeira malha fechada onde a saída do controlador (status check) age sobre a decisão de uma pessoa
+        (apertar Merge ou não).
+      </p>
+
+      <div class="m05-callout">
+        <strong>Cinco regras inegociáveis do pipeline desta aula</strong>
+        <ol>
+          <li>Nenhum PR vai para <code>main</code> sem checks verdes nos dois workflows.</li>
+          <li>Toda mudança em <code>iac/</code> ou em <code>etl/</code> roda <code>wb.yml</code> e <code>bb.yml</code>.</li>
+          <li>Self-hosted runner é <em>ephemeral</em> &mdash; um job, uma instância de runner, um descarte.</li>
+          <li>Nenhuma access key permanente em workflow. Apenas session token rotacionado a cada aula.</li>
+          <li>CI vermelho em <code>main</code> dispara <code>cancel-update-stack</code> automático no CloudFormation.</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- 2. White box                                                          -->
+    <!-- ==================================================================== -->
+
+    <section class="content-block">
+      <h2>2. White box &mdash; conhecendo a implementação</h2>
+      <p>
+        Teste de caixa branca é aquele em que quem escreve o teste tem acesso ao código. A pergunta que ele
+        responde é <em>"a implementação está correta dado o caminho que escolhi?"</em>. A unidade de medida
+        é a função, a branch, o ramo do <code>if</code>. Se você ainda não viu o código, não é caixa branca.
+      </p>
+
+      <h3>2.1 Unit tests</h3>
+      <p>
+        Unit é o piso da pirâmide. Função pura, dependências mockadas, milissegundos por teste. O critério
+        para reconhecer um bom unit test é o tempo de execução: se um teste demora mais de 50ms, ele provavelmente
+        está fazendo I/O real e deveria ser integration. A vantagem do unit é o ciclo de feedback &mdash; o
+        engenheiro roda <code>pytest -m unit</code> antes mesmo de abrir o PR e descobre erros enquanto a
+        intenção ainda está fresca.
+      </p>
+      <p>
+        Para guiar a quantidade de testes por função, usamos a <strong>complexidade ciclomática</strong> (CC).
+        CC é o número de caminhos linearmente independentes da função: cada <code>if</code>, <code>for</code>,
+        <code>and</code>/<code>or</code>, <code>try/except</code> soma um. Funções com CC &le; 5 normalmente
+        precisam de um único teste; CC entre 6 e 10 pede um teste por branch importante; CC &gt; 10 é sinal
+        de refactor &mdash; testar primeiro só fixa a complexidade no lugar.
+      </p>
+
+      <h3>2.2 Integration tests</h3>
+      <p>
+        Integration sobe os colaboradores reais e roda o ETL contra eles. O ganho aqui é capturar tudo que
+        o mock esconde: serialização de tipo nativo, timezone do Postgres, encoding do CSV, transação aninhada,
+        constraint do banco. O custo é tempo &mdash; um teste de integração demora segundos, não milissegundos.
+      </p>
+      <p>
+        Hoje (Aula 05) ainda usamos um Postgres <em>mockado</em> com SQLite em memória. É portável e roda no
+        runner GitHub-hosted, mas mente sobre tipos. Na Aula 06 substituímos por <strong>Testcontainers</strong>
+        com Postgres 14 real em Docker. Os identificadores <code>TC-WB-INT-NN</code> permanecem &mdash; só a
+        infraestrutura por trás muda.
+      </p>
+
+      <h3>2.3 Coverage &mdash; que tipo importa</h3>
+      <table>
+        <thead><tr><th>Tipo de coverage</th><th>O que mede</th><th>Veredito</th></tr></thead>
+        <tbody>
+          <tr><td>Statement / line</td><td>% de linhas executadas pelo menos uma vez</td><td>Mínimo aceitável &mdash; engana fácil</td></tr>
+          <tr><td>Branch</td><td>% de <code>if/else</code> exercitados nos dois lados</td><td>Indispensável para lógica de validação</td></tr>
+          <tr><td>Path</td><td>% de combinações de branches</td><td>Caro &mdash; cresce exponencial; só em funções críticas</td></tr>
+          <tr><td>Mutation</td><td>% de mutantes mortos pelos testes</td><td>Padrão-ouro, lento, melhor agendado</td></tr>
+          <tr><td>Function</td><td>% de funções com pelo menos 1 chamada</td><td>Útil para flagrar dead code</td></tr>
+        </tbody>
+      </table>
+      <p>
+        A política do projeto é deliberadamente conservadora: <strong>80% line + 70% branch nas funções marcadas
+        com decorator <code>@critical</code></strong>. O restante do projeto roda sem gate de coverage.
+        Coverage de 100% no projeto inteiro é um número que enche os olhos do gestor e cria testes ruins;
+        coverage focado nas funções que governam idempotência, normalização e validação é onde a métrica vira
+        sinal e não ruído.
+      </p>
+
+      <h3>2.4 Mutation testing</h3>
+      <p>
+        Mutation testing inverte a relação: em vez de medir <em>se</em> o teste roda o código, mede se o teste
+        <em>detecta</em> mudanças no código. A ferramenta gera mutantes (troca <code>&gt;</code> por <code>&gt;=</code>,
+        <code>and</code> por <code>or</code>, retorna <code>None</code>) e roda a suíte. Se a suíte continua
+        verde, o mutante "sobreviveu" &mdash; havia uma cobertura falsa.
+      </p>
+      <p>
+        Em Python usamos <code>mutmut</code> ou <code>cosmic-ray</code>. O custo é alto: cada mutante exige
+        rodar a suíte inteira. Por isso não roda em todo PR &mdash; roda agendado (cron noturno) ou em pré-release.
+        E o gate é <em>suave</em>: warning, não falha. Mutation score abaixo de 70% nas funções críticas vira
+        ticket de débito técnico, não bloqueio de merge.
+      </p>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- 3. Black box                                                          -->
+    <!-- ==================================================================== -->
+
+    <section class="content-block">
+      <h2>3. Black box &mdash; defendendo o contrato</h2>
+      <p>
+        Teste de caixa preta é o que não conhece a implementação. A pergunta é <em>"a promessa para quem
+        consome continua sendo cumprida?"</em>. É escrito por quem usa, ou por QA, ou por uma ferramenta que
+        conhece só a interface. Quando um refactor interno passa em todos os black box, está garantido que
+        nenhum consumidor vai notar a mudança.
+      </p>
+
+      <h3>3.1 Contract tests</h3>
+      <p>
+        Contrato é a promessa explícita de uma interface. JSON Schema descreve um payload esperado;
+        Great Expectations descreve uma suíte de propriedades sobre uma tabela inteira (linhas, ranges, nulls);
+        OpenAPI snapshot tira foto da especificação atual e diff entre versões denuncia breaking change.
+      </p>
+      <p>
+        No projeto Olist, o contrato mais sensível é o do dashboard da diretoria: as colunas
+        <code>kpi_receita_mensal</code>, <code>kpi_ticket_medio_estado</code>, <code>kpi_top10_categoria</code>.
+        Se o ETL mudar nome de coluna ou tipo, o contract test fica vermelho antes do dashboard quebrar para
+        a diretoria. Esse é o ROI do black box.
+      </p>
+
+      <h3>3.2 API tests</h3>
+      <p>
+        O ETL hoje expõe um endpoint pequeno (<code>POST /load</code>, <code>GET /healthz</code>, <code>GET /metrics</code>).
+        Os API tests usam <code>pytest + httpx</code> para bater nesses endpoints e validar status, headers,
+        payload e idempotência. Identificadores: <code>TC-BB-API-NN</code>. O caso <code>TC-BB-API-04</code>
+        verifica RF-06 &mdash; chama <code>POST /load</code> duas vezes com o mesmo payload e checa que o
+        Postgres tem a quantidade certa de linhas, não o dobro.
+      </p>
+
+      <h3>3.3 Property-based tests</h3>
+      <p>
+        Property-based testing (com a biblioteca <code>hypothesis</code>) gera entradas aleatórias dentro de
+        um domínio descrito e procura contraexemplo. Em vez de "para esta entrada x, espere y", a propriedade
+        é "para qualquer x do domínio D, a saída deve ter a propriedade P". Funciona muito bem para a
+        quarentena (RF-03): a propriedade é "se a linha não passa na validação, o sistema deve gravá-la
+        em quarentena com motivo, e jamais deve crescer a tabela final".
+      </p>
+
+      <h3>3.4 End-to-end tests com Schemathesis</h3>
+      <p>
+        Schemathesis é uma ferramenta de fuzz baseada em OpenAPI. Você aponta para a spec gerada do ETL,
+        e ela cria centenas de chamadas válidas e inválidas, verificando se o servidor responde dentro do
+        contrato. É property-based aplicado a APIs HTTP. Roda no runner self-hosted porque precisa atravessar
+        a VPC para alcançar o ETL.
+      </p>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- 4. Pirâmide do projeto                                                -->
+    <!-- ==================================================================== -->
+
+    <section class="content-block">
+      <h2>4. A pirâmide de testes do projeto Olist</h2>
+      <p>
+        A pirâmide de testes (Mike Cohn, 2009) é o modelo mental: muitos testes rápidos baratos na base,
+        poucos testes lentos caros no topo. Há variantes (diamante, troféu) para sistemas com forte
+        componente UI; para nosso pipeline de dados, a pirâmide clássica funciona bem. A diferença é que
+        cada camada também carrega uma decisão de <em>onde</em> roda &mdash; runner público ou self-hosted.
+      </p>
+
+      <div class="m05-mermaid">
+        <pre class="mermaid">
+flowchart TB
+  subgraph TOP["TOPO &mdash; lento, caro, fragil"]
+    E2E["End-to-end &middot; Schemathesis<br/>TC-BB-E2E-01..05<br/>self-hosted (EC2)"]
+  end
+  subgraph MID2["Camada 4 &middot; black box"]
+    CT["Contract &middot; Great Expectations<br/>TC-BB-CT-01..04"]
+    API["API &middot; pytest + httpx<br/>TC-BB-API-01..06"]
+  end
+  subgraph MID1["Camada 3 &middot; integracao"]
+    INT["Integration &middot; pytest<br/>TC-WB-INT-01..05<br/>self-hosted (EC2) na Aula 06"]
+  end
+  subgraph BASE["BASE &mdash; rapido, barato, robusto"]
+    LINT["Lint &middot; ruff + mypy"]
+    UNIT["Unit &middot; pytest -m unit<br/>TC-WB-UN-01..20"]
+    MUT["Mutation &middot; mutmut<br/>(opcional, agendado)"]
+  end
+
+  LINT --> UNIT
+  UNIT --> MUT
+  UNIT --> INT
+  INT --> CT
+  INT --> API
+  CT --> E2E
+  API --> E2E
+
+  classDef wb fill:#f2f2ee,stroke:#0f0f0f,color:#0f0f0f
+  classDef bb fill:#ffffff,stroke:#0f0f0f,color:#0f0f0f
+  class LINT,UNIT,MUT,INT wb
+  class CT,API,E2E bb
+        </pre>
+      </div>
+      <p>
+        Os identificadores estáveis (<code>TC-WB-UN-NN</code>, <code>TC-WB-INT-NN</code>, <code>TC-BB-CT-NN</code>,
+        <code>TC-BB-API-NN</code>, <code>TC-BB-E2E-NN</code>) entram na RTM (<code>documents/04_rtm.md</code>)
+        substituindo o status <em>Aberto</em> que foi gerado na Aula 03. Ao final desta aula, espera-se ver
+        a coluna <em>Status</em> da RTM com pelo menos 50% das linhas em <em>Coberto</em>.
+      </p>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- 5. GitHub Actions                                                     -->
+    <!-- ==================================================================== -->
+
+    <section class="content-block">
+      <h2>5. GitHub Actions &mdash; o motor do pipeline</h2>
+      <p>
+        GitHub Actions é a plataforma de CI/CD nativa do GitHub. Um <strong>workflow</strong> é um arquivo
+        YAML em <code>.github/workflows/</code> com triggers (<code>on:</code>), jobs e steps. Cada job
+        roda em um runner (máquina virtual provisionada pela GitHub ou self-hosted). Steps de um job rodam
+        em sequência, mas jobs paralelizam por padrão &mdash; <code>needs:</code> introduz dependência.
+      </p>
+
+      <h3>5.1 Triggers que importam</h3>
       <ul>
-        <li><strong>Contexto no pipeline Olist</strong> &mdash; por que esta é a aula-coração do curso.</li>
-        <li><strong>ETL vs ELT</strong> &mdash; critérios de decisão entre os dois paradigmas.</li>
-        <li><strong>Serverless para dados</strong> &mdash; modelo stateless, efêmero, event-driven e cobrança por DPU-segundo.</li>
-        <li><strong>Arquitetura do AWS Glue</strong> &mdash; Data Catalog, Crawler, Job, Workflow e Studio.</li>
-        <li><strong>Fundamentos de Spark e PySpark</strong> &mdash; DataFrame, lazy evaluation, transformações e ações.</li>
-        <li><strong>Qualidade de dados no ETL</strong> &mdash; deduplicação, casting, nulls e enforcement de schema.</li>
-        <li><strong>Catálogo e formatos abertos</strong> &mdash; tabelas, partições, estatísticas, Iceberg, Delta e Hudi.</li>
-        <li><strong>Laboratório prático</strong> &mdash; crawler, jobs Raw &rarr; Trusted &rarr; Refined e validação no Athena.</li>
+        <li><code>push</code> &mdash; commit chega numa branch.</li>
+        <li><code>pull_request</code> &mdash; PR aberto, atualizado ou reaberto.</li>
+        <li><code>workflow_dispatch</code> &mdash; botão manual; útil para suite de carga.</li>
+        <li><code>schedule</code> &mdash; cron noturno; útil para mutation.</li>
+        <li><code>workflow_run</code> &mdash; reage a <em>outro</em> workflow terminar; usamos no closed loop CI &harr; CFN.</li>
+      </ul>
+
+      <h3>5.2 Filtros indispensáveis</h3>
+      <p>
+        Sem filtro, todo commit roda todo workflow &mdash; quota da GitHub queima rápido. Os dois filtros
+        que sempre vão num workflow real:
+      </p>
+      <pre>on:
+  pull_request:
+    paths: ["etl/**", "tests/**", ".github/workflows/wb.yml"]
+  push:
+    branches: [main]
+
+concurrency:
+  group: wb-${{ github.ref }}
+  cancel-in-progress: true</pre>
+      <p>
+        <code>paths:</code> diz "só rode se tocou em arquivos relevantes". <code>concurrency:</code> diz "se
+        eu já estou rodando para essa branch, cancela o anterior" &mdash; evita pilhas de jobs presas atrás
+        de uma série de commits no mesmo PR.
+      </p>
+
+      <h3>5.3 Padrões avançados &mdash; matrix, reusable, composite</h3>
+      <p>
+        <strong>Matrix</strong> roda a mesma lógica com várias dimensões (Python 3.11/3.12/3.13, ou
+        unit/integration/contract). <code>fail-fast: false</code> é o padrão recomendado &mdash; se um item da
+        matrix quebra, os outros continuam para dar visibilidade total. Já <strong>reusable workflows</strong>
+        (<code>workflow_call:</code>) deixam um workflow chamar outro, com inputs e secrets passados
+        explicitamente &mdash; centraliza lógica que se repete entre repos.
+      </p>
+
+      <h3>5.4 Secrets, environments e a etiqueta de fork</h3>
+      <table>
+        <thead><tr><th>Mecanismo</th><th>Quem lê</th><th>Quando usar</th></tr></thead>
+        <tbody>
+          <tr><td>Secrets do repo</td><td>Workflows do mesmo repo</td><td>Token genérico de teste</td></tr>
+          <tr><td>Secrets da org</td><td>Repos selecionados</td><td>Token compartilhado entre projetos</td></tr>
+          <tr><td>Environment secrets</td><td>Jobs com <code>environment:</code></td><td>Credencial AWS com required reviewer</td></tr>
+          <tr><td>OIDC token</td><td>Job com <code>id-token: write</code></td><td>AssumeRole na AWS sem secret estática</td></tr>
+        </tbody>
+      </table>
+      <p>
+        Detalhe importante de segurança: <strong>PR aberto a partir de um fork não recebe os secrets</strong>.
+        Isso protege contra workflow malicioso introduzido por contribuidor externo. Se sua suíte precisa de
+        secret e o repo aceita PR de fork, separe em workflow disparado por <code>workflow_run</code> da branch
+        principal &mdash; nunca dispare por <code>pull_request</code> de fork com secrets.
+      </p>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- 6. OIDC e ADR                                                         -->
+    <!-- ==================================================================== -->
+
+    <section class="content-block">
+      <h2>6. OIDC entre GitHub e AWS &mdash; o ideal e o realista</h2>
+      <p>
+        OpenID Connect (OIDC) é a forma moderna de federar identidade entre GitHub Actions e AWS. Em vez de
+        guardar uma access key permanente como secret, o workflow apresenta um JWT assinado pelo GitHub,
+        e a AWS &mdash; configurada com aquele issuer como IdP federado &mdash; emite uma credencial temporária
+        para a role configurada. Auditável, curto, sem rotação manual.
+      </p>
+
+      <div class="m05-mermaid">
+        <pre class="mermaid">
+sequenceDiagram
+  autonumber
+  participant W as GitHub Workflow
+  participant T as token.actions.githubusercontent.com
+  participant I as AWS IAM (IdP federation)
+  participant R as AWS API
+
+  W->>T: 1. solicita JWT (id-token write)
+  T-->>W: 2. JWT assinado (sub=repo, ref, branch)
+  W->>I: 3. AssumeRoleWithWebIdentity(JWT, RoleArn)
+  I-->>W: 4. credencial temporaria
+  W->>R: 5. chama AWS API
+  Note over W,R: nenhuma secret estatica<br/>credencial expira em ate 1h
+        </pre>
+      </div>
+
+      <h3>6.1 Por que OIDC não roda no Learner Lab</h3>
+      <p>
+        Para configurar federation OIDC, a conta AWS precisa criar um recurso <code>iam:CreateOpenIDConnectProvider</code>
+        e uma role com <code>sts:AssumeRoleWithWebIdentity</code> apontando para o issuer do GitHub.
+        Ambas as ações estão bloqueadas pela política do AWS Academy Learner Lab. Para o curso, então, ensinamos
+        OIDC como conceito &mdash; é o que se usa em produção &mdash; e adotamos um caminho mais simples no laboratório:
+        o session token rotacionado a cada início de aula.
+      </p>
+
+      <h3>6.2 ADR-05 &mdash; session token no Learner Lab</h3>
+      <div class="m05-callout">
+        <strong>ADR-05 &middot; usar session token rotacionado em vez de OIDC</strong>
+        <ul>
+          <li><strong>Contexto:</strong> Learner Lab bloqueia <code>iam:CreateOpenIDConnectProvider</code>; OIDC indisponível.</li>
+          <li><strong>Decisão:</strong> usar <code>AWS_ACCESS_KEY_ID</code>, <code>AWS_SECRET_ACCESS_KEY</code> e
+            <code>AWS_SESSION_TOKEN</code> como secrets do repo, atualizados a cada início de aula.</li>
+          <li><strong>Consequências:</strong> CI quebra quando o token expira (~3h); necessário renovar manualmente.</li>
+          <li><strong>Mitigação:</strong> primeiro step de todo workflow chama <code>aws sts get-caller-identity</code>
+            &mdash; falha cedo, mensagem clara, evita erro confuso lá no meio do job.</li>
+          <li><strong>Validade:</strong> apenas neste laboratório. Em produção, sempre OIDC ou Roles Anywhere.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- 7. Self-hosted runner                                                 -->
+    <!-- ==================================================================== -->
+
+    <section class="content-block">
+      <h2>7. Self-hosted runners no EC2</h2>
+      <p>
+        GitHub-hosted runner é grátis até quota e ótimo para trabalho determinístico (lint, unit). Mas roda
+        fora da VPC. Para tocar em recursos privados (Postgres atrás de SG fechado, S3 com endpoint policy
+        restritiva, ETL escutando em porta interna) o runner público obriga abrir caminho pela internet ou
+        ter NAT &mdash; aumenta superfície e custo. Self-hosted dentro da VPC mata o problema.
+      </p>
+
+      <h3>7.1 Por que vale o esforço</h3>
+      <ul>
+        <li><strong>Custo</strong>: 2.000 minutos grátis por mês acabam rápido com matrix; EC2 t3.micro está
+          coberto pelo Free Tier durante o curso.</li>
+        <li><strong>Latência</strong>: EC2 us-east-1 falando com S3 us-east-1 é praticamente LAN; runner
+          GitHub-hosted dá um salto pela internet pública. Suite de integração observada cai para um quarto
+          do tempo.</li>
+        <li><strong>Acesso privado</strong>: Postgres já em SG fechado &mdash; o runner já está dentro da VPC,
+          sem precisar abrir <code>0.0.0.0/0</code> no firewall.</li>
+      </ul>
+
+      <h3>7.2 Os riscos &mdash; e por que não usar em produção</h3>
+      <p>
+        Self-hosted runner executa o que o workflow mandar com a identidade da máquina (instance role). Isso
+        significa que um PR malicioso de fork, se conseguir disparar workflow self-hosted, roda código arbitrário
+        dentro da sua VPC. As ameaças clássicas:
+      </p>
+      <ul>
+        <li>Workflow lê instance metadata (IMDS) e exfiltra credencial.</li>
+        <li>Persistência entre jobs &mdash; cache envenenado para o próximo PR.</li>
+        <li>Privilege escalation no host se o runner roda como root.</li>
+        <li>Mineração silenciosa em runner ocioso.</li>
+        <li>Movimento lateral pela VPC para serviços vizinhos.</li>
+      </ul>
+
+      <h3>7.3 Mitigações obrigatórias</h3>
+      <ul>
+        <li><code>--ephemeral</code>: o runner roda <em>um</em> job e some. Sem persistência, sem cache envenenado.</li>
+        <li><code>runs-on: [self-hosted, lab]</code>: label específico, evita workflow alheio pegar o runner.</li>
+        <li>Branch protection bloqueia PR de fork executar workflow no self-hosted (configuração no repo:
+          <em>Require approval for first-time contributors</em>).</li>
+        <li><strong>IMDSv2 obrigatório</strong> no EC2 &mdash; protege contra SSRF que tentaria ler credencial.</li>
+        <li>Instance role com policy mínima: <em>read</em> no S3 do projeto, <code>logs:Put*</code> no
+          CloudWatch, e nada mais.</li>
+        <li><strong>Nunca</strong> usar self-hosted runner em conta de produção da empresa, especialmente em
+          repos públicos.</li>
+      </ul>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- 8. SSM Run Command                                                    -->
+    <!-- ==================================================================== -->
+
+    <section class="content-block">
+      <h2>8. Conectar o EC2 sem console &mdash; SSM Run Command</h2>
+      <p>
+        A regra do projeto (Aula 04) é: nada por console. O que vai ao código vai pelo CLI; o que vai ao
+        EC2 vai pelo SSM. <strong>SSM Run Command</strong> executa um script remotamente usando a instance
+        role &mdash; sem SSH, sem porta 22 aberta, sem IP exposto. Cada execução é registrada no CloudTrail
+        com quem mandou, o quê, quando e qual foi a saída.
+      </p>
+
+      <h3>8.1 Pré-requisitos no EC2</h3>
+      <ul>
+        <li>SSM Agent instalado (Amazon Linux 2 e 2023 já vêm com ele).</li>
+        <li>Instance profile com <code>AmazonSSMManagedInstanceCore</code> anexado.</li>
+        <li>Conectividade com endpoint do SSM &mdash; via internet ou VPC endpoint.</li>
+        <li>Tag <code>Role=runner</code> &mdash; deixa o filtro CLI inequívoco.</li>
+      </ul>
+
+      <h3>8.2 Comando completo</h3>
+      <pre>OWNER=$(gh repo view --json owner -q .owner.login)
+REPO=$(gh repo view --json name -q .name)
+
+# 1) Localiza a instancia candidata
+INSTANCE_ID=$(aws ec2 describe-instances \
+  --filters "Name=tag:Role,Values=runner" \
+            "Name=instance-state-name,Values=running" \
+  --query "Reservations[0].Instances[0].InstanceId" --output text)
+
+# 2) Token de registro emitido pelo GitHub (vale 1 hora)
+RUNNER_TOKEN=$(gh api -X POST \
+  /repos/$OWNER/$REPO/actions/runners/registration-token \
+  --jq .token)
+
+# 3) Manda o EC2 instalar e registrar como ephemeral
+aws ssm send-command \
+  --instance-ids "$INSTANCE_ID" \
+  --document-name AWS-RunShellScript \
+  --comment "register self-hosted runner ephemeral lab" \
+  --parameters commands="cd /home/ec2-user; sudo -u ec2-user bash scripts/register_runner.sh $OWNER $REPO $RUNNER_TOKEN"
+
+# 4) Confirmacao
+gh api /repos/$OWNER/$REPO/actions/runners \
+  --jq '.runners[] | {name, status, labels: [.labels[].name]}'</pre>
+
+      <p>
+        O <code>scripts/register_runner.sh</code> (no repo) é simplesmente um wrapper sobre o tarball oficial:
+        baixa <code>actions-runner-linux-x64</code>, descompacta, chama <code>config.sh</code> com flag
+        <code>--ephemeral</code> e dispara <code>run.sh</code> em background. A flag <code>--ephemeral</code>
+        garante que o runner desregistra e morre depois de um job &mdash; o que é perfeito para o caso lab,
+        onde a instância é descartável.
+      </p>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- 9. Distribuição entre runners                                         -->
+    <!-- ==================================================================== -->
+
+    <section class="content-block">
+      <h2>9. Distribuição entre runners &mdash; quem roda onde</h2>
+      <p>
+        A escolha de runner por job não é estética. Cada categoria de teste pede um ambiente: lint e unit
+        querem isolamento total e rapidez (GitHub-hosted); contract, api e e2e querem latência baixa contra
+        o ETL e leitura privilegiada do Postgres (self-hosted dentro da VPC).
+      </p>
+
+      <table>
+        <thead><tr><th>Workflow / Job</th><th>Runner</th><th>Por quê</th></tr></thead>
+        <tbody>
+          <tr><td><code>wb.yml / lint</code></td><td><code>ubuntu-latest</code></td><td>Sem dependência de infra</td></tr>
+          <tr><td><code>wb.yml / unit</code></td><td><code>ubuntu-latest</code></td><td>Determinístico, mocks só</td></tr>
+          <tr><td><code>wb.yml / integration</code></td><td><code>[self-hosted, lab]</code></td><td>Postgres da Aula 06 estará na VPC</td></tr>
+          <tr><td><code>wb.yml / mutation</code></td><td><code>ubuntu-latest</code> agendado</td><td>Lento, matrix paralela cobre custo</td></tr>
+          <tr><td><code>bb.yml / api</code></td><td><code>[self-hosted, lab]</code></td><td>Bate no endpoint do ETL</td></tr>
+          <tr><td><code>bb.yml / contract</code></td><td><code>[self-hosted, lab]</code></td><td>Lê Postgres real</td></tr>
+          <tr><td><code>bb.yml / e2e</code></td><td><code>[self-hosted, lab]</code></td><td>Schemathesis &mdash; latência baixa</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- 10. Closed loop CI ↔ CFN                                              -->
+    <!-- ==================================================================== -->
+
+    <section class="content-block">
+      <h2>10. Closed loop &mdash; CI vermelho dispara rollback do change set</h2>
+      <p>
+        Aqui é onde a aula encontra o coração SRE do projeto. A Aula 04 deixou o stack vivo com drift detection.
+        Hoje liga o pipeline ao stack: se um <code>cloudformation update-stack</code> for aplicado em
+        <code>main</code> e o workflow falhar logo depois, o EventBridge captura o evento e dispara
+        <code>cancel-update-stack</code> automaticamente. O change set ruim é revertido sem precisar de
+        ninguém olhar o tela.
+      </p>
+
+      <h3>10.1 O fluxo completo</h3>
+      <div class="m05-mermaid">
+        <pre class="mermaid">
+sequenceDiagram
+  autonumber
+  participant Dev as Codespace (aluno)
+  participant GH as GitHub
+  participant UB as ubuntu-latest
+  participant EC2 as EC2 self-hosted
+  participant AWS as AWS API
+  participant EB as EventBridge
+
+  Dev->>GH: push branch + abre PR
+  GH->>UB: dispara wb.yml (lint, unit)
+  UB-->>GH: status success
+  GH->>EC2: dispara bb.yml (api, contract, e2e)
+  EC2->>AWS: aws sts get-caller-identity
+  EC2->>AWS: chama ETL endpoint, le S3, Postgres
+  AWS-->>EC2: respostas
+  EC2-->>GH: status success ou failure
+  alt CI verde
+    GH-->>Dev: merge liberado
+  else CI vermelho
+    GH->>EB: workflow_run failure event
+    EB->>AWS: SSM Run Command - cancel-update-stack
+    AWS-->>EB: stack revertido
+    EB-->>Dev: notificacao no PR
+  end
+        </pre>
+      </div>
+
+      <h3>10.2 Anatomia do loop</h3>
+      <ul>
+        <li><strong>Sensor:</strong> evento <code>workflow_run</code> com <code>conclusion=failure</code> emitido pelo GitHub para o EventBridge da AWS (via integração GitHub-AWS ou via webhook).</li>
+        <li><strong>Comparador:</strong> rule no EventBridge filtra por workflow alvo + branch <code>main</code>.</li>
+        <li><strong>Controlador:</strong> SSM Document <code>CancelOlistStackUpdate</code> chama <code>aws cloudformation cancel-update-stack</code>.</li>
+        <li><strong>Atuador:</strong> CloudFormation reverte para o último estado consistente.</li>
+        <li><strong>Reobservação:</strong> drift detection já rodando reporta o estado pós-rollback.</li>
+      </ul>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- 11. Anti-padrões                                                      -->
+    <!-- ==================================================================== -->
+
+    <section class="content-block">
+      <h2>11. Anti-padrões do pipeline</h2>
+      <p>
+        Cada um dos sete a seguir já apareceu em projeto real. Marcar como anti-padrão e proibir explicitamente
+        em <code>AGENTS.md</code> custa menos do que combatê-los depois.
+      </p>
+      <table>
+        <thead><tr><th>Anti-padrão</th><th>Sintoma</th><th>Correção</th></tr></thead>
+        <tbody>
+          <tr><td>Secret em log</td><td><code>echo $TOKEN</code> ou <code>set -x</code> num step</td><td>Mascaramento do GH não protege com <code>set -x</code></td></tr>
+          <tr><td>Runner reutilizado entre PRs</td><td>Workspace contaminado, cache envenenado</td><td><code>--ephemeral</code> sempre</td></tr>
+          <tr><td>Teste flaky com <code>retry: 3</code></td><td>Sucesso eventual mascara bug intermitente</td><td>Quarentena ou conserto &mdash; nunca retry</td></tr>
+          <tr><td>Coverage por número absoluto</td><td><code>--cov-fail-under=100</code></td><td>Gate em funções críticas, não no projeto inteiro</td></tr>
+          <tr><td>Access key permanente em secret</td><td><code>AKIA...</code> guardado por meses</td><td>OIDC ou session token rotacionado</td></tr>
+          <tr><td>Workflow sem <code>paths:</code></td><td>Roda tudo a cada commit, mesmo em <code>README.md</code></td><td>Filtro <code>paths:</code> + <code>concurrency:</code></td></tr>
+          <tr><td>Self-hosted sem label restritivo</td><td>Qualquer workflow pega o runner</td><td><code>runs-on: [self-hosted, lab]</code></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- 12. Roteiro prático                                                   -->
+    <!-- ==================================================================== -->
+
+    <section class="content-block">
+      <h2>12. Roteiro prático guiado &mdash; 21h00 a 22h00</h2>
+      <p>
+        Sequência de 9 passos. Cada aluno sai com dois workflows verdes em <code>main</code>, EC2 ativo como
+        runner ephemeral e branch protection ligada. Tudo é CLI &mdash; nada por console AWS, nada de SSH.
+      </p>
+
+      <h3>12.1 Passo 1 &mdash; renovar o session token</h3>
+      <p>
+        O token de hoje precisa estar no <code>~/.aws/credentials</code> do Codespace e nos secrets do GitHub.
+        O CI usa o secret; o terminal usa o local; os dois espelham.
+      </p>
+      <pre># 1. AWS Academy Learner Lab -&gt; Start Lab -&gt; AWS Details -&gt; Show
+#    Copiar bloco AWS CLI (3 linhas).
+
+mkdir -p ~/.aws
+cat &gt; ~/.aws/credentials &lt;&lt;'EOF'
+[default]
+aws_access_key_id=ASIA...
+aws_secret_access_key=...
+aws_session_token=...
+EOF
+chmod 600 ~/.aws/credentials
+
+# 2. Espelhar no GitHub (gh ja autenticado no Codespace)
+gh secret set AWS_ACCESS_KEY_ID
+gh secret set AWS_SECRET_ACCESS_KEY
+gh secret set AWS_SESSION_TOKEN
+gh secret set AWS_REGION --body "us-east-1"
+
+# 3. Validar handshake
+aws sts get-caller-identity</pre>
+
+      <h3>12.2 Passo 2 &mdash; skill <code>gen_test_suite</code> + geração</h3>
+      <p>
+        A skill ensina o agente Tester a ler RF/RNF e gerar os arquivos de teste com identificadores estáveis.
+        Saída: pasta <code>tests/</code> populada e RTM atualizada.
+      </p>
+      <pre>cat &gt; documents/agents/skills/gen_test_suite.md &lt;&lt;'EOF'
+## Quando usar
+Apos RF/RNF estaveis e antes de qualquer workflow CI.
+
+## Entrada
+- documents/01_functional_requirements.md
+- documents/05_test_plan_load.md
+- documents/06_test_plan_security.md
+
+## Passos
+1. Para cada RF/RNF, escolher categoria (unit, integration, contract, api, e2e).
+2. Gerar arquivo pytest com identificador TC-WB-NN ou TC-BB-NN.
+3. Marcar com pytest.mark (unit, integration, contract, api, e2e, smoke).
+4. Atualizar documents/04_rtm.md trocando 'Aberto' por TC gerado.
+
+## Saida
+tests/{unit,integration,contract,api,e2e}/test_*.py
+EOF
+
+gemini -p "Aplique documents/agents/skills/gen_test_suite.md.
+Gere os arquivos em tests/. Atualize a RTM."
+
+pytest -m unit --collect-only | head -40</pre>
+
+      <h3>12.3 Passo 3 &mdash; <code>wb.yml</code></h3>
+      <pre>name: wb
+on:
+  pull_request:
+    paths: ["etl/**", "tests/**", ".github/workflows/wb.yml"]
+  push:
+    branches: [main]
+
+concurrency:
+  group: wb-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -r requirements-dev.txt
+      - run: ruff check etl/ tests/
+      - run: mypy etl/
+
+  unit:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -r requirements-dev.txt
+      - run: pytest -m unit --cov=etl --cov-branch --cov-fail-under=80
+      - uses: actions/upload-artifact@v4
+        with: { name: coverage-xml, path: coverage.xml }
+
+  mutation:
+    needs: unit
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install mutmut
+      - run: mutmut run --paths-to-mutate=etl/critical || true
+      - run: mutmut results</pre>
+
+      <h3>12.4 Passo 4 &mdash; EC2 vira self-hosted runner via SSM</h3>
+      <p>
+        Comando completo na seção 8. Após a execução, o runner aparece em
+        <code>gh api /repos/.../actions/runners</code> com label <code>lab</code> e status <code>online</code>.
+      </p>
+
+      <h3>12.5 Passo 5 &mdash; <code>bb.yml</code></h3>
+      <pre>name: bb
+on:
+  pull_request:
+    paths: ["etl/**", "tests/**", ".github/workflows/bb.yml"]
+  push:
+    branches: [main]
+
+concurrency:
+  group: bb-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  api:
+    runs-on: [self-hosted, lab]
+    env:
+      AWS_ACCESS_KEY_ID:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_SESSION_TOKEN:     ${{ secrets.AWS_SESSION_TOKEN }}
+      AWS_REGION:            us-east-1
+    steps:
+      - uses: actions/checkout@v4
+      - run: aws sts get-caller-identity
+      - run: pip install -r requirements-dev.txt
+      - run: pytest -m api -q
+
+  contract:
+    needs: api
+    runs-on: [self-hosted, lab]
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install -r requirements-dev.txt
+      - run: pytest -m contract -q
+      - run: great_expectations checkpoint run dashboard_kpis
+
+  e2e:
+    needs: contract
+    runs-on: [self-hosted, lab]
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install -r requirements-dev.txt
+      - run: schemathesis run docs/openapi.yaml --checks all</pre>
+
+      <h3>12.6 Passo 6 &mdash; branch protection</h3>
+      <pre>OWNER=$(gh repo view --json owner -q .owner.login)
+REPO=$(gh repo view --json name -q .name)
+
+gh api -X PUT /repos/$OWNER/$REPO/branches/main/protection \
+  --input - &lt;&lt;'EOF'
+{
+  "required_status_checks": {
+    "strict": true,
+    "contexts": [
+      "wb / lint", "wb / unit",
+      "bb / api", "bb / contract", "bb / e2e"
+    ]
+  },
+  "enforce_admins": false,
+  "required_pull_request_reviews": {
+    "required_approving_review_count": 1,
+    "dismiss_stale_reviews": true
+  },
+  "restrictions": null,
+  "required_linear_history": true,
+  "allow_force_pushes": false
+}
+EOF</pre>
+
+      <h3>12.7 Passo 7 &mdash; smoke quebrando RF-06</h3>
+      <p>
+        RF-06 é "ETL idempotente sem duplicar". Forçamos uma quebra removendo o <code>ON CONFLICT</code> do
+        upsert e abrimos um PR. Resultado esperado: <code>wb / unit</code> ainda passa (mock não detecta),
+        <code>bb / api</code> quebra no caso <code>TC-BB-API-04</code>, branch protection bloqueia o merge.
+      </p>
+      <pre>git checkout -b smoke/quebra-rf-06
+sed -i 's/ON CONFLICT.*//' etl/loaders/orders.py
+git add etl/loaders/orders.py
+git commit -m "test(smoke): quebra RF-06 para validar gate"
+git push -u origin smoke/quebra-rf-06
+gh pr create --fill --title "smoke: quebra RF-06"
+gh pr checks --watch</pre>
+
+      <h3>12.8 Passo 8 &mdash; closed loop CI &harr; CFN</h3>
+      <pre># Rule no EventBridge filtrando workflow_run com falha em main
+aws events put-rule \
+  --name olist-ci-failure-rollback \
+  --event-pattern '{
+    "source": ["github.actions"],
+    "detail-type": ["workflow_run"],
+    "detail": {
+      "workflow_run": {
+        "conclusion": ["failure"],
+        "head_branch": ["main"]
+      }
+    }
+  }'
+
+# SSM Document que cancela update-stack
+aws ssm create-document \
+  --name CancelOlistStackUpdate \
+  --document-type Automation \
+  --content file://iac/ssm/cancel_update_stack.yaml
+
+# Target da rule -&gt; Automation
+aws events put-targets \
+  --rule olist-ci-failure-rollback \
+  --targets "Id=1,Arn=arn:aws:ssm:us-east-1:$ACCOUNT:automation-definition/CancelOlistStackUpdate,RoleArn=arn:aws:iam::$ACCOUNT:role/LabRole"</pre>
+
+      <h3>12.9 Passo 9 &mdash; critério de pronto e commit</h3>
+      <p>
+        Antes do <code>git push</code> da tag, conferir:
+      </p>
+      <ul>
+        <li><code>wb.yml</code> e <code>bb.yml</code> verdes em <code>main</code>.</li>
+        <li>EC2 listado em <code>gh api /repos/.../actions/runners</code> com label <code>lab</code>.</li>
+        <li>Branch protection ativa com 5 checks.</li>
+        <li>PR smoke quebrou e foi bloqueado.</li>
+        <li>EventBridge rule conectada à failure event.</li>
+        <li><code>documents/12_test_strategy.md</code>, <code>13_ci_pipeline.md</code>, <code>14_runner_runbook.md</code> commitados.</li>
+        <li>RTM atualizada &mdash; "Aberto" reduzido em &ge; 50%.</li>
+        <li>ADR-05 commitado.</li>
+      </ul>
+      <pre>git add .github/workflows tests/ documents/ iac/ssm/
+git commit -m "feat(aula-05): wb + bb pipeline white/black box com runner self-hosted ephemeral"
+git tag aula-05
+git push origin main --tags</pre>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- 13. Entregas e RTM                                                    -->
+    <!-- ==================================================================== -->
+
+    <section class="content-block">
+      <h2>13. Entregas e atualização da RTM</h2>
+      <p>
+        Toda entrega da aula vive no repositório <code>olist-sre-pipeline</code>. Nada de console AWS, nada
+        fora do git.
+      </p>
+
+      <h3>13.1 Arquivos novos</h3>
+      <ul>
+        <li><code>.github/workflows/wb.yml</code></li>
+        <li><code>.github/workflows/bb.yml</code></li>
+        <li><code>tests/unit/</code>, <code>tests/integration/</code>, <code>tests/contract/</code>, <code>tests/api/</code>, <code>tests/e2e/</code></li>
+        <li><code>iac/cloudformation/runner.yaml</code> (ou snippet em <code>compute.yaml</code>) documentando a tag <code>Role=runner</code></li>
+        <li><code>iac/ssm/cancel_update_stack.yaml</code> &mdash; SSM Automation Document</li>
+        <li><code>documents/agents/skills/gen_test_suite.md</code></li>
+        <li><code>documents/agents/skills/wire_self_hosted_runner.md</code></li>
+        <li><code>documents/12_test_strategy.md</code> &mdash; estratégia white/black box, pirâmide aplicada, política de coverage</li>
+        <li><code>documents/13_ci_pipeline.md</code> &mdash; mapa visual (Mermaid) do pipeline com gates</li>
+        <li><code>documents/14_runner_runbook.md</code> &mdash; como recriar o runner via SSM se cair</li>
+      </ul>
+
+      <h3>13.2 Atualização da RTM</h3>
+      <p>
+        Antes da Aula 05, a RTM (<code>documents/04_rtm.md</code>) tinha grande parte das linhas marcadas como
+        <em>Aberto</em>. Hoje cada teste gerado pela skill <code>gen_test_suite</code> entra como cobertura.
+        Exemplo de transição esperada:
+      </p>
+      <table>
+        <thead><tr><th>Req</th><th>Componente</th><th>Caso de teste antes</th><th>Caso de teste depois</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>RF-01</td><td>ETL Python &middot; ingest</td><td>TC-LOAD-01 (planejado)</td><td>TC-WB-UN-01, TC-BB-API-01</td><td>Coberto</td></tr>
+          <tr><td>RF-02</td><td>ETL Python &middot; normalize</td><td>TC-WB-INT-02 (planejado)</td><td>TC-WB-UN-04, TC-WB-INT-02</td><td>Coberto</td></tr>
+          <tr><td>RF-03</td><td>ETL &middot; quarentena</td><td>(Aberto)</td><td>TC-WB-UN-09, TC-BB-PROP-01</td><td>Coberto</td></tr>
+          <tr><td>RF-06</td><td>ETL Python &middot; upsert</td><td>TC-INT-03 (planejado)</td><td>TC-WB-INT-03, TC-BB-API-04</td><td>Coberto</td></tr>
+          <tr><td>RNF-PERF-01</td><td>EC2 ETL &middot; sizing</td><td>TC-LOAD-02 (planejado)</td><td>TC-LOAD-02 (Aula 06)</td><td>Aberto &mdash; Aula 06</td></tr>
+          <tr><td>RNF-REL-01</td><td>Pipeline + observabilidade</td><td>TC-CHAOS-02 (Aberto)</td><td>TC-CHAOS-02 (Aula 06)</td><td>Aberto &mdash; Aula 06</td></tr>
+          <tr><td>RNF-SEC-01</td><td>Postgres &middot; SG</td><td>TC-SEC-04 (Aberto)</td><td>TC-SEC-04 (Aula 06)</td><td>Aberto &mdash; Aula 06</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- 14. Glossário                                                         -->
+    <!-- ==================================================================== -->
+
+    <section class="content-block">
+      <h2>14. Glossário &mdash; vocabulário desta aula</h2>
+
+      <h3>14.1 Testes e qualidade</h3>
+      <table>
+        <thead><tr><th style="width:18%;">Sigla</th><th>Significado</th></tr></thead>
+        <tbody>
+          <tr><td><strong>TDD</strong></td><td>Test-Driven Development &mdash; escreve teste antes do código.</td></tr>
+          <tr><td><strong>BDD</strong></td><td>Behavior-Driven Development &mdash; cenários em Given/When/Then.</td></tr>
+          <tr><td><strong>MUT</strong></td><td>Mutation Testing &mdash; mede se a suíte detecta mudanças no código.</td></tr>
+          <tr><td><strong>SAST</strong></td><td>Static Application Security Testing &mdash; análise estática (Bandit).</td></tr>
+          <tr><td><strong>DAST</strong></td><td>Dynamic Application Security Testing &mdash; análise dinâmica via tráfego.</td></tr>
+          <tr><td><strong>SCA</strong></td><td>Software Composition Analysis &mdash; verificação de dependências (Trivy).</td></tr>
+          <tr><td><strong>E2E</strong></td><td>End-to-End test &mdash; cobre o fluxo do usuário real.</td></tr>
+          <tr><td><strong>QA</strong></td><td>Quality Assurance &mdash; disciplina de garantia de qualidade.</td></tr>
+          <tr><td><strong>CC</strong></td><td>Complexidade Ciclomática &mdash; número de caminhos independentes da função.</td></tr>
+          <tr><td><strong>TC-WB-NN</strong></td><td>Test Case &middot; White Box &mdash; identificador estável no projeto.</td></tr>
+          <tr><td><strong>TC-BB-NN</strong></td><td>Test Case &middot; Black Box &mdash; identificador estável no projeto.</td></tr>
+          <tr><td><strong>WF-NN</strong></td><td>Workflow identifier &mdash; <code>wb.yml</code>, <code>bb.yml</code>.</td></tr>
+          <tr><td><strong>RTM</strong></td><td>Requirements Traceability Matrix &mdash; rastreia RF/RNF até teste.</td></tr>
+          <tr><td><strong>ADR</strong></td><td>Architecture Decision Record &mdash; contexto, decisão, consequências.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>14.2 CI / CD e identidade</h3>
+      <table>
+        <thead><tr><th style="width:18%;">Sigla</th><th>Significado</th></tr></thead>
+        <tbody>
+          <tr><td><strong>CI</strong></td><td>Continuous Integration &mdash; integração contínua de código.</td></tr>
+          <tr><td><strong>CD</strong></td><td>Continuous Delivery / Deployment &mdash; entrega contínua.</td></tr>
+          <tr><td><strong>GHA</strong></td><td>GitHub Actions &mdash; plataforma de CI nativa do GitHub.</td></tr>
+          <tr><td><strong>PR</strong></td><td>Pull Request &mdash; proposta de merge revisável.</td></tr>
+          <tr><td><strong>gh</strong></td><td>GitHub CLI &mdash; cliente de linha de comando para a API do GitHub.</td></tr>
+          <tr><td><strong>YAML</strong></td><td>YAML Ain't Markup Language &mdash; formato declarativo dos workflows.</td></tr>
+          <tr><td><strong>VCS</strong></td><td>Version Control System &mdash; aqui git.</td></tr>
+          <tr><td><strong>SBOM</strong></td><td>Software Bill of Materials &mdash; inventário de dependências.</td></tr>
+          <tr><td><strong>DORA</strong></td><td>DevOps Research and Assessment &mdash; quatro métricas de entrega.</td></tr>
+          <tr><td><strong>OIDC</strong></td><td>OpenID Connect &mdash; protocolo de federação de identidade sobre OAuth2.</td></tr>
+          <tr><td><strong>IdP</strong></td><td>Identity Provider &mdash; quem emite tokens (GitHub, Google, etc).</td></tr>
+          <tr><td><strong>JWT</strong></td><td>JSON Web Token &mdash; token assinado em três partes.</td></tr>
+          <tr><td><strong>STS</strong></td><td>AWS Security Token Service &mdash; emissor de credenciais temporárias.</td></tr>
+          <tr><td><strong>RBAC</strong></td><td>Role-Based Access Control &mdash; permissões via papéis.</td></tr>
+          <tr><td><strong>IAM</strong></td><td>Identity and Access Management &mdash; serviço da AWS.</td></tr>
+          <tr><td><strong>MFA</strong></td><td>Multi-Factor Authentication &mdash; segundo fator no login.</td></tr>
+          <tr><td><strong>IMDSv2</strong></td><td>Instance Metadata Service v2 &mdash; metadata do EC2 com token obrigatório.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>14.3 AWS e SRE</h3>
+      <table>
+        <thead><tr><th style="width:18%;">Sigla</th><th>Significado</th></tr></thead>
+        <tbody>
+          <tr><td><strong>EC2</strong></td><td>Elastic Compute Cloud &mdash; máquinas virtuais.</td></tr>
+          <tr><td><strong>S3</strong></td><td>Simple Storage Service &mdash; object storage.</td></tr>
+          <tr><td><strong>SSM</strong></td><td>AWS Systems Manager &mdash; agrega Run Command, Parameter Store, Session Manager.</td></tr>
+          <tr><td><strong>CFN</strong></td><td>AWS CloudFormation &mdash; IaC declarativo.</td></tr>
+          <tr><td><strong>EventBridge</strong></td><td>Bus de eventos AWS &mdash; rule + target.</td></tr>
+          <tr><td><strong>SG</strong></td><td>Security Group &mdash; firewall stateful no nível do recurso.</td></tr>
+          <tr><td><strong>VPC</strong></td><td>Virtual Private Cloud &mdash; rede virtual isolada.</td></tr>
+          <tr><td><strong>ARN</strong></td><td>Amazon Resource Name &mdash; identificador único de recurso.</td></tr>
+          <tr><td><strong>SLI</strong></td><td>Service Level Indicator &mdash; métrica de confiabilidade.</td></tr>
+          <tr><td><strong>SLO</strong></td><td>Service Level Objective &mdash; meta interna sobre o SLI.</td></tr>
+          <tr><td><strong>SLA</strong></td><td>Service Level Agreement &mdash; compromisso externo.</td></tr>
+          <tr><td><strong>MTTR</strong></td><td>Mean Time To Recovery &mdash; tempo médio até recuperação.</td></tr>
+          <tr><td><strong>MTTD</strong></td><td>Mean Time To Detect &mdash; tempo médio até detecção.</td></tr>
+          <tr><td><strong>RTO</strong></td><td>Recovery Time Objective &mdash; tempo máximo aceitável para retomar serviço.</td></tr>
+          <tr><td><strong>RPO</strong></td><td>Recovery Point Objective &mdash; quantidade máxima aceitável de dado perdido.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- 15. Referências                                                       -->
+    <!-- ==================================================================== -->
+
+    <section class="content-block">
+      <h2>15. Referências e leituras</h2>
+      <ul>
+        <li>Beck, K. &mdash; <em>Test-Driven Development by Example</em>, Addison-Wesley.</li>
+        <li>Cohn, M. &mdash; <em>Succeeding with Agile</em> (capítulo da pirâmide de testes).</li>
+        <li>Fowler, M. &mdash; <em>The Practical Test Pyramid</em> (martinfowler.com).</li>
+        <li>Wynne, M.; Hellesoy, A.; Tooke, S. &mdash; <em>The Cucumber Book</em> (BDD).</li>
+        <li><em>Hypothesis</em>, <em>Schemathesis</em>, <em>Great Expectations</em> &mdash; documentação oficial.</li>
+        <li><em>mutmut</em> e <em>cosmic-ray</em> &mdash; mutation testing em Python.</li>
+        <li>GitHub Docs &mdash; <em>Workflows, OIDC with AWS, Self-hosted runners</em>.</li>
+        <li>AWS Docs &mdash; <em>Systems Manager Run Command</em>, <em>EventBridge integration with GitHub</em>.</li>
+        <li>Beyer et al. &mdash; <em>Site Reliability Engineering &mdash; How Google Runs Production Systems</em>, O'Reilly.</li>
+        <li>Forsgren, N.; Humble, J.; Kim, G. &mdash; <em>Accelerate &mdash; Building and Scaling High-Performing Technology Organizations</em> (DORA metrics).</li>
+        <li>OWASP &mdash; <em>CI/CD Security Top 10</em>.</li>
+        <li>Hellerstein, J.; Diao, Y.; Parekh, S.; Tilbury, D. &mdash; <em>Feedback Control of Computing Systems</em> (closed loops em SRE).</li>
       </ul>
     </section>
 
@@ -49,5 +1094,26 @@
     </section>
 
   </main>
+
+  <!-- Mermaid v11 — diagramas: pirâmide e sequência CI -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'neutral',
+      securityLevel: 'loose',
+      flowchart: { htmlLabels: true, curve: 'basis' },
+      sequence: { actorMargin: 50, messageAlign: 'center' },
+      themeVariables: {
+        fontFamily: 'JetBrains Mono, ui-monospace, monospace',
+        primaryColor: '#ffffff',
+        primaryBorderColor: '#0f0f0f',
+        primaryTextColor: '#0f0f0f',
+        lineColor: '#5c5c5c',
+        clusterBkg: '#fafaf7',
+        clusterBorder: '#d6d6d1'
+      }
+    });
+  </script>
 </body>
 </html>

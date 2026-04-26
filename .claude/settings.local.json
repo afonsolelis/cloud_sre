@@ -10,7 +10,15 @@
       "Bash(python -c ' *)",
       "Bash(grep -c '<li>$\\\\|<li>' /c/Users/Afonso/repos/cloud_sre/aulas/aula_01_fundamentos_de_cloud_para_dados_e_governanca_de_acessos/material/material_aula_01_fundamentos_de_cloud_para_dados_e_governanca_de_acessos.html)",
       "Bash(awk '/Exercícios de fixação/,0' /c/Users/Afonso/repos/cloud_sre/aulas/aula_01_fundamentos_de_cloud_para_dados_e_governanca_de_acessos/material/material_aula_01_fundamentos_de_cloud_para_dados_e_governanca_de_acessos.html)",
-      "Bash(python *)"
+      "Bash(python *)",
+      "WebFetch(domain:animejs.com)",
+      "Bash(start chrome *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(mkdir -p /c/Users/afons/.claude/projects/C--Users-afons-Repos-cloud-sre/memory)",
+      "Bash(mv /c/Users/afons/.claude/projects/C--Users-afons-Repos-cloud_sre/memory/feedback_repurpose_lecture_folders.md /c/Users/afons/.claude/projects/C--Users-afons-Repos-cloud-sre/memory/)",
+      "Bash(npx playwright *)"
     ]
   }
 }
