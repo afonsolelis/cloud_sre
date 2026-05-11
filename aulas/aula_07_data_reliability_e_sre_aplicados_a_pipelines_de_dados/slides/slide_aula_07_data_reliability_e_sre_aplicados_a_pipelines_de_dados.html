@@ -64,8 +64,8 @@
       border-color: var(--deck-accent);
     }
 
-    /* Bloco "em construção" — placeholder bem visível.
-       Composição quadrada, contraste preto, sem fofura. */
+    /* Bloco "em construção" — placeholder visível.
+       Composição quadrada, contraste em preto, estilo neutro. */
     .a07-placeholder-block {
       border: 1px solid var(--deck-accent);
       border-left: 4px solid var(--deck-accent);
@@ -208,7 +208,7 @@
           <h1 class="deck-title">Táticas Bass para sistemas distribuídos &mdash; estressando o ATAM</h1>
           <p class="deck-meta">Aula 07 &nbsp;&bull;&nbsp; 28/05/2026</p>
           <p class="deck-year">2026</p>
-          <p class="deck-subtitle">Tática já testada localmente. Agora vale a pena testar de novo na nuvem &mdash; porque os <em>sensitivity points</em> do ATAM da Aula 05 têm perfil diferente em distribuído.</p>
+          <p class="deck-subtitle">As táticas arquiteturais validadas localmente na Aula 05 devem ser reavaliadas no contexto distribuído da AWS, uma vez que os mesmos <em>sensitivity points</em> apresentam perfil de risco distinto quando a arquitetura é decomposta em EC2, S3 e Lambda.</p>
         </div>
       </div>
     </div>
@@ -220,29 +220,29 @@
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Agenda</span>
-          <h2 class="deck-title">O que vai acontecer nesta aula</h2>
-          <p class="deck-summary">Bloco teórico sobre táticas de Len Bass aplicadas a sistemas distribuídos e releitura do ATAM montado na Aula 05. Bloco prático &mdash; experimentos controlados sobre os <em>sensitivity points</em> agora na arquitetura distribuída em AWS (migrada na Aula 06).</p>
+          <h2 class="deck-title">Estrutura da aula</h2>
+          <p class="deck-summary">A sessão compreende um bloco teórico dedicado às táticas arquiteturais de Len Bass aplicadas a sistemas distribuídos, com releitura da análise ATAM elaborada na Aula 05, seguido de um bloco prático no qual serão conduzidos experimentos controlados sobre os <em>sensitivity points</em> identificados, agora avaliados na arquitetura distribuída em AWS migrada na Aula 06.</p>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
             <h3>Bloco teórico &middot; 19h00&ndash;20h30</h3>
             <ul>
-              <li>Recap Aulas 04 &rarr; 06: Docker, ATAM+Bass local, migração AWS</li>
-              <li>Tática arquitetural &mdash; por que distribuído muda tudo</li>
-              <li>Os 5 grupos de tactics de Bass na nuvem</li>
-              <li>Releitura da tabela ATAM da Aula 05 em chave distribuída</li>
-              <li>Sensitivity point &rarr; experimento &rarr; métrica</li>
-              <li>Taxonomia de experimentos: chaos, load, latência, partição</li>
+              <li>Recapitulação das Aulas 04 a 06: Docker, ATAM e Bass no ambiente local, migração para a AWS</li>
+              <li>Tática arquitetural e as implicações específicas dos sistemas distribuídos</li>
+              <li>Os cinco grupos de táticas de Bass aplicados ao contexto da nuvem</li>
+              <li>Releitura da tabela ATAM da Aula 05 sob a perspectiva distribuída</li>
+              <li><em>Sensitivity point</em>, experimento e métrica como tríade metodológica</li>
+              <li>Taxonomia de experimentos: <em>chaos</em>, carga, latência e partição</li>
             </ul>
           </article>
           <article class="deck-card">
             <h3>Prática AWS Student &middot; 20h30&ndash;22h00</h3>
             <ul>
               <li>Abertura da arquitetura distribuída entregue na Aula 06</li>
-              <li>3 experimentos derivados dos sensitivity points da Aula 05</li>
-              <li>Coleta de métricas &mdash; latência, erro, MTTR, custo</li>
-              <li>Revisão das tactics aplicadas / faltantes</li>
-              <li>Relatório de evidências commitado no repositório</li>
+              <li>Três experimentos derivados dos <em>sensitivity points</em> da Aula 05</li>
+              <li>Coleta de métricas relativas a latência, erro, MTTR e custo</li>
+              <li>Revisão das táticas aplicadas e identificação das ausentes</li>
+              <li>Relatório de evidências versionado no repositório</li>
             </ul>
           </article>
         </div>
@@ -255,39 +255,39 @@
     <div class="slide">
       <div class="deck-shell a07-compact">
         <div>
-          <span class="deck-kicker">Recap &middot; De onde viemos</span>
-          <h2 class="deck-title">Aulas 04 &rarr; 06 &mdash; o que já está construído</h2>
-          <p class="deck-summary">A Aula 07 não começa do zero. A turma já tem stack local em Docker (04), tabela ATAM e tactics Bass aplicadas no ambiente local (05), e a stack migrada para a AWS (06). Hoje a gente <strong>volta ao ATAM da Aula 05</strong> e reexamina cada <em>sensitivity point</em> à luz do mundo distribuído.</p>
+          <span class="deck-kicker">Recapitulação &middot; Trajetória do curso</span>
+          <h2 class="deck-title">Aulas 04 a 06 &mdash; entregas consolidadas</h2>
+          <p class="deck-summary">A Aula 07 fundamenta-se nas entregas anteriores: a <em>stack</em> local em Docker construída na Aula 04, a tabela ATAM e as táticas de Bass aplicadas ao ambiente local na Aula 05, e a arquitetura migrada para a AWS na Aula 06. Nesta sessão, retomamos a análise ATAM da Aula 05 e reexaminamos cada <em>sensitivity point</em> sob a ótica do ambiente distribuído.</p>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
             <h3>Aula 04 &middot; Docker local</h3>
             <ul>
-              <li>Stack inicial em <code>docker-compose</code></li>
-              <li>S3 mock + ClickHouse + Streamlit + ingestor</li>
-              <li>Concluída &mdash; repo da disciplina pronto</li>
+              <li><em>Stack</em> inicial em <code>docker-compose</code></li>
+              <li>S3 simulado, ClickHouse, Streamlit e ingestor</li>
+              <li>Repositório da disciplina consolidado</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>Aula 05 &middot; ATAM + Bass local</h3>
+            <h3>Aula 05 &middot; ATAM e Bass no ambiente local</h3>
             <ul>
-              <li>Tabela ATAM construída sobre a stack local</li>
-              <li>Tactics aplicadas em Docker: encapsulation, contracts, monitor</li>
-              <li>Entrega: ATAM com <em>sensitivity, tradeoff, risk</em> &mdash; base desta aula</li>
+              <li>Tabela ATAM elaborada sobre a <em>stack</em> local</li>
+              <li>Táticas aplicadas em Docker: <em>encapsulation</em>, contratos e monitoramento</li>
+              <li>Entrega: ATAM com <em>sensitivity</em>, <em>tradeoff</em> e <em>risk</em> &mdash; insumo desta aula</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>Aula 06 &middot; Migração para AWS</h3>
+            <h3>Aula 06 &middot; Migração para a AWS</h3>
             <ul>
-              <li>Lift-and-shift via Gemini CLI: S3 + EC2 ClickHouse + EC2 Streamlit + Lambda ingestor</li>
-              <li>Sem ATAM novo &mdash; só execução de migração</li>
-              <li>Saída: a mesma stack, agora distribuída na nuvem</li>
+              <li><em>Lift-and-shift</em> com Gemini CLI: S3, EC2 ClickHouse, EC2 Streamlit e Lambda como ingestor</li>
+              <li>Sem nova análise ATAM &mdash; apenas execução da migração</li>
+              <li>Resultado: a mesma <em>stack</em>, agora distribuída na nuvem</li>
             </ul>
           </article>
         </div>
         <div class="deck-callout">
-          <strong>O que herdamos para hoje</strong>
-          <p style="margin:0;">Arquitetura distribuída em pé na AWS Learner Lab (entrega da Aula 06) + tabela ATAM construída na Aula 05, com 3 a 5 sensitivity points já catalogados. A Aula 07 reabre essa tabela e transforma cada ponto em <strong>experimento controlado com métrica</strong> &mdash; porque na nuvem o perfil de carga, latência e falha mudou.</p>
+          <strong>Insumos herdados para a presente aula</strong>
+          <p style="margin:0;">A arquitetura distribuída disponível na AWS Learner Lab (entrega da Aula 06), em conjunto com a tabela ATAM construída na Aula 05 contendo de três a cinco <em>sensitivity points</em> catalogados, constitui o ponto de partida. A Aula 07 retoma essa tabela e converte cada ponto identificado em <strong>experimento controlado com métrica</strong>, dado que o perfil de carga, latência e falha na nuvem difere substancialmente daquele observado no ambiente local.</p>
         </div>
       </div>
     </div>
@@ -299,15 +299,15 @@
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Tese da aula</span>
-          <h2 class="deck-title">Tactic já testada localmente &mdash; vale testar de novo na nuvem</h2>
-          <p class="deck-summary">As tactics aplicadas na Aula 05 funcionavam num mundo onde a rede era um cabo virtual e a máquina era a sua. Em distribuído, o mesmo <em>sensitivity point</em> ganha outro perfil: latência sobe com a rede, <em>single point of failure</em> muda de nome (EC2 &rarr; AZ &rarr; região), cache local vira CDN. <strong>Mesmo ATAM, novo experimento.</strong></p>
+          <h2 class="deck-title">Uma tática só pode ser considerada efetiva após validação sob condições controladas de estresse no ambiente distribuído</h2>
+          <p class="deck-summary">As táticas aplicadas na Aula 05 foram validadas em um contexto no qual a rede correspondia a uma abstração virtual e a máquina constituía recurso local. Em arquiteturas distribuídas, cada <em>sensitivity point</em> assume novo perfil de risco: a latência cresce em função da rede, o <em>single point of failure</em> migra de nível (do processo único para EC2, AZ ou região) e o cache local cede lugar à camada de CDN. A análise ATAM permanece, porém o experimento associado deve ser reformulado.</p>
         </div>
         <div class="deck-callout">
-          <strong>Três regras desta aula</strong>
+          <strong>Três princípios orientadores da aula</strong>
           <ol style="margin:12px 0 0; padding-left:22px;">
-            <li>Toda tática declarada no slide precisa ter um experimento que a confirme &mdash; ou a refute &mdash; <em>na arquitetura distribuída</em>.</li>
+            <li>Toda tática apresentada deve ser acompanhada de experimento que a confirme ou refute <em>na arquitetura distribuída</em>.</li>
             <li>Todo experimento parte de um <em>sensitivity point</em> registrado na tabela ATAM da Aula 05, relido sob a ótica da nuvem.</li>
-            <li>Toda execução termina com métrica medida e commitada no repositório &mdash; latência p99, erro, MTTR, throughput, custo.</li>
+            <li>Toda execução é concluída com métrica mensurada e versionada no repositório &mdash; latência p99, taxa de erro, MTTR, <em>throughput</em> e custo.</li>
           </ol>
         </div>
       </div>
@@ -319,9 +319,9 @@
     <div class="slide">
       <div class="deck-shell a07-compact">
         <div>
-          <span class="deck-kicker">Teoria &middot; Bass distribuído</span>
-          <h2 class="deck-title">Os 5 grupos de tactics em sistemas distribuídos</h2>
-          <p class="deck-summary">Bass agrupa as táticas por <em>quality attribute</em>. Em sistemas distribuídos elas brilham porque o ambiente naturalmente quebra &mdash; rede particiona, máquina cai, fila enche. Detalhes de cada grupo no material; aqui ficam os cabeçalhos.</p>
+          <span class="deck-kicker">Teoria &middot; Bass no contexto distribuído</span>
+          <h2 class="deck-title">Os cinco grupos de táticas em sistemas distribuídos</h2>
+          <p class="deck-summary">Bass organiza as táticas por <em>quality attribute</em>. Em sistemas distribuídos, sua aplicação ganha relevância acentuada, pois o ambiente é intrinsecamente sujeito a falhas: a rede particiona, máquinas tornam-se indisponíveis e filas atingem capacidade. O material complementar detalha cada grupo; neste slide, registram-se os cabeçalhos.</p>
         </div>
         <div class="a07-grid-3">
           <article class="deck-card">
@@ -388,9 +388,9 @@
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Método &middot; ATAM da Aula 05 &rarr; experimento na nuvem</span>
-          <h2 class="deck-title">Roteiro: cada <em>sensitivity point</em> da Aula 05 vira um experimento aqui</h2>
-          <p class="deck-summary">Sensitivity points não são bug &mdash; são pontos onde uma decisão arquitetural altera mais de um atributo de qualidade. Em distribuído, esses pontos <strong>mudam de perfil</strong>: latência aumenta com a rede, <em>single point of failure</em> muda de nome (EC2 &rarr; AZ &rarr; região), cache local vira CDN, monitor por log vira métrica e dashboard.</p>
+          <span class="deck-kicker">Método &middot; Da análise ATAM da Aula 05 ao experimento na nuvem</span>
+          <h2 class="deck-title">Roteiro metodológico: cada <em>sensitivity point</em> da Aula 05 origina um experimento na presente sessão</h2>
+          <p class="deck-summary"><em>Sensitivity points</em> não constituem defeitos, mas sim pontos em que uma decisão arquitetural impacta mais de um atributo de qualidade. Em ambientes distribuídos, esses pontos <strong>assumem novo perfil</strong>: a latência cresce com a rede, o <em>single point of failure</em> migra de nível (de EC2 para AZ e, posteriormente, para região), o cache local cede lugar à CDN e o monitoramento por <em>log</em> é substituído por métricas e painéis.</p>
         </div>
         <table class="deck-table">
           <thead>
@@ -404,7 +404,7 @@
             <tr><td>Streamlit como processo único</td><td>Streamlit em EC2 single point</td><td>Availability &middot; failover</td><td>Stop EC2 Streamlit</td></tr>
           </tbody>
         </table>
-        <p style="font-size:.9em; color: var(--deck-muted); margin-top: 12px;">A tabela acima é <strong>ilustrativa</strong>. Os experimentos reais saem da tabela ATAM construída na <strong>Aula 05</strong>, relida sob o perfil distribuído entregue na Aula 06.</p>
+        <p style="font-size:.9em; color: var(--deck-muted); margin-top: 12px;">A tabela apresentada tem caráter <strong>ilustrativo</strong>. Os experimentos efetivamente conduzidos derivam da tabela ATAM elaborada na <strong>Aula 05</strong>, relida sob o perfil distribuído resultante da migração da Aula 06.</p>
       </div>
     </div>
 
@@ -415,24 +415,25 @@
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Aviso &middot; Em construção</span>
-          <h2 class="deck-title">Os experimentos específicos serão definidos a partir dos resultados da Aula 06</h2>
-          <p class="deck-summary">Esta aula é, por desenho, um <em>placeholder estruturado</em>. O esqueleto, a metodologia e o ATAM-base (da Aula 05) já estão prontos. O que falta é ver como a migração da Aula 06 afetou o perfil de cada sensitivity point.</p>
+          <h2 class="deck-title">Definição dos experimentos específicos condicionada aos resultados da Aula 06</h2>
+          <p class="deck-summary">Esta aula constitui, por desenho, um <em>placeholder estruturado</em>. A estrutura conceitual, a metodologia e a análise ATAM de base (proveniente da Aula 05) encontram-se consolidadas. Resta determinar como a migração realizada na Aula 06 alterou o perfil de cada <em>sensitivity point</em>.</p>
         </div>
         <div class="a07-placeholder-block">
           <span class="a07-placeholder-kicker">Placeholder explícito</span>
           <p class="a07-placeholder-title">Conteúdo detalhado a ser preenchido após a Aula 06 &mdash; depende dos resultados da migração que afetam os <em>sensitivity points</em> listados na Aula 05</p>
           <p>
-            A tabela ATAM-base é a da <strong>Aula 05</strong>. Ela já está pronta e versionada no repositório.
-            O que muda na Aula 07 é o <em>perfil</em> de cada sensitivity point depois que a stack saiu do Docker
-            local e foi para a nuvem na Aula 06: latência maior por causa da rede, falha de máquina vira falha
-            de EC2 / AZ, escrita no S3 real tem 503 e throttle, cold start aparece no Lambda.
+            A tabela ATAM de base corresponde àquela elaborada na <strong>Aula 05</strong>, já versionada no repositório.
+            A alteração introduzida pela Aula 07 reside no <em>perfil</em> de cada <em>sensitivity point</em> após a
+            <em>stack</em> ter sido migrada do Docker local para a nuvem na Aula 06: a latência aumenta em razão da rede,
+            a falha de máquina assume a forma de falha de EC2 ou AZ, a escrita no S3 real apresenta códigos 503 e <em>throttle</em>,
+            e o <em>cold start</em> manifesta-se no Lambda.
           </p>
           <p>
-            Os experimentos específicos &mdash; quais EC2 serão derrubadas, qual percentual de payload, qual janela
-            de latência, qual cenário de falha &mdash; serão derivados desses dois insumos (ATAM da Aula 05 +
+            Os experimentos específicos &mdash; quais instâncias EC2 serão suspensas, qual percentual de <em>payload</em>,
+            qual janela de latência e qual cenário de falha &mdash; serão derivados desses dois insumos (ATAM da Aula 05 e
             arquitetura distribuída da Aula 06) e detalhados na semana de <strong>28/05/2026</strong>. Cada ponto
-            fraco real (sensitivity, tradeoff ou risk) que aparecer na tabela vira um experimento desta aula, com
-            hipótese, execução e métrica.
+            crítico identificado na tabela (<em>sensitivity</em>, <em>tradeoff</em> ou <em>risk</em>) será convertido em
+            experimento desta aula, com hipótese, execução e métrica associadas.
           </p>
         </div>
       </div>
@@ -445,55 +446,55 @@
       <div class="deck-shell a07-compact">
         <div>
           <span class="deck-kicker">Plano de medição &middot; Placeholder</span>
-          <h2 class="deck-title">O que vamos medir em cada experimento</h2>
-          <p class="deck-summary">A escolha das métricas é o que separa engenharia de teatro. Cada experimento da prática terá métrica antes/depois e janela definida. A lista abaixo é o conjunto canônico &mdash; o detalhe entra com a ATAM.</p>
+          <h2 class="deck-title">Métricas a serem coletadas em cada experimento</h2>
+          <p class="deck-summary">A escolha criteriosa das métricas distingue a prática da engenharia de meras encenações. Cada experimento da prática contará com métricas mensuradas antes e depois da intervenção, em janela temporal definida. A lista que segue corresponde ao conjunto canônico; os detalhes específicos serão definidos a partir da análise ATAM.</p>
         </div>
         <div class="a07-grid-3">
           <article class="deck-card">
             <h3>Latência</h3>
             <ul>
-              <li>p50, p95, p99</li>
-              <li>Janela 5&ndash;15 min</li>
-              <li>Origem &mdash; CloudWatch ou cliente</li>
+              <li>Percentis p50, p95 e p99</li>
+              <li>Janela de 5 a 15 minutos</li>
+              <li>Origem: CloudWatch ou cliente externo</li>
             </ul>
           </article>
           <article class="deck-card">
             <h3>Taxa de erro</h3>
             <ul>
-              <li>HTTP 5xx, S3 503, Lambda fail</li>
-              <li>Erros / total na janela</li>
-              <li>Threshold por SLI</li>
+              <li>HTTP 5xx, S3 503 e falhas de Lambda</li>
+              <li>Razão entre erros e total na janela</li>
+              <li>Limiar definido por SLI</li>
             </ul>
           </article>
           <article class="deck-card">
             <h3>MTTR</h3>
             <ul>
-              <li>Tempo do erro &rarr; ack</li>
-              <li>Tempo do ack &rarr; recovery</li>
-              <li>Manual vs automático</li>
+              <li>Intervalo entre erro e reconhecimento</li>
+              <li>Intervalo entre reconhecimento e recuperação</li>
+              <li>Comparação entre execução manual e automática</li>
             </ul>
           </article>
           <article class="deck-card">
             <h3>Throughput</h3>
             <ul>
-              <li>Requests / s</li>
-              <li>Linhas ingeridas / min</li>
-              <li>Degradação vs baseline</li>
+              <li>Requisições por segundo</li>
+              <li>Linhas ingeridas por minuto</li>
+              <li>Degradação em relação ao <em>baseline</em></li>
             </ul>
           </article>
           <article class="deck-card">
             <h3>Custo por hora</h3>
             <ul>
-              <li>EC2 + S3 + Lambda</li>
-              <li>Antes vs durante o experimento</li>
-              <li>Dimensão FinOps básica</li>
+              <li>EC2, S3 e Lambda</li>
+              <li>Comparativo antes e durante o experimento</li>
+              <li>Dimensão FinOps elementar</li>
             </ul>
           </article>
           <article class="deck-card">
             <h3>Disponibilidade</h3>
             <ul>
-              <li>% uptime na janela</li>
-              <li>Health check externo</li>
+              <li>Percentual de <em>uptime</em> na janela</li>
+              <li><em>Health check</em> externo</li>
               <li>Cobertura de SLO</li>
             </ul>
           </article>
@@ -507,27 +508,27 @@
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Roadmap &middot; Aula 08</span>
-          <h2 class="deck-title">Para onde vamos depois daqui</h2>
-          <p class="deck-summary">A Aula 07 fecha o ciclo de validação. A Aula 08 leva todo o material para um projeto final integrado, publicado no GitHub de cada aluno.</p>
+          <span class="deck-kicker">Roteiro &middot; Aula 08</span>
+          <h2 class="deck-title">Próximos passos do curso</h2>
+          <p class="deck-summary">A Aula 07 encerra o ciclo de validação. A Aula 08 integra todo o material em um projeto final, publicado no repositório GitHub de cada aluno.</p>
         </div>
         <div class="deck-columns">
           <div class="deck-panel">
             <strong>Aula 08 &middot; 11/06/2026</strong>
             <ul>
               <li>Projeto final integrado no GitHub</li>
-              <li>Arquitetura distribuída + evidências de Bass + relatório ATAM</li>
-              <li>README com decisões, tradeoffs, métricas medidas hoje</li>
-              <li>Repositório nomeado pela convenção <code>20261sre-&lt;nome&gt;-&lt;sobrenome&gt;</code></li>
+              <li>Arquitetura distribuída, evidências das táticas de Bass e relatório ATAM</li>
+              <li>README contendo decisões, <em>tradeoffs</em> e métricas mensuradas nesta aula</li>
+              <li>Repositório nomeado conforme a convenção <code>20261sre-&lt;nome&gt;-&lt;sobrenome&gt;</code></li>
             </ul>
           </div>
           <div class="deck-panel">
-            <strong>O que precisa estar pronto até lá</strong>
+            <strong>Requisitos prévios à Aula 08</strong>
             <ul>
-              <li>Tabela ATAM da Aula 05 versionada (já entregue)</li>
-              <li>3 experimentos distribuídos com métrica registrada</li>
-              <li>Decisões de tactic justificadas no README</li>
-              <li>Imagens / prints dos dashboards usados</li>
+              <li>Tabela ATAM da Aula 05 versionada (entrega já realizada)</li>
+              <li>Três experimentos distribuídos com métricas registradas</li>
+              <li>Decisões relativas às táticas justificadas no README</li>
+              <li>Imagens e capturas de tela dos painéis utilizados</li>
             </ul>
           </div>
         </div>
@@ -541,8 +542,8 @@
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Encerramento &middot; Código da prática</span>
-          <h2 class="deck-title">Repositório base e referência da Aula 05</h2>
-          <p class="deck-summary">O ponto de partida do código continua sendo o repositório da Aula 04. A leitura obrigatória é o slide da <strong>Aula 05</strong> &mdash; é de lá que sai a tabela ATAM que vamos estressar hoje, agora sobre a stack distribuída entregue na Aula 06.</p>
+          <h2 class="deck-title">Repositório base e referência à Aula 05</h2>
+          <p class="deck-summary">O ponto de partida do código permanece sendo o repositório da Aula 04. A leitura obrigatória corresponde ao slide da <strong>Aula 05</strong>, do qual provém a tabela ATAM que será submetida a estresse na presente aula, agora sobre a <em>stack</em> distribuída entregue na Aula 06.</p>
         </div>
         <div class="a07-repo-cta-wrap">
           <a class="a07-repo-cta"
@@ -564,7 +565,7 @@
           </a>
         </div>
         <p style="margin-top:14px; font-size:.92em; color: var(--deck-muted); text-align:center;">
-          Convenção: faça <strong>fork</strong> e renomeie para <code>20261sre-&lt;primeironome&gt;-&lt;ultimonome&gt;</code> antes de versionar suas mudanças desta aula.
+          Convenção: deve-se realizar <strong>fork</strong> e renomear o repositório para <code>20261sre-&lt;primeironome&gt;-&lt;ultimonome&gt;</code> antes de versionar as modificações desta aula.
         </p>
       </div>
     </div>

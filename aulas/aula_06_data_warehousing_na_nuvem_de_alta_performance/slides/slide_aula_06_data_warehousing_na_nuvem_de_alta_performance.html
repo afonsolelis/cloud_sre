@@ -282,7 +282,7 @@
           <h1 class="deck-title">Migração para AWS Student Lab via Gemini CLI</h1>
           <p class="deck-meta">Aula 06 &nbsp;&bull;&nbsp; 21/05/2026 &nbsp;&bull;&nbsp; Aula presencial</p>
           <p class="deck-year">2026</p>
-          <p class="deck-subtitle">Do Docker local ao distribuído na nuvem &mdash; lift-and-shift, decomposição e Gemini CLI como copiloto de provisionamento.</p>
+          <p class="deck-subtitle">Migração da stack Docker local para uma arquitetura distribuída na nuvem, contemplando as etapas de lift-and-shift e decomposição, com utilização do Gemini CLI como assistente para o provisionamento via AWS CLI.</p>
         </div>
       </div>
     </div>
@@ -294,8 +294,8 @@
       <div class="deck-shell a06-compact">
         <div>
           <span class="deck-kicker">Agenda</span>
-          <h2 class="deck-title">O que vai acontecer nesta aula</h2>
-          <p class="deck-summary">Bloco teórico curto &mdash; arquitetura alvo, mapeamento Docker &rarr; AWS e Gemini CLI 101. Bloco prático longo &mdash; lift-and-shift e decomposição, executados via AWS CLI gerado pelo agente.</p>
+          <h2 class="deck-title">Estrutura da aula</h2>
+          <p class="deck-summary">A aula divide-se em dois blocos. O bloco teórico apresenta a arquitetura alvo, o mapeamento entre os serviços Docker e os serviços AWS correspondentes e uma introdução ao Gemini CLI. O bloco prático é dedicado à execução das etapas de lift-and-shift e decomposição, conduzidas por meio do AWS CLI gerado pelo agente.</p>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
@@ -320,7 +320,7 @@
             </ul>
           </article>
         </div>
-        <p style="margin-top:10px; font-size:.84em; color: var(--deck-muted);"><strong>Tese:</strong> migrar é executar a arquitetura que foi planejada &mdash; primeiro lift-and-shift para garantir continuidade, depois decomposição para colher os benefícios do distribuído.</p>
+        <p style="margin-top:10px; font-size:.84em; color: var(--deck-muted);"><strong>Tese:</strong> a migração consiste na execução da arquitetura previamente planejada. Recomenda-se priorizar a continuidade operacional na primeira etapa (lift-and-shift) e introduzir a decomposição arquitetural em uma segunda etapa controlada, com o objetivo de obter os benefícios associados aos sistemas distribuídos.</p>
       </div>
     </div>
 
@@ -331,8 +331,8 @@
       <div class="deck-shell a06-compact">
         <div>
           <span class="deck-kicker">Recap &middot; Onde paramos</span>
-          <h2 class="deck-title">Stack Olist resiliente, ATAM mapeada, ainda local</h2>
-          <p class="deck-summary">A Aula 04 subiu a stack inteira em Docker Compose; a Aula 05 fez a análise ATAM do sistema e aplicou táticas Bass <em>locais</em> com testes e stress. Hoje, essa stack viaja para a nuvem.</p>
+          <h2 class="deck-title">Stack Olist resiliente, ATAM mapeada, ainda em ambiente local</h2>
+          <p class="deck-summary">A Aula 04 conduziu o provisionamento integral da stack em Docker Compose. A Aula 05 desenvolveu a análise arquitetural por meio do método ATAM e aplicou as táticas de Bass em escopo local, incluindo testes e ensaios de carga. Na presente aula, essa stack é portada para a nuvem.</p>
         </div>
         <div class="a06-grid-3">
           <article class="deck-card">
@@ -354,18 +354,18 @@
             </ul>
           </article>
           <article class="deck-card">
-            <h3>Aula 06 &middot; Hoje</h3>
+            <h3>Aula 06 &middot; Atual</h3>
             <ul>
-              <li>Migração para AWS Student Lab.</li>
-              <li>Gemini CLI como copiloto de provisionamento.</li>
-              <li>Lift-and-shift &rarr; decomposição.</li>
-              <li>Sem nova análise &mdash; consumimos a ATAM da Aula 05.</li>
+              <li>Migração para o AWS Student Lab.</li>
+              <li>Utilização do Gemini CLI como assistente de provisionamento.</li>
+              <li>Etapas de lift-and-shift seguidas de decomposição.</li>
+              <li>Não há nova análise arquitetural; aproveita-se a ATAM elaborada na Aula 05.</li>
             </ul>
           </article>
         </div>
         <div class="a06-atam-link">
           <strong>ATAM como insumo, não como conteúdo</strong>
-          Os <em>sensitivity points</em> listados na Aula 05 são o nosso checklist de migração &mdash; vamos honrá-los no provisionamento e revisitá-los na Aula 07 testando o sistema agora em nuvem.
+          Os <em>sensitivity points</em> registrados na Aula 05 constituem o roteiro arquitetural desta migração: serão observados durante o provisionamento e novamente avaliados na Aula 07, quando o sistema for submetido a ensaios no ambiente em nuvem.
         </div>
         <p style="margin-top:14px; font-size:.84em; color: var(--deck-muted); display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
           Repositório base da prática:
@@ -386,15 +386,15 @@
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Tese da aula</span>
-          <h2 class="deck-title">Migrar é executar a arquitetura planejada</h2>
-          <p class="deck-summary">A análise arquitetural já foi feita (ATAM da Aula 05). Hoje é execução: primeiro <strong>lift-and-shift</strong> para garantir continuidade, depois <strong>decomposição</strong> para colher os benefícios do distribuído.</p>
+          <h2 class="deck-title">A migração como execução da arquitetura planejada</h2>
+          <p class="deck-summary">A análise arquitetural foi conduzida previamente, por meio da ATAM elaborada na Aula 05. A presente aula concentra-se na execução: realiza-se primeiramente o <strong>lift-and-shift</strong>, com o objetivo de assegurar a continuidade operacional, e em seguida a <strong>decomposição</strong>, que permite obter os benefícios próprios de uma arquitetura distribuída.</p>
         </div>
         <div class="deck-callout">
-          <strong>Três regras desta aula</strong>
+          <strong>Três princípios orientadores desta aula</strong>
           <ol style="margin:12px 0 0; padding-left:22px;">
-            <li><strong>Lift-and-shift antes de redesenhar</strong> &mdash; o <code>compose</code> inteiro roda dentro de uma EC2 antes de virar serviços separados.</li>
-            <li><strong>Console é proibido</strong> &mdash; tudo via AWS CLI, e o AWS CLI é digitado <em>pelo Gemini CLI</em>. Revisão humana antes de executar.</li>
-            <li><strong>Honrar os sensitivity points da Aula 05</strong> &mdash; cada decisão de provisionamento confere com o que a ATAM disse que pode quebrar.</li>
+            <li><strong>Lift-and-shift antes da redesenhar a arquitetura</strong> &mdash; o <code>compose</code> integral é executado dentro de uma única EC2 antes de ser decomposto em serviços individuais.</li>
+            <li><strong>Restrição ao uso do console</strong> &mdash; todas as operações são realizadas via AWS CLI, sendo os comandos gerados pelo Gemini CLI e submetidos à revisão humana antes da execução.</li>
+            <li><strong>Observância dos sensitivity points da Aula 05</strong> &mdash; cada decisão de provisionamento é avaliada à luz dos pontos de sensibilidade identificados na análise ATAM.</li>
           </ol>
         </div>
       </div>
@@ -407,8 +407,8 @@
       <div class="deck-shell a06-map-table">
         <div>
           <span class="deck-kicker">Arquitetura alvo &middot; Mapeamento</span>
-          <h2 class="deck-title">Hoje em Docker &mdash; amanhã em AWS</h2>
-          <p class="deck-summary">Tradução 1:1 do compose para serviços AWS dentro dos limites do Student Lab. EC2 + S3 + Lambda + IAM + SG + Secrets Manager &mdash; nada além.</p>
+          <h2 class="deck-title">Equivalência entre componentes Docker e serviços AWS</h2>
+          <p class="deck-summary">Realiza-se uma tradução direta dos componentes do <code>compose</code> para os serviços AWS correspondentes, respeitando-se os limites estabelecidos pelo Student Lab. O conjunto utilizado restringe-se a EC2, S3, Lambda, IAM, Security Groups e Secrets Manager.</p>
         </div>
         <table class="deck-table">
           <thead>
@@ -417,23 +417,23 @@
           <tbody>
             <tr>
               <td class="docker"><code>minio</code> &middot; bucket <code>olist</code></td>
-              <td class="aws"><strong>S3 bucket</strong> <code>olist-&lt;aluno&gt;-raw</code> &mdash; mesma API, sem endpoint custom.</td>
+              <td class="aws"><strong>S3 bucket</strong> <code>olist-&lt;aluno&gt;-raw</code>, com mesma API e sem necessidade de endpoint customizado.</td>
             </tr>
             <tr>
               <td class="docker"><code>clickhouse</code> &middot; container <code>olist_analytics</code></td>
-              <td class="aws"><strong>EC2 dedicada</strong> Amazon Linux 2023 t3.medium rodando ClickHouse Server (porta 8123 só na VPC).</td>
+              <td class="aws"><strong>EC2 dedicada</strong> Amazon Linux 2023 t3.medium executando o ClickHouse Server, com a porta 8123 restrita à VPC.</td>
             </tr>
             <tr>
               <td class="docker"><code>dashboard</code> &middot; Streamlit em 8501</td>
-              <td class="aws"><strong>EC2 dedicada</strong> servindo Streamlit em 8501, exposta via SG na internet.</td>
+              <td class="aws"><strong>EC2 dedicada</strong> servindo o Streamlit na porta 8501, exposta à internet por meio de Security Group.</td>
             </tr>
             <tr>
               <td class="docker"><code>ingestor</code> &middot; worker idle Python</td>
-              <td class="aws"><strong>Lambda event-driven</strong> acionada por <code>S3:PutObject</code>; <em>fallback</em>: cron <code>systemd</code> numa das EC2.</td>
+              <td class="aws"><strong>Lambda event-driven</strong> acionada por <code>S3:PutObject</code>. Como alternativa, há um <em>fallback</em> baseado em cron via <code>systemd</code> hospedado em uma das instâncias EC2.</td>
             </tr>
             <tr>
               <td class="docker"><code>.env</code> com credenciais MinIO/CH</td>
-              <td class="aws"><strong>IAM role</strong> <code>LabRole</code> para acesso S3 + <strong>AWS Secrets Manager</strong> para senha do ClickHouse.</td>
+              <td class="aws"><strong>IAM role</strong> <code>LabRole</code> para o acesso ao S3, complementada pelo <strong>AWS Secrets Manager</strong> para a custódia da senha do ClickHouse.</td>
             </tr>
           </tbody>
         </table>
@@ -447,8 +447,8 @@
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Arquitetura alvo &middot; Visão</span>
-          <h2 class="deck-title">A stack do Olist na AWS &mdash; pós-decomposição</h2>
-          <p class="deck-summary">CSVs entram no S3, Lambda ingestor dispara, ClickHouse na EC2 privada armazena, Streamlit na EC2 pública lê. VPC default, SGs encadeados, IAM no caminho.</p>
+          <h2 class="deck-title">A stack do Olist na AWS após a decomposição</h2>
+          <p class="deck-summary">Os arquivos CSV são depositados no S3, o que aciona a Lambda responsável pela ingestão. Os dados são então persistidos no ClickHouse, hospedado em uma EC2 privada, e consumidos pelo Streamlit em uma EC2 pública. A topologia utiliza a VPC default, com Security Groups encadeados e controle de acesso por IAM.</p>
         </div>
         <div class="a06-mermaid">
 <pre class="mermaid">
@@ -484,25 +484,25 @@ flowchart LR
         <div>
           <span class="deck-kicker">Ambiente &middot; AWS Academy</span>
           <h2 class="deck-title">AWS Student Lab &mdash; Learner Lab</h2>
-          <p class="deck-summary">Sandbox gratuito da AWS Academy. Sessão curta, credenciais rotativas, region única, role pré-pronta. Suficiente para a aula inteira &mdash; desde que respeite os limites.</p>
+          <p class="deck-summary">Trata-se do sandbox gratuito disponibilizado pela AWS Academy, caracterizado por sessões de curta duração, credenciais rotativas, uma única região disponível e uma role pré-configurada. O ambiente é suficiente para a realização integral da aula, desde que sejam observados os limites estabelecidos.</p>
         </div>
         <div class="deck-columns">
           <div class="deck-panel">
-            <strong>Como obter credenciais</strong>
+            <strong>Procedimento para obtenção das credenciais</strong>
             <ul>
-              <li>Login em <code>awsacademy.instructure.com</code>.</li>
-              <li>Botão <em>Start Lab</em> &rarr; sessão de ~4h.</li>
-              <li><em>AWS Details</em> &gt; <em>AWS CLI</em> entrega <code>AWS_ACCESS_KEY_ID</code>, <code>AWS_SECRET_ACCESS_KEY</code>, <code>AWS_SESSION_TOKEN</code>.</li>
-              <li>Em <em>SSH key</em>, baixar <code>labsuser.pem</code>; <code>chmod 400</code>.</li>
+              <li>Realizar o login em <code>awsacademy.instructure.com</code>.</li>
+              <li>Acionar o botão <em>Start Lab</em>, que inicia uma sessão com duração aproximada de quatro horas.</li>
+              <li>Em <em>AWS Details</em> &gt; <em>AWS CLI</em>, recuperar as variáveis <code>AWS_ACCESS_KEY_ID</code>, <code>AWS_SECRET_ACCESS_KEY</code> e <code>AWS_SESSION_TOKEN</code>.</li>
+              <li>Em <em>SSH key</em>, efetuar o download do arquivo <code>labsuser.pem</code> e aplicar <code>chmod 400</code>.</li>
             </ul>
           </div>
           <div class="deck-panel">
-            <strong>Limites fixos</strong>
+            <strong>Limites estabelecidos</strong>
             <ul>
-              <li>Region única: <code>us-east-1</code>.</li>
-              <li>Role pré-pronta: <code>LabRole</code> &mdash; nada de IAM custom.</li>
+              <li>Região única disponível: <code>us-east-1</code>.</li>
+              <li>Role pré-configurada: <code>LabRole</code>. Não é permitida a criação de IAM personalizada.</li>
               <li><em>Instance profile</em> fixo: <code>LabInstanceProfile</code>.</li>
-              <li>Credenciais expiram em ~4h &mdash; renovar voltando no <em>Start Lab</em>.</li>
+              <li>As credenciais expiram em aproximadamente quatro horas e devem ser renovadas por meio de novo acionamento do <em>Start Lab</em>.</li>
             </ul>
           </div>
         </div>
@@ -516,8 +516,8 @@ flowchart LR
       <div class="deck-shell a06-compact">
         <div>
           <span class="deck-kicker">Ferramenta &middot; Gemini CLI</span>
-          <h2 class="deck-title">Gemini CLI como copiloto</h2>
-          <p class="deck-summary">Agente de linha de comando do Google, com <em>free tier</em> generoso. Substitui Claude Code/AIOX para alunos sem assinatura paga. Loop: prompt &rarr; comando AWS CLI &rarr; revisão humana &rarr; execução &rarr; validação.</p>
+          <h2 class="deck-title">Gemini CLI como assistente de provisionamento</h2>
+          <p class="deck-summary">O Gemini CLI é o agente de linha de comando do Google, que dispõe de um <em>free tier</em> com cota generosa, configurando-se como alternativa ao Claude Code e ao AIOX para os alunos que não possuem assinatura paga. O fluxo de uso compreende as seguintes etapas: formulação do prompt, geração do comando AWS CLI pelo agente, revisão humana, execução e validação do resultado.</p>
         </div>
         <div class="a06-snippet">
           <span class="a06-snippet-label">instalar e autenticar</span>
@@ -531,7 +531,7 @@ gemini auth
 gemini "diga ola em uma linha"</pre>
         </div>
         <p style="margin-top:14px; font-size:.9em; color: var(--deck-muted);">
-          <strong>Loop esperado:</strong> aluno descreve a intenção &rarr; Gemini gera <code>aws ec2 run-instances ...</code> &rarr; aluno revisa palavra a palavra &rarr; executa &rarr; Gemini ajuda a validar com um <code>describe-*</code>. Nunca auto-executar comando destrutivo (<code>terminate</code>, <code>delete</code>, <code>force</code>) sem revisão.
+          <strong>Fluxo esperado:</strong> o aluno descreve a intenção em linguagem natural; o Gemini gera o comando <code>aws ec2 run-instances ...</code>; o aluno revisa o comando integralmente; executa o procedimento; e, em seguida, o Gemini auxilia na validação por meio de um comando <code>describe-*</code>. Recomenda-se que nenhum comando destrutivo (a exemplo de <code>terminate</code>, <code>delete</code> ou <code>force</code>) seja executado sem revisão prévia.
         </p>
       </div>
     </div>
@@ -543,35 +543,35 @@ gemini "diga ola em uma linha"</pre>
       <div class="deck-shell a06-compact">
         <div>
           <span class="deck-kicker">Ambiente &middot; Limites</span>
-          <h2 class="deck-title">Restrições do Learner Lab &mdash; o que respeitar</h2>
-          <p class="deck-summary">O Lab é generoso mas opinativo. Saber o que <em>não</em> tem evita travas no meio da prática.</p>
+          <h2 class="deck-title">Restrições do Learner Lab a serem observadas</h2>
+          <p class="deck-summary">O ambiente, embora amplo em recursos, apresenta limitações específicas. O conhecimento prévio dessas restrições evita interrupções durante a etapa prática.</p>
         </div>
         <div class="a06-grid-3">
           <article class="deck-card">
-            <h3>Region &amp; IAM</h3>
+            <h3>Região e IAM</h3>
             <ul>
-              <li>Só <code>us-east-1</code>.</li>
-              <li>Sem criação de roles custom.</li>
-              <li>Usar sempre <code>LabRole</code>.</li>
-              <li>EC2 sobe com <code>LabInstanceProfile</code>.</li>
+              <li>Apenas <code>us-east-1</code> está disponível.</li>
+              <li>Não é possível criar roles personalizadas.</li>
+              <li>Utiliza-se sempre a <code>LabRole</code>.</li>
+              <li>As EC2 são instanciadas com <code>LabInstanceProfile</code>.</li>
             </ul>
           </article>
           <article class="deck-card">
             <h3>Serviços</h3>
             <ul>
-              <li>EC2, S3, Lambda, Secrets Manager &mdash; OK.</li>
-              <li>VPC default já existe &mdash; não criar nova.</li>
-              <li>Sem Redshift, Glue, Athena hoje.</li>
-              <li>Lambda pode estar <em>limitada</em>: ter fallback cron.</li>
+              <li>EC2, S3, Lambda e Secrets Manager estão habilitados.</li>
+              <li>A VPC default já está provisionada; não se deve criar uma nova.</li>
+              <li>Redshift, Glue e Athena não são utilizados nesta aula.</li>
+              <li>A Lambda pode encontrar-se limitada; recomenda-se manter o <em>fallback</em> baseado em cron.</li>
             </ul>
           </article>
           <article class="deck-card">
             <h3>Operação</h3>
             <ul>
-              <li>Sessão ~4h &mdash; credenciais rotativas.</li>
-              <li>Desligar EC2 ao final ou queima crédito.</li>
-              <li>SSH via key pair gerado <em>no</em> Lab.</li>
-              <li>Sem domínios custom, sem ACM.</li>
+              <li>A sessão tem duração aproximada de quatro horas, com credenciais rotativas.</li>
+              <li>As instâncias EC2 devem ser desligadas ao final para evitar o consumo desnecessário de créditos.</li>
+              <li>O acesso SSH utiliza o key pair gerado no próprio Lab.</li>
+              <li>Não há suporte a domínios personalizados nem ao ACM.</li>
             </ul>
           </article>
         </div>
@@ -585,16 +585,16 @@ gemini "diga ola em uma linha"</pre>
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Etapa 1 &middot; Lift-and-shift</span>
-          <h2 class="deck-title">Mover primeiro. Melhorar depois.</h2>
-          <p class="deck-summary">O <code>compose</code> inteiro vai rodar dentro de uma única EC2. Tudo no <code>docker-compose</code>, mas agora numa instância da AWS. É feio? É. Funciona? Funciona. E nos dá uma <em>baseline</em> migrada antes de começar a decompor.</p>
+          <h2 class="deck-title">Priorização da continuidade na primeira etapa</h2>
+          <p class="deck-summary">O <code>compose</code> integral será executado dentro de uma única EC2, preservando-se a estrutura original, agora hospedada em uma instância AWS. Trata-se de uma configuração provisória, cuja função é estabelecer uma <em>baseline</em> migrada antes do início da decomposição arquitetural.</p>
         </div>
         <div class="deck-callout">
-          <strong>Por que lift-and-shift primeiro</strong>
+          <strong>Razões para a precedência do lift-and-shift</strong>
           <ol style="margin:12px 0 0; padding-left:22px;">
-            <li>Valida que credenciais, region e SG estão certos &mdash; sem entrar no labirinto de serviços distintos.</li>
-            <li>Mantém o sistema rodando "igualzinho" para depois decompor por partes.</li>
-            <li>Cria o ponto de comparação que será usado quando a Etapa 2 terminar.</li>
-            <li>Em produção real, este é o caminho que minimiza downtime de migração.</li>
+            <li>Permite validar credenciais, região e Security Groups sem a complexidade adicional de serviços distintos.</li>
+            <li>Mantém o sistema em operação com o mesmo comportamento, viabilizando uma decomposição incremental e controlada.</li>
+            <li>Estabelece o ponto de comparação a ser utilizado ao término da Etapa 2.</li>
+            <li>Em cenários reais de produção, este é o caminho que minimiza o tempo de indisponibilidade durante a migração.</li>
           </ol>
         </div>
       </div>
@@ -607,8 +607,8 @@ gemini "diga ola em uma linha"</pre>
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Etapa 1 &middot; Passo 1.1</span>
-          <h2 class="deck-title">Renovar credenciais do Student Lab</h2>
-          <p class="deck-summary">No Lab, clique em <em>AWS Details</em> &rarr; <em>AWS CLI</em> &rarr; <em>Show</em>. Copie os três valores e exporte para a sessão atual.</p>
+          <h2 class="deck-title">Renovação das credenciais do Student Lab</h2>
+          <p class="deck-summary">No painel do Lab, acessa-se a sequência <em>AWS Details</em> &rarr; <em>AWS CLI</em> &rarr; <em>Show</em>. Recomenda-se copiar os três valores apresentados e exportá-los para a sessão atual do terminal.</p>
         </div>
         <div class="a06-snippet">
           <span class="a06-snippet-label">terminal / Codespace</span>
@@ -620,7 +620,7 @@ export AWS_DEFAULT_REGION="us-east-1"
 aws sts get-caller-identity
 # Esperado: Account, Arn com user voclabs/...</pre>
         </div>
-        <p style="margin-top:14px; font-size:.92em; color: var(--deck-muted);">As credenciais expiram em ~4h. Se algo travar com <code>ExpiredToken</code>, voltar aqui e renovar.</p>
+        <p style="margin-top:14px; font-size:.92em; color: var(--deck-muted);">As credenciais possuem validade aproximada de quatro horas. Caso ocorra interrupção com erro <code>ExpiredToken</code>, retorna-se a esta etapa e procede-se à renovação.</p>
       </div>
     </div>
 
@@ -631,8 +631,8 @@ aws sts get-caller-identity
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Etapa 1 &middot; Passo 1.2</span>
-          <h2 class="deck-title">Provisionar EC2 via Gemini CLI</h2>
-          <p class="deck-summary">Descreva a intenção em linguagem natural. Gemini gera o comando AWS CLI. Aluno revisa. Aluno executa.</p>
+          <h2 class="deck-title">Provisionamento da EC2 mediante uso do Gemini CLI</h2>
+          <p class="deck-summary">O aluno formula a intenção em linguagem natural. O Gemini gera o comando AWS CLI correspondente. O aluno realiza a revisão e procede à execução.</p>
         </div>
         <div class="a06-snippet">
           <span class="a06-snippet-label">prompt para o Gemini CLI</span>
@@ -669,8 +669,8 @@ aws sts get-caller-identity
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Etapa 1 &middot; Passo 1.3 &middot; user-data</span>
-          <h2 class="deck-title">userdata-monolito.sh &mdash; o que a EC2 faz no boot</h2>
-          <p class="deck-summary">Bootstrap autônomo: instala Docker, habilita o serviço, adiciona o usuário <code>ec2-user</code> ao grupo e clona o repo. Quando o SSH liga, a stack já está pronta para <code>compose up</code>.</p>
+          <h2 class="deck-title">userdata-monolito.sh &mdash; operações executadas no boot da EC2</h2>
+          <p class="deck-summary">O script realiza o bootstrap de forma autônoma: instala o Docker, habilita o serviço, adiciona o usuário <code>ec2-user</code> ao grupo correspondente e efetua o clone do repositório. No momento em que o acesso SSH é disponibilizado, a stack encontra-se pronta para a execução de <code>compose up</code>.</p>
         </div>
         <div class="a06-snippet">
           <span class="a06-snippet-label">userdata-monolito.sh</span>
@@ -703,8 +703,8 @@ chown -R ec2-user:ec2-user /home/ec2-user/20261sre-primeironome-ultimonome</pre>
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Etapa 1 &middot; Passo 1.4</span>
-          <h2 class="deck-title">SSH na EC2, subir o compose</h2>
-          <p class="deck-summary">EC2 com IP público &rarr; SSH com a key <code>labsuser.pem</code> baixada do Lab &rarr; <code>docker compose up -d</code>. Em 1-2 minutos, os 4 containers estão saudáveis.</p>
+          <h2 class="deck-title">Acesso SSH à EC2 e inicialização do compose</h2>
+          <p class="deck-summary">A partir da EC2 com IP público, estabelece-se a conexão SSH utilizando a chave <code>labsuser.pem</code> obtida no Lab, e procede-se à execução de <code>docker compose up -d</code>. Em aproximadamente um a dois minutos, os quatro contêineres encontram-se em estado saudável.</p>
         </div>
         <div class="a06-snippet">
           <span class="a06-snippet-label">terminal local</span>
@@ -732,32 +732,32 @@ docker compose ps   # 4 containers healthy</pre>
       <div class="deck-shell a06-compact">
         <div>
           <span class="deck-kicker">Etapa 1 &middot; Passo 1.5</span>
-          <h2 class="deck-title">Popular MinIO interno, rodar ingestor, validar dashboard</h2>
-          <p class="deck-summary">Fluxo idêntico à Aula 04 &mdash; só que agora rodando dentro da EC2.</p>
+          <h2 class="deck-title">População do MinIO interno, execução do ingestor e validação do dashboard</h2>
+          <p class="deck-summary">O fluxo operacional é idêntico ao apresentado na Aula 04, com a particularidade de que a execução ocorre, agora, dentro de uma instância EC2.</p>
         </div>
         <div class="a06-grid-3">
           <article class="deck-card">
-            <h3>Upload CSVs</h3>
+            <h3>Upload dos CSVs</h3>
             <ul>
-              <li>Acessar console MinIO em <code>http://&lt;ec2-public-ip&gt;:9003</code>.</li>
-              <li>Criar bucket <code>olist</code>.</li>
-              <li>Subir os CSVs da pasta <code>data/</code>.</li>
+              <li>Acessar o console MinIO em <code>http://&lt;ec2-public-ip&gt;:9003</code>.</li>
+              <li>Criar o bucket <code>olist</code>.</li>
+              <li>Realizar o upload dos arquivos CSV armazenados na pasta <code>data/</code>.</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>Rodar ingestor</h3>
+            <h3>Execução do ingestor</h3>
             <ul>
               <li><code>docker exec olist_ingestor python /app/ingest_minio.py</code></li>
-              <li>Aplicar schema e view.</li>
-              <li>Validar <code>SELECT count() FROM olist_raw.ingestion</code>.</li>
+              <li>Aplicar o schema e a view correspondentes.</li>
+              <li>Validar com <code>SELECT count() FROM olist_raw.ingestion</code>.</li>
             </ul>
           </article>
           <article class="deck-card">
             <h3>Dashboard</h3>
             <ul>
               <li>Acessar <code>http://&lt;ec2-public-ip&gt;:8501</code>.</li>
-              <li>Top-N produtos renderiza.</li>
-              <li><strong>Continua para o próximo slide.</strong></li>
+              <li>Confirmar a renderização do ranking top-N de produtos.</li>
+              <li><strong>Procede-se ao próximo slide.</strong></li>
             </ul>
           </article>
         </div>
@@ -771,18 +771,18 @@ docker compose ps   # 4 containers healthy</pre>
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Etapa 1 &middot; Critério de pronto</span>
-          <h2 class="deck-title">Dashboard servindo do IP público da EC2</h2>
-          <p class="deck-summary">Antes de avançar para a decomposição, valide que o monolito está vivo na nuvem.</p>
+          <h2 class="deck-title">Dashboard servindo a partir do IP público da EC2</h2>
+          <p class="deck-summary">Antes do avanço para a etapa de decomposição, verifica-se que o monolito encontra-se operacional no ambiente em nuvem.</p>
         </div>
         <div class="deck-callout">
-          <strong>Checklist da Etapa 1</strong>
+          <strong>Lista de verificação da Etapa 1</strong>
           <ol style="margin:12px 0 0; padding-left:22px;">
-            <li>EC2 com tag <code>olist-monolito</code> em estado <code>running</code>.</li>
-            <li>SSH funcional com <code>labsuser.pem</code>.</li>
-            <li><code>docker compose ps</code> mostra 4 containers <em>healthy</em>.</li>
-            <li><code>SELECT count() FROM olist_raw.ingestion</code> retorna &gt; 0.</li>
-            <li><strong><code>http://&lt;ec2-public-ip&gt;:8501</code> mostra o ranking de top produtos.</strong></li>
-            <li>Screenshot do dashboard salvo no fork do repo.</li>
+            <li>EC2 identificada pela tag <code>olist-monolito</code> e em estado <code>running</code>.</li>
+            <li>Acesso SSH operacional com <code>labsuser.pem</code>.</li>
+            <li>O comando <code>docker compose ps</code> apresenta quatro contêineres em estado <em>healthy</em>.</li>
+            <li>A consulta <code>SELECT count() FROM olist_raw.ingestion</code> retorna valor superior a zero.</li>
+            <li><strong>O endereço <code>http://&lt;ec2-public-ip&gt;:8501</code> exibe o ranking de produtos mais vendidos.</strong></li>
+            <li>O screenshot do dashboard encontra-se salvo no fork do repositório.</li>
           </ol>
         </div>
       </div>
@@ -795,19 +795,19 @@ docker compose ps   # 4 containers healthy</pre>
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Etapa 2 &middot; Decomposição</span>
-          <h2 class="deck-title">Quebrar o monolito &mdash; cada serviço no seu lugar canônico AWS</h2>
-          <p class="deck-summary">Agora separamos cada serviço em recurso AWS dedicado. Mesmas interfaces (S3 API, HTTP/SQL), provedores diferentes. Cada passo é independente e pode ser feito de forma incremental.</p>
+          <h2 class="deck-title">Decomposição do monolito em serviços AWS apropriados a cada responsabilidade</h2>
+          <p class="deck-summary">Nesta etapa, cada serviço da stack é alocado em um recurso AWS dedicado. As interfaces são preservadas (S3 API, HTTP e SQL); apenas os provedores subjacentes mudam. Cada passo é independente e pode ser conduzido de forma incremental.</p>
         </div>
         <div class="deck-callout">
-          <strong>Oito passos da decomposição</strong>
+          <strong>Os oito passos da decomposição</strong>
           <ol style="margin:12px 0 0; padding-left:22px;">
-            <li>S3 substitui MinIO.</li>
-            <li>EC2 dedicada para ClickHouse.</li>
-            <li>User-data do ClickHouse com Secrets Manager.</li>
-            <li>EC2 dedicada para Streamlit (systemd).</li>
-            <li>Ingestor vira Lambda event-driven.</li>
-            <li>Lambda handler Python.</li>
-            <li>IAM + Security Groups encadeados.</li>
+            <li>Substituição do MinIO pelo S3.</li>
+            <li>Provisionamento de EC2 dedicada para o ClickHouse.</li>
+            <li>Configuração do user-data do ClickHouse com integração ao Secrets Manager.</li>
+            <li>Provisionamento de EC2 dedicada para o Streamlit, executado via systemd.</li>
+            <li>Conversão do ingestor em função Lambda event-driven.</li>
+            <li>Implementação do handler Python da Lambda.</li>
+            <li>Configuração de IAM e dos Security Groups encadeados.</li>
             <li>Validação end-to-end.</li>
           </ol>
         </div>
@@ -821,8 +821,8 @@ docker compose ps   # 4 containers healthy</pre>
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Etapa 2 &middot; Passo 2.1</span>
-          <h2 class="deck-title">S3 substitui MinIO</h2>
-          <p class="deck-summary">Mesma API S3 &mdash; só muda quem responde. Sem <code>endpoint_url</code> custom no boto3, credenciais via IAM role da EC2 / Lambda.</p>
+          <h2 class="deck-title">Substituição do MinIO pelo S3</h2>
+          <p class="deck-summary">A API S3 é preservada, alterando-se apenas o provedor que responde às requisições. Não há necessidade de um <code>endpoint_url</code> customizado no boto3; as credenciais são herdadas da IAM role atribuída à EC2 ou à Lambda.</p>
         </div>
         <div class="a06-snippet">
           <span class="a06-snippet-label">criar bucket e subir os CSVs</span>
@@ -834,7 +834,7 @@ aws s3 cp data/ "s3://${BUCKET}/olist/" --recursive \
 
 aws s3 ls "s3://${BUCKET}/olist/"</pre>
         </div>
-        <p style="margin-top:14px; font-size:.92em; color: var(--deck-muted);">No código do ingestor: remover <code>endpoint_url</code>, remover <code>AWS_ACCESS_KEY_ID</code>/<code>SECRET</code>, deixar boto3 herdar do <em>instance profile</em>.</p>
+        <p style="margin-top:14px; font-size:.92em; color: var(--deck-muted);">No código do ingestor, recomenda-se a remoção do parâmetro <code>endpoint_url</code> e das variáveis <code>AWS_ACCESS_KEY_ID</code> e <code>SECRET</code>, deixando-se que o boto3 herde as credenciais do <em>instance profile</em>.</p>
       </div>
     </div>
 
@@ -845,8 +845,8 @@ aws s3 ls "s3://${BUCKET}/olist/"</pre>
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Etapa 2 &middot; Passo 2.2</span>
-          <h2 class="deck-title">EC2 dedicada para ClickHouse</h2>
-          <p class="deck-summary">Nova EC2 t3.medium. SG <code>sg-clickhouse</code> aceita 8123 só da SG do Streamlit e da Lambda. Senha do CH em Secrets Manager (criar antes da EC2 subir).</p>
+          <h2 class="deck-title">Provisionamento de EC2 dedicada ao ClickHouse</h2>
+          <p class="deck-summary">Provisiona-se uma nova instância EC2 t3.medium. O Security Group <code>sg-clickhouse</code> autoriza tráfego na porta 8123 unicamente a partir dos Security Groups associados ao Streamlit e à Lambda. A senha do ClickHouse é armazenada no Secrets Manager e deve ser criada previamente à subida da EC2.</p>
         </div>
         <div class="a06-snippet">
           <span class="a06-snippet-label">criar SG e secret antes da instância</span>
@@ -875,7 +875,7 @@ aws secretsmanager create-secret \
         <div>
           <span class="deck-kicker">Etapa 2 &middot; Passo 2.3 &middot; user-data</span>
           <h2 class="deck-title">userdata-clickhouse.sh &mdash; bootstrap autônomo</h2>
-          <p class="deck-summary">No boot, a EC2 pega a senha do Secrets Manager (via <code>LabRole</code>), instala o ClickHouse, cria o usuário <code>dashboard</code> e sobe o serviço.</p>
+          <p class="deck-summary">Durante o boot, a EC2 obtém a senha junto ao Secrets Manager por meio da <code>LabRole</code>, instala o ClickHouse, cria o usuário <code>dashboard</code> e inicializa o serviço.</p>
         </div>
         <div class="a06-snippet">
           <span class="a06-snippet-label">userdata-clickhouse.sh</span>
@@ -915,8 +915,8 @@ clickhouse-client -q "CREATE DATABASE IF NOT EXISTS olist_raw"</pre>
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Etapa 2 &middot; Passo 2.4</span>
-          <h2 class="deck-title">EC2 dedicada para Streamlit (systemd)</h2>
-          <p class="deck-summary">EC2 t3.small. SG <code>sg-streamlit</code> aceita 8501 da internet, 22 do IP do aluno. Conecta no CH usando IP privado e senha vinda do Secrets Manager. Roda como service <code>systemd</code>.</p>
+          <h2 class="deck-title">Provisionamento de EC2 dedicada ao Streamlit, executado via systemd</h2>
+          <p class="deck-summary">Provisiona-se uma instância EC2 t3.small. O Security Group <code>sg-streamlit</code> autoriza tráfego na porta 8501 a partir da internet e na porta 22 unicamente a partir do IP do aluno. A conexão com o ClickHouse utiliza o IP privado, e a senha é recuperada no Secrets Manager. O serviço é executado por meio de unidade <code>systemd</code>.</p>
         </div>
         <div class="a06-snippet">
           <span class="a06-snippet-label">userdata-streamlit.sh</span>
@@ -962,8 +962,8 @@ systemctl enable --now streamlit</pre>
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Etapa 2 &middot; Passo 2.5</span>
-          <h2 class="deck-title">Ingestor vira Lambda event-driven</h2>
-          <p class="deck-summary">PUT no S3 dispara a Lambda; ela lê o CSV, transforma em NDJSON e insere no ClickHouse via HTTP. Se o Lab limitar Lambda, <em>fallback</em>: cron <code>systemd</code> dentro de uma das EC2 chamando o mesmo script.</p>
+          <h2 class="deck-title">Conversão do ingestor em função Lambda event-driven</h2>
+          <p class="deck-summary">Uma operação PUT no S3 aciona a Lambda, que efetua a leitura do CSV, sua conversão para NDJSON e a inserção no ClickHouse via HTTP. Caso o Lab apresente limitação ao serviço Lambda, o <em>fallback</em> consiste em um cron <code>systemd</code>, hospedado em uma das instâncias EC2, que invoca o mesmo script.</p>
         </div>
         <div class="a06-snippet">
           <span class="a06-snippet-label">criar a Lambda + trigger S3</span>
@@ -1010,7 +1010,7 @@ aws s3api put-bucket-notification-configuration --bucket "$BUCKET" \
         <div>
           <span class="deck-kicker">Etapa 2 &middot; Passo 2.6</span>
           <h2 class="deck-title">Lambda handler &mdash; <code>lambda_handler.py</code></h2>
-          <p class="deck-summary">Adaptação direta do <code>ingest_minio.py</code> da Aula 04: recebe <em>event</em> S3, lê o objeto, batches de 50k para o ClickHouse via <code>clickhouse_connect</code>.</p>
+          <p class="deck-summary">Trata-se de uma adaptação direta do <code>ingest_minio.py</code> apresentado na Aula 04: o handler recebe um <em>event</em> S3, realiza a leitura do objeto e procede à inserção no ClickHouse em lotes de cinquenta mil registros, por meio do <code>clickhouse_connect</code>.</p>
         </div>
         <div class="a06-snippet">
           <span class="a06-snippet-label">lambda/lambda_handler.py</span>
@@ -1050,7 +1050,7 @@ def handler(event, context):
         <div>
           <span class="deck-kicker">Etapa 2 &middot; Passo 2.7</span>
           <h2 class="deck-title">IAM e Security Groups encadeados</h2>
-          <p class="deck-summary">No Lab a role é <code>LabRole</code>. Os SGs viram a rede de cola entre as 3 pontas. Princípio: cada SG só aceita tráfego de quem precisa, na porta que precisa.</p>
+          <p class="deck-summary">No Lab, a role utilizada é a <code>LabRole</code>. Os Security Groups operam como elementos de conexão entre os três componentes principais. O princípio orientador é o de que cada SG admite apenas o tráfego estritamente necessário, na porta correspondente, proveniente da origem autorizada.</p>
         </div>
         <div class="a06-grid-3">
           <article class="deck-card">
@@ -1068,16 +1068,16 @@ def handler(event, context):
               <li>Inbound 8501 &larr; <code>0.0.0.0/0</code>.</li>
               <li>Inbound 22 &larr; IP do aluno.</li>
               <li>Outbound livre.</li>
-              <li>Permissão de chegar no <code>sg-clickhouse</code>.</li>
+              <li>Permissão de acesso ao <code>sg-clickhouse</code>.</li>
             </ul>
           </article>
           <article class="deck-card">
             <h3>IAM</h3>
             <ul>
-              <li>Tudo via <code>LabRole</code>.</li>
-              <li>EC2 sobe com <code>LabInstanceProfile</code>.</li>
-              <li>Lambda usa <code>LabRole</code> também.</li>
-              <li>Secrets Manager: <code>secretsmanager:GetSecretValue</code> já vem na role.</li>
+              <li>Todas as operações são realizadas via <code>LabRole</code>.</li>
+              <li>As EC2 são instanciadas com <code>LabInstanceProfile</code>.</li>
+              <li>A Lambda também utiliza a <code>LabRole</code>.</li>
+              <li>Secrets Manager: a permissão <code>secretsmanager:GetSecretValue</code> já se encontra atribuída à role.</li>
             </ul>
           </article>
         </div>
@@ -1092,7 +1092,7 @@ def handler(event, context):
         <div>
           <span class="deck-kicker">Etapa 2 &middot; Passo 2.8</span>
           <h2 class="deck-title">Validação end-to-end</h2>
-          <p class="deck-summary">Suba um CSV. Lambda dispara. ClickHouse cresce. Dashboard atualiza. Sem console clicado, sem rota manual &mdash; pipeline reativo do começo ao fim.</p>
+          <p class="deck-summary">Procede-se ao upload de um arquivo CSV; a Lambda é automaticamente acionada; o volume de dados do ClickHouse é incrementado; e o dashboard reflete a atualização. Todo o pipeline é reativo de ponta a ponta, sem intervenção manual no console.</p>
         </div>
         <div class="a06-snippet">
           <span class="a06-snippet-label">teste de fluxo reativo</span>
@@ -1120,23 +1120,23 @@ echo "http://${ST_EC2_IP}:8501"</pre>
       <div class="deck-shell a06-compact">
         <div>
           <span class="deck-kicker">Encerramento &middot; Pronto</span>
-          <h2 class="deck-title">Critério de pronto da Aula 06</h2>
-          <p class="deck-summary">O que cada aluno precisa entregar no fim da aula. Tudo via fork do repo da Aula 04.</p>
+          <h2 class="deck-title">Critério de conclusão da Aula 06</h2>
+          <p class="deck-summary">A presente seção enumera as entregas esperadas de cada aluno ao final da aula. A submissão é realizada por meio do fork do repositório da Aula 04.</p>
         </div>
         <div class="deck-columns">
           <div class="deck-panel">
             <strong>Saídas técnicas</strong>
             <ul>
-              <li>EC2 monolito rodando &mdash; screenshot do dashboard no IP público (Etapa 1).</li>
-              <li>Decomposição feita &mdash; S3, EC2 ClickHouse, EC2 Streamlit, Lambda (ou cron fallback).</li>
-              <li>Dashboard servindo do S3 + EC2 com dados frescos (Etapa 2).</li>
-              <li>Infra versionada em <code>infra/userdata-*.sh</code> + <code>lambda/lambda_handler.py</code>.</li>
+              <li>EC2 monolito em execução, acompanhada do screenshot do dashboard servindo a partir do IP público (Etapa 1).</li>
+              <li>Decomposição realizada, contemplando S3, EC2 do ClickHouse, EC2 do Streamlit e Lambda (ou cron como <em>fallback</em>).</li>
+              <li>Dashboard servindo dados atualizados a partir do conjunto S3 e EC2 (Etapa 2).</li>
+              <li>Infraestrutura versionada em <code>infra/userdata-*.sh</code> e <code>lambda/lambda_handler.py</code>.</li>
             </ul>
           </div>
           <div class="deck-panel">
-            <strong>Limpeza obrigatória</strong>
+            <strong>Procedimentos de limpeza obrigatórios</strong>
             <ul>
-              <li>Boa prática: derrubar tudo ao final da aula.</li>
+              <li>Recomenda-se, como boa prática, a remoção de todos os recursos ao final da aula.</li>
               <li><code>aws ec2 terminate-instances --instance-ids ...</code></li>
               <li><code>aws lambda delete-function</code> e <code>aws s3 rb --force</code>.</li>
               <li><code>aws secretsmanager delete-secret --force-delete-without-recovery</code>.</li>
@@ -1153,25 +1153,25 @@ echo "http://${ST_EC2_IP}:8501"</pre>
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Roadmap &middot; Próximas aulas</span>
-          <h2 class="deck-title">O que vem depois da migração</h2>
-          <p class="deck-summary">A Aula 06 entrega o sistema migrado. A Aula 07 estressa o sistema distribuído usando como roteiro os sensitivity points da ATAM da Aula 05. A Aula 08 consolida tudo no projeto final.</p>
+          <h2 class="deck-title">Desdobramentos posteriores à migração</h2>
+          <p class="deck-summary">A Aula 06 finaliza a migração do sistema. Na Aula 07, o sistema distribuído é submetido a ensaios de stress orientados pelos <em>sensitivity points</em> da ATAM elaborada na Aula 05. A Aula 08, por sua vez, consolida o conjunto no projeto final integrado.</p>
         </div>
         <div class="deck-columns">
           <div class="deck-panel">
             <strong>Aula 07 &middot; 28/05/2026</strong>
             <ul>
-              <li>Bass <em>distribuído</em> aplicado na stack AWS.</li>
-              <li>Estressar os <em>sensitivity points</em> do ATAM da Aula 05 &mdash; agora em nuvem.</li>
-              <li>Caos: derrubar EC2, throttling de Lambda, S3 503, SG aberto demais.</li>
-              <li>Mitigações: <em>redundancy</em>, <em>idempotency</em>, <em>retry</em>, <em>circuit breaker</em>, <em>least privilege</em>.</li>
+              <li>Aplicação das táticas de Bass para sistemas distribuídos na stack AWS.</li>
+              <li>Realização de ensaios sobre os <em>sensitivity points</em> da ATAM da Aula 05, agora em ambiente em nuvem.</li>
+              <li>Cenários de caos: indisponibilidade de EC2, throttling de Lambda, respostas HTTP 503 do S3 e excesso de exposição em Security Group.</li>
+              <li>Mitigações: <em>redundancy</em>, <em>idempotency</em>, <em>retry</em>, <em>circuit breaker</em> e <em>least privilege</em>.</li>
             </ul>
           </div>
           <div class="deck-panel">
             <strong>Aula 08 &middot; 11/06/2026</strong>
             <ul>
               <li>Projeto final integrado.</li>
-              <li>Repositório com tudo: stack local + ATAM (Aula 05) + infra AWS (Aula 06) + testes de stress (Aula 07).</li>
-              <li>Entrega via GitHub.</li>
+              <li>Repositório contendo: stack local, ATAM (Aula 05), infraestrutura AWS (Aula 06) e testes de stress (Aula 07).</li>
+              <li>Entrega realizada via GitHub.</li>
             </ul>
           </div>
         </div>
@@ -1186,7 +1186,7 @@ echo "http://${ST_EC2_IP}:8501"</pre>
         <div>
           <span class="deck-kicker">Encerramento &middot; Código da prática</span>
           <h2 class="deck-title">Repositório da aula</h2>
-          <p class="deck-summary">Mesmo repo da Aula 04/05 &mdash; agora com os novos arquivos da migração: <code>infra/userdata-*.sh</code>, <code>infra/sg.json</code>, <code>lambda/lambda_handler.py</code>.</p>
+          <p class="deck-summary">Utiliza-se o mesmo repositório das Aulas 04 e 05, acrescido dos novos artefatos referentes à migração: <code>infra/userdata-*.sh</code>, <code>infra/sg.json</code> e <code>lambda/lambda_handler.py</code>.</p>
         </div>
         <div class="a06-repo-cta-wrap">
           <a class="a06-repo-cta"
@@ -1210,7 +1210,7 @@ echo "http://${ST_EC2_IP}:8501"</pre>
           </a>
         </div>
         <p style="margin-top:18px; font-size:.92em; color: var(--deck-muted); text-align:center;">
-          Antes de versionar suas mudanças, faça <strong>fork</strong> e renomeie para <code>20261sre-&lt;primeironome&gt;-&lt;ultimonome&gt;</code>.
+          Antes de versionar as alterações, recomenda-se realizar o <strong>fork</strong> do repositório e renomeá-lo para o padrão <code>20261sre-&lt;primeironome&gt;-&lt;ultimonome&gt;</code>.
         </p>
       </div>
     </div>

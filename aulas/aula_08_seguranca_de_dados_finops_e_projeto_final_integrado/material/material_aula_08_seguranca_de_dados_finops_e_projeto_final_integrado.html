@@ -152,263 +152,279 @@
       <p class="meta">Aula 08 &nbsp;&bull;&nbsp; 11/06/2026</p>
       <h1>Projeto final — desafio entregue no GitHub</h1>
       <p class="summary">
-        Este material acompanha a Aula 08 da disciplina <strong>Cloud Computing e SRE &mdash; Visão Prática com AWS</strong>
-        do MBA em Engenharia de Dados. Hoje não há conteúdo teórico novo: a aula é 100% dedicada à entrega do projeto
-        final. O <em>output</em> da disciplina deixa de ser anotação de aula e vira <strong>repositório público no
-        GitHub</strong>, com arquitetura documentada, infra reprodutível, testes verdes e evidências de execução.
-        O desafio específico será publicado em arquivo separado a partir de <strong>04/06/2026</strong>.
+        Este material acompanha a Aula 08 da disciplina <strong>Cloud Computing e SRE &mdash; Visão Prática com AWS</strong>,
+        ofertada no âmbito do MBA em Engenharia de Dados. A presente sessão não contempla a introdução de conteúdo
+        teórico novo: a aula é integralmente dedicada à entrega do projeto final. O artefato de saída da disciplina
+        consolida-se em um <strong>repositório público no GitHub</strong>, contendo arquitetura documentada,
+        infraestrutura reprodutível, testes automatizados aprovados e evidências de execução. O desafio específico
+        será publicado em arquivo separado a partir de <strong>04/06/2026</strong>.
       </p>
       <p>
-        <span class="m08-tag">Pré-requisitos</span> Repositório individual com a stack das Aulas 04 a 07 funcionando:
-        <code>docker-compose</code> da Aula 04, Bass local da Aula 05, migração AWS com ATAM da Aula 06 e Bass distribuído
-        com estresse sob carga da Aula 07. Branch <code>main</code> protegida, CI verde.
+        <span class="m08-tag">Pré-requisitos</span> Repositório individual com a stack das Aulas 04 a 07 em pleno
+        funcionamento: <code>docker-compose</code> da Aula 04, Bass local da Aula 05, migração para AWS com ATAM
+        da Aula 06 e Bass distribuído com estresse sob carga da Aula 07. Branch <code>main</code> protegida e
+        esteira de CI aprovada.
       </p>
       <p>
         <span class="m08-tag">Sumário</span>
-        Tese &middot; recap do arco Aulas 04→07 &middot; convenção de repositório &middot; critérios de avaliação &middot;
-        como organizar o README de um projeto SRE/Cloud &middot; orientação para a apresentação &middot;
-        <em>placeholders</em> do desafio específico e da dinâmica da aula.
+        Tese &middot; revisão do arco compreendido entre as Aulas 04 e 07 &middot; convenção de repositório &middot;
+        critérios de avaliação &middot; orientações para a organização do README de um projeto SRE/Cloud &middot;
+        orientações para a apresentação &middot; <em>placeholders</em> do desafio específico e da dinâmica da aula.
       </p>
     </section>
 
     <section class="content-block">
       <h2>1. Tese da aula</h2>
       <p>
-        Ao longo de cinco aulas (Aulas 04 a 07) construímos, em conjunto, uma plataforma de dados que sai do laptop e
-        vai para a nuvem. Hoje cada aluno mostra, por conta própria, que sabe replicar e estender esse caminho. O semestre,
-        que começou como sequência de exercícios assistidos, agora se materializa como <strong>repositório versionado</strong>.
-        O critério é simples e severo: <em>se um colega abre seu repositório e não consegue subir a stack em 15 minutos
-        a partir do README, a entrega não está pronta</em>.
+        Ao longo das Aulas 04 a 07 foi construída, de forma colaborativa, uma plataforma de dados que parte do
+        ambiente local e progride em direção à nuvem. Nesta sessão, cada aluno demonstra, de forma autônoma, sua
+        capacidade de replicar e estender esse percurso. O semestre, iniciado como uma sequência de exercícios
+        assistidos, materializa-se em um <strong>repositório versionado</strong>. O critério adotado é objetivo
+        e exigente: <em>caso um colega não consiga colocar a stack em execução, a partir do README, em até quinze
+        minutos, a entrega não está concluída</em>.
       </p>
       <div class="m08-callout">
         <strong>Tese</strong>
         <p style="margin: 0;">
-          O semestre virou repositório. Hoje é dia de provar que a stack vive sem o professor por perto — com
-          arquitetura clara, infra reprodutível, testes verdes e evidências reais commitadas.
+          Esta sessão verifica a autonomia dos alunos na operação e evolução da arquitetura proposta, demandando
+          arquitetura claramente documentada, infraestrutura reprodutível, testes automatizados aprovados e
+          evidências reais devidamente versionadas.
         </p>
       </div>
       <p>
-        A aula é deliberadamente sem conteúdo teórico novo. Não há slide com conceito a memorizar, nem laboratório
-        guiado a copiar. Há um desafio individual, três horas de trabalho assistido em sala e um repositório no GitHub
-        com a sua entrega. Esse é o exame prático da disciplina.
+        A aula é, por concepção, isenta de conteúdo teórico novo. Não são previstos <em>slides</em> com conceitos
+        a memorizar nem laboratórios guiados a reproduzir. Propõem-se um desafio individual, três horas de trabalho
+        assistido em sala e um repositório no GitHub contendo a entrega correspondente. Este é o exame prático da
+        disciplina.
       </p>
     </section>
 
     <section class="content-block">
-      <h2>2. Recap — Aulas 04 a 07</h2>
+      <h2>2. Revisão — Aulas 04 a 07</h2>
       <p>
-        Antes de mergulhar na entrega, vale revisitar o arco que cada aluno percorreu. O projeto final não é um
-        artefato isolado: ele é a colheita do que foi plantado nas quatro aulas anteriores. Se algum dos blocos abaixo
-        não está sólido no seu repositório, esta é a hora de fechar a lacuna antes da apresentação.
+        Antes de avançar para a entrega, convém revisitar o arco percorrido por cada aluno. O projeto final não
+        constitui um artefato isolado; representa, antes, a consolidação dos resultados acumulados nas quatro aulas
+        anteriores. Caso algum dos blocos descritos a seguir não esteja consolidado no repositório individual,
+        este é o momento de saná-lo previamente à apresentação.
       </p>
       <div class="m08-grid-2">
         <div class="m08-card">
           <h4>Aula 04 &middot; 07/05/2026</h4>
           <p><strong>Stack Docker local Olist.</strong></p>
           <ul>
-            <li>Ingestão e processamento near real-time em containers locais.</li>
+            <li>Ingestão e processamento <em>near real-time</em> em contêineres locais.</li>
             <li><code>docker-compose.yml</code> como ponto único de partida.</li>
-            <li>Pipeline ponta-a-ponta antes de qualquer serviço gerenciado.</li>
+            <li>Pipeline ponta a ponta executado previamente à adoção de qualquer serviço gerenciado.</li>
           </ul>
         </div>
         <div class="m08-card">
           <h4>Aula 05 &middot; 14/05/2026</h4>
           <p><strong>Bass local em Docker.</strong></p>
           <ul>
-            <li>Avaliação de arquitetura no ambiente local antes da nuvem.</li>
+            <li>Avaliação de arquitetura em ambiente local previamente à migração para a nuvem.</li>
             <li>Identificação de cenários, respostas táticas e <em>trade-offs</em>.</li>
-            <li>Documento de Bass commitado em <code>documents/</code>.</li>
+            <li>Documento Bass devidamente versionado em <code>documents/</code>.</li>
           </ul>
         </div>
         <div class="m08-card">
           <h4>Aula 06 &middot; 21/05/2026</h4>
           <p><strong>Migração para AWS com ATAM.</strong></p>
           <ul>
-            <li>Stack local migra para AWS — IaC versionado.</li>
-            <li>Análise ATAM expõe pontos de sensibilidade e risco.</li>
-            <li>Decisões de arquitetura documentadas e justificadas.</li>
+            <li>Migração da stack local para a AWS, com IaC versionado.</li>
+            <li>Análise ATAM evidencia pontos de sensibilidade e risco.</li>
+            <li>Decisões de arquitetura documentadas e devidamente justificadas.</li>
           </ul>
         </div>
         <div class="m08-card">
           <h4>Aula 07 &middot; 28/05/2026</h4>
-          <p><strong>Bass distribuído + estresse do ATAM.</strong></p>
+          <p><strong>Bass distribuído e estresse do ATAM.</strong></p>
           <ul>
-            <li>Bass aplicado à versão distribuída na AWS.</li>
-            <li>Validação sob carga: a plataforma posta à prova.</li>
-            <li>Evidências de resiliência commitadas no repositório.</li>
+            <li>Aplicação do Bass à versão distribuída na AWS.</li>
+            <li>Validação sob carga, submetendo a plataforma a estresse real.</li>
+            <li>Evidências de resiliência versionadas no repositório.</li>
           </ul>
         </div>
       </div>
       <p>
-        Os quatro blocos juntos formam o material bruto da entrega. O projeto final pede que você os apresente como
-        uma <strong>narrativa única</strong> dentro do mesmo repositório &mdash; não como pastas desconexas.
+        Os quatro blocos compõem, em conjunto, o material constitutivo da entrega. O projeto final requer que sejam
+        apresentados como uma <strong>narrativa única</strong>, integrada ao mesmo repositório, e não como diretórios
+        desconexos.
       </p>
     </section>
 
     <section class="content-block" id="convencao-do-repo">
       <h2>3. Convenção do repositório</h2>
       <p>
-        Todos os projetos seguem o mesmo padrão de naming usado desde a Aula 04. O nome do repositório é parte da entrega:
-        não use nome criativo, não inverta a ordem, não use acento ou caractere especial. O <em>matching</em> do
-        nome com o padrão simplifica avaliação, busca e comparação entre projetos.
+        Todos os projetos seguem o mesmo padrão de nomenclatura adotado desde a Aula 04. O nome do repositório
+        constitui parte integrante da entrega: não se admitem nomes alternativos, inversões de ordem nem o uso de
+        acentos ou caracteres especiais. A adequação do nome ao padrão estabelecido facilita a avaliação, a busca
+        e a comparação entre projetos.
       </p>
       <div class="m08-naming-pill">
         <strong>20261sre-&lt;primeironome&gt;-&lt;ultimonome&gt;</strong>
       </div>
-      <h3>3.1 Como criar o repositório</h3>
+      <h3>3.1 Procedimento de criação do repositório</h3>
       <ol>
-        <li>Acesse o repositório base: <a href="https://github.com/afonsolelis/20261sre-primeironome-ultimonome" target="_blank" rel="noopener">https://github.com/afonsolelis/20261sre-primeironome-ultimonome</a>.</li>
-        <li>Clique em <em>Fork</em> para criar uma cópia na sua conta pessoal do GitHub.</li>
-        <li>Renomeie o fork em <em>Settings → Repository name</em> seguindo o padrão acima, em minúsculas e sem acento. Exemplo: <code>20261sre-maria-souza</code>.</li>
-        <li>Garanta que o repositório está <strong>público</strong> &mdash; repositórios privados não são aceitos para avaliação.</li>
-        <li>Confirme que a branch padrão é <code>main</code> e que <em>branch protection</em> está ativa (mesmo padrão da Aula 05).</li>
+        <li>Acessar o repositório base: <a href="https://github.com/afonsolelis/20261sre-primeironome-ultimonome" target="_blank" rel="noopener">https://github.com/afonsolelis/20261sre-primeironome-ultimonome</a>.</li>
+        <li>Clicar em <em>Fork</em> para criar uma cópia na conta pessoal do GitHub.</li>
+        <li>Renomear o <em>fork</em> em <em>Settings → Repository name</em>, observando o padrão acima, em minúsculas e sem acentos. Exemplo: <code>20261sre-maria-souza</code>.</li>
+        <li>Assegurar que o repositório esteja configurado como <strong>público</strong>; repositórios privados não são aceitos para fins de avaliação.</li>
+        <li>Confirmar que a branch padrão é <code>main</code> e que a <em>branch protection</em> encontra-se ativa, em conformidade com o padrão estabelecido na Aula 05.</li>
       </ol>
 
       <h3>3.2 Fluxo de trabalho até a entrega</h3>
       <ul>
-        <li>Trabalhe em <em>branches</em> de feature (<code>feat/...</code>, <code>fix/...</code>); não commite direto em <code>main</code>.</li>
-        <li>Abra <em>pull request</em> contra <code>main</code> para cada bloco relevante de mudança.</li>
-        <li>Mantenha CI verde antes de fazer <em>merge</em>: workflow <code>wb.yml</code> e <code>bb.yml</code> herdados das aulas anteriores.</li>
-        <li>Antes da apresentação, garanta que o último commit em <code>main</code> contém a entrega completa.</li>
-        <li>(Opcional, recomendado) Aplique a tag <code>aula-08-entrega</code> no commit final para marcar o ponto de avaliação.</li>
+        <li>Trabalhar em <em>branches</em> de funcionalidade (<code>feat/...</code>, <code>fix/...</code>), evitando <em>commits</em> diretos em <code>main</code>.</li>
+        <li>Abrir um <em>pull request</em> em direção à <code>main</code> para cada bloco relevante de modificação.</li>
+        <li>Manter a esteira de CI aprovada antes de efetuar o <em>merge</em>: <em>workflows</em> <code>wb.yml</code> e <code>bb.yml</code> herdados das aulas anteriores.</li>
+        <li>Antes da apresentação, assegurar que o último <em>commit</em> em <code>main</code> contemple a entrega completa.</li>
+        <li>(Opcional, porém recomendado) Aplicar a tag <code>aula-08-entrega</code> no <em>commit</em> final, demarcando o ponto de avaliação.</li>
       </ul>
 
       <div class="m08-callout">
-        <strong>Critério de pronto do naming</strong>
+        <strong>Critérios de conformidade da nomenclatura</strong>
         <p style="margin: 0;">
-          Repositório público, nome no padrão <code>20261sre-&lt;primeironome&gt;-&lt;ultimonome&gt;</code>, branch
-          <code>main</code> contendo a entrega final, README na raiz, último CI verde.
+          Repositório público, nome em conformidade com o padrão <code>20261sre-&lt;primeironome&gt;-&lt;ultimonome&gt;</code>,
+          branch <code>main</code> contendo a entrega final, <code>README.md</code> na raiz e última execução de CI
+          aprovada.
         </p>
       </div>
     </section>
 
     <section class="content-block">
-      <h2>4. Critérios de avaliação (esqueleto)</h2>
+      <h2>4. Critérios de avaliação (estrutura)</h2>
       <p>
-        Os critérios abaixo formam o esqueleto fixo da avaliação. O peso de cada eixo e os <em>cut-offs</em> exatos
-        serão fechados na semana da entrega, em conjunto com o desafio específico. O conjunto, porém, não muda:
-        sem repositório no padrão, sem README, sem evidência, não há nota.
+        Os critérios apresentados a seguir constituem a estrutura fixa da avaliação. O peso atribuído a cada eixo
+        e os <em>cut-offs</em> precisos serão definidos na semana da entrega, em conjunto com o desafio específico.
+        O conjunto de critérios, no entanto, permanece inalterado: a ausência de repositório em conformidade com
+        o padrão, de <code>README.md</code> ou de evidências de execução impossibilita a atribuição de nota.
       </p>
       <table>
         <thead>
           <tr>
             <th>#</th>
             <th>Critério</th>
-            <th>O que avaliamos no repositório</th>
+            <th>O que é avaliado no repositório</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td>01</td>
             <td>Arquitetura documentada</td>
-            <td><code>README.md</code> com seção de arquitetura, diagrama (Mermaid ou imagem), descrição dos serviços e justificativa das decisões.</td>
+            <td><code>README.md</code> contendo seção de arquitetura, diagrama (Mermaid ou imagem), descrição dos serviços e justificativa das decisões adotadas.</td>
           </tr>
           <tr>
             <td>02</td>
-            <td>Infra reprodutível</td>
-            <td><code>docker-compose.yml</code> e/ou templates AWS (CloudFormation) com comando único de subida (<code>make up</code>, <code>docker compose up</code>, <code>aws cloudformation deploy</code>).</td>
+            <td>Infraestrutura reprodutível</td>
+            <td><code>docker-compose.yml</code> e/ou <em>templates</em> AWS (CloudFormation) acompanhados de comando único de provisionamento (<code>make up</code>, <code>docker compose up</code>, <code>aws cloudformation deploy</code>).</td>
           </tr>
           <tr>
             <td>03</td>
             <td>Testes automatizados</td>
-            <td>Suite de testes rodando em CI (GitHub Actions), com badge ou print do último run verde anexado ao README.</td>
+            <td>Suíte de testes em execução na esteira de CI (GitHub Actions), com <em>badge</em> ou captura de tela da última execução aprovada anexada ao README.</td>
           </tr>
           <tr>
             <td>04</td>
             <td>Evidências de execução</td>
-            <td>Logs, prints, vídeo curto (até 3 min) ou pasta <code>documents/</code> com saída real do pipeline, métricas observadas e respostas a falhas induzidas.</td>
+            <td>Logs, capturas de tela, vídeo de curta duração (até 3 minutos) ou diretório <code>documents/</code> contendo saída real do pipeline, métricas observadas e respostas às falhas induzidas.</td>
           </tr>
           <tr>
             <td>05</td>
-            <td>Commits limpos</td>
-            <td>Histórico legível, mensagens descritivas, sem <code>WIP</code>, <code>fix fix</code> ou <em>force push</em> destrutivo em <code>main</code>.</td>
+            <td>Histórico de <em>commits</em> consistente</td>
+            <td>Histórico legível, mensagens descritivas, sem ocorrências de <code>WIP</code>, <code>fix fix</code> ou <em>force push</em> destrutivo em <code>main</code>.</td>
           </tr>
         </tbody>
       </table>
       <p>
-        Cada eixo é binário em sua versão mínima (existe / não existe) e graduado em sua versão completa. O peso final
-        de cada eixo será publicado junto com o enunciado do desafio.
+        Cada eixo apresenta caráter binário em sua versão mínima (presente ou ausente) e admite graduação em sua
+        versão completa. O peso final atribuído a cada eixo será publicado em conjunto com o enunciado do desafio.
       </p>
     </section>
 
     <section class="content-block">
-      <h2>5. Como organizar o README de um projeto SRE/Cloud</h2>
+      <h2>5. Organização do README de um projeto SRE/Cloud</h2>
       <p>
-        O <code>README.md</code> é o cartão de visita do seu repositório. Em projetos SRE/Cloud, ele deveria conseguir
-        responder cinco perguntas para um leitor que nunca abriu seu código antes. Estruture seu README respondendo,
-        nesta ordem, às perguntas abaixo.
+        O <code>README.md</code> constitui o documento de apresentação do repositório. Em projetos de SRE e Cloud,
+        espera-se que ele seja capaz de responder a cinco perguntas fundamentais para um leitor que nunca tenha
+        acessado o código anteriormente. Recomenda-se estruturar o README de modo a responder, nesta ordem, às
+        perguntas elencadas a seguir.
       </p>
 
       <div class="m08-block">
-        <h3>5.1 O que é este projeto?</h3>
+        <h3>5.1 Qual é o objeto deste projeto?</h3>
         <p>
-          Em um parágrafo: qual problema ele resolve, em que domínio, com qual dataset. Evite <em>buzzwords</em>;
-          escreva como quem explica para um analista de negócio.
+          Em um parágrafo, identificar o problema abordado, o domínio de aplicação e o <em>dataset</em> utilizado.
+          Recomenda-se evitar <em>buzzwords</em> e adotar um registro acessível, equivalente ao utilizado em
+          comunicações destinadas a um analista de negócio.
         </p>
       </div>
 
       <div class="m08-block">
-        <h3>5.2 Qual é a arquitetura?</h3>
+        <h3>5.2 Qual é a arquitetura adotada?</h3>
         <p>
-          Inclua um diagrama (Mermaid no próprio README ou imagem em <code>docs/</code>) mostrando os componentes:
-          fontes de dados, serviços de ingestão, processamento, armazenamento, observabilidade. Explique cada caixa
-          em uma frase. Cite as escolhas de Bass/ATAM que justificam o desenho.
+          Incluir um diagrama (em Mermaid, no próprio README, ou em imagem armazenada em <code>docs/</code>) que
+          represente os componentes principais: fontes de dados, serviços de ingestão, processamento, armazenamento
+          e observabilidade. Cada elemento deve ser descrito em uma frase, com referência explícita às decisões
+          de Bass e ATAM que sustentam o desenho proposto.
         </p>
       </div>
 
       <div class="m08-block">
-        <h3>5.3 Como subo isso na minha máquina?</h3>
+        <h3>5.3 Como executar o projeto em ambiente local?</h3>
         <p>
-          Seção <em>Quick start</em> com pré-requisitos (Docker, AWS CLI, conta AWS Student), comando único de subida
-          (<code>make up</code> ou equivalente) e tempo estimado até <em>up &amp; running</em>. Um colega deve conseguir
-          subir tudo em até 15 minutos sem perguntar nada.
+          Seção de <em>Quick Start</em> contendo pré-requisitos (Docker, AWS CLI, conta AWS Student), comando único
+          de provisionamento (<code>make up</code> ou equivalente) e estimativa de tempo até <em>up &amp; running</em>.
+          Espera-se que um colega seja capaz de executar todo o ambiente em até quinze minutos, sem necessidade de
+          esclarecimentos adicionais.
         </p>
       </div>
 
       <div class="m08-block">
-        <h3>5.4 Como sei que está funcionando?</h3>
+        <h3>5.4 Como verificar o funcionamento adequado?</h3>
         <p>
-          Seção de validação: como rodar os testes (<code>make test</code>), onde ver métricas em tempo real
-          (dashboard, CloudWatch, Grafana), exemplos de queries de validação, badges de CI. Inclua um <em>screenshot</em>
-          ou snippet de log de uma execução real.
+          Seção de validação: instruções para execução dos testes (<code>make test</code>), localização das métricas
+          em tempo real (<em>dashboard</em>, CloudWatch, Grafana), exemplos de <em>queries</em> de validação e
+          <em>badges</em> de CI. Recomenda-se incluir uma captura de tela ou trecho de <em>log</em> proveniente de
+          execução real.
         </p>
       </div>
 
       <div class="m08-block">
-        <h3>5.5 O que aprendi construindo isso?</h3>
+        <h3>5.5 Quais foram os aprendizados obtidos?</h3>
         <p>
-          Seção curta de <em>trade-offs</em> e decisões: o que você considerou e descartou, onde a arquitetura tem
-          dívida técnica conhecida, o que faria diferente em produção. Essa seção transforma o repositório de
-          exercício em portfólio.
+          Seção sintética de <em>trade-offs</em> e decisões: alternativas consideradas e descartadas, dívida técnica
+          conhecida na arquitetura e ajustes que seriam recomendados em ambiente produtivo. Esta seção converte o
+          repositório de exercício didático em peça de portfólio profissional.
         </p>
       </div>
 
       <p>
-        Estruture a raiz do repositório com pastas reconhecíveis: <code>infra/</code> (IaC), <code>services/</code> ou
-        <code>src/</code> (código), <code>tests/</code> (testes), <code>documents/</code> (Bass, ATAM, relatórios),
-        <code>.github/workflows/</code> (CI). Quem abre o repositório enxerga a estrutura antes de ler qualquer linha
-        de prosa.
+        Recomenda-se estruturar a raiz do repositório com diretórios reconhecíveis: <code>infra/</code> (IaC),
+        <code>services/</code> ou <code>src/</code> (código-fonte), <code>tests/</code> (testes),
+        <code>documents/</code> (Bass, ATAM, relatórios) e <code>.github/workflows/</code> (CI). A organização
+        permite que o leitor depreenda a estrutura do projeto antes mesmo de examinar qualquer trecho de prosa.
       </p>
     </section>
 
     <section class="content-block">
-      <h2>6. Orientação para a apresentação em sala</h2>
+      <h2>6. Orientações para a apresentação em sala</h2>
       <p>
-        No bloco 3 da aula (apresentações curtas), cada aluno tem um intervalo de alguns minutos para mostrar o repositório.
-        Tempo exato por apresentação será calibrado em sala conforme o tamanho da turma. Prepare-se para apresentar
-        nesta ordem:
+        No terceiro bloco da aula, destinado às apresentações breves, cada aluno dispõe de alguns minutos para
+        apresentar o repositório. O tempo individual será calibrado em sala, em função do tamanho da turma.
+        Recomenda-se organizar a apresentação na seguinte ordem:
       </p>
       <ol>
-        <li><strong>Abra o GitHub</strong> &mdash; mostre o repositório, o naming, a árvore de pastas e o último CI verde.</li>
-        <li><strong>Mostre o diagrama de arquitetura</strong> &mdash; explique a stack em 60 segundos, citando Bass/ATAM.</li>
-        <li><strong>Mostre uma evidência de execução</strong> &mdash; abra um log, um dashboard, um print de run de teste sob carga.</li>
-        <li><strong>Apresente uma decisão de trade-off</strong> &mdash; o que você escolheu, o que descartou, por quê.</li>
-        <li><strong>Encerre com a próxima coisa</strong> &mdash; o que faria se tivesse mais uma semana.</li>
+        <li><strong>Acessar o GitHub</strong> &mdash; apresentar o repositório, a nomenclatura, a árvore de diretórios e a última execução aprovada na esteira de CI.</li>
+        <li><strong>Apresentar o diagrama de arquitetura</strong> &mdash; descrever a stack em aproximadamente sessenta segundos, com referência explícita a Bass e ATAM.</li>
+        <li><strong>Demonstrar uma evidência de execução</strong> &mdash; exibir um <em>log</em>, um <em>dashboard</em> ou uma captura de tela de execução de teste sob carga.</li>
+        <li><strong>Discutir uma decisão de <em>trade-off</em></strong> &mdash; expor a alternativa adotada, a alternativa descartada e os fundamentos da escolha.</li>
+        <li><strong>Encerrar com perspectivas futuras</strong> &mdash; indicar o que seria realizado caso houvesse mais uma semana de trabalho.</li>
       </ol>
       <p>
-        Não use slide de PowerPoint &mdash; o repositório é o slide. Apresente direto do GitHub, do terminal e do console
-        de observabilidade. Apresentações que terminam dentro do tempo, com evidência real na tela, valem mais que
-        apresentações longas com promessas.
+        Não se recomenda o uso de <em>slides</em> em PowerPoint: o próprio repositório cumpre essa função.
+        A apresentação deve ser conduzida diretamente a partir do GitHub, do terminal e do console de
+        observabilidade. Apresentações que se encerram dentro do tempo previsto, com evidências reais exibidas
+        em tela, são consideradas superiores a exposições longas pautadas em promessas.
       </p>
     </section>
 
@@ -419,63 +435,65 @@
         <h3>O enunciado do desafio será divulgado a partir de 04/06/2026.</h3>
         <p>
           <strong>[Desafio detalhado será divulgado a partir de 04/06/2026]</strong>. O enunciado será publicado em
-          arquivo separado no repositório do curso e anunciado em sala. Esta seção do material será atualizada com o
-          texto definitivo assim que o desafio for fechado.
+          arquivo separado no repositório do curso e comunicado em sala. Esta seção do material será atualizada com
+          o texto definitivo tão logo o desafio seja consolidado.
         </p>
         <p>
-          <strong>Direções possíveis</strong> (sem comprometimento ainda): variação do Olist com um <em>dataset</em> novo;
-          uma nova <em>feature</em> analítica acoplada à plataforma existente; ou um pivô para outro domínio
-          (logística, saúde, energia) reaproveitando a stack das Aulas 04 a 07. Em todos os cenários, a stack-base
-          permanece a mesma &mdash; o desafio mexe na ponta, não no esqueleto.
+          <strong>Direções possíveis</strong> (sem comprometimento neste momento): variação do Olist com um
+          <em>dataset</em> distinto; incorporação de uma nova funcionalidade analítica à plataforma existente;
+          ou aplicação a outro domínio (logística, saúde, energia) com reaproveitamento da stack das Aulas 04 a 07.
+          Em todos os cenários, a stack-base permanece inalterada: o desafio incide sobre as extremidades, não
+          sobre o núcleo arquitetural.
         </p>
       </div>
       <p>
-        Até a publicação do desafio, o aluno consegue se preparar de duas formas. Primeiro, garantindo que a stack
-        atual (Aulas 04 a 07) está sólida no repositório individual: <em>up</em> reproduzível, CI verde, README minimamente
-        coerente. Segundo, lendo os <em>documents/</em> de Bass e ATAM produzidos nas aulas anteriores &mdash; qualquer
-        desafio nesta linha vai pedir que esses documentos sejam revisados e estendidos.
+        Até a publicação do desafio, recomenda-se ao aluno duas frentes de preparação. A primeira consiste em
+        consolidar a stack atual (Aulas 04 a 07) no repositório individual, com provisionamento reprodutível,
+        esteira de CI aprovada e <code>README.md</code> minimamente coerente. A segunda consiste na revisão dos
+        documentos de Bass e ATAM, armazenados em <code>documents/</code> e produzidos nas aulas anteriores:
+        qualquer desafio nesta linha demandará que esses documentos sejam revisados e estendidos.
       </p>
     </section>
 
     <section class="content-block">
       <h2>8. Dinâmica do dia &mdash; placeholder</h2>
       <p>
-        Distribuição preliminar de tempo. A divisão respeita o intervalo regulamentar 19h00 → 22h00 e será calibrada
-        no início da aula conforme o número de alunos presentes e o número de apresentações.
+        Distribuição preliminar do tempo. A divisão respeita o intervalo regulamentar entre 19h00 e 22h00 e será
+        calibrada no início da aula, em função do número de alunos presentes e do número de apresentações previstas.
       </p>
       <table>
         <thead>
           <tr>
             <th>Bloco</th>
             <th>Duração estimada</th>
-            <th>O que acontece</th>
+            <th>Atividades previstas</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td>Briefing do desafio</td>
             <td>~30 min</td>
-            <td>Apresentação do enunciado, regras de entrega, critérios de avaliação e dúvidas iniciais.</td>
+            <td>Apresentação do enunciado, regras de entrega, critérios de avaliação e esclarecimento de dúvidas iniciais.</td>
           </tr>
           <tr>
             <td>Trabalho assistido</td>
             <td>~90 min</td>
-            <td>Cada aluno avança no próprio repositório; professor faz tira-dúvidas individuais e revisão de README/diagrama.</td>
+            <td>Cada aluno avança no próprio repositório, com atendimento individual de dúvidas e revisão de README e diagrama pelo professor.</td>
           </tr>
           <tr>
-            <td>Apresentações curtas</td>
+            <td>Apresentações breves</td>
             <td>~60 min</td>
-            <td>Cada aluno mostra repositório, diagrama, evidências e recebe feedback do professor e da turma.</td>
+            <td>Cada aluno apresenta o repositório, o diagrama e as evidências, recebendo a devolutiva do professor e dos colegas de turma.</td>
           </tr>
         </tbody>
       </table>
       <div class="m08-placeholder">
-        <span class="m08-tag">Detalhes finos &middot; a definir</span>
-        <h3>Tempo por apresentação e ordem da fila</h3>
+        <span class="m08-tag">Detalhes específicos &middot; a definir</span>
+        <h3>Tempo por apresentação e ordem da sequência</h3>
         <p>
-          <strong>[Detalhes serão divulgados a partir de 04/06/2026 com o enunciado do desafio]</strong>. Tempo
-          individual de apresentação, ordem da fila (sorteio ou por inscrição) e formato exato de feedback serão
-          fechados em conjunto com o desafio específico.
+          <strong>[Detalhes serão divulgados a partir de 04/06/2026 com o enunciado do desafio]</strong>. O tempo
+          individual de apresentação, a ordem da sequência (por sorteio ou inscrição) e o formato preciso da
+          devolutiva serão definidos em conjunto com o desafio específico.
         </p>
       </div>
     </section>
@@ -483,26 +501,29 @@
     <section class="content-block">
       <h2>9. Atividade prática em sala &mdash; entrega final no GitHub</h2>
       <p>
-        Esta é a aula prática de fechamento da disciplina. O exercício prático em sala é a própria entrega do projeto
-        final. Use as três horas para:
+        Esta é a aula prática de encerramento da disciplina. A atividade prática conduzida em sala corresponde à
+        própria entrega do projeto final. Recomenda-se aproveitar o período de três horas conforme as orientações
+        a seguir:
       </p>
       <ol>
-        <li><strong>Antes da aula:</strong> garanta que seu fork do repositório base está renomeado para <code>20261sre-&lt;primeironome&gt;-&lt;ultimonome&gt;</code>, público, com a stack das Aulas 04 a 07 commitada em <code>main</code>.</li>
-        <li><strong>Bloco 1 (briefing):</strong> tome nota do desafio específico, das regras e dos critérios. Faça perguntas &mdash; esse é o único momento em que o professor responde dúvidas sobre o enunciado.</li>
-        <li><strong>Bloco 2 (trabalho assistido):</strong> abra Codespace ou ambiente local, crie uma branch de feature, implemente a entrega, faça push, abra PR contra <code>main</code>, merge.</li>
-        <li><strong>Bloco 3 (apresentação):</strong> apresente seu repositório seguindo a ordem da seção 6 deste material.</li>
-        <li><strong>Após a apresentação:</strong> aplique a tag <code>aula-08-entrega</code> no commit final; deixe o repositório público para avaliação posterior.</li>
+        <li><strong>Antes da aula:</strong> assegurar que o <em>fork</em> do repositório base esteja renomeado para <code>20261sre-&lt;primeironome&gt;-&lt;ultimonome&gt;</code>, configurado como público e com a stack das Aulas 04 a 07 versionada em <code>main</code>.</li>
+        <li><strong>Bloco 1 (briefing):</strong> registrar o desafio específico, as regras de entrega e os critérios de avaliação. Apresentar dúvidas, uma vez que este é o único momento em que o professor responde a questionamentos sobre o enunciado.</li>
+        <li><strong>Bloco 2 (trabalho assistido):</strong> iniciar o Codespace ou o ambiente local, criar uma <em>branch</em> de funcionalidade, implementar a entrega, efetuar o <em>push</em>, abrir um <em>pull request</em> em direção a <code>main</code> e realizar o <em>merge</em>.</li>
+        <li><strong>Bloco 3 (apresentação):</strong> apresentar o repositório de acordo com a ordem estabelecida na seção 6 deste material.</li>
+        <li><strong>Após a apresentação:</strong> aplicar a tag <code>aula-08-entrega</code> ao <em>commit</em> final e manter o repositório público para fins de avaliação posterior.</li>
       </ol>
       <p>
-        Não há lista de exercícios escritos nesta aula. A entrega é o repositório, e o repositório é o exame.
-        Boa entrega &mdash; e obrigado por percorrerem o arco completo do semestre.
+        Esta aula não contempla uma lista de exercícios escritos. A entrega corresponde ao próprio repositório e o
+        repositório constitui o instrumento de avaliação. Agradecemos aos alunos pela dedicação ao longo do arco
+        completo do semestre e desejamos um bom trabalho na entrega final.
       </p>
       <div class="m08-callout">
         <strong>Encerramento da disciplina</strong>
         <p style="margin: 0;">
-          Esta é a última aula do curso. O repositório de cada aluno permanece como portfólio público: continue
-          mexendo nele depois da disciplina, use-o em entrevistas, mostre evolução. Cloud e SRE se aprendem fazendo,
-          e o que está no GitHub é a prova de que você fez.
+          Esta é a última aula do curso. O repositório de cada aluno permanece como portfólio público: recomenda-se
+          mantê-lo em evolução após o término da disciplina, utilizá-lo em processos seletivos e demonstrar sua
+          progressão ao longo do tempo. Os fundamentos de Cloud e SRE consolidam-se por meio da prática, e o
+          conteúdo disponível no GitHub constitui a evidência dessa prática.
         </p>
       </div>
     </section>

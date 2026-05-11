@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/png" href="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" />
-  <title>Material Aula 05 — ATAM + Taticas Bass na stack Docker local</title>
+  <title>Material Aula 05 — ATAM e Táticas Bass aplicadas à stack Docker local</title>
   <link rel="stylesheet" href="../../../assets/styles.css" />
   <link rel="stylesheet" href="../../../assets/slides.css" />
   <style data-material05-local>
@@ -166,33 +166,36 @@
 
     <section class="content-block">
       <p class="meta">Aula 05 &nbsp;&bull;&nbsp; 14/05/2026 &nbsp;&bull;&nbsp; Aula presencial</p>
-      <h1>ATAM + Taticas Bass na stack Docker local</h1>
+      <h1>ATAM e Táticas Bass aplicadas à stack Docker local</h1>
       <p class="summary">
-        Este material acompanha a Aula 05 da disciplina <strong>Cloud Computing e SRE &mdash; Visao Pratica com AWS</strong> do MBA em Engenharia de
-        Dados. A aula e a ultima que roda inteiramente no laptop. Pegamos a stack Docker do Olist deixada pela Aula 04
-        (MinIO + ClickHouse + ingestor Python + dashboard Streamlit), aplicamos o <strong>Architecture Tradeoff Analysis Method (ATAM)</strong>
-        para mapear os pontos frageis e usamos o <strong>catalogo de taticas de Len Bass</strong> (4a ed.) para resolver cada um. Cada tatica
-        ganha teste automatizado em <code>pytest</code> e um cenario de stress que tenta quebrar de proposito. Encerramos com a tabela ATAM
-        atualizada com evidencias do "antes vs depois". Continuamos 100% locais &mdash; nenhuma chamada para a nuvem nesta aula.
+        Este material acompanha a Aula 05 da disciplina <strong>Cloud Computing e SRE &mdash; Visão Prática com AWS</strong>, integrante do MBA em Engenharia
+        de Dados. Trata-se da última aula executada integralmente em ambiente local. A partir da stack Docker do Olist legada pela Aula 04
+        (MinIO, ClickHouse, ingestor em Python e dashboard Streamlit), aplica-se o <strong>Architecture Tradeoff Analysis Method (ATAM)</strong> com
+        o propósito de mapear os pontos de fragilidade da arquitetura. Em seguida, recorre-se ao <strong>catálogo de táticas proposto por Len Bass</strong>
+        (4ª edição) para a resolução de cada ponto identificado. Cada tática é acompanhada de teste automatizado em <code>pytest</code> e de um
+        cenário de estresse formulado para verificar sua efetividade. A aula encerra-se com a tabela ATAM atualizada e enriquecida com evidências
+        comparativas entre o estado anterior e o estado posterior à intervenção. O ambiente permanece integralmente local, sem qualquer chamada
+        para serviços de nuvem.
       </p>
       <p>
-        <span class="m05-tag">Pre-requisitos</span> Docker Desktop (ou Docker Engine + Compose v2), Git, navegador web, ~2&nbsp;GB de RAM livre, a
-        stack da Aula 04 funcionando. Python 3.9+ no host para rodar <code>pytest</code> e <code>locust</code>.
+        <span class="m05-tag">Pré-requisitos</span> Docker Desktop (ou Docker Engine com Compose v2), Git, navegador web, aproximadamente 2&nbsp;GB de
+        memória RAM disponível e a stack da Aula 04 operacional. Python 3.9 ou superior instalado no host para a execução de <code>pytest</code> e
+        <code>locust</code>.
       </p>
       <p>
-        <span class="m05-tag">Restricoes</span> Sem nuvem hoje &middot; ainda Docker Compose &middot; cada tatica precisa de teste + stress
-        &middot; o entregavel e o mesmo repositorio da Aula 04, agora fortalecido.
+        <span class="m05-tag">Restrições</span> O encontro não contempla utilização de nuvem; a base permanece em Docker Compose; cada tática deve
+        ser acompanhada por teste automatizado e cenário de estresse; o entregável corresponde ao mesmo repositório da Aula 04, agora fortalecido.
       </p>
       <p>
-        <span class="m05-tag">Repositorio base</span>
-        Toda a refatoracao parte do repositorio da Aula 04.
+        <span class="m05-tag">Repositório base</span>
+        A refatoração tem como ponto de partida o repositório produzido na Aula 04.
       </p>
       <p>
         <a class="m05-repo-cta" href="https://github.com/afonsolelis/20261sre-primeironome-ultimonome" target="_blank" rel="noopener">
           <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
             <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
           </svg>
-          Abrir o repositorio da Aula 04
+          Abrir o repositório da Aula 04
         </a>
       </p>
     </section>
@@ -200,103 +203,110 @@
     <section class="content-block">
       <h2>1. Tese da aula</h2>
       <p>
-        A primeira tentacao ao terminar uma stack que "funciona" e migrar logo para a nuvem. Antes disso, vale uma parada deliberada: <strong>dar
-        nome ao que pode quebrar e fortalecer os pontos identificados</strong>. A stack da Aula 04 funciona, mas funciona por instinto. Quando o
-        ClickHouse oscila, o dashboard quebra silenciosamente. Quando o ingestor encontra um throttle do S3, ele aborta. Quando duas execucoes
-        rodam em paralelo, o resultado e indeterminado. Cada um desses sintomas tem nome proprio no catalogo de Bass: <em>retry</em>, <em>circuit
-        breaker</em>, <em>bulkhead</em>, <em>idempotency</em>. E cada um aparece como linha em uma tabela ATAM que ainda nao escrevemos.
+        A inclinação imediata ao concluir uma stack que "funciona" consiste em migrá-la rapidamente para a nuvem. Antes disso, faz-se necessária
+        uma reflexão deliberada: <strong>nomear o que pode falhar e fortalecer os pontos identificados</strong>. A stack produzida na Aula 04 opera,
+        mas o faz por inércia. Quando o ClickHouse oscila, o dashboard apresenta falhas silenciosas. Quando o ingestor encontra throttling no
+        S3, sua execução é abortada. Quando duas execuções concorrentes ocorrem em paralelo, o resultado torna-se indeterminado. Cada um desses
+        sintomas possui designação no catálogo de Bass: <em>retry</em>, <em>circuit breaker</em>, <em>bulkhead</em>, <em>idempotency</em>. Cada
+        ocorrência, por sua vez, materializa-se em uma linha da tabela ATAM ainda a ser elaborada.
       </p>
       <div class="m05-callout">
         <strong>Tese</strong>
-        Antes de migrar para a nuvem, precisamos saber o que pode quebrar. ATAM da a lista; Bass da as armas. A tabela ATAM identifica
-        sensitivity points, tradeoffs, riscos e non-risks da arquitetura atual. As taticas Bass viram intervencao concreta no codigo &mdash;
-        com teste que prova que funcionam e stress que tenta romper.
+        Antes de proceder à migração para a nuvem, é necessário identificar os pontos de fragilidade da arquitetura. A análise ATAM produz o
+        inventário dos sensitivity points, tradeoffs, riscos e non-risks; o catálogo de táticas proposto por Bass fornece as intervenções
+        concretas que mitigam esses pontos. Cada tática é materializada no código, validada por teste automatizado e submetida a um cenário de
+        estresse que busca demonstrar sua efetividade.
       </div>
-      <h3>1.1 Quatro regras desta aula</h3>
+      <h3>1.1 Quatro princípios orientadores desta aula</h3>
       <ol>
-        <li>Continuamos <strong>100% locais</strong> &mdash; ainda Docker Compose, sem console clicado, sem nuvem.</li>
-        <li>A <strong>tabela ATAM</strong> da Aula 05 e quem vai ser reestressada na nuvem (Aula 07) &mdash; nao reescrevemos depois, levamos esta.</li>
-        <li>Cada tatica introduzida precisa de <strong>teste automatizado em pytest</strong> + <strong>cenario de stress reproduzivel</strong>.</li>
-        <li>Encerramos com a <strong>tabela ATAM atualizada</strong> com evidencias do "antes vs depois" por sensitivity point.</li>
+        <li>O ambiente permanece <strong>integralmente local</strong>, baseado em Docker Compose, sem qualquer interação com consoles de nuvem.</li>
+        <li>A <strong>tabela ATAM</strong> elaborada na Aula 05 será o instrumento utilizado para reavaliar a arquitetura na nuvem durante a Aula 07; não se prevê sua reelaboração posterior.</li>
+        <li>Cada tática introduzida deve ser acompanhada de <strong>teste automatizado em pytest</strong> e de <strong>cenário de estresse reproduzível</strong>.</li>
+        <li>A aula encerra-se com a <strong>tabela ATAM atualizada</strong> e enriquecida com evidências comparativas, por sensitivity point, entre o estado anterior e o estado posterior à aplicação das táticas.</li>
       </ol>
     </section>
 
     <section class="content-block">
-      <h2>2. Recap da Aula 04 &mdash; o ponto de partida</h2>
+      <h2>2. Retomada da Aula 04 &mdash; o ponto de partida</h2>
       <p>
-        A Aula 04 deixou em pe quatro servicos orquestrados em <code>docker compose</code>: <strong>MinIO</strong> no papel de object storage
-        S3-compatible, <strong>ClickHouse</strong> como warehouse colunar com engine <em>MergeTree</em>, um <strong>ingestor Python</strong>
-        com boto3 + pandas + clickhouse-connect, e um <strong>dashboard Streamlit</strong> consumindo a view <code>v_top_products</code>. A
-        ingestao e <em>append-only</em>: cada execucao grava um <code>unixtime</code> proprio, a view filtra por <code>max(unixtime)</code> por
-        <code>tag</code>, e reingestoes sao naturalmente idempotentes.
+        A Aula 04 deixou em operação quatro serviços orquestrados em <code>docker compose</code>: o <strong>MinIO</strong> no papel de object
+        storage compatível com a API do S3; o <strong>ClickHouse</strong> como warehouse colunar com engine <em>MergeTree</em>; um
+        <strong>ingestor em Python</strong> baseado em boto3, pandas e clickhouse-connect; e um <strong>dashboard Streamlit</strong> que consome
+        a view <code>v_top_products</code>. A ingestão é estritamente <em>append-only</em>: cada execução grava um <code>unixtime</code> próprio,
+        a view filtra pelo <code>max(unixtime)</code> de cada <code>tag</code> e as reingestões são, por construção, idempotentes.
       </p>
       <p>
-        Essa stack ja incorpora &mdash; sem nomear &mdash; algumas decisoes que Bass catalogaria como taticas: o <code>healthcheck</code> de cada
-        servico e um <em>Ping/Echo</em>; o <code>depends_on: condition: service_healthy</code> e uma forma de <em>orchestration</em>; o cache do
-        Streamlit (<code>@st.cache_data</code>) e uma tatica de <em>performance</em>. O que falta e a camada que aparece quando algo da errado:
-        retry, timeout explicito, circuit breaker, bulkhead. E falta o quadro mental que organiza tudo &mdash; o ATAM.
+        A stack já incorpora, ainda que sem designação formal, algumas decisões que o catálogo de Bass classificaria como táticas: o
+        <code>healthcheck</code> de cada serviço corresponde a um <em>Ping/Echo</em>; a diretiva <code>depends_on: condition: service_healthy</code>
+        constitui uma forma de <em>orchestration</em>; o cache do Streamlit (<code>@st.cache_data</code>) representa uma tática voltada à
+        <em>performance</em>. O que ainda não está presente é a camada de mitigação acionada diante de falhas: retry, timeout explícito, circuit
+        breaker e bulkhead. Tampouco existe o quadro conceitual que organiza essas decisões — papel desempenhado pelo ATAM.
       </p>
-      <h3>2.1 O que ja existe</h3>
+      <h3>2.1 Elementos já implementados</h3>
       <ul>
-        <li>Quatro servicos com healthchecks e dependencias orquestradas.</li>
-        <li>Ingestao append-only com idempotencia por <code>max(unixtime)</code> + <code>tag</code>.</li>
-        <li>View <code>v_top_products</code> agregando 3 CSVs do Olist.</li>
-        <li>Dashboard Streamlit lendo a view via HTTP do ClickHouse, com cache <code>ttl=60</code>.</li>
-        <li>Reset garantido com <code>docker compose down -v</code>.</li>
+        <li>Quatro serviços com healthchecks e dependências orquestradas.</li>
+        <li>Ingestão append-only com idempotência assegurada por <code>max(unixtime)</code> e <code>tag</code>.</li>
+        <li>View <code>v_top_products</code> agregando três arquivos CSV do dataset Olist.</li>
+        <li>Dashboard Streamlit consumindo a view via HTTP do ClickHouse, com cache configurado em <code>ttl=60</code>.</li>
+        <li>Procedimento de reinicialização assegurado por <code>docker compose down -v</code>.</li>
       </ul>
-      <h3>2.2 O que ainda nao sabemos</h3>
+      <h3>2.2 Questões em aberto</h3>
       <ul>
-        <li>O que quebra primeiro sob estresse de rede?</li>
-        <li>Onde estao os <em>sensitivity points</em> &mdash; pontos onde uma decisao move muito o ponteiro de um QA?</li>
-        <li>Quais decisoes sao <em>tradeoffs</em> disfarcados?</li>
-        <li>Que <em>riscos</em> arquiteturais estamos ignorando por habito?</li>
-        <li>Onde devemos investir <em>taticas</em> antes de pagar nuvem?</li>
+        <li>Qual componente apresenta menor tolerância sob estresse de rede?</li>
+        <li>Onde se localizam os <em>sensitivity points</em>, isto é, os pontos em que uma decisão exerce influência expressiva sobre a resposta de um QA?</li>
+        <li>Quais decisões correspondem a <em>tradeoffs</em> ainda não explicitados?</li>
+        <li>Que <em>riscos</em> arquiteturais permanecem ignorados por hábito?</li>
+        <li>Onde devem ser aplicadas <em>táticas</em> antes da migração para a nuvem?</li>
       </ul>
     </section>
 
     <section class="content-block">
-      <h2>3. ATAM 101 &mdash; o metodo</h2>
+      <h2>3. Fundamentos do ATAM &mdash; o método</h2>
       <p>
         O <strong>Architecture Tradeoff Analysis Method</strong> foi proposto por Rick Kazman, Mark Klein e Paul Clements no
-        <em>Software Engineering Institute</em> da Carnegie Mellon University. Ele estabelece um procedimento estruturado para revisar uma
-        arquitetura de software contra <strong>cenarios de quality attribute</strong>, identificar onde a arquitetura e <em>sensivel</em>, onde
-        existem <em>tradeoffs</em> entre QAs concorrentes, onde corre <em>riscos</em> e onde tomou decisoes seguras (<em>non-risks</em>).
+        <em>Software Engineering Institute</em> da Carnegie Mellon University. O método estabelece um procedimento estruturado para revisar
+        uma arquitetura de software com base em <strong>cenários de quality attribute</strong>, identificando os pontos em que a arquitetura
+        é <em>sensível</em>, em que existem <em>tradeoffs</em> entre QAs concorrentes, em que se observam <em>riscos</em> e em que se
+        configuram <em>non-risks</em>.
       </p>
       <p>
-        Diferente de uma revisao de codigo, o ATAM nao olha a sintaxe ou o estilo. Diferente de um checklist, nao da pontos. Diferente de um
-        benchmark, nao mede performance &mdash; descreve onde a performance importa e onde ela e fragil. A saida central do ATAM e uma
-        <strong>tabela</strong>, e essa tabela e o artefato vivo que viaja com a arquitetura conforme ela evolui. No nosso curso, a tabela ATAM
-        gerada nesta Aula 05 vai sobreviver a migracao para a AWS (Aula 06) e ser <em>reestressada</em> na nuvem (Aula 07).
+        Diferentemente de uma revisão de código, o ATAM não examina a sintaxe ou o estilo; diferentemente de um checklist, não produz
+        pontuações; diferentemente de um benchmark, não mede performance — antes, descreve em que circunstâncias a performance se torna
+        relevante e em que pontos ela permanece frágil. A saída central do ATAM é uma <strong>tabela</strong>, que constitui artefato vivo
+        e acompanha a arquitetura ao longo de sua evolução. No contexto deste curso, a tabela ATAM elaborada nesta Aula 05 será preservada
+        durante a migração para a AWS (Aula 06) e <em>reavaliada sob estresse</em> em ambiente de nuvem (Aula 07).
       </p>
-      <h3>3.1 As 7 colunas da tabela ATAM</h3>
+      <h3>3.1 As sete colunas da tabela ATAM</h3>
       <table>
         <thead>
-          <tr><th>Coluna</th><th>O que significa</th></tr>
+          <tr><th>Coluna</th><th>Significado</th></tr>
         </thead>
         <tbody>
-          <tr><td><strong>Quality Attribute</strong></td><td>O "ility" sob analise (availability, performance, modifiability, security, etc.).</td></tr>
-          <tr><td><strong>Scenario</strong></td><td>Caso concreto no formato estimulo + ambiente + resposta + medida.</td></tr>
-          <tr><td><strong>Architectural Decisions</strong></td><td>Escolhas estruturais ja tomadas que afetam esse cenario.</td></tr>
-          <tr><td><strong>Sensitivity Points</strong></td><td>Pontos onde a decisao afeta diretamente a resposta &mdash; <em>aqui</em> e onde se estressa.</td></tr>
-          <tr><td><strong>Tradeoffs</strong></td><td>Quando melhorar um QA piora outro &mdash; sensitivity para dois ou mais QAs simultaneamente.</td></tr>
-          <tr><td><strong>Risks</strong></td><td>Decisoes cuja consequencia ainda nao temos como prever ou medir.</td></tr>
-          <tr><td><strong>Non-risks</strong></td><td>Decisoes conscientemente bem fundamentadas &mdash; descartadas do radar.</td></tr>
+          <tr><td><strong>Quality Attribute</strong></td><td>O atributo de qualidade sob análise (availability, performance, modifiability, security, entre outros).</td></tr>
+          <tr><td><strong>Scenario</strong></td><td>Caso concreto formulado a partir de estímulo, ambiente, resposta e medida.</td></tr>
+          <tr><td><strong>Architectural Decisions</strong></td><td>Escolhas estruturais previamente adotadas que afetam o cenário em questão.</td></tr>
+          <tr><td><strong>Sensitivity Points</strong></td><td>Pontos em que a decisão influencia diretamente a resposta observada e que constituem o objeto da validação por estresse.</td></tr>
+          <tr><td><strong>Tradeoffs</strong></td><td>Situações em que a melhoria de um QA implica a degradação de outro; correspondem a sensitivity points compartilhados por dois ou mais QAs.</td></tr>
+          <tr><td><strong>Risks</strong></td><td>Decisões cujas consequências ainda não podem ser previstas ou mensuradas.</td></tr>
+          <tr><td><strong>Non-risks</strong></td><td>Decisões conscientemente bem fundamentadas, retiradas do radar de preocupações.</td></tr>
         </tbody>
       </table>
       <div class="m05-callout">
-        <strong>Por que a tabela importa para a nossa stack</strong>
-        Quando alguem perguntar "por que existe esse <code>tenacity.retry</code> aqui?", a resposta nao vai ser "porque eu copiei do StackOverflow".
-        Vai ser "porque o sensitivity point SP-02 da tabela ATAM exige" &mdash; e quem ler vai poder rastrear ate a decisao original. Arquitetura
-        deixa de ser folclore e vira artefato.
+        <strong>Relevância da tabela para o sistema em estudo</strong>
+        Quando questionado a respeito da presença do decorador <code>tenacity.retry</code> em determinado trecho do código, o autor não responde
+        "porque foi copiado de um repositório externo". A resposta apropriada é "porque o sensitivity point SP-02 da tabela ATAM o requer" — e
+        o leitor pode rastrear, a partir dessa referência, a decisão arquitetural original. A arquitetura deixa, assim, de constituir folclore
+        técnico para tornar-se artefato documentado.
       </div>
     </section>
 
     <section class="content-block">
-      <h2>4. Tabela ATAM completa do sistema Olist (Docker local)</h2>
+      <h2>4. Tabela ATAM completa do sistema Olist (ambiente Docker local)</h2>
       <p>
-        Esta e a saida central da aula. As sete linhas cobrem os QAs que importam para esta stack &mdash; e que vao importar ainda mais quando
-        ela migrar para AWS na Aula 06. Cada linha descreve um cenario realista, lista as decisoes ja tomadas, aponta onde a arquitetura e
-        sensivel, identifica tradeoffs com outros QAs, registra riscos abertos e celebra non-risks (decisoes bem fundamentadas).
+        A tabela apresentada a seguir constitui a saída central da aula. As sete linhas contemplam os atributos de qualidade relevantes para esta
+        stack — atributos cuja relevância tende a se intensificar com a migração para a AWS na Aula 06. Cada linha descreve um cenário
+        realista, enumera as decisões já adotadas, indica os pontos em que a arquitetura é sensível, identifica tradeoffs com outros QAs,
+        registra os riscos em aberto e formaliza os non-risks, correspondentes a decisões bem fundamentadas.
       </p>
       <div class="m05-atam-table">
         <table>
@@ -379,133 +389,146 @@
         </table>
       </div>
       <p>
-        Essa tabela vive em <code>docs/atam.md</code> no fork pessoal. Ela e o input direto da Aula 06: quando a migracao para AWS comecar, cada
-        sensitivity point listado aqui ganhara uma decisao equivalente na nuvem (ex.: cache do Streamlit vira CloudFront cache; healthcheck do CH
-        vira health check do Target Group). Nada se perde &mdash; tudo se traduz.
+        Essa tabela é mantida em <code>docs/atam.md</code> no fork pessoal e constitui o insumo direto da Aula 06. Quando a migração para a AWS
+        for iniciada, cada sensitivity point listado receberá uma decisão equivalente em ambiente de nuvem; por exemplo, o cache do Streamlit
+        passa a ser implementado por meio de CloudFront cache, ao passo que o healthcheck do ClickHouse é substituído pelo health check do
+        Target Group. Nenhum elemento é descartado: todos são traduzidos para o novo contexto.
       </p>
     </section>
 
     <section class="content-block">
-      <h2>5. Sensitivity points consolidados &mdash; o que estressar hoje</h2>
+      <h2>5. Sensitivity points consolidados &mdash; pontos a serem submetidos a estresse</h2>
       <p>
-        Da leitura vertical da tabela acima, cinco pontos se destacam como os <strong>sensitivity points</strong> mais relevantes para a Aula 05.
-        Eles vao virar branches no fork pessoal, com tatica aplicada, teste correspondente e cenario de stress especifico.
+        A partir da leitura vertical da tabela apresentada, cinco pontos emergem como os <strong>sensitivity points</strong> mais relevantes para
+        a Aula 05. Cada um deles dará origem a uma branch no fork pessoal, com tática aplicada, teste correspondente e cenário de estresse
+        específico.
       </p>
       <h3>5.1 SP-01 &middot; Healthcheck do ClickHouse</h3>
       <p>
-        O healthcheck atual usa <code>wget --spider http://localhost:8123/ping</code> com <code>interval: 10s</code> default. Em maquinas mais
-        lentas, o MergeTree leva 15-20s para inicializar &mdash; e o Compose declara o servico <em>unhealthy</em> antes da hora. O dashboard, que
-        depende de <code>service_healthy</code>, oscila no startup. <strong>Tatica:</strong> tunar <code>interval/timeout/retries/start_period</code>.
+        O healthcheck atual recorre a <code>wget --spider http://localhost:8123/ping</code> com <code>interval: 10s</code> padrão. Em máquinas
+        de menor desempenho, o MergeTree exige de 15 a 20 segundos para a inicialização, intervalo em que o Compose declara o serviço como
+        <em>unhealthy</em>. O dashboard, que depende da condição <code>service_healthy</code>, apresenta instabilidades durante a inicialização.
+        <strong>Tática:</strong> ajuste fino dos parâmetros <code>interval/timeout/retries/start_period</code>.
       </p>
       <h3>5.2 SP-02 &middot; Ingestor como single point of failure</h3>
       <p>
-        O <code>ingest_minio.py</code> roda em modo "ou termina, ou aborta". Nao tem retry, nao tem retomada de checkpoint, nao tem dead-letter.
-        Uma desconexao de rede no meio de uma execucao mata o run inteiro &mdash; a idempotencia por <code>max(unixtime)</code> da Aula 04 protege o estado,
-        mas obriga reingestao do zero. <strong>Tatica:</strong> <em>retry</em> com backoff exponencial + exception handling explicito.
+        O módulo <code>ingest_minio.py</code> opera em modo binário: a execução conclui ou é abortada. Não dispõe de retry, retomada por
+        checkpoint ou mecanismo de dead-letter. Uma desconexão de rede durante a execução interrompe o processamento em sua totalidade. A
+        idempotência por <code>max(unixtime)</code> introduzida na Aula 04 protege o estado, mas obriga a reingestão integral.
+        <strong>Tática:</strong> <em>retry</em> com backoff exponencial e exception handling explícito.
       </p>
-      <h3>5.3 SP-03 &middot; Ausencia de circuit breaker no boto3</h3>
+      <h3>5.3 SP-03 &middot; Ausência de circuit breaker no boto3</h3>
       <p>
-        O boto3 retenta indefinidamente em <code>SlowDown</code> e em desconexoes transitorias. Sem timeout explicito por chamada e sem circuit
-        breaker, o ingestor martela o downstream em loop. Local, com MinIO, da para tolerar. Na AWS real, vira problema serio &mdash; e e
-        exatamente o cenario que a Aula 07 vai estressar. <strong>Tatica:</strong> <em>circuit breaker</em> implementado em <code>app/breakers.py</code>.
+        O boto3 efetua novas tentativas indefinidamente diante de respostas <code>SlowDown</code> e de desconexões transitórias. Na ausência
+        de timeout explícito por chamada e de circuit breaker, o ingestor sobrecarrega continuamente o downstream em laço. Em ambiente local
+        com MinIO, o cenário ainda é tolerável; em ambiente AWS real, configura-se como problema relevante — precisamente o cenário a ser
+        examinado na Aula 07. <strong>Tática:</strong> <em>circuit breaker</em> implementado em <code>app/breakers.py</code>.
       </p>
-      <h3>5.4 SP-04 &middot; Latencia da view sob concorrencia</h3>
+      <h3>5.4 SP-04 &middot; Latência da view sob concorrência</h3>
       <p>
-        A view <code>v_top_products</code> faz <code>WHERE unixtime = (SELECT max(unixtime) ...)</code> em tres CTEs. Conforme o numero de
-        execucoes acumuladas cresce, a subquery percorre mais parts. Com uma sessao, e instantanea. Com 50 sessoes batendo simultaneamente no
-        dashboard, o ClickHouse comeca a sofrer. O cache do Streamlit ajuda, mas e local por sessao. <strong>Tatica:</strong> <em>cache</em>
-        reforcado com medicao de hit/miss; eventual materialized view.
+        A view <code>v_top_products</code> executa a cláusula <code>WHERE unixtime = (SELECT max(unixtime) ...)</code> em três CTEs. À medida
+        que o número de execuções acumuladas cresce, a subconsulta percorre um número maior de parts. Com uma única sessão, a resposta é
+        instantânea; com cinquenta sessões concorrentes consultando o dashboard, o ClickHouse passa a apresentar degradação. O cache do
+        Streamlit contribui parcialmente, mas é local por sessão. <strong>Tática:</strong> <em>cache</em> reforçado com instrumentação de
+        hit e miss, com eventual adoção de materialized view.
       </p>
       <h3>5.5 SP-05 &middot; Credenciais em <code>.env</code></h3>
       <p>
-        Hoje, <code>minioadmin/minioadmin</code> esta no <code>.env</code>. O dashboard usa o usuario <code>default</code> do ClickHouse com
-        privilegio total. Risco de commit acidental, sem rotacao, sem secret manager. <strong>Tatica:</strong> <em>limit exposure</em> &mdash;
-        usuario <code>dashboard</code> read-only no CH; <code>.env</code> no <code>.gitignore</code>; <code>.env.example</code> versionado; log
-        do ingestor mascarando segredos.
+        No estado atual, as credenciais <code>minioadmin/minioadmin</code> residem no arquivo <code>.env</code>, e o dashboard utiliza o
+        usuário <code>default</code> do ClickHouse com privilégio total. Verifica-se risco de commit acidental, ausência de política de
+        rotação e ausência de secret manager. <strong>Tática:</strong> <em>limit exposure</em> — criação de usuário <code>dashboard</code>
+        com acesso read-only no ClickHouse; inclusão de <code>.env</code> no <code>.gitignore</code>; versionamento exclusivo de
+        <code>.env.example</code>; mascaramento de segredos nos logs produzidos pelo ingestor.
       </p>
     </section>
 
     <section class="content-block">
-      <h2>6. Bass 101 &mdash; o vocabulario das taticas</h2>
+      <h2>6. Fundamentos de Bass &mdash; o vocabulário das táticas</h2>
       <p>
-        Em <em>Software Architecture in Practice</em> (4a ed., Addison-Wesley, 2021), Len Bass e coautores propoem uma estrutura simples para
-        raciocinar sobre arquitetura. Em vez de tratar arquitetura como diagramas de caixas e setas, eles a tratam como um conjunto de decisoes
-        que afetam <strong>quality attributes</strong> mensuraveis. Cada decisao recebe um nome, e catalogada como <strong>tatica</strong>, e o
-        agrupamento coerente de varias taticas em torno de um problema vira um <strong>padrao</strong>.
+        Em <em>Software Architecture in Practice</em> (4ª edição, Addison-Wesley, 2021), Len Bass e seus coautores propõem uma estrutura conceitual
+        objetiva para o raciocínio sobre arquitetura. Em lugar de tratá-la como composição de diagramas de caixas e setas, os autores a definem
+        como um conjunto de decisões que afetam <strong>quality attributes</strong> mensuráveis. Cada decisão recebe uma designação e é
+        catalogada como <strong>tática</strong>; o agrupamento coerente de múltiplas táticas em torno de um problema dá origem a um
+        <strong>padrão</strong>.
       </p>
-      <h3>6.1 Definicao rapida</h3>
+      <h3>6.1 Definições essenciais</h3>
       <ul>
-        <li><strong>Quality Attribute (QA)</strong> &mdash; uma caracteristica mensuravel do sistema. Os classicos: <em>availability</em>,
-        <em>performance</em>, <em>modifiability</em>, <em>testability</em>, <em>security</em>, <em>deployability</em>, <em>usability</em>.</li>
-        <li><strong>Cenario de QA</strong> &mdash; sentenca estruturada com <em>fonte</em>, <em>estimulo</em>, <em>ambiente</em>, <em>artefato</em>,
-        <em>resposta</em> e <em>medida</em>. Exemplo: "Quando o ClickHouse fica indisponivel por 30 segundos durante operacao normal, o
-        dashboard responde em &lt; 1s usando a ultima leitura em cache."</li>
-        <li><strong>Tatica</strong> &mdash; uma decisao arquitetural que afeta diretamente a resposta de um cenario de QA. Menor unidade que move
-        o ponteiro. Exemplos: retry com backoff exponencial, circuit breaker, cache, bulkhead, timeout, fail-fast.</li>
-        <li><strong>Padrao</strong> &mdash; combinacao coerente de varias taticas resolvendo um problema recorrente. Exemplo: o padrao de
-        <em>resilient client</em> combina timeout + retry + circuit breaker + fallback.</li>
+        <li><strong>Quality Attribute (QA)</strong> &mdash; característica mensurável do sistema. Entre os exemplos clássicos, encontram-se
+        <em>availability</em>, <em>performance</em>, <em>modifiability</em>, <em>testability</em>, <em>security</em>, <em>deployability</em> e
+        <em>usability</em>.</li>
+        <li><strong>Cenário de QA</strong> &mdash; sentença estruturada que articula <em>fonte</em>, <em>estímulo</em>, <em>ambiente</em>,
+        <em>artefato</em>, <em>resposta</em> e <em>medida</em>. A título de ilustração: "Quando o ClickHouse permanece indisponível por 30
+        segundos durante operação normal, o dashboard responde em menos de 1 segundo utilizando a última leitura armazenada em cache."</li>
+        <li><strong>Tática</strong> &mdash; decisão arquitetural que afeta diretamente a resposta de um cenário de QA. Constitui a menor unidade
+        capaz de alterar o comportamento observado. Exemplos típicos incluem retry com backoff exponencial, circuit breaker, cache, bulkhead,
+        timeout e fail-fast.</li>
+        <li><strong>Padrão</strong> &mdash; combinação coerente de múltiplas táticas voltada à resolução de um problema recorrente. O padrão
+        <em>resilient client</em>, por exemplo, articula timeout, retry, circuit breaker e fallback.</li>
       </ul>
       <div class="m05-callout">
-        <strong>Tatica vs padrao &mdash; resumo</strong>
-        Tatica e a menor unidade de decisao arquitetural; cabe em uma frase ("aplicar retry com backoff exponencial nas chamadas S3"). Padrao
-        e um conjunto coerente de taticas para um problema recorrente ("resilient client"). No catalogo de Bass, padroes sao construidos a
-        partir de taticas; nesta aula, vamos focar em taticas individuais.
+        <strong>Distinção entre tática e padrão &mdash; síntese</strong>
+        A tática constitui a menor unidade de decisão arquitetural e pode ser enunciada em uma única frase ("aplicar retry com backoff
+        exponencial nas chamadas a S3"). O padrão corresponde a um conjunto coerente de táticas voltadas à resolução de um problema recorrente
+        (por exemplo, "resilient client"). No catálogo de Bass, os padrões são construídos a partir de táticas; o foco desta aula recai sobre
+        as táticas individualmente consideradas.
       </div>
     </section>
 
     <section class="content-block">
-      <h2>7. Mapeamento sensitivity &rarr; tatica</h2>
+      <h2>7. Mapeamento entre sensitivity points e táticas</h2>
       <p>
-        Para cada sensitivity point identificado, escolhemos uma tatica do catalogo de Bass que enderece o problema. A tabela abaixo e o mapa
-        que orienta a pratica.
+        Para cada sensitivity point identificado, seleciona-se uma tática do catálogo de Bass capaz de endereçar o problema. A tabela apresentada
+        a seguir constitui o mapa que orienta as atividades práticas.
       </p>
       <table>
         <thead>
-          <tr><th>Sensitivity</th><th>Tatica Bass</th><th>Grupo (QA)</th><th>Onde aplicar no codigo</th></tr>
+          <tr><th>Sensitivity</th><th>Tática de Bass</th><th>Grupo (QA)</th><th>Local de aplicação no código</th></tr>
         </thead>
         <tbody>
           <tr>
-            <td>SP-01 Healthcheck CH</td>
+            <td>SP-01 Healthcheck do ClickHouse</td>
             <td><strong>Ping/Echo + Heartbeat</strong></td>
             <td>Availability</td>
-            <td><code>docker-compose.yaml</code>: tunar <code>interval/timeout/retries/start_period</code>; expor <code>/health</code> custom no dashboard.</td>
+            <td><code>docker-compose.yaml</code>: ajuste de <code>interval/timeout/retries/start_period</code> e exposição de endpoint <code>/health</code> customizado no dashboard.</td>
           </tr>
           <tr>
             <td>SP-02 Ingestor SPOF</td>
             <td><strong>Retry + Exception Handling + Idempotency</strong></td>
             <td>Availability</td>
-            <td><code>app/ingest_minio.py</code>: <code>@tenacity.retry</code> nas chamadas S3 e CH; logging estruturado.</td>
+            <td><code>app/ingest_minio.py</code>: aplicação de <code>@tenacity.retry</code> nas chamadas a S3 e ClickHouse, complementada por logging estruturado.</td>
           </tr>
           <tr>
-            <td>SP-03 Sem circuit breaker</td>
+            <td>SP-03 Ausência de circuit breaker</td>
             <td><strong>Circuit Breaker</strong></td>
             <td>Availability + Performance</td>
-            <td><code>app/breakers.py</code>: classe <code>CircuitBreaker</code> com threshold + recovery time.</td>
+            <td><code>app/breakers.py</code>: classe <code>CircuitBreaker</code> com parâmetros de threshold e recovery time.</td>
           </tr>
           <tr>
-            <td>SP-04 Latencia da view</td>
-            <td><strong>Cache (reforcado)</strong></td>
+            <td>SP-04 Latência da view</td>
+            <td><strong>Cache (reforçado)</strong></td>
             <td>Performance</td>
-            <td>Streamlit com <code>@st.cache_data(ttl=60, show_spinner=False)</code>; metricas de hit/miss; considerar materialized view.</td>
+            <td>Streamlit com <code>@st.cache_data(ttl=60, show_spinner=False)</code>; instrumentação de métricas de hit e miss; avaliação da adoção de materialized view.</td>
           </tr>
           <tr>
             <td>SP-05 Credenciais</td>
             <td><strong>Limit Exposure + Authenticate Actors</strong></td>
             <td>Security</td>
-            <td>Usuario <code>dashboard</code> read-only no CH; <code>.env</code> no <code>.gitignore</code>; mascaramento de segredos em logs.</td>
+            <td>Usuário <code>dashboard</code> com acesso read-only no ClickHouse; <code>.env</code> incluído no <code>.gitignore</code>; mascaramento de segredos nos logs.</td>
           </tr>
         </tbody>
       </table>
     </section>
 
     <section class="content-block">
-      <h2>8. Cada tatica em detalhe</h2>
+      <h2>8. Detalhamento de cada tática</h2>
 
-      <h3>8.1 Ping/Echo + Heartbeat &mdash; healthcheck robusto</h3>
+      <h3>8.1 Ping/Echo e Heartbeat &mdash; healthcheck robusto</h3>
       <p>
-        <span class="m05-pill">Availability</span> A tatica <em>Ping/Echo</em> e ativa: um componente faz a pergunta, o outro responde. O Compose
-        ja implementa Ping/Echo via <code>healthcheck</code>. <em>Heartbeat</em> e o oposto: o componente fala periodicamente sem ser perguntado.
-        Vamos focar em Ping/Echo bem configurado &mdash; tunar timing e adicionar endpoint custom no dashboard.
+        <span class="m05-pill">Availability</span> A tática <em>Ping/Echo</em> caracteriza-se por sua natureza ativa: um componente formula a
+        verificação e o outro responde. O Compose já implementa Ping/Echo por meio do mecanismo <code>healthcheck</code>. A tática
+        <em>Heartbeat</em>, por sua vez, opera em sentido inverso: o componente comunica periodicamente seu estado, sem requisição prévia. A
+        intervenção desta aula concentra-se na configuração adequada de Ping/Echo, com ajuste do timing e adição de endpoint customizado no
+        dashboard.
       </p>
       <pre><code># docker-compose.yaml (patch)
 clickhouse:
@@ -525,16 +548,17 @@ dashboard:
     timeout: 3s
     retries: 3</code></pre>
       <p>
-        O <code>start_period</code> e a melhoria mais importante: durante esse intervalo inicial, o Compose nao conta falhas de healthcheck &mdash;
-        evita o falso negativo do MergeTree subindo. Para o dashboard, usamos o endpoint nativo do Streamlit (<code>/_stcore/health</code>) que
-        responde 200 quando o servidor esta pronto.
+        O parâmetro <code>start_period</code> representa a melhoria de maior impacto: durante esse intervalo inicial, o Compose não contabiliza
+        falhas de healthcheck, o que evita o falso negativo associado à inicialização do MergeTree. Para o dashboard, utiliza-se o endpoint
+        nativo do Streamlit (<code>/_stcore/health</code>), que retorna código HTTP 200 quando o servidor está apto a responder.
       </p>
 
-      <h3>8.2 Retry + Exception Handling + Idempotency</h3>
+      <h3>8.2 Retry, Exception Handling e Idempotency</h3>
       <p>
-        <span class="m05-pill">Availability</span> Cenario Bass: ingestor encontra throttle (<code>SlowDown</code> do S3) ou desconexao temporaria
-        do ClickHouse; deve retentar com backoff exponencial; a idempotencia ja existente garante que reexecucao nao corrompe estado. A biblioteca
-        <code>tenacity</code> faz isso com um decorador.
+        <span class="m05-pill">Availability</span> No cenário formulado por Bass, o ingestor depara-se com throttling (resposta
+        <code>SlowDown</code> do S3) ou com desconexão temporária do ClickHouse, devendo efetuar novas tentativas com backoff exponencial. A
+        propriedade de idempotência preexistente assegura que a reexecução não comprometa a integridade do estado. A biblioteca
+        <code>tenacity</code> implementa essa lógica por meio de um decorador.
       </p>
       <pre><code># app/ingest_minio.py (refactor com tenacity)
 from tenacity import (
@@ -569,15 +593,17 @@ def insert_batch(ch, rows):
 def s3_get_object(s3, bucket, key):
     return s3.get_object(Bucket=bucket, Key=key)</code></pre>
       <p>
-        A idempotencia ja vinha por <code>max(unixtime)</code> + <code>tag</code> da Aula 04 &mdash; aqui apenas <em>nomeamos</em> a propriedade
-        e <em>testamos</em> em <code>pytest</code>. A reentrancia da execucao e segura: rodar duas vezes nao duplica dados na view.
+        A idempotência já estava assegurada pela combinação <code>max(unixtime)</code> e <code>tag</code> desde a Aula 04. Nesta sessão, a
+        propriedade é apenas <em>nomeada</em> formalmente e <em>validada</em> em <code>pytest</code>. A reentrância da execução é, portanto,
+        segura: a execução em duplicidade não acarreta duplicação de dados na view.
       </p>
 
       <h3>8.3 Circuit Breaker</h3>
       <p>
-        <span class="m05-pill">Availability + Performance</span> Apos N falhas consecutivas, parar de tentar; entrar em estado <em>open</em>;
-        permitir que o downstream se recupere antes de tentar de novo. Sem isso, o ingestor martela o componente caido e amplifica o problema.
-        Implementacao simples em <code>app/breakers.py</code>:
+        <span class="m05-pill">Availability + Performance</span> Após N falhas consecutivas, a tática interrompe novas tentativas e transiciona
+        para o estado <em>open</em>, concedendo ao downstream o tempo necessário para recuperação antes de uma nova chamada. Na ausência desse
+        mecanismo, o ingestor sobrecarrega continuamente o componente indisponível, amplificando o problema. A implementação proposta é
+        apresentada a seguir, em <code>app/breakers.py</code>:
       </p>
       <pre><code># app/breakers.py
 import time
@@ -613,16 +639,18 @@ cb = CircuitBreaker(failure_threshold=5, recovery_seconds=30)
 def s3_get(key):
     return cb.call(lambda: s3.get_object(Bucket=BUCKET, Key=key))</code></pre>
       <p>
-        O breaker tem tres estados implicitos no codigo: <em>closed</em> (operacao normal), <em>open</em> (rejeita chamadas), e o passo de
-        verificacao apos <code>recovery_seconds</code> que funciona como <em>half-open</em> (tenta uma vez para ver se voltou). A combinacao com
-        <code>tenacity</code> e potente: o retry trata flakes momentaneos, o breaker trata falha sustentada.
+        O circuit breaker apresenta três estados implícitos no código: <em>closed</em> (operação normal), <em>open</em> (rejeição de chamadas)
+        e o estado de verificação posterior ao intervalo <code>recovery_seconds</code>, equivalente ao <em>half-open</em>, em que se efetua uma
+        tentativa controlada para verificar a disponibilidade. A combinação com <code>tenacity</code> é particularmente eficaz: o retry trata
+        flutuações momentâneas (<em>flakes</em>), enquanto o breaker trata falhas sustentadas.
       </p>
 
-      <h3>8.4 Cache (reforcado)</h3>
+      <h3>8.4 Cache (reforçado)</h3>
       <p>
-        <span class="m05-pill">Performance</span> O <code>@st.cache_data(ttl=60)</code> do Streamlit ja existe na Aula 04. A intervencao desta
-        aula e <em>medir</em> e <em>configurar</em>: TTL ajustado, log de hit/miss, endpoint <code>/metrics</code> custom, decisao consciente de
-        tradeoff entre frescor e carga no ClickHouse.
+        <span class="m05-pill">Performance</span> O decorador <code>@st.cache_data(ttl=60)</code> do Streamlit já está presente desde a Aula 04.
+        A intervenção desta aula consiste em <em>mensurar</em> e <em>configurar</em>: ajuste do TTL, registro em log de hits e misses,
+        exposição de endpoint <code>/metrics</code> customizado e tomada consciente de decisão sobre o tradeoff entre frescor da informação e
+        carga no ClickHouse.
       </p>
       <pre><code># app/streamlit_app.py (cache mensuravel)
 import streamlit as st
@@ -644,14 +672,16 @@ def get_top_products(top_n: int):
     _cache_stats["hits"] += 1
     return result</code></pre>
       <p>
-        Tradeoff explicito: TTL=60s significa que o dashboard pode mostrar dado defasado em ate 1 minuto. Para um dashboard analitico de Olist,
-        isso e aceitavel. Para um sistema de fraude, nao seria.
+        Tradeoff explícito: um TTL de 60 segundos implica que o dashboard pode exibir informação defasada em até um minuto. No contexto de um
+        dashboard analítico para o Olist, tal característica é aceitável; em um sistema voltado à detecção de fraude, contudo, não seria
+        admissível.
       </p>
 
-      <h3>8.5 Limit Exposure + Authenticate Actors</h3>
+      <h3>8.5 Limit Exposure e Authenticate Actors</h3>
       <p>
-        <span class="m05-pill">Security</span> A tatica <em>Limit Exposure</em> diz: reduzir a superficie de ataque mantendo so o que e
-        necessario aberto. <em>Authenticate Actors</em> diz: cada componente deve provar quem e antes de obter privilegio. Aplicacao concreta:
+        <span class="m05-pill">Security</span> A tática <em>Limit Exposure</em> consiste em reduzir a superfície de ataque, mantendo expostos
+        apenas os recursos estritamente necessários. A tática <em>Authenticate Actors</em>, por sua vez, estabelece que cada componente deve
+        comprovar sua identidade antes de obter privilégio. A aplicação concreta dessas táticas é apresentada a seguir:
       </p>
       <pre><code># Criar usuario read-only no ClickHouse
 docker exec -i olist_analytics clickhouse-client &lt;&lt;'SQL'

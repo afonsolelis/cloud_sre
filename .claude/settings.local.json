@@ -18,7 +18,10 @@
       "Bash(git push *)",
       "Bash(mkdir -p /c/Users/afons/.claude/projects/C--Users-afons-Repos-cloud-sre/memory)",
       "Bash(mv /c/Users/afons/.claude/projects/C--Users-afons-Repos-cloud_sre/memory/feedback_repurpose_lecture_folders.md /c/Users/afons/.claude/projects/C--Users-afons-Repos-cloud-sre/memory/)",
-      "Bash(npx playwright *)"
+      "Bash(npx playwright *)",
+      "Bash(npx --version)",
+      "Bash(node tmp/inspect_slides.mjs)",
+      "Bash(node *)"
     ]
   }
 }

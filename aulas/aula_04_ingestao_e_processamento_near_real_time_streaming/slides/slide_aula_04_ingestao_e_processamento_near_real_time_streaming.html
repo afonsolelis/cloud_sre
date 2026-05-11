@@ -215,7 +215,7 @@
           <h1 class="deck-title">Ingestão e Processamento Near Real-time com Streaming</h1>
           <p class="deck-meta">Aula 04 &nbsp;&bull;&nbsp; 07/05/2026 &nbsp;&bull;&nbsp; Aula presencial</p>
           <p class="deck-year">2026</p>
-          <p class="deck-subtitle">Antes de pagar nuvem, sobe local &mdash; Docker Compose, MinIO no lugar do S3, ClickHouse como warehouse, Streamlit como front.</p>
+          <p class="deck-subtitle">Implementação local da arquitetura de ingestão near real-time para o dataset Olist em Docker Compose, com MinIO como camada de armazenamento compatível com a API S3, ClickHouse como data warehouse analítico e Streamlit como camada de apresentação.</p>
         </div>
       </div>
     </div>
@@ -227,37 +227,37 @@
       <div class="deck-shell a04-compact">
         <div>
           <span class="deck-kicker">Agenda</span>
-          <h2 class="deck-title">O que vai acontecer nesta aula</h2>
-          <p class="deck-summary">Bloco teórico curto e direto; bloco prático longo no terminal subindo e validando a stack do Olist em Docker Compose.</p>
+          <h2 class="deck-title">Estrutura desta aula</h2>
+          <p class="deck-summary">A aula combina um bloco teórico inicial, dedicado aos fundamentos da ingestão near real-time, com um bloco prático estendido em que a stack completa do Olist é implantada e validada em Docker Compose.</p>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
             <h3>Bloco teórico &middot; 19h00 &ndash; 20h30</h3>
             <ul>
-              <li>Por que stack local antes da nuvem</li>
-              <li>Docker Compose como contrato de stack</li>
-              <li>MinIO 101 &mdash; S3 API local</li>
-              <li>ClickHouse 101 &mdash; MergeTree, JSON, LowCardinality</li>
-              <li>Schema-on-read vs schema-on-write</li>
-              <li>Idempotência por <code>max(unixtime)</code> + <code>tag</code></li>
-              <li>Near real-time pragmático &mdash; micro-batches</li>
+              <li>Fundamentos da execução local previamente à nuvem</li>
+              <li>Docker Compose como contrato declarativo da stack</li>
+              <li>MinIO 101 &mdash; implementação local da API S3</li>
+              <li>ClickHouse 101 &mdash; MergeTree, JSON e LowCardinality</li>
+              <li>Schema-on-read versus schema-on-write</li>
+              <li>Idempotência por <code>max(unixtime)</code> e <code>tag</code></li>
+              <li>Near real-time pragmático por meio de micro-batches</li>
             </ul>
           </article>
           <article class="deck-card">
             <h3>Prática guiada &middot; 20h30 &ndash; 22h00</h3>
             <ul>
-              <li>Clonar o repo e subir <code>docker compose up -d</code></li>
-              <li>Criar bucket <code>olist</code> no MinIO console</li>
-              <li>Upload dos CSVs Olist para o bucket</li>
-              <li>Aplicar schema <code>olist_raw.ingestion</code></li>
-              <li>Rodar <code>ingest_minio.py</code> &mdash; landing NDJSON</li>
-              <li>Criar a view <code>v_top_products</code></li>
-              <li>Abrir o dashboard Streamlit</li>
-              <li>Reingerir e observar a idempotência</li>
+              <li>Clonagem do repositório e execução de <code>docker compose up -d</code></li>
+              <li>Criação do bucket <code>olist</code> no console MinIO</li>
+              <li>Carga dos CSVs Olist no bucket</li>
+              <li>Aplicação do schema <code>olist_raw.ingestion</code></li>
+              <li>Execução de <code>ingest_minio.py</code> com landing em NDJSON</li>
+              <li>Criação da view <code>v_top_products</code></li>
+              <li>Abertura do dashboard Streamlit</li>
+              <li>Reingestão e observação da idempotência</li>
             </ul>
           </article>
         </div>
-        <p style="margin-top:10px; font-size:.84em; color: var(--deck-muted);"><strong>Tese:</strong> stack local entrega paridade dev/prod via interfaces (S3 SDK, SQL). Custo zero, feedback loop curto, mesmas APIs.</p>
+        <p style="margin-top:10px; font-size:.84em; color: var(--deck-muted);"><strong>Tese:</strong> a execução local oferece paridade entre desenvolvimento e produção por meio de interfaces consolidadas (SDK S3 e SQL), proporcionando custo nulo, ciclo de feedback reduzido e preservação das mesmas APIs utilizadas em ambiente de nuvem.</p>
       </div>
     </div>
 
@@ -268,16 +268,16 @@
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Tese da aula</span>
-          <h2 class="deck-title">Antes de pagar nuvem, sobe local</h2>
-          <p class="deck-summary">A interface é o contrato &mdash; não o fornecedor. Quem fala S3 API e SQL, fala com MinIO+ClickHouse local hoje e com S3+Redshift amanhã. A engenharia mora nas interfaces; a fatura, no provedor.</p>
+          <h2 class="deck-title">A interface como contrato de engenharia</h2>
+          <p class="deck-summary">A interface, e não o fornecedor, constitui o contrato técnico relevante. Um pipeline que se comunica por meio da API S3 e da linguagem SQL opera tanto sobre MinIO e ClickHouse em ambiente local quanto sobre S3 e Redshift em ambiente de nuvem, com alterações restritas a endpoint e credenciais. A engenharia reside nas interfaces; a fatura, no provedor.</p>
         </div>
         <div class="deck-callout">
           <strong>Quatro regras desta aula</strong>
           <ol style="margin:12px 0 0; padding-left:22px;">
-            <li>Stack inteira em <code>docker compose up -d</code> &mdash; nada de clique em console cloud hoje.</li>
-            <li>Ingestão é <strong>append-only</strong>: cada execução marca <code>unixtime</code> e <code>tag</code> próprios.</li>
-            <li>Modelagem é <strong>schema-on-read</strong> &mdash; landing como <code>JSON</code>, modelagem nas views.</li>
-            <li>Healthcheck em todo serviço crítico &mdash; <code>depends_on: service_healthy</code> ou nada.</li>
+            <li>A stack completa é orquestrada por meio de <code>docker compose up -d</code>, sem operações em consoles de provedores de nuvem ao longo desta aula.</li>
+            <li>A ingestão segue o paradigma <strong>append-only</strong>, em que cada execução registra <code>unixtime</code> e <code>tag</code> próprios.</li>
+            <li>A modelagem adota o regime <strong>schema-on-read</strong>, mantendo a landing como <code>JSON</code> bruto e concentrando a tipagem nas views.</li>
+            <li>Healthchecks são obrigatórios em todo serviço crítico, sustentando a diretiva <code>depends_on: service_healthy</code>.</li>
           </ol>
         </div>
       </div>
@@ -290,35 +290,35 @@
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Teoria &middot; Estratégia</span>
-          <h2 class="deck-title">Por que stack local antes da nuvem</h2>
-          <p class="deck-summary">A nuvem cobra por hora &mdash; e por erro. O laboratório local cobra por curiosidade. Mesmas interfaces, latência menor, custo zero.</p>
+          <h2 class="deck-title">Justificativa para a execução local previamente à nuvem</h2>
+          <p class="deck-summary">Provedores de nuvem cobram por tempo de uso e penalizam erros operacionais com fatura adicional, ao passo que o laboratório local permite experimentação irrestrita. Ao preservar as mesmas interfaces, obtém-se latência menor e custo nulo.</p>
         </div>
         <div class="a04-grid-3">
           <article class="deck-card">
-            <h3>Feedback loop</h3>
+            <h3>Ciclo de feedback</h3>
             <ul>
-              <li>Subir/derrubar em segundos.</li>
-              <li>Erro caro vira erro barato.</li>
-              <li>Sem IAM no caminho do iniciante.</li>
-              <li>Tudo cabe no laptop do aluno.</li>
+              <li>Provisão e desprovisão em segundos.</li>
+              <li>Erros de alto custo são convertidos em erros de baixo custo.</li>
+              <li>Ausência de IAM no caminho do iniciante.</li>
+              <li>Ambiente integralmente contido no equipamento do estudante.</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>Paridade dev/prod</h3>
+            <h3>Paridade entre desenvolvimento e produção</h3>
             <ul>
-              <li>MinIO fala S3 API &mdash; mesmo SDK boto3.</li>
-              <li>ClickHouse é o mesmo no laptop e no servidor.</li>
-              <li>O contrato é a interface, não o fornecedor.</li>
-              <li>Migrar para AWS muda só endpoint e credencial.</li>
+              <li>O MinIO implementa a API S3, preservando o mesmo SDK boto3.</li>
+              <li>O ClickHouse é idêntico no laptop e no servidor de produção.</li>
+              <li>O contrato é definido pela interface, não pelo fornecedor.</li>
+              <li>A migração para a AWS exige alteração apenas de endpoint e credenciais.</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>Custo &amp; reprodutibilidade</h3>
+            <h3>Custo e reprodutibilidade</h3>
             <ul>
-              <li>Zero fatura mensal.</li>
-              <li>Stack inteira em um <code>compose.yaml</code>.</li>
-              <li>Aluno reproduz em casa sem session token.</li>
-              <li>Reset com <code>docker compose down -v</code>.</li>
+              <li>Ausência de fatura mensal.</li>
+              <li>Stack inteira declarada em um único <code>compose.yaml</code>.</li>
+              <li>O estudante reproduz o ambiente sem dependência de session token.</li>
+              <li>Reset integral por meio de <code>docker compose down -v</code>.</li>
             </ul>
           </article>
         </div>
@@ -332,20 +332,20 @@
       <div class="deck-shell a04-table-compact">
         <div>
           <span class="deck-kicker">Teoria &middot; Espectro</span>
-          <h2 class="deck-title">Batch, micro-batch, streaming</h2>
-          <p class="deck-summary">"Near real-time" é uma faixa do espectro &mdash; não um ponto. Hoje rodamos micro-batch frequente. Streaming verdadeiro vem com Kafka/Flink e tem custo de operação maior.</p>
+          <h2 class="deck-title">Batch, micro-batch e streaming</h2>
+          <p class="deck-summary">A expressão "near real-time" designa uma faixa do espectro de latência, e não um ponto fixo. Nesta aula adota-se o regime de micro-batch frequente; o streaming propriamente dito, suportado por Kafka ou Flink, comporta custo operacional consideravelmente superior.</p>
         </div>
         <table class="deck-table">
           <thead>
-            <tr><th>Modo</th><th>Latência típica</th><th>Como funciona</th><th>Quando usar</th></tr>
+            <tr><th>Modo</th><th>Latência típica</th><th>Mecânica de operação</th><th>Cenários adequados</th></tr>
           </thead>
           <tbody>
-            <tr><td>Batch</td><td>Horas / dia</td><td>Janela longa, processa tudo de uma vez.</td><td>Relatório diário, BI clássico.</td></tr>
-            <tr><td>Micro-batch</td><td>Segundos / minutos</td><td>Lotes pequenos e frequentes &mdash; pandas, Spark Structured Streaming.</td><td>Dashboards "vivos", agregações leves.</td></tr>
-            <tr><td>Streaming</td><td>Sub-segundo</td><td>Evento a evento &mdash; Kafka, Flink, Kinesis.</td><td>Detecção de fraude, telemetria crítica.</td></tr>
+            <tr><td>Batch</td><td>Horas a dia</td><td>Janela longa, processamento do conjunto integral em uma única execução.</td><td>Relatório diário, BI clássico.</td></tr>
+            <tr><td>Micro-batch</td><td>Segundos a minutos</td><td>Lotes pequenos e frequentes, conduzidos por pandas ou Spark Structured Streaming.</td><td>Dashboards operacionais, agregações analíticas leves.</td></tr>
+            <tr><td>Streaming</td><td>Sub-segundo</td><td>Processamento evento a evento, suportado por Kafka, Flink ou Kinesis.</td><td>Detecção de fraude, telemetria crítica.</td></tr>
           </tbody>
         </table>
-        <p style="margin-top:10px; font-size:.86em; color: var(--deck-muted);"><strong>Hoje:</strong> micro-batch via <code>ingest_minio.py</code> rodando em loop manual ou cron. Sem Kafka, sem Flink &mdash; deliberadamente.</p>
+        <p style="margin-top:10px; font-size:.86em; color: var(--deck-muted);"><strong>Implementação adotada:</strong> micro-batch executado via <code>ingest_minio.py</code>, acionado por meio de loop manual ou cron, com exclusão deliberada de Kafka e Flink.</p>
       </div>
     </div>
 
@@ -356,28 +356,28 @@
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Teoria &middot; Compose</span>
-          <h2 class="deck-title">Docker Compose como contrato de stack</h2>
-          <p class="deck-summary">Um arquivo YAML descreve todo o sistema &mdash; serviços, volumes, redes, healthchecks, dependências. Vira a fonte única de verdade do ambiente.</p>
+          <h2 class="deck-title">Docker Compose como contrato declarativo da stack</h2>
+          <p class="deck-summary">Um único arquivo YAML descreve todo o sistema, abrangendo serviços, volumes, redes, healthchecks e dependências. Esse artefato constitui a fonte única de verdade do ambiente.</p>
         </div>
         <div class="deck-columns">
           <div class="deck-panel">
             <strong>Conceitos centrais</strong>
             <ul>
               <li><code>services</code>: cada container do sistema.</li>
-              <li><code>volumes</code>: persistência fora do container.</li>
-              <li><code>healthcheck</code>: SLO local &mdash; "estou pronto".</li>
-              <li><code>depends_on: service_healthy</code>: orquestração de startup.</li>
-              <li><code>ports</code>: expõe para o host.</li>
-              <li><code>environment</code>: configuração injetada.</li>
+              <li><code>volumes</code>: persistência externa ao ciclo de vida do container.</li>
+              <li><code>healthcheck</code>: SLO local que sinaliza prontidão do serviço.</li>
+              <li><code>depends_on: service_healthy</code>: orquestração condicionada do startup.</li>
+              <li><code>ports</code>: exposição de portas para o host.</li>
+              <li><code>environment</code>: configuração injetada no processo.</li>
             </ul>
           </div>
           <div class="deck-panel">
-            <strong>Os 4 serviços da nossa stack</strong>
+            <strong>Os quatro serviços que compõem a stack</strong>
             <ul>
-              <li><code>clickhouse</code> &mdash; warehouse colunar.</li>
-              <li><code>minio</code> &mdash; object storage S3-compatible.</li>
-              <li><code>ingestor</code> &mdash; worker Python idle.</li>
-              <li><code>dashboard</code> &mdash; Streamlit servindo BI.</li>
+              <li><code>clickhouse</code> &mdash; data warehouse colunar.</li>
+              <li><code>minio</code> &mdash; object storage compatível com a API S3.</li>
+              <li><code>ingestor</code> &mdash; worker Python em estado ocioso, executado sob demanda.</li>
+              <li><code>dashboard</code> &mdash; aplicação Streamlit responsável pela camada de BI.</li>
             </ul>
           </div>
         </div>
@@ -391,8 +391,8 @@
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Arquitetura &middot; Visão</span>
-          <h2 class="deck-title">A stack do Olist em uma figura</h2>
-          <p class="deck-summary">CSVs entram pelo MinIO. O ingestor lê via S3 SDK, transforma em NDJSON e escreve em <code>olist_raw.ingestion</code>. Views materializam métricas. Streamlit consome via HTTP do ClickHouse.</p>
+          <h2 class="deck-title">Representação esquemática da stack Olist</h2>
+          <p class="deck-summary">Os CSVs ingressam pelo MinIO, são lidos pelo ingestor por meio do SDK S3, convertidos em NDJSON e gravados na tabela <code>olist_raw.ingestion</code>. As views derivam as métricas analíticas, e o Streamlit consome o resultado via HTTP no ClickHouse.</p>
         </div>
         <div class="a04-mermaid">
 <pre class="mermaid">
@@ -429,8 +429,8 @@ flowchart LR
       <div class="deck-shell a04-compact">
         <div>
           <span class="deck-kicker">Stack &middot; Serviços</span>
-          <h2 class="deck-title">Os quatro serviços</h2>
-          <p class="deck-summary">Cada serviço tem papel único, porta exposta e healthcheck. Volumes persistem dados entre <code>up</code> e <code>down</code>.</p>
+          <h2 class="deck-title">Os quatro serviços da stack</h2>
+          <p class="deck-summary">Cada serviço cumpre um papel específico, com porta exposta e healthcheck próprios. Os volumes preservam os dados entre os comandos <code>up</code> e <code>down</code>.</p>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
@@ -438,10 +438,10 @@ flowchart LR
             <ul>
               <li>Imagem: <code>clickhouse/clickhouse-server:latest</code>.</li>
               <li>Container: <code>olist_analytics</code>.</li>
-              <li>Portas: <code>8123</code> HTTP, <code>9000</code> native.</li>
+              <li>Portas: <code>8123</code> (HTTP) e <code>9000</code> (nativo).</li>
               <li>Healthcheck: <code>wget --spider /ping</code>.</li>
               <li>Volume: <code>clickhouse_data</code>.</li>
-              <li>Papel: <strong>warehouse analítico</strong>.</li>
+              <li>Papel: <strong>data warehouse analítico</strong>.</li>
             </ul>
           </article>
           <article class="deck-card">
@@ -449,31 +449,31 @@ flowchart LR
             <ul>
               <li>Imagem: <code>minio/minio</code>.</li>
               <li>Container: <code>olist_minio</code>.</li>
-              <li>Portas: <code>9002</code> API, <code>9003</code> console.</li>
+              <li>Portas: <code>9002</code> (API) e <code>9003</code> (console).</li>
               <li>Credenciais: <code>minioadmin / minioadmin</code>.</li>
               <li>Healthcheck: <code>curl /minio/health/live</code>.</li>
-              <li>Papel: <strong>object storage S3-compatible</strong>.</li>
+              <li>Papel: <strong>object storage compatível com a API S3</strong>.</li>
             </ul>
           </article>
           <article class="deck-card">
             <h3>ingestor</h3>
             <ul>
-              <li>Build local &mdash; <code>python:3.9-slim</code>.</li>
+              <li>Build local sobre <code>python:3.9-slim</code>.</li>
               <li>Container: <code>olist_ingestor</code>.</li>
-              <li>Comando: <code>tail -f /dev/null</code> (idle).</li>
-              <li>Env: <code>S3_ENDPOINT_URL=http://minio:9000</code>.</li>
-              <li>Depende de <code>minio</code> + <code>clickhouse</code> healthy.</li>
+              <li>Comando: <code>tail -f /dev/null</code> (estado ocioso).</li>
+              <li>Variável: <code>S3_ENDPOINT_URL=http://minio:9000</code>.</li>
+              <li>Depende de <code>minio</code> e <code>clickhouse</code> em estado healthy.</li>
               <li>Papel: <strong>worker de ingestão</strong>.</li>
             </ul>
           </article>
           <article class="deck-card">
             <h3>dashboard</h3>
             <ul>
-              <li>Build local &mdash; mesma imagem do ingestor.</li>
+              <li>Build local sobre a mesma imagem do ingestor.</li>
               <li>Container: <code>olist_dashboard</code>.</li>
               <li>Porta: <code>8501</code>.</li>
               <li>Comando: <code>streamlit run streamlit_app.py</code>.</li>
-              <li>Depende de <code>clickhouse</code> healthy.</li>
+              <li>Depende de <code>clickhouse</code> em estado healthy.</li>
               <li>Papel: <strong>frontend de visualização</strong>.</li>
             </ul>
           </article>
@@ -488,8 +488,8 @@ flowchart LR
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Stack &middot; Código</span>
-          <h2 class="deck-title">docker-compose.yaml &mdash; resumo</h2>
-          <p class="deck-summary">Versão enxuta para leitura. O arquivo completo vive no repo da aula. Note <code>depends_on: condition: service_healthy</code> orquestrando o startup.</p>
+          <h2 class="deck-title">docker-compose.yaml &mdash; versão resumida</h2>
+          <p class="deck-summary">Apresenta-se uma versão condensada para fins de leitura; o arquivo completo encontra-se no repositório da aula. Observe-se a diretiva <code>depends_on: condition: service_healthy</code>, responsável pela orquestração condicional do startup.</p>
         </div>
         <div class="a04-snippet">
           <span class="a04-snippet-label">docker-compose.yaml</span>
@@ -549,28 +549,28 @@ volumes:
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Teoria &middot; MinIO</span>
-          <h2 class="deck-title">MinIO 101 &mdash; S3 API no laptop</h2>
-          <p class="deck-summary">Servidor de objetos open source que implementa a API S3. Mesmos SDKs, mesmos verbos, mesmas semânticas. O endpoint muda, o resto não.</p>
+          <h2 class="deck-title">MinIO 101 &mdash; API S3 em ambiente local</h2>
+          <p class="deck-summary">O MinIO é um servidor de objetos de código aberto que implementa a API S3. Mantém-se a mesma família de SDKs, os mesmos verbos REST e a mesma semântica de operações; o endpoint constitui a única alteração substantiva.</p>
         </div>
         <div class="deck-columns">
           <div class="deck-panel">
-            <strong>Conceitos S3</strong>
+            <strong>Conceitos da API S3</strong>
             <ul>
               <li><strong>Bucket</strong>: container nomeado de objetos.</li>
-              <li><strong>Objeto</strong>: arquivo + metadados, identificado por <em>key</em>.</li>
-              <li><strong>Endpoint URL</strong>: onde o SDK vai bater.</li>
-              <li><strong>Path-style</strong> vs <strong>virtual-hosted</strong>: como o bucket aparece na URL.</li>
-              <li>API REST &mdash; <code>PutObject</code>, <code>GetObject</code>, <code>ListObjectsV2</code>.</li>
+              <li><strong>Objeto</strong>: arquivo e metadados associados, identificado por <em>key</em>.</li>
+              <li><strong>Endpoint URL</strong>: localização à qual o SDK direciona as requisições.</li>
+              <li><strong>Path-style</strong> versus <strong>virtual-hosted</strong>: forma como o bucket é expresso na URL.</li>
+              <li>API REST com operações como <code>PutObject</code>, <code>GetObject</code> e <code>ListObjectsV2</code>.</li>
             </ul>
           </div>
           <div class="deck-panel">
-            <strong>O que muda do S3 real</strong>
+            <strong>Diferenças em relação ao S3 em produção</strong>
             <ul>
-              <li>Endpoint: <code>http://minio:9000</code> (não AWS).</li>
-              <li>Credenciais: <code>minioadmin/minioadmin</code> &mdash; só local.</li>
-              <li>boto3 precisa de <code>endpoint_url=...</code> no client.</li>
-              <li>Console web em <code>localhost:9003</code> &mdash; análogo ao AWS Console.</li>
-              <li>Sem IAM elaborado, sem KMS &mdash; volta a aparecer na nuvem.</li>
+              <li>Endpoint: <code>http://minio:9000</code>, distinto do endereço AWS.</li>
+              <li>Credenciais: <code>minioadmin/minioadmin</code>, restritas ao ambiente local.</li>
+              <li>O boto3 exige a configuração explícita de <code>endpoint_url=...</code> no cliente.</li>
+              <li>Console web em <code>localhost:9003</code>, análogo funcional ao AWS Console.</li>
+              <li>Recursos como IAM elaborado e KMS são adicionados apenas no ambiente de nuvem.</li>
             </ul>
           </div>
         </div>
@@ -584,35 +584,35 @@ volumes:
       <div class="deck-shell a04-compact">
         <div>
           <span class="deck-kicker">Teoria &middot; ClickHouse</span>
-          <h2 class="deck-title">ClickHouse 101 &mdash; OLAP colunar rápido</h2>
-          <p class="deck-summary">Banco colunar, vetorizado, SQL-friendly. Engine padrão é <code>MergeTree</code>: armazena ordenado pela chave, compacta por coluna, varre só o que precisa.</p>
+          <h2 class="deck-title">ClickHouse 101 &mdash; banco colunar OLAP de alto desempenho</h2>
+          <p class="deck-summary">O ClickHouse é um banco colunar e vetorizado, com sintaxe SQL. Sua engine padrão é a <code>MergeTree</code>, que armazena os dados ordenados pela chave definida, compacta por coluna e realiza varreduras restritas às porções relevantes.</p>
         </div>
         <div class="a04-grid-3">
           <article class="deck-card">
             <h3>MergeTree</h3>
             <ul>
-              <li>Engine de tabela base do CH.</li>
-              <li><code>ORDER BY</code> define a chave de leitura.</li>
-              <li>Dados particionados em "parts" no disco.</li>
-              <li>Merges em background &mdash; nome da família.</li>
+              <li>Engine fundamental de tabela do ClickHouse.</li>
+              <li>A cláusula <code>ORDER BY</code> define a chave de leitura.</li>
+              <li>Os dados são particionados em <em>parts</em> em disco.</li>
+              <li>Operações de merge ocorrem em background, originando o nome da família.</li>
             </ul>
           </article>
           <article class="deck-card">
             <h3>Tipo JSON</h3>
             <ul>
-              <li>Coluna semi-estruturada nativa.</li>
-              <li>Permite schema-on-read sem perder performance.</li>
-              <li>Indexa subcaminhos automaticamente.</li>
-              <li>Bom para landing de dados heterogêneos.</li>
+              <li>Coluna semi-estruturada de tipo nativo.</li>
+              <li>Viabiliza o regime schema-on-read sem degradação de performance.</li>
+              <li>Indexa subcaminhos de forma automática.</li>
+              <li>Adequado à landing de dados heterogêneos.</li>
             </ul>
           </article>
           <article class="deck-card">
             <h3>LowCardinality</h3>
             <ul>
-              <li>Wrapper para colunas com poucos valores únicos.</li>
-              <li>Armazena dicionário + códigos.</li>
-              <li>Reduz drasticamente disco e CPU.</li>
-              <li>Perfeito para <code>tag</code>, <code>region</code>, <code>status</code>.</li>
+              <li>Wrapper destinado a colunas com baixa cardinalidade.</li>
+              <li>Armazena dicionário e códigos correspondentes.</li>
+              <li>Reduz significativamente o consumo de disco e CPU.</li>
+              <li>Particularmente indicado para <code>tag</code>, <code>region</code> e <code>status</code>.</li>
             </ul>
           </article>
         </div>
@@ -626,19 +626,19 @@ volumes:
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Teoria &middot; Modelagem</span>
-          <h2 class="deck-title">Schema-on-read vs schema-on-write</h2>
-          <p class="deck-summary">Quem decide o schema &mdash; quem grava ou quem lê? A escolha define quão rápido o pipeline se adapta a novas fontes.</p>
+          <h2 class="deck-title">Schema-on-read versus schema-on-write</h2>
+          <p class="deck-summary">A definição de quem estabelece o schema &mdash; a escrita ou a leitura &mdash; determina a velocidade com que o pipeline se adapta a novas fontes de dados.</p>
         </div>
         <table class="deck-table">
           <thead>
             <tr><th>Aspecto</th><th>Schema-on-write</th><th>Schema-on-read</th></tr>
           </thead>
           <tbody>
-            <tr><td>Onde valida o tipo</td><td>Na ingestão.</td><td>Na query.</td></tr>
-            <tr><td>Custo de mudar schema</td><td>Alto &mdash; ALTER, migration.</td><td>Baixo &mdash; só muda a view.</td></tr>
-            <tr><td>Risco</td><td>Quebra cedo, perde dado.</td><td>Quebra tarde, atrasa relatório.</td></tr>
-            <tr><td>Exemplo clássico</td><td>Postgres, Redshift.</td><td>Data Lake, ClickHouse JSON, BigQuery STRUCT.</td></tr>
-            <tr><td>Nossa escolha hoje</td><td>&mdash;</td><td><strong>Landing como JSON, modelagem nas views.</strong></td></tr>
+            <tr><td>Local de validação do tipo</td><td>Na ingestão.</td><td>Na query.</td></tr>
+            <tr><td>Custo de alteração do schema</td><td>Alto, exigindo ALTER e migração.</td><td>Baixo, restrito à modificação da view.</td></tr>
+            <tr><td>Perfil de risco</td><td>Falha precoce, com perda potencial de dados.</td><td>Falha tardia, com atraso na geração de relatórios.</td></tr>
+            <tr><td>Exemplos clássicos</td><td>Postgres, Redshift.</td><td>Data Lake, ClickHouse JSON, BigQuery STRUCT.</td></tr>
+            <tr><td>Opção adotada nesta aula</td><td>&mdash;</td><td><strong>Landing como JSON, com modelagem concentrada nas views.</strong></td></tr>
           </tbody>
         </table>
       </div>
@@ -651,8 +651,8 @@ volumes:
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Modelagem &middot; Raw</span>
-          <h2 class="deck-title">A tabela landing &mdash; uma só, para tudo</h2>
-          <p class="deck-summary">Três colunas só: <code>unixtime</code>, <code>data</code>, <code>tag</code>. Qualquer CSV que entre no bucket cai aqui. A "tabela" lógica do produto vira uma <em>view</em> mais tarde.</p>
+          <h2 class="deck-title">Tabela landing única para o conjunto de fontes</h2>
+          <p class="deck-summary">A tabela conta com apenas três colunas: <code>unixtime</code>, <code>data</code> e <code>tag</code>. Qualquer CSV depositado no bucket é gravado nessa estrutura, e a representação lógica das tabelas de produto emerge posteriormente, na forma de <em>view</em>.</p>
         </div>
         <div class="a04-snippet">
           <span class="a04-snippet-label">sql/raw/01_schema.sql</span>
@@ -668,7 +668,7 @@ ENGINE = MergeTree
 ORDER BY (tag, unixtime);</pre>
         </div>
         <p style="margin-top:14px; font-size:.92em; color: #2e2e2e;">
-          <strong>Padrão:</strong> <em>append-only</em>. Cada execução do ingestor gera um <code>unixtime</code> novo no início do run e tagueia cada linha com o nome do CSV de origem. Não existe <code>UPDATE</code> nem <code>DELETE</code> aqui &mdash; só <code>INSERT</code>.
+          <strong>Padrão adotado:</strong> <em>append-only</em>. Cada execução do ingestor calcula um novo <code>unixtime</code> no início da rotina e marca cada linha com o nome do CSV de origem. Não há operações de <code>UPDATE</code> ou <code>DELETE</code>; apenas <code>INSERT</code>.
         </p>
       </div>
     </div>
@@ -680,26 +680,26 @@ ORDER BY (tag, unixtime);</pre>
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Padrão &middot; Idempotência</span>
-          <h2 class="deck-title">Idempotência sem MERGE nem UPSERT</h2>
-          <p class="deck-summary">Reingerir o mesmo CSV grava de novo &mdash; isso é bom. A view filtra <code>max(unixtime)</code> por <code>tag</code> e enxerga só a execução mais recente. Linhagem livre, sem efeito colateral.</p>
+          <h2 class="deck-title">Idempotência sem recurso a MERGE ou UPSERT</h2>
+          <p class="deck-summary">A reingestão do mesmo CSV produz nova gravação, o que constitui comportamento desejado. A view aplica o filtro <code>max(unixtime)</code> por <code>tag</code> e expõe apenas a execução mais recente, preservando a linhagem sem qualquer efeito colateral.</p>
         </div>
         <div class="deck-columns">
           <div class="deck-panel">
-            <strong>Como funciona</strong>
+            <strong>Mecânica de operação</strong>
             <ul>
-              <li>Ingestor calcula <code>unixtime = int(time.time())</code> uma vez no início.</li>
-              <li>Toda linha desse run leva esse <code>unixtime</code>.</li>
-              <li><code>tag</code> = nome do CSV (ex.: <code>olist_order_items_dataset.csv</code>).</li>
-              <li>View consome <code>WHERE unixtime = (SELECT max(unixtime) FROM ... WHERE tag = X)</code>.</li>
+              <li>O ingestor calcula <code>unixtime = int(time.time())</code> uma única vez ao iniciar.</li>
+              <li>Todas as linhas da execução recebem esse mesmo valor de <code>unixtime</code>.</li>
+              <li>A <code>tag</code> corresponde ao nome do CSV (por exemplo, <code>olist_order_items_dataset.csv</code>).</li>
+              <li>A view consulta <code>WHERE unixtime = (SELECT max(unixtime) FROM ... WHERE tag = X)</code>.</li>
             </ul>
           </div>
           <div class="deck-panel">
-            <strong>O que isso compra</strong>
+            <strong>Benefícios decorrentes</strong>
             <ul>
-              <li>Reingestões sempre seguras &mdash; nunca corrompem o estado.</li>
-              <li>Histórico das execuções preservado &mdash; vira auditoria de graça.</li>
-              <li>Reverter para versão anterior = filtrar outro <code>unixtime</code>.</li>
-              <li>Zero locks, zero transações distribuídas.</li>
+              <li>Reingestões são integralmente seguras e não comprometem o estado.</li>
+              <li>O histórico das execuções permanece preservado, configurando trilha de auditoria sem custo adicional.</li>
+              <li>A reversão para uma versão anterior reduz-se ao filtro por outro <code>unixtime</code>.</li>
+              <li>Não há necessidade de locks ou de transações distribuídas.</li>
             </ul>
           </div>
         </div>
@@ -713,8 +713,8 @@ ORDER BY (tag, unixtime);</pre>
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Código &middot; Ingestor</span>
-          <h2 class="deck-title">app/ingest_minio.py &mdash; o coração da ingestão</h2>
-          <p class="deck-summary">Lê CSV do MinIO via boto3, vira pandas, gera NDJSON, manda em batches de 50k linhas para o ClickHouse. Cada linha vira <code>{ unixtime, data, tag }</code>.</p>
+          <h2 class="deck-title">app/ingest_minio.py &mdash; o núcleo da ingestão</h2>
+          <p class="deck-summary">O script lê os CSVs no MinIO por meio do boto3, converte os dados para pandas, gera NDJSON e os encaminha em lotes de 50 mil linhas ao ClickHouse. Cada linha resultante é representada como <code>{ unixtime, data, tag }</code>.</p>
         </div>
         <div class="a04-snippet">
           <span class="a04-snippet-label">ingest_minio.py (resumo)</span>
@@ -761,8 +761,8 @@ for obj in s3.list_objects_v2(Bucket=BUCKET)["Contents"]:
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Modelagem &middot; View</span>
-          <h2 class="deck-title">v_top_products &mdash; junta três CSVs, sempre na execução mais recente</h2>
-          <p class="deck-summary">A view materializa "produto mais vendido" sem materializar tabela física. Cada CTE pega só o <code>max(unixtime)</code> da sua <code>tag</code>. Reingere sem medo.</p>
+          <h2 class="deck-title">v_top_products &mdash; junção de três CSVs sempre na execução mais recente</h2>
+          <p class="deck-summary">A view formaliza a métrica de "produto mais vendido" sem materializar uma tabela física. Cada CTE seleciona exclusivamente o <code>max(unixtime)</code> da respectiva <code>tag</code>, o que garante que as reingestões sejam seguras.</p>
         </div>
         <div class="a04-snippet">
           <span class="a04-snippet-label">sql/views/01_top_products.sql (resumo)</span>
@@ -810,28 +810,28 @@ GROUP BY product_id, category_pt, category_en;</pre>
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Frontend &middot; Streamlit</span>
-          <h2 class="deck-title">app/streamlit_app.py &mdash; dashboard de top produtos</h2>
-          <p class="deck-summary">Lê a view <code>v_top_products</code> via HTTP, cacheia 60s e renderiza filtros + tabela + gráfico de barras + breakdown por categoria. Indica a hora da última ingestão.</p>
+          <h2 class="deck-title">app/streamlit_app.py &mdash; dashboard dos produtos com maior desempenho</h2>
+          <p class="deck-summary">A aplicação consulta a view <code>v_top_products</code> via HTTP, mantém cache de 60 segundos e renderiza filtros, tabela, gráfico de barras e breakdown por categoria, exibindo ainda o instante da última ingestão.</p>
         </div>
         <div class="deck-columns">
           <div class="deck-panel">
             <strong>Estrutura da página</strong>
             <ul>
-              <li>Sidebar: Top N (5 &ndash; 100), métrica, filtro de categoria.</li>
-              <li>Header: métricas resumo &mdash; total de produtos, receita.</li>
+              <li>Sidebar: Top N (entre 5 e 100), métrica e filtro de categoria.</li>
+              <li>Cabeçalho: métricas-resumo, incluindo total de produtos e receita.</li>
               <li>Tabela: top-N ordenado.</li>
               <li>Gráfico de barras: receita ou unidades por produto.</li>
-              <li>Breakdown: agregado por categoria.</li>
+              <li>Breakdown: agregação por categoria.</li>
               <li>Rodapé: timestamp UTC da última ingestão.</li>
             </ul>
           </div>
           <div class="deck-panel">
             <strong>Decisões técnicas</strong>
             <ul>
-              <li><code>@st.cache_data(ttl=60)</code> &mdash; segura o ClickHouse.</li>
-              <li>Conexão como usuário <code>dashboard</code> read-only.</li>
-              <li>Sem joins na app &mdash; tudo já vem da view.</li>
-              <li>Headless: <code>--server.headless=true</code> para Docker.</li>
+              <li><code>@st.cache_data(ttl=60)</code> protege o ClickHouse de requisições redundantes.</li>
+              <li>Conexão estabelecida com o usuário <code>dashboard</code> em modo somente leitura.</li>
+              <li>Ausência de joins na aplicação, uma vez que a view já entrega o resultado consolidado.</li>
+              <li>Execução em modo headless: <code>--server.headless=true</code> para o Docker.</li>
               <li>Porta <code>8501</code> exposta no host.</li>
             </ul>
           </div>
@@ -846,8 +846,8 @@ GROUP BY product_id, category_pt, category_en;</pre>
       <div class="deck-shell a04-compact">
         <div>
           <span class="deck-kicker">Dados &middot; Olist</span>
-          <h2 class="deck-title">O dataset que alimenta a aula</h2>
-          <p class="deck-summary"><em>Olist Brazilian E-commerce Public Dataset</em> &mdash; 9 CSVs cobrindo pedidos, clientes, produtos, sellers, reviews, pagamentos, geolocalização. A "tag" no <code>ingestion</code> é o nome do arquivo.</p>
+          <h2 class="deck-title">O conjunto de dados utilizado nesta aula</h2>
+          <p class="deck-summary">O <em>Olist Brazilian E-commerce Public Dataset</em> é composto por nove arquivos CSV que abrangem pedidos, clientes, produtos, sellers, reviews, pagamentos e geolocalização. A <em>tag</em> registrada na tabela <code>ingestion</code> corresponde ao nome do arquivo de origem.</p>
         </div>
         <div class="a04-grid-3">
           <article class="deck-card">
@@ -872,9 +872,9 @@ GROUP BY product_id, category_pt, category_en;</pre>
             <h3>Tradução</h3>
             <ul>
               <li><code>product_category_name_translation.csv</code></li>
-              <li>Mapeia categoria PT &rarr; EN.</li>
-              <li>Usada pela view para enriquecer o produto.</li>
-              <li>É o exemplo mais simples de "join na view".</li>
+              <li>Estabelece o mapeamento da categoria de PT para EN.</li>
+              <li>Utilizada pela view para enriquecimento dos dados de produto.</li>
+              <li>Constitui o exemplo mais elementar de junção realizada em view.</li>
             </ul>
           </article>
         </div>
@@ -888,16 +888,16 @@ GROUP BY product_id, category_pt, category_en;</pre>
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Discussão &middot; Espectro</span>
-          <h2 class="deck-title">Quando trocar micro-batch por streaming de verdade</h2>
-          <p class="deck-summary">Micro-batch resolve a maior parte dos dashboards. Streaming verdadeiro vira obrigatório quando a janela de decisão fica menor que o intervalo do lote.</p>
+          <h2 class="deck-title">Critérios para a substituição do micro-batch por streaming propriamente dito</h2>
+          <p class="deck-summary">O regime de micro-batch atende à maioria absoluta dos dashboards analíticos. A adoção de streaming propriamente dito torna-se necessária quando a janela de decisão de negócio passa a ser menor que o intervalo do lote.</p>
         </div>
         <div class="deck-callout">
-          <strong>Sinais de upgrade para streaming verdadeiro</strong>
+          <strong>Indicadores que justificam a migração para streaming propriamente dito</strong>
           <ol style="margin:12px 0 0; padding-left:22px;">
-            <li>Decisão de negócio precisa rodar em &lt; 5 segundos (fraude, autorização, matching).</li>
-            <li>Volume torna lotes inviáveis &mdash; back-pressure constante, ingestor sempre atrasado.</li>
-            <li>Múltiplos consumidores precisam dos mesmos eventos em paralelo &mdash; broker resolve melhor.</li>
-            <li>Time já tem maturidade operacional para Kafka/MSK ou Kinesis &mdash; senão, o custo de operar mata o ganho.</li>
+            <li>A decisão de negócio precisa ser executada em menos de cinco segundos (cenários de fraude, autorização ou matching).</li>
+            <li>O volume de dados torna o processamento em lotes inviável, com backpressure constante e ingestor permanentemente em atraso.</li>
+            <li>Múltiplos consumidores demandam os mesmos eventos em paralelo, situação para a qual um broker oferece resposta mais adequada.</li>
+            <li>A equipe já dispõe da maturidade operacional necessária para operar Kafka/MSK ou Kinesis; sem ela, o custo operacional supera os ganhos.</li>
           </ol>
         </div>
       </div>
@@ -910,28 +910,28 @@ GROUP BY product_id, category_pt, category_en;</pre>
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Prática &middot; Abertura</span>
-          <h2 class="deck-title">20h30 &mdash; mão no terminal</h2>
-          <p class="deck-summary">Vamos subir a stack inteira, ingerir todos os CSVs do Olist, criar a view, abrir o dashboard e reingerir para ver a idempotência funcionando. Tudo local, tudo idempotente, tudo no repo.</p>
+          <h2 class="deck-title">20h30 &mdash; início do bloco prático no terminal</h2>
+          <p class="deck-summary">A atividade compreende a implantação completa da stack, a ingestão de todos os CSVs do Olist, a criação da view, a abertura do dashboard e a execução de uma reingestão destinada a evidenciar o comportamento idempotente. A integralidade do exercício ocorre em ambiente local, com base no código versionado no repositório.</p>
         </div>
         <div class="deck-columns">
           <div class="deck-panel">
             <strong>Pré-requisitos</strong>
             <ul>
-              <li>Docker Desktop ou Docker Engine + Compose v2.</li>
+              <li>Docker Desktop ou Docker Engine acompanhado de Compose v2.</li>
               <li>Git instalado.</li>
-              <li>Navegador para o console MinIO e o Streamlit.</li>
-              <li>~2 GB de RAM livre.</li>
-              <li>Porta 8123, 8501, 9000, 9002, 9003 livres.</li>
+              <li>Navegador para acesso ao console MinIO e ao Streamlit.</li>
+              <li>Aproximadamente 2 GB de RAM disponíveis.</li>
+              <li>Portas 8123, 8501, 9000, 9002 e 9003 livres.</li>
             </ul>
           </div>
           <div class="deck-panel">
-            <strong>Critério de pronto</strong>
+            <strong>Critério de conclusão</strong>
             <ul>
-              <li>4 containers <code>healthy</code> em <code>docker compose ps</code>.</li>
-              <li>Bucket <code>olist</code> populado no MinIO console.</li>
-              <li>Linhas em <code>olist_raw.ingestion</code> para cada CSV.</li>
+              <li>Quatro containers em estado <code>healthy</code>, verificáveis por <code>docker compose ps</code>.</li>
+              <li>Bucket <code>olist</code> populado no console MinIO.</li>
+              <li>Linhas registradas em <code>olist_raw.ingestion</code> para cada CSV.</li>
               <li>View <code>v_top_products</code> retornando dados.</li>
-              <li>Dashboard em <code>localhost:8501</code> respondendo.</li>
+              <li>Dashboard respondendo em <code>localhost:8501</code>.</li>
             </ul>
           </div>
         </div>
@@ -944,32 +944,32 @@ GROUP BY product_id, category_pt, category_en;</pre>
     <div class="slide">
       <div class="deck-shell a04-compact">
         <div>
-          <span class="deck-kicker">Prática &middot; Passos 1 &ndash; 3</span>
-          <h2 class="deck-title">Subir a stack</h2>
+          <span class="deck-kicker">Prática &middot; Passos 1 a 3</span>
+          <h2 class="deck-title">Implantação da stack</h2>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
-            <h3>1. Clonar o repo</h3>
+            <h3>1. Clonagem do repositório</h3>
             <ul>
-              <li><code>git clone</code> do repositório da aula.</li>
-              <li><code>cp .env.example .env</code> &mdash; defaults já funcionam.</li>
-              <li>Conferir <code>docker-compose.yaml</code> presente.</li>
+              <li>Executar <code>git clone</code> do repositório da aula.</li>
+              <li>Aplicar <code>cp .env.example .env</code>; os valores-padrão são suficientes.</li>
+              <li>Confirmar a presença do <code>docker-compose.yaml</code>.</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>2. Subir os containers</h3>
+            <h3>2. Inicialização dos containers</h3>
             <ul>
               <li><code>docker compose up -d --build</code></li>
-              <li><code>docker compose ps</code> &rarr; todos <code>healthy</code>.</li>
-              <li>Logs: <code>docker compose logs -f clickhouse</code>.</li>
+              <li><code>docker compose ps</code> &rarr; todos os serviços em estado <code>healthy</code>.</li>
+              <li>Logs disponíveis em <code>docker compose logs -f clickhouse</code>.</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>3. Criar bucket no MinIO</h3>
+            <h3>3. Criação do bucket no MinIO</h3>
             <ul>
-              <li>Abrir <code>http://localhost:9003</code>.</li>
+              <li>Acessar <code>http://localhost:9003</code>.</li>
               <li>Login: <code>minioadmin / minioadmin</code>.</li>
-              <li>Buckets &rarr; Create &rarr; <code>olist</code>.</li>
+              <li>Em Buckets, selecionar Create e atribuir o nome <code>olist</code>.</li>
             </ul>
           </article>
         </div>
@@ -982,32 +982,32 @@ GROUP BY product_id, category_pt, category_en;</pre>
     <div class="slide">
       <div class="deck-shell a04-compact">
         <div>
-          <span class="deck-kicker">Prática &middot; Passos 4 &ndash; 6</span>
-          <h2 class="deck-title">Popular landing e rodar ingestão</h2>
+          <span class="deck-kicker">Prática &middot; Passos 4 a 6</span>
+          <h2 class="deck-title">Popular a landing e executar a ingestão</h2>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
-            <h3>4. Upload dos CSVs</h3>
+            <h3>4. Carga dos CSVs</h3>
             <ul>
-              <li>Pegar os CSVs da pasta <code>data/</code> do repo.</li>
-              <li>Arrastar para o bucket <code>olist</code> no console.</li>
-              <li>Ou usar o cliente <code>mc</code>: <code>mc cp data/*.csv local/olist/</code>.</li>
+              <li>Localizar os CSVs na pasta <code>data/</code> do repositório.</li>
+              <li>Arrastar os arquivos para o bucket <code>olist</code> no console.</li>
+              <li>Alternativamente, utilizar o cliente <code>mc</code>: <code>mc cp data/*.csv local/olist/</code>.</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>5. Aplicar o schema</h3>
+            <h3>5. Aplicação do schema</h3>
             <ul>
               <li><code>docker exec -i olist_analytics clickhouse-client &lt; sql/raw/01_schema.sql</code></li>
-              <li>Cria database <code>olist_raw</code> e tabela <code>ingestion</code>.</li>
-              <li>Reexecuta sem erro &mdash; <code>IF NOT EXISTS</code>.</li>
+              <li>Cria a database <code>olist_raw</code> e a tabela <code>ingestion</code>.</li>
+              <li>A reexecução é segura, dada a cláusula <code>IF NOT EXISTS</code>.</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>6. Rodar a ingestão</h3>
+            <h3>6. Execução da ingestão</h3>
             <ul>
               <li><code>docker exec olist_ingestor python /app/ingest_minio.py</code></li>
-              <li>Lê todos os CSVs do bucket.</li>
-              <li>Cada CSV gera N inserts no <code>ingestion</code>.</li>
+              <li>O script percorre todos os CSVs presentes no bucket.</li>
+              <li>Cada CSV gera N inserts na tabela <code>ingestion</code>.</li>
             </ul>
           </article>
         </div>
@@ -1020,32 +1020,32 @@ GROUP BY product_id, category_pt, category_en;</pre>
     <div class="slide">
       <div class="deck-shell a04-compact">
         <div>
-          <span class="deck-kicker">Prática &middot; Passos 7 &ndash; 9</span>
-          <h2 class="deck-title">Validar landing e criar a view</h2>
+          <span class="deck-kicker">Prática &middot; Passos 7 a 9</span>
+          <h2 class="deck-title">Validar a landing e criar a view</h2>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
-            <h3>7. Conferir a landing</h3>
+            <h3>7. Verificação da landing</h3>
             <ul>
               <li><code>SELECT tag, count() FROM olist_raw.ingestion GROUP BY tag</code></li>
-              <li>Deve aparecer uma linha por CSV ingerido.</li>
-              <li>Total deve bater com o número de linhas do CSV.</li>
+              <li>Espera-se uma linha por CSV ingerido.</li>
+              <li>O total deve corresponder ao número de linhas do respectivo CSV.</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>8. Aplicar a view</h3>
+            <h3>8. Aplicação da view</h3>
             <ul>
               <li><code>docker exec -i olist_analytics clickhouse-client &lt; sql/views/01_top_products.sql</code></li>
-              <li>Cria <code>olist_raw.v_top_products</code>.</li>
-              <li>É só metadado &mdash; barata, refaz sem custo.</li>
+              <li>Cria a view <code>olist_raw.v_top_products</code>.</li>
+              <li>Trata-se de metadado, de baixo custo e reexecutável sem prejuízo.</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>9. Validar a view</h3>
+            <h3>9. Validação da view</h3>
             <ul>
               <li><code>SELECT * FROM olist_raw.v_top_products LIMIT 10</code></li>
-              <li>Deve devolver produtos com categoria PT/EN e métricas.</li>
-              <li>Confere ordenação por <code>revenue</code> DESC.</li>
+              <li>Deve retornar produtos com as categorias em PT/EN e respectivas métricas.</li>
+              <li>Verificar a ordenação por <code>revenue</code> em ordem decrescente.</li>
             </ul>
           </article>
         </div>
@@ -1058,31 +1058,31 @@ GROUP BY product_id, category_pt, category_en;</pre>
     <div class="slide">
       <div class="deck-shell a04-compact">
         <div>
-          <span class="deck-kicker">Prática &middot; Passos 10 &ndash; 12</span>
+          <span class="deck-kicker">Prática &middot; Passos 10 a 12</span>
           <h2 class="deck-title">Dashboard, idempotência e encerramento</h2>
         </div>
         <div class="deck-grid">
           <article class="deck-card">
-            <h3>10. Abrir o dashboard</h3>
+            <h3>10. Acesso ao dashboard</h3>
             <ul>
               <li>Acessar <code>http://localhost:8501</code>.</li>
-              <li>Brincar com filtros (Top N, métrica, categoria).</li>
-              <li>Conferir o timestamp "última ingestão" no rodapé.</li>
+              <li>Explorar os filtros disponíveis (Top N, métrica e categoria).</li>
+              <li>Verificar o timestamp da última ingestão exibido no rodapé.</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>11. Reingerir &mdash; ver idempotência</h3>
+            <h3>11. Reingestão e observação da idempotência</h3>
             <ul>
-              <li>Rodar o ingestor de novo: <code>docker exec olist_ingestor python /app/ingest_minio.py</code>.</li>
-              <li><code>SELECT tag, count(DISTINCT unixtime) FROM olist_raw.ingestion GROUP BY tag</code> &rarr; aumenta.</li>
-              <li>Dashboard mostra os mesmos números &mdash; view filtra <code>max(unixtime)</code>.</li>
+              <li>Executar novamente o ingestor: <code>docker exec olist_ingestor python /app/ingest_minio.py</code>.</li>
+              <li><code>SELECT tag, count(DISTINCT unixtime) FROM olist_raw.ingestion GROUP BY tag</code>; o valor é incrementado.</li>
+              <li>O dashboard exibe os mesmos números, pois a view filtra pelo <code>max(unixtime)</code>.</li>
             </ul>
           </article>
           <article class="deck-card">
-            <h3>12. Encerrar</h3>
+            <h3>12. Encerramento</h3>
             <ul>
-              <li><code>docker compose down</code> &mdash; volumes ficam.</li>
-              <li><code>docker compose down -v</code> &mdash; volumes vão embora (reset).</li>
+              <li><code>docker compose down</code> &mdash; os volumes são preservados.</li>
+              <li><code>docker compose down -v</code> &mdash; os volumes são removidos, configurando reset completo.</li>
               <li>Commit do trabalho no fork pessoal.</li>
             </ul>
           </article>
@@ -1097,20 +1097,20 @@ GROUP BY product_id, category_pt, category_en;</pre>
       <div class="deck-shell a04-table-compact">
         <div>
           <span class="deck-kicker">Prática &middot; Troubleshooting</span>
-          <h2 class="deck-title">Quando algo dá errado</h2>
-          <p class="deck-summary">Os sintomas mais comuns na sala &mdash; e o caminho rápido para destravar sem ficar caçando em log obscuro.</p>
+          <h2 class="deck-title">Resolução de falhas frequentes</h2>
+          <p class="deck-summary">Esta seção consolida os sintomas mais comuns observados em sala e indica o caminho mais expedito para sua resolução, dispensando inspeção exaustiva de logs.</p>
         </div>
         <table class="deck-table">
           <thead>
-            <tr><th>Sintoma</th><th>Causa provável</th><th>Ação rápida</th></tr>
+            <tr><th>Sintoma</th><th>Causa provável</th><th>Ação corretiva</th></tr>
           </thead>
           <tbody>
-            <tr><td>Porta 8123/8501/9002 já em uso</td><td>Outro processo na mesma porta.</td><td>Mudar o mapeamento <code>host:container</code> no compose.</td></tr>
-            <tr><td><code>ingestor</code> não inicia</td><td><code>clickhouse</code> ou <code>minio</code> ainda <em>starting</em>.</td><td>Esperar healthcheck ou rodar <code>docker compose up -d</code> de novo.</td></tr>
-            <tr><td><code>NoSuchBucket: olist</code></td><td>Bucket não foi criado no console.</td><td>Criar manualmente em <code>localhost:9003</code>.</td></tr>
-            <tr><td>View devolve 0 linhas</td><td>CSV foi ingerido com <code>tag</code> diferente do esperado.</td><td>Conferir <code>SELECT DISTINCT tag FROM olist_raw.ingestion</code>.</td></tr>
-            <tr><td>Streamlit em loop de erro</td><td>View ainda não foi criada.</td><td>Aplicar <code>01_top_products.sql</code> e atualizar a página.</td></tr>
-            <tr><td>Disco enchendo</td><td>Reingestões acumuladas em <code>ingestion</code>.</td><td>Rodar <code>OPTIMIZE TABLE olist_raw.ingestion FINAL</code> ou reset com <code>down -v</code>.</td></tr>
+            <tr><td>Porta 8123, 8501 ou 9002 em uso</td><td>Outro processo ocupando a mesma porta.</td><td>Alterar o mapeamento <code>host:container</code> no arquivo compose.</td></tr>
+            <tr><td>O serviço <code>ingestor</code> não inicia</td><td>O <code>clickhouse</code> ou o <code>minio</code> ainda se encontram em estado <em>starting</em>.</td><td>Aguardar a conclusão do healthcheck ou reexecutar <code>docker compose up -d</code>.</td></tr>
+            <tr><td><code>NoSuchBucket: olist</code></td><td>O bucket não foi criado no console.</td><td>Criar manualmente em <code>localhost:9003</code>.</td></tr>
+            <tr><td>A view retorna zero linhas</td><td>O CSV foi ingerido com <code>tag</code> distinta da esperada.</td><td>Verificar com <code>SELECT DISTINCT tag FROM olist_raw.ingestion</code>.</td></tr>
+            <tr><td>Streamlit em ciclo de erro</td><td>A view ainda não foi criada.</td><td>Aplicar <code>01_top_products.sql</code> e atualizar a página.</td></tr>
+            <tr><td>Disco com ocupação crescente</td><td>Reingestões acumuladas na tabela <code>ingestion</code>.</td><td>Executar <code>OPTIMIZE TABLE olist_raw.ingestion FINAL</code> ou realizar reset com <code>down -v</code>.</td></tr>
           </tbody>
         </table>
       </div>
@@ -1128,18 +1128,18 @@ GROUP BY product_id, category_pt, category_en;</pre>
         <table class="deck-table">
           <thead><tr><th>Termo</th><th>Significado</th></tr></thead>
           <tbody>
-            <tr><td><strong>MinIO</strong></td><td>Object storage open source compatível com a API S3.</td></tr>
-            <tr><td><strong>ClickHouse</strong></td><td>Banco analítico colunar vetorizado, foco em OLAP.</td></tr>
-            <tr><td><strong>MergeTree</strong></td><td>Engine padrão do ClickHouse &mdash; ordenado por <code>ORDER BY</code>, merges em background.</td></tr>
-            <tr><td><strong>Schema-on-read</strong></td><td>Schema aplicado na hora da query, não na ingestão.</td></tr>
-            <tr><td><strong>NDJSON</strong></td><td>Newline-Delimited JSON &mdash; um JSON por linha.</td></tr>
-            <tr><td><strong>S3 API</strong></td><td>Conjunto de verbos REST do Amazon S3 (GetObject, PutObject, etc).</td></tr>
-            <tr><td><strong>Endpoint URL</strong></td><td>URL base onde o SDK envia as requisições.</td></tr>
-            <tr><td><strong>Healthcheck</strong></td><td>Comando que reporta saúde do container ao Docker.</td></tr>
-            <tr><td><strong>depends_on: service_healthy</strong></td><td>Espera o healthcheck do dependente passar antes de subir.</td></tr>
+            <tr><td><strong>MinIO</strong></td><td>Object storage de código aberto compatível com a API S3.</td></tr>
+            <tr><td><strong>ClickHouse</strong></td><td>Banco analítico colunar vetorizado, dedicado a cargas OLAP.</td></tr>
+            <tr><td><strong>MergeTree</strong></td><td>Engine padrão do ClickHouse, ordenada por <code>ORDER BY</code>, com merges executados em background.</td></tr>
+            <tr><td><strong>Schema-on-read</strong></td><td>Schema aplicado no momento da query, e não na ingestão.</td></tr>
+            <tr><td><strong>NDJSON</strong></td><td>Newline-Delimited JSON, padrão em que um JSON é representado por linha.</td></tr>
+            <tr><td><strong>API S3</strong></td><td>Conjunto de verbos REST do Amazon S3 (GetObject, PutObject, entre outros).</td></tr>
+            <tr><td><strong>Endpoint URL</strong></td><td>URL base à qual o SDK encaminha as requisições.</td></tr>
+            <tr><td><strong>Healthcheck</strong></td><td>Comando que reporta ao Docker o estado de saúde do container.</td></tr>
+            <tr><td><strong>depends_on: service_healthy</strong></td><td>Aguarda a aprovação do healthcheck do serviço dependente antes de iniciar o consumidor.</td></tr>
             <tr><td><strong>Micro-batch</strong></td><td>Processamento em lotes pequenos e frequentes.</td></tr>
-            <tr><td><strong>Idempotência</strong></td><td>Rodar duas vezes tem o mesmo efeito de rodar uma vez.</td></tr>
-            <tr><td><strong>Streamlit</strong></td><td>Framework Python para dashboards de dados.</td></tr>
+            <tr><td><strong>Idempotência</strong></td><td>Propriedade segundo a qual N execuções produzem o mesmo efeito de uma única.</td></tr>
+            <tr><td><strong>Streamlit</strong></td><td>Framework Python destinado à construção de dashboards de dados.</td></tr>
           </tbody>
         </table>
       </div>
@@ -1166,11 +1166,11 @@ GROUP BY product_id, category_pt, category_en;</pre>
             </ul>
           </div>
           <div class="deck-panel">
-            <strong>Conceito &amp; padrões</strong>
+            <strong>Conceitos e padrões</strong>
             <ul>
-              <li>Kleppmann, M. &mdash; <em>Designing Data-Intensive Applications</em> (cap. 11 &mdash; Stream Processing).</li>
+              <li>Kleppmann, M. &mdash; <em>Designing Data-Intensive Applications</em>, cap. 11 (Stream Processing).</li>
               <li>Akidau, T. et al. &mdash; <em>Streaming Systems</em> (O'Reilly).</li>
-              <li>AWS &mdash; <em>Lake House Architecture</em> whitepaper (paridade conceitual).</li>
+              <li>AWS &mdash; <em>Lake House Architecture</em>, whitepaper (referência conceitual).</li>
               <li><em>Olist Brazilian E-commerce Dataset</em> &mdash; Kaggle.</li>
             </ul>
           </div>
@@ -1186,7 +1186,7 @@ GROUP BY product_id, category_pt, category_en;</pre>
         <div>
           <span class="deck-kicker">Encerramento &middot; Código da prática</span>
           <h2 class="deck-title">Repositório da aula</h2>
-          <p class="deck-summary">Todo o código que rodamos hoje &mdash; <code>docker-compose.yaml</code>, ingestor, schema, view, dashboard &mdash; está versionado no repositório abaixo. Fork, clone, experimente em casa.</p>
+          <p class="deck-summary">A totalidade do código utilizado nesta sessão &mdash; <code>docker-compose.yaml</code>, ingestor, schema, view e dashboard &mdash; encontra-se versionada no repositório indicado a seguir. Recomenda-se a realização de fork e a reprodução do ambiente em contexto próprio.</p>
         </div>
         <div class="a04-repo-cta-wrap">
           <a class="a04-repo-cta"
@@ -1204,7 +1204,7 @@ GROUP BY product_id, category_pt, category_en;</pre>
           <p class="a04-repo-url">https://github.com/afonsolelis/20261sre-primeironome-ultimonome</p>
         </div>
         <p style="margin-top:18px; font-size:.92em; color: var(--deck-muted); text-align:center;">
-          Convenção do repositório: faça um <strong>fork</strong> e renomeie para <code>20261sre-&lt;primeironome&gt;-&lt;ultimonome&gt;</code> antes de versionar suas mudanças.
+          Convenção do repositório: recomenda-se efetuar um <strong>fork</strong> e renomeá-lo para <code>20261sre-&lt;primeironome&gt;-&lt;ultimonome&gt;</code> previamente ao versionamento das alterações.
         </p>
       </div>
     </div>
