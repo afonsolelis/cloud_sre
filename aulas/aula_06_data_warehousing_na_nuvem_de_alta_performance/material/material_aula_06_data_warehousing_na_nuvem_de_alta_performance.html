@@ -4,12 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/png" href="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" />
-  <title>Material Aula 06 — Testcontainers, chaos engineering e qualidade de código mensurada</title>
+  <title>Material Aula 06 — Migração para AWS Student Lab via Gemini CLI</title>
   <link rel="stylesheet" href="../../../assets/styles.css" />
   <link rel="stylesheet" href="../../../assets/slides.css" />
   <style data-material06-local>
-    /* Material is a long-form document — neutralize the height/overflow rules
-       that slides.css applies to html, body. */
+    /* Material é documento longo — neutralizar overflow/height de slides.css. */
     html, body.material {
       height: auto !important;
       min-height: 100%;
@@ -67,6 +66,7 @@
       border-radius: 0 4px 4px 0;
     }
     .m06-callout strong:first-child { display: block; margin-bottom: 6px; }
+
     .m06-mermaid {
       background: var(--deck-panel, #ffffff);
       border: 1px solid var(--deck-line, #d6d6d1);
@@ -93,6 +93,7 @@
       margin: 0 auto;
       background: transparent;
     }
+
     .m06-tag {
       display: inline-block;
       font-family: var(--font-mono);
@@ -105,799 +106,793 @@
       border-radius: 3px;
       margin-right: 6px;
     }
+
+    .m06-repo-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 22px;
+      border: 1px solid #0f0f0f;
+      border-radius: 4px;
+      background: #0f0f0f;
+      color: #ffffff;
+      text-decoration: none;
+      font-family: var(--font-mono);
+      font-size: .92rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      margin: 16px 0;
+    }
+    .m06-repo-cta:hover { background: #2a2a2a; }
+    .m06-repo-cta svg { width: 20px; height: 20px; fill: currentColor; }
+
+    .m06-lab-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 18px;
+      border: 1px solid #0f0f0f;
+      border-radius: 4px;
+      background: transparent;
+      color: #0f0f0f;
+      text-decoration: none;
+      font-family: var(--font-mono);
+      font-size: .82rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      margin: 8px 0;
+    }
+    .m06-lab-cta:hover { background: #0f0f0f; color: #fff; }
   </style>
 </head>
 <body class="material">
   <main class="page">
 
     <section class="content-block">
-      <p class="meta">Aula 06 &nbsp;&bull;&nbsp; 21/05/2026</p>
-      <h1>Testcontainers, chaos engineering e qualidade de código mensurada</h1>
+      <p class="meta">Aula 06 &nbsp;&bull;&nbsp; 21/05/2026 &nbsp;&bull;&nbsp; Aula presencial</p>
+      <h1>Migração para AWS Student Lab via Gemini CLI</h1>
       <p class="summary">
-        Este material acompanha a Aula 06 da disciplina <strong>Cloud Computing e SRE &mdash; Visão Prática com AWS</strong>
-        do MBA em Engenharia de Dados. Hoje saímos do mock e ganhamos infraestrutura real e descartável (Testcontainers).
-        Em seguida, quebramos o sistema de propósito com chaos engineering &mdash; o closed loop CW &rarr; Controlador SRE
-        &rarr; ETL/Postgres da Aula 03 é exercitado em laboratório controlado. E medimos o custo cognitivo do código com
-        complexidade ciclomática, Halstead e Maintainability Index. Tudo entra como gate no CI da Aula 05.
+        Este material acompanha a Aula 06 da disciplina <strong>Cloud Computing e SRE &mdash; Visão Prática com AWS</strong> do MBA em Engenharia de Dados.
+        A aula faz a primeira migração de verdade: a stack Olist &mdash; subida em Docker Compose na Aula 04 e analisada via ATAM + endurecida com táticas locais de
+        Bass na Aula 05 &mdash; deixa o laptop e vai para a AWS. O caminho usa o <strong>AWS Academy Learner Lab</strong> como ambiente e o <strong>Gemini CLI</strong>
+        como copiloto de provisionamento. A análise arquitetural já foi feita na Aula 05; hoje é execução: <strong>lift-and-shift</strong> primeiro, depois
+        <strong>decomposição</strong>.
       </p>
       <p>
-        <span class="m06-tag">Pré-requisitos</span> Aula 05 entregue: <code>wb.yml</code> e <code>bb.yml</code> verdes,
-        EC2 self-hosted runner ativo via SSM, branch protection ligada na <code>main</code>, tag <code>aula-05</code> no remoto.
+        <span class="m06-tag">Pré-requisitos</span>
+        Conta AWS Academy ativa &middot; Codespace ou laptop com AWS CLI v2 instalado &middot; Node 18+ para instalar o Gemini CLI &middot;
+        repositório da Aula 04/05 clonado (fork pessoal) &middot; chave SSH <code>labsuser.pem</code> baixada do Lab.
+      </p>
+      <p>
+        <span class="m06-tag">Restrições da aula</span> Tudo via AWS CLI &middot; AWS CLI é digitado pelo Gemini CLI (não pelo aluno direto) &middot;
+        revisão humana obrigatória antes de executar &middot; nada de console clicado &middot; só serviços liberados no Lab: EC2, S3, Lambda, IAM, Secrets Manager, SG, VPC default.
+      </p>
+      <p>
+        <span class="m06-tag">Repositório</span>
+        Mesmo repositório das Aulas 04/05. Hoje ele ganha os arquivos da infra: <code>infra/userdata-*.sh</code>, <code>infra/sg.json</code>,
+        <code>lambda/lambda_handler.py</code>.
+      </p>
+      <p>
+        <a class="m06-repo-cta" href="https://github.com/afonsolelis/20261sre-primeironome-ultimonome" target="_blank" rel="noopener">
+          <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+          </svg>
+          Abrir repositório no GitHub
+        </a>
       </p>
     </section>
 
     <section class="content-block">
-      <h2>1. Onde estamos &mdash; e o que ainda dói</h2>
+      <h2>1. Recap das Aulas 04 e 05</h2>
       <p>
-        Em cinco aulas modelamos o problema (02), desenhamos a arquitetura (03), provisionamos o stack
-        <code>olist-sre-pipeline-lab</code> (04) e amarramos a esteira de CI com <em>white box</em> e <em>black box</em>
-        (05). O sistema está vivo em laboratório, mas três fragilidades continuam mascaradas: o teste de integração ainda
-        mocka o Postgres &mdash; portanto não pega bug de driver, dialeto SQL ou lock; nenhuma falha foi injetada de
-        propósito &mdash; portanto não sabemos como o sistema reage a turbulência; e métricas de qualidade são lidas no
-        relatório de cobertura, mas não derrubam o pipeline. Esta aula fecha as três frentes.
+        A Aula 04 desceu do plano abstrato para o teclado: subimos uma stack inteira de ingestão near real-time no laptop, com <strong>MinIO</strong> no papel de S3,
+        <strong>ClickHouse</strong> como warehouse colunar, um <strong>ingestor Python</strong> em Docker e um <strong>dashboard Streamlit</strong> consumindo as
+        métricas. O dataset foi o <em>Olist Brazilian E-commerce Public Dataset</em>. O padrão de modelagem foi <strong>schema-on-read</strong>: tudo cai numa
+        tabela landing <code>olist_raw.ingestion(unixtime Int64, data JSON, tag LowCardinality(String))</code> e a modelagem vive em <em>views</em>. A
+        idempotência vem de filtrar <code>max(unixtime)</code> por <code>tag</code>; reingestões nunca corrompem o estado.
       </p>
       <p>
-        Em SRE, dois conceitos sustentam a aula. O primeiro é <strong>paridade de ambiente</strong>: o teste só vale se o
-        que ele exercita se parece com o que vai rodar em produção. O segundo é <strong><em>toil</em></strong>: trabalho
-        manual repetitivo, sem valor duradouro, que escala linearmente com a operação. Código de baixa qualidade vira
-        <em>toil</em> &mdash; cada bug fix custa horas, cada PR pequeno trava em revisão. Medir qualidade é o primeiro
-        passo para tirar <em>toil</em> da conta.
+        A Aula 05 olhou para essa stack pela lente de <strong>arquitetura</strong>. Construiu uma análise <strong>ATAM</strong> (Architecture Tradeoff Analysis Method) do
+        sistema completo &mdash; mapeando quality attributes, scenarios, decisões, sensitivity points, tradeoffs, risks e non-risks &mdash; e em seguida aplicou as
+        <strong>táticas de Len Bass</strong> ainda no laptop: healthchecks robustos, <code>depends_on: condition: service_healthy</code>, lote ótimo do ingestor,
+        cache no Streamlit, testes por componente, smoke tests pós-<code>compose up</code> e stress por ponto fraco. Ao final da Aula 05 a stack estava madura para o
+        laptop e existia uma tabela ATAM concreta documentando o que sustentava o sistema e o que poderia quebrar.
+      </p>
+      <p>
+        A Aula 06 fecha esse ciclo movendo a mesma stack para a AWS. Não estamos refazendo o sistema nem construindo nova análise arquitetural: estamos
+        <em>portando</em> o sistema e <em>honrando</em> a leitura arquitetural feita na Aula 05. As interfaces (S3 API, HTTP do ClickHouse, Streamlit em 8501) continuam
+        as mesmas; muda quem responde a elas.
       </p>
       <div class="m06-callout">
-        <strong>Tese</strong>
-        <p style="margin: 0;">
-          Mock esconde bug de driver. Sistema sem chaos quebra na produção pela primeira vez. Código sem métrica
-          vira <em>toil</em> permanente. Hoje fechamos os três e amarramos o resultado em CI gate &mdash; sem isso,
-          a Aula 07 herda dívida.
-        </p>
+        <strong>ATAM como insumo, não como conteúdo da Aula 06</strong>
+        A tabela ATAM construída na Aula 05 é o <em>checklist arquitetural</em> que vamos honrar nesta migração. Cada sensitivity point que apareceu lá &mdash;
+        healthcheck do ClickHouse, single point of failure do ingestor, retry no boto3, latência da view sob carga, credenciais em texto plano &mdash;
+        informa as decisões de provisionamento desta aula. A <strong>Aula 07 vai voltar à mesma tabela</strong> e estressar cada sensitivity point agora no
+        contexto distribuído da AWS.
+      </div>
+      <div class="m06-callout">
+        <strong>Continuidade narrativa</strong>
+        Aula 04 = construir &middot; Aula 05 = analisar (ATAM) e endurecer local (Bass) &middot; <strong>Aula 06 = migrar (lift-and-shift + decomposição)</strong> &middot;
+        Aula 07 = estressar distribuído (Bass para sistemas distribuídos, atacando os sensitivity points da ATAM) &middot; Aula 08 = projeto final integrado.
       </div>
     </section>
 
     <section class="content-block">
-      <h2>2. Testcontainers &mdash; infra real, descartável e controlada pelo teste</h2>
+      <h2>2. Tese da aula &mdash; migrar é executar a arquitetura planejada</h2>
       <p>
-        Testcontainers é uma família de bibliotecas (Java original em 2015, depois Python, Go, .NET, Node) que coloca
-        a suíte de teste no comando do Docker. Em Python usamos <code>testcontainers-python</code>: o teste invoca
-        <code>PostgresContainer("postgres:16-alpine").start()</code>, recebe uma URI dinâmica com porta efêmera,
-        executa o caso, e ao final da fixture o container é destruído. Volume some, dado some, ambiente volta ao zero.
-        Isso ataca duas dores clássicas do mock: discrepância semântica (o mock não conhece todos os <em>edge cases</em>
-        do dialeto) e drift (o mock envelhece, a produção não).
+        A tentação ao olhar uma nuvem nova é abrir o console e começar a clicar. O custo dessa rota é alto: cada clique não deixa rastro reproduzível, cada
+        erro custa hora-recurso de uma sessão de Lab que dura quatro horas, e o time inteiro fica preso na criatividade de quem domina o console primeiro.
+        Vamos inverter a ordem: <strong>tudo via AWS CLI, e o AWS CLI é digitado pelo Gemini CLI</strong> &mdash; o aluno descreve a intenção em linguagem natural,
+        revisa o comando que o agente gera, executa, valida.
       </p>
-      <h3>2.1 Quando vale e quando não vale</h3>
       <p>
-        Mock continua certo na base da pirâmide &mdash; testes unitários puros, lógica sem efeito colateral. Testcontainer
-        entra na faixa de integração: SQL real, transações reais, drivers reais. A regra de bolso é: se o erro só aparece
-        com infra real, o teste tem que ter infra real.
+        Como a análise arquitetural já foi feita na Aula 05, hoje a aula é execução pura. A sequência é deliberada: primeiro um lift-and-shift que move o
+        <code>docker-compose</code> inteiro para uma EC2 (continuidade primeiro), depois uma decomposição que separa cada serviço em recurso AWS canônico
+        (benefícios do distribuído depois).
+      </p>
+      <p>
+        As três regras desta aula:
+      </p>
+      <ol>
+        <li><strong>Lift-and-shift antes de redesenhar.</strong> O <code>docker-compose.yaml</code> inteiro vai rodar dentro de uma única EC2 antes de virar serviços separados. Só depois decompomos.</li>
+        <li><strong>Console é proibido.</strong> Tudo via AWS CLI, e o AWS CLI é digitado <em>pelo Gemini CLI</em>. O aluno descreve a intenção em linguagem natural, revisa o comando que o agente gera, executa, valida.</li>
+        <li><strong>Honrar os sensitivity points da Aula 05.</strong> Cada decisão de provisionamento confere com o que a ATAM disse que poderia quebrar &mdash; credenciais saem do <code>.env</code> e vão para Secrets Manager, ingestor ganha capacidade reativa via Lambda, EC2 do ClickHouse fica numa SG fechada.</li>
+      </ol>
+    </section>
+
+    <section class="content-block">
+      <h2>3. Mapeamento Docker &rarr; AWS</h2>
+      <p>
+        Conhecida a stack local e a leitura arquitetural feita na Aula 05, o mapeamento <em>compose</em> &rarr; AWS é uma tradução 1:1 dentro dos limites do
+        Learner Lab. Cada serviço do <code>docker-compose.yaml</code> ganha um destino na nuvem.
       </p>
       <table>
-        <thead><tr><th>Critério</th><th>Mock</th><th>Testcontainer</th></tr></thead>
+        <thead>
+          <tr><th>Hoje em Docker</th><th>Amanhã em AWS</th><th>Por quê</th></tr>
+        </thead>
         <tbody>
-          <tr><td>Tempo por teste</td><td>1&ndash;5 ms</td><td>200 ms&ndash;2 s (1ª subida)</td></tr>
-          <tr><td>Paridade com produção</td><td>Baixa</td><td>Alta</td></tr>
-          <tr><td>Pega bug de driver/dialeto</td><td>Não</td><td>Sim</td></tr>
-          <tr><td>Dependência de Docker</td><td>Nenhuma</td><td>Obrigatória no runner</td></tr>
-          <tr><td>Custo de manutenção</td><td>Alto (mock vira ficção)</td><td>Médio</td></tr>
-          <tr><td>Faixa adequada</td><td>Unit, lógica pura</td><td>Integration, contract com infra</td></tr>
+          <tr>
+            <td><code>minio</code> &middot; bucket <code>olist</code></td>
+            <td><strong>S3 bucket</strong> <code>olist-&lt;aluno&gt;-raw</code></td>
+            <td>Mesma API. Boto3 fala com S3 nativamente; basta remover <code>endpoint_url</code> e <code>aws_access_key_id</code> do código &mdash; credenciais herdam do <em>instance profile</em>.</td>
+          </tr>
+          <tr>
+            <td><code>clickhouse</code> &middot; container <code>olist_analytics</code></td>
+            <td><strong>EC2 dedicada</strong> Amazon Linux 2023 t3.medium</td>
+            <td>ClickHouse Server roda nativo em Linux. EC2 dedicada nos dá controle de RAM e disco. SG abre 8123 só dentro da VPC.</td>
+          </tr>
+          <tr>
+            <td><code>dashboard</code> &middot; Streamlit em 8501</td>
+            <td><strong>EC2 dedicada</strong> t3.small</td>
+            <td>Streamlit roda como <em>service systemd</em> e sobrevive a reboot. SG expõe 8501 na internet para o aluno e demonstração.</td>
+          </tr>
+          <tr>
+            <td><code>ingestor</code> &middot; worker idle Python</td>
+            <td><strong>Lambda event-driven</strong> (ou cron <em>systemd</em>)</td>
+            <td>Lambda é acionada por <code>S3:PutObject</code> &mdash; ingestão vira reativa. Se o Lab limitar Lambda, fallback é um cron <em>systemd</em> na EC2 do Streamlit.</td>
+          </tr>
+          <tr>
+            <td><code>.env</code> com credenciais MinIO/CH</td>
+            <td><strong>IAM role</strong> (<code>LabRole</code>) + <strong>Secrets Manager</strong></td>
+            <td>Resolve o risco "credenciais em texto plano" já apontado pela ATAM da Aula 05. Senha do CH fica em Secrets Manager; acesso ao S3 vem do <em>instance profile</em> da EC2 / Lambda.</td>
+          </tr>
         </tbody>
       </table>
+    </section>
 
-      <h3>2.2 Padrões de fixture &mdash; <code>session</code> vs <code>function</code></h3>
+    <section class="content-block">
+      <h2>4. Diagrama da arquitetura alvo</h2>
       <p>
-        O escopo da fixture é o trade-off central. Container por teste é seguro mas explode o tempo total &mdash; cada
-        fixture <em>function-scoped</em> paga 200&ndash;500 ms só para subir. Container compartilhado em <em>session</em>
-        é 10&times; mais rápido, mas exige reset entre testes para evitar acoplamento por estado. A receita do curso:
-        escopo <code>session</code> + <code>TRUNCATE</code> ou <code>ROLLBACK</code> automatizado em fixture
-        <em>function-scoped</em>.
+        O diagrama abaixo mostra a topologia depois da decomposição completa. O usuário acessa o Streamlit (EC2 pública). O Streamlit consulta o ClickHouse
+        (EC2 privada) via HTTP. Quando um CSV é colocado no bucket S3, a Lambda <em>ingestor</em> dispara e popula o ClickHouse. Tanto Streamlit quanto a
+        Lambda buscam a senha do CH no Secrets Manager &mdash; nenhuma credencial vive em arquivo de configuração.
       </p>
-<pre># tests/integration/conftest.py
-import pytest
-from testcontainers.postgres import PostgresContainer
-from testcontainers.localstack import LocalStackContainer
+      <div class="m06-mermaid">
+<pre class="mermaid">
+flowchart LR
+  user((Usuario))
+  subgraph aws[AWS Student Lab - us-east-1]
+    direction LR
+    s3[(S3 olist-aluno-raw<br/>CSVs Olist + gold)]
+    lambda[Lambda ingestor<br/>S3:PutObject trigger<br/>LabRole]
+    subgraph vpc[VPC default]
+      direction LR
+      ec2ch[EC2 ClickHouse<br/>t3.medium<br/>SG: 8123 privado]
+      ec2st[EC2 Streamlit<br/>t3.small<br/>SG: 8501 publico]
+    end
+    secrets[Secrets Manager<br/>senha do ClickHouse]
+  end
+  s3 -->|PutObject| lambda
+  lambda -->|INSERT NDJSON| ec2ch
+  ec2st -->|HTTP :8123 privado| ec2ch
+  ec2ch -.->|get senha| secrets
+  ec2st -.->|get senha| secrets
+  user -->|HTTP :8501| ec2st
+</pre>
+      </div>
+    </section>
 
-@pytest.fixture(scope="session")
-def pg():
-    with PostgresContainer("postgres:16-alpine") as c:
-        yield c
-
-@pytest.fixture(scope="session")
-def aws():
-    with LocalStackContainer(image="localstack/localstack:3").with_services(
-        "s3", "ssm"
-    ) as c:
-        yield c
-
-@pytest.fixture
-def db(pg, _truncate_all):
-    return pg.get_connection_url()</pre>
-
-      <h3>2.3 LocalStack como variante</h3>
+    <section class="content-block">
+      <h2>5. AWS Student Lab</h2>
+      <h3>5.1 O Learner Lab</h3>
       <p>
-        LocalStack emula APIs AWS dentro de um container. Para S3, SSM Parameter Store, SQS e EventBridge a fidelidade
-        é alta &mdash; o teste de integração pode rodar inteiramente local. Para serviços profundos &mdash; IAM com
-        permissions boundary, KMS HSM, redes complexas &mdash; LocalStack não substitui conta real. A regra: use
-        LocalStack para o que cabe e teste em conta real o que LocalStack não simula com fidelidade.
+        O <em>AWS Academy Learner Lab</em> entrega contas AWS descartáveis para uso educacional. Cada aluno tem um <em>sandbox</em> com créditos limitados,
+        uma role pré-configurada (<code>LabRole</code>) e um <em>instance profile</em> pré-configurado (<code>LabInstanceProfile</code>). A operação é simples
+        e deliberadamente restrita:
+      </p>
+      <ol>
+        <li>Acessar <a href="https://awsacademy.instructure.com/" target="_blank" rel="noopener">awsacademy.instructure.com</a> e fazer login.</li>
+        <li>Entrar no curso, abrir o módulo "Learner Lab".</li>
+        <li>Clicar em <em>Start Lab</em>. Um indicador vermelho fica verde quando a sessão sobe (~1 minuto).</li>
+        <li>Clicar em <em>AWS Details</em> &rarr; <em>AWS CLI</em> &rarr; <em>Show</em>. O painel mostra <code>AWS_ACCESS_KEY_ID</code>, <code>AWS_SECRET_ACCESS_KEY</code> e <code>AWS_SESSION_TOKEN</code>. Copie os três.</li>
+        <li>Em <em>AWS Details</em> &rarr; <em>SSH key</em>, baixe <code>labsuser.pem</code>. Salve em <code>~/labsuser.pem</code> e <code>chmod 400</code>.</li>
+        <li>Region única: <code>us-east-1</code>. Não tente outra &mdash; vai negar permissão.</li>
+      </ol>
+      <p>
+        A sessão dura cerca de quatro horas. Quando expira, as credenciais param de funcionar com erro <code>ExpiredToken</code>. Renovar é só clicar em
+        <em>Start Lab</em> novamente e re-exportar as novas três variáveis.
       </p>
 
-      <h3>2.4 Docker no runner</h3>
+      <h3>5.2 Restrições do Learner Lab</h3>
       <p>
-        Sem Docker, fixture vazia. No nosso self-hosted runner (EC2 da Aula 04), o <code>cloud-init</code> precisa
-        instalar o Docker, habilitá-lo no boot e dar permissão ao usuário do runner. Se o pull da imagem
-        <code>postgres:16-alpine</code> for feito a cada job, paga 5&ndash;15 s só de download. Em runner self-hosted
-        com cache local, paga uma vez por boot.
+        O Lab é generoso, mas opinativo. Cinco restrições afetam diretamente as escolhas desta aula:
       </p>
-<pre># cloud-init / userdata da EC2 runner
-yum install -y docker
+      <ul>
+        <li><strong>Apenas <code>us-east-1</code>.</strong> Outras regiões retornam <em>access denied</em>. Configure <code>AWS_DEFAULT_REGION=us-east-1</code>.</li>
+        <li><strong>Sem criação de IAM custom.</strong> Você não pode criar roles novas, mas tem a <code>LabRole</code> pronta com permissão em S3, Lambda, Secrets Manager, CloudWatch Logs e EC2. EC2 sobe com <code>LabInstanceProfile</code> &mdash; o instance profile que envelopa essa role.</li>
+        <li><strong>VPC default.</strong> Não crie nova VPC. Use a default da region. Security Groups são livres para criar.</li>
+        <li><strong>Lambda pode estar limitada.</strong> Em alguns períodos do semestre, a criação de Lambda no Lab fica limitada por quota. Por isso temos um <em>fallback</em>: ingestor vira cron <em>systemd</em> rodando dentro da EC2 do Streamlit, chamando <code>aws s3 sync</code> e o script Python a cada N minutos.</li>
+        <li>Serviços de DW e analytics gerenciados (Redshift, Glue, Athena) não estão liberados nesta aula. Atenha-se a EC2 + S3 + Lambda + IAM + Secrets Manager + SG.</li>
+      </ul>
+    </section>
+
+    <section class="content-block">
+      <h2>6. Gemini CLI &mdash; o copiloto da aula</h2>
+      <p>
+        O <strong>Gemini CLI</strong> é um agente de linha de comando do Google, com <em>free tier</em> generoso (no momento, milhões de tokens/mês para
+        contas pessoais) e contexto longo. Para a aula, ele substitui Claude Code / AIOX para os alunos que não têm assinatura paga. A instalação é via
+        npm e a autenticação usa conta Google.
+      </p>
+<pre><code># 1. Instalar
+npm install -g @google/gemini-cli
+
+# 2. Autenticar (abre navegador para login Google)
+gemini auth
+
+# 3. Confirmar que está funcionando
+gemini "diga ola em uma linha"
+</code></pre>
+      <p>
+        O <em>loop esperado</em> da aula é simples:
+      </p>
+      <ol>
+        <li><strong>Prompt em linguagem natural</strong>: aluno descreve a intenção. "Gere um <code>aws ec2 run-instances</code> com t3.medium, AMI Amazon Linux 2023, SG abrindo 22 e 8501, instance profile <code>LabInstanceProfile</code>, key <code>vockey</code>, tag <code>Name=olist-monolito</code>, e user-data que instale docker."</li>
+        <li><strong>Geração</strong>: Gemini devolve o comando AWS CLI completo.</li>
+        <li><strong>Revisão</strong>: aluno lê o comando palavra por palavra. Confere flags destrutivas, region, recursos referenciados. Se algo soa estranho, pergunta o porquê.</li>
+        <li><strong>Execução</strong>: aluno cola no terminal e roda.</li>
+        <li><strong>Validação</strong>: Gemini pode ajudar a escrever a verificação ("escreva um <code>aws ec2 describe-instances</code> que liste só instâncias com tag <code>Name=olist-monolito</code>").</li>
+      </ol>
+      <div class="m06-callout">
+        <strong>Regra de ouro</strong>
+        Nunca rodar comando destrutivo sem revisão (<code>terminate</code>, <code>delete</code>, <code>force</code>). O agente é um copiloto, não o piloto.
+      </div>
+    </section>
+
+    <section class="content-block">
+      <h2>7. Etapa 1 &mdash; Lift-and-shift</h2>
+      <p>
+        A primeira metade da prática (20h30 &mdash; ~21h15) move o <em>compose</em> inteiro para dentro de uma única EC2. Esta etapa não é uma "etapa
+        descartável de aquecimento": ela é o caminho que minimiza downtime em uma migração real. <strong>Primeiro mover, depois melhorar.</strong> Sem
+        ela, todo bug que aparecer na decomposição (Etapa 2) será confundido com bug do lift-and-shift.
+      </p>
+
+      <h3>7.1 Passo 1.1 &mdash; renovar credenciais do Student Lab</h3>
+      <p>
+        No painel do Lab, em <em>AWS Details &gt; AWS CLI &gt; Show</em>, copie as três variáveis e exporte:
+      </p>
+<pre><code>export AWS_ACCESS_KEY_ID="ASIA..."
+export AWS_SECRET_ACCESS_KEY="..."
+export AWS_SESSION_TOKEN="..."
+export AWS_DEFAULT_REGION="us-east-1"
+
+aws sts get-caller-identity
+# Esperado:
+# {
+#   "UserId": "AROA.../user...",
+#   "Account": "012345678901",
+#   "Arn": "arn:aws:sts::012345678901:assumed-role/voclabs/..."
+# }
+</code></pre>
+      <p>
+        Se algo retornar <code>ExpiredToken</code> durante a aula, volte aqui e renove. Não tente <code>aws configure</code>: o Lab usa session token, e
+        <code>aws configure</code> não armazena <code>AWS_SESSION_TOKEN</code> facilmente.
+      </p>
+
+      <h3>7.2 Passo 1.2 &mdash; criar SG e provisionar a EC2 monolito via Gemini CLI</h3>
+      <p>
+        Primeiro o Security Group, depois a instância. Prompt para o Gemini:
+      </p>
+<pre><code>gemini "gere um par de comandos aws cli:
+1. crie um security group chamado sg-olist-monolito na VPC default, com regras de inbound:
+   - 22 TCP de 0.0.0.0/0
+   - 8501 TCP de 0.0.0.0/0
+2. gere o comando aws ec2 run-instances que:
+   - usa AMI Amazon Linux 2023 mais recente em us-east-1
+   - t3.medium
+   - instance profile LabInstanceProfile
+   - security group: sg-olist-monolito
+   - user-data: file://userdata-monolito.sh
+   - key pair: vockey
+   - tag Name=olist-monolito"
+</code></pre>
+      <p>
+        Comando esperado para criar o SG:
+      </p>
+<pre><code>VPC_ID=$(aws ec2 describe-vpcs --filters Name=is-default,Values=true \
+  --query 'Vpcs[0].VpcId' --output text)
+
+SG_ID=$(aws ec2 create-security-group \
+  --group-name sg-olist-monolito \
+  --description "Olist monolito - 22, 8501" \
+  --vpc-id "$VPC_ID" \
+  --query 'GroupId' --output text)
+
+aws ec2 authorize-security-group-ingress --group-id "$SG_ID" \
+  --protocol tcp --port 22   --cidr 0.0.0.0/0
+aws ec2 authorize-security-group-ingress --group-id "$SG_ID" \
+  --protocol tcp --port 8501 --cidr 0.0.0.0/0
+</code></pre>
+      <p>Comando esperado para subir a EC2:</p>
+<pre><code>aws ec2 run-instances \
+  --image-id $(aws ec2 describe-images \
+    --owners amazon \
+    --filters "Name=name,Values=al2023-ami-2023.*-x86_64" \
+    --query 'sort_by(Images, &amp;CreationDate)[-1].ImageId' --output text) \
+  --instance-type t3.medium \
+  --key-name vockey \
+  --iam-instance-profile Name=LabInstanceProfile \
+  --security-group-ids "$SG_ID" \
+  --user-data file://userdata-monolito.sh \
+  --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=olist-monolito}]'
+</code></pre>
+
+      <h3>7.3 Passo 1.3 &mdash; user-data da EC2 monolito</h3>
+      <p>
+        Arquivo <code>infra/userdata-monolito.sh</code>. Bootstrap autônomo: instala Docker, habilita o serviço, adiciona <code>ec2-user</code> ao grupo,
+        instala o plugin Compose v2 e clona o repositório.
+      </p>
+<pre><code>#!/bin/bash
+set -euxo pipefail
+
+dnf update -y
+dnf install -y docker git
 systemctl enable --now docker
 usermod -aG docker ec2-user
-docker info | grep -E "Server Version|Storage Driver"
-docker run --rm hello-world</pre>
+
+# Plugin compose v2 oficial
+mkdir -p /usr/local/lib/docker/cli-plugins
+curl -SL "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64" \
+  -o /usr/local/lib/docker/cli-plugins/docker-compose
+chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+
+# Repo da aula
+cd /home/ec2-user
+sudo -u ec2-user git clone https://github.com/&lt;aluno&gt;/20261sre-primeironome-ultimonome.git
+chown -R ec2-user:ec2-user /home/ec2-user/20261sre-primeironome-ultimonome
+</code></pre>
+      <p>
+        Note que esse <code>user-data</code> é totalmente autônomo &mdash; quando o SSH ficar disponível, a stack já está pronta para <code>compose up</code>.
+        Substitua <code>&lt;aluno&gt;</code> pelo seu usuário GitHub antes de subir a instância.
+      </p>
+
+      <h3>7.4 Passo 1.4 &mdash; SSH e subir o <code>compose</code></h3>
+<pre><code># pega o IP publico
+EC2_IP=$(aws ec2 describe-instances \
+  --filters "Name=tag:Name,Values=olist-monolito" \
+            "Name=instance-state-name,Values=running" \
+  --query 'Reservations[0].Instances[0].PublicIpAddress' --output text)
+
+# corrige permissao da chave (se ainda nao corrigiu)
+chmod 400 ~/labsuser.pem
+
+# entra na maquina
+ssh -i ~/labsuser.pem ec2-user@"$EC2_IP"
+
+# dentro da EC2:
+cd ~/20261sre-primeironome-ultimonome
+cp .env.example .env
+docker compose up -d --build
+docker compose ps   # 4 containers healthy
+</code></pre>
+
+      <h3>7.5 Passo 1.5 &mdash; popular MinIO, rodar ingestor, validar dashboard</h3>
+      <p>
+        Acesse o console MinIO em <code>http://&lt;ec2-public-ip&gt;:9003</code> (login <code>minioadmin / minioadmin</code>). Crie o bucket <code>olist</code>
+        e suba os CSVs da pasta <code>data/</code>. Em seguida, dentro da EC2:
+      </p>
+<pre><code>docker exec -i olist_analytics clickhouse-client &lt; sql/raw/01_schema.sql
+docker exec olist_ingestor python /app/ingest_minio.py
+docker exec -i olist_analytics clickhouse-client &lt; sql/views/01_top_products.sql
+
+# valida landing
+docker exec olist_analytics clickhouse-client -q \
+  "SELECT tag, count() FROM olist_raw.ingestion GROUP BY tag ORDER BY tag"
+</code></pre>
+      <p>
+        Critério de pronto da Etapa 1: <strong>abrir <code>http://&lt;ec2-public-ip&gt;:8501</code> no navegador e ver o dashboard de top produtos
+        renderizando.</strong> Capture screenshot e salve no fork do repo. Só então avance para a Etapa 2.
+      </p>
     </section>
 
     <section class="content-block">
-      <h2>3. Chaos engineering &mdash; quebrar de propósito antes que quebre por acidente</h2>
+      <h2>8. Etapa 2 &mdash; Decomposição</h2>
       <p>
-        Chaos engineering nasceu na Netflix em 2010, quando a empresa migrava do datacenter para a AWS. O Chaos Monkey
-        desligava instâncias EC2 aleatoriamente para forçar a arquitetura a tolerar falhas que aconteciam de qualquer
-        jeito. Em 2014 a prática vira disciplina formal &mdash; <em>principlesofchaos.org</em>. A definição operacional
-        é simples: chaos engineering é a disciplina de experimentar em um sistema para construir confiança na sua
-        capacidade de tolerar condições turbulentas em produção. <strong>É experimento, não teste.</strong> Tem
-        hipótese, observação e conclusão.
+        A segunda metade da prática (~21h15 &mdash; 22h00) tira a stack do monolito e distribui cada serviço em recurso AWS dedicado. As interfaces continuam
+        as mesmas (S3 API, HTTP/SQL do ClickHouse, HTTP do Streamlit) &mdash; muda quem responde a elas. A ordem dos passos é importante: ClickHouse precisa
+        existir antes do Streamlit; o S3 precisa existir antes da Lambda.
       </p>
 
-      <h3>3.1 Os cinco princípios canônicos</h3>
-      <ol>
-        <li><strong>Hipótese sobre estado estacionário</strong> &mdash; antes do experimento, o sistema é caracterizado
-          por uma métrica observável (SLI). A hipótese diz que o estado estacionário se mantém apesar da falha.</li>
-        <li><strong>Variar eventos do mundo real</strong> &mdash; latência, perda de pacote, kill de processo, disco
-          cheio, queda de zona. Não inventar falha exótica.</li>
-        <li><strong>Rodar em produção</strong> &mdash; com salvaguardas. Por enquanto, no nosso laboratório. A Aula 08
-          discute produção real.</li>
-        <li><strong>Automatizar</strong> &mdash; experimento como código (<code>chaos/experiments/*.yaml</code>).
-          Game day pontual, regressão recorrente.</li>
-        <li><strong>Minimizar o raio de explosão</strong> &mdash; janela curta, área isolada, kill switch obrigatório.</li>
-      </ol>
+      <h3>8.1 Passo 2.1 &mdash; S3 substitui MinIO</h3>
+<pre><code>BUCKET="olist-${USER}-raw"
+aws s3 mb "s3://${BUCKET}" --region us-east-1
 
-      <h3>3.2 Métodos &mdash; o que cabe no Learner Lab</h3>
+# Sobe os CSVs da pasta data/
+aws s3 cp data/ "s3://${BUCKET}/olist/" --recursive \
+  --exclude "*" --include "*.csv"
+
+aws s3 ls "s3://${BUCKET}/olist/"
+</code></pre>
       <p>
-        AWS FIS (Fault Injection Service) é a oferta gerenciada para chaos. <strong>No Learner Lab a FIS não está
-        habilitada.</strong> Substituímos com SSM Run Command (que distribui comandos para EC2 alvo) e ferramentas
-        Linux instaladas na EC2: Toxiproxy para latência e perda em TCP, <code>tc netem</code> para qdisc do kernel,
-        <code>stress-ng</code> para CPU/memória, <code>fallocate</code> para disco. O efeito é equivalente; muda o
-        empacotamento.
+        No código do ingestor, remova <code>endpoint_url</code> e remova <code>aws_access_key_id</code>/<code>aws_secret_access_key</code>. O boto3 herda
+        as credenciais do <em>instance profile</em> da EC2 ou da execução role da Lambda. O bucket name vira a única variável que precisa entrar via env.
+        Esta troca também resolve o sensitivity point "credenciais em texto plano" levantado na ATAM da Aula 05.
+      </p>
+
+      <h3>8.2 Passo 2.2 &mdash; EC2 dedicada para o ClickHouse</h3>
+      <p>
+        Antes da EC2, criamos o secret com a senha do ClickHouse:
+      </p>
+<pre><code># Gerar senha forte e armazenar
+CH_PASSWORD=$(openssl rand -base64 24)
+aws secretsmanager create-secret \
+  --name olist/clickhouse \
+  --secret-string "{\"password\":\"${CH_PASSWORD}\"}"
+</code></pre>
+      <p>
+        SG do ClickHouse: aceita 8123 só de SGs internos (Streamlit e Lambda). SSH só do IP do aluno.
+      </p>
+<pre><code>SG_CH=$(aws ec2 create-security-group \
+  --group-name sg-clickhouse \
+  --description "ClickHouse - 8123 interno" \
+  --vpc-id "$VPC_ID" --query 'GroupId' --output text)
+
+# SSH apenas do meu IP
+MY_IP=$(curl -s https://checkip.amazonaws.com)
+aws ec2 authorize-security-group-ingress --group-id "$SG_CH" \
+  --protocol tcp --port 22 --cidr "${MY_IP}/32"
+</code></pre>
+
+      <h3>8.3 Passo 2.3 &mdash; user-data da EC2 ClickHouse</h3>
+      <p>
+        Arquivo <code>infra/userdata-clickhouse.sh</code>. A EC2 puxa a senha do Secrets Manager via <code>LabRole</code>, instala o ClickHouse, cria o
+        usuário <code>dashboard</code> com escopo restrito à VPC e aplica o schema de bootstrap.
+      </p>
+<pre><code>#!/bin/bash
+set -euxo pipefail
+dnf install -y curl jq
+
+curl https://clickhouse.com/ | sh
+./clickhouse install --noninteractive
+
+CH_PASSWORD=$(aws secretsmanager get-secret-value \
+  --secret-id olist/clickhouse \
+  --query SecretString --output text | jq -r .password)
+
+cat &gt; /etc/clickhouse-server/users.d/dashboard.xml &lt;&lt;EOF
+&lt;clickhouse&gt;
+  &lt;users&gt;
+    &lt;dashboard&gt;
+      &lt;password&gt;${CH_PASSWORD}&lt;/password&gt;
+      &lt;networks&gt;&lt;ip&gt;10.0.0.0/8&lt;/ip&gt;&lt;/networks&gt;
+      &lt;profile&gt;default&lt;/profile&gt;
+    &lt;/dashboard&gt;
+  &lt;/users&gt;
+&lt;/clickhouse&gt;
+EOF
+
+systemctl enable --now clickhouse-server
+
+# Bootstrap do schema e da view (mesmo SQL da Aula 04)
+clickhouse-client -q "CREATE DATABASE IF NOT EXISTS olist_raw"
+clickhouse-client --multiquery &lt; /home/ec2-user/app/sql/raw/01_schema.sql
+clickhouse-client --multiquery &lt; /home/ec2-user/app/sql/views/01_top_products.sql
+</code></pre>
+
+      <h3>8.4 Passo 2.4 &mdash; EC2 dedicada para o Streamlit</h3>
+      <p>
+        SG do Streamlit: 8501 aberto na internet; 22 só do IP do aluno; outbound livre. Permitir que <code>sg-streamlit</code> chegue no <code>sg-clickhouse</code>:
+      </p>
+<pre><code>aws ec2 authorize-security-group-ingress --group-id "$SG_CH" \
+  --protocol tcp --port 8123 --source-group "$SG_ST"
+</code></pre>
+      <p>
+        User-data do Streamlit (<code>infra/userdata-streamlit.sh</code>). Roda como service <code>systemd</code> e sobrevive a reboot.
+      </p>
+<pre><code>#!/bin/bash
+set -euxo pipefail
+dnf install -y python3-pip git jq
+
+cd /home/ec2-user
+sudo -u ec2-user git clone \
+  https://github.com/&lt;aluno&gt;/20261sre-primeironome-ultimonome.git app
+cd app
+pip3 install -r requirements.txt
+
+CH_PASSWORD=$(aws secretsmanager get-secret-value \
+  --secret-id olist/clickhouse \
+  --query SecretString --output text | jq -r .password)
+
+cat &gt; .env &lt;&lt;EOF
+CLICKHOUSE_HOST=&lt;ip-privado-do-ch&gt;
+CLICKHOUSE_USER=dashboard
+CLICKHOUSE_PASSWORD=${CH_PASSWORD}
+EOF
+
+# rodar como service systemd para sobreviver a reboot
+cat &gt; /etc/systemd/system/streamlit.service &lt;&lt;EOF
+[Unit]
+Description=Streamlit dashboard
+After=network-online.target
+
+[Service]
+WorkingDirectory=/home/ec2-user/app
+EnvironmentFile=/home/ec2-user/app/.env
+ExecStart=/usr/bin/streamlit run streamlit_app.py --server.address=0.0.0.0
+Restart=always
+User=ec2-user
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl enable --now streamlit
+</code></pre>
+
+      <h3>8.5 Passo 2.5 &mdash; ingestor vira Lambda event-driven</h3>
+      <p>
+        O <code>lambda_handler.py</code> é uma adaptação direta do <code>ingest_minio.py</code> da Aula 04. As diferenças: (1) recebe <em>events</em> S3
+        em vez de listar bucket inteiro; (2) credenciais herdam da role da Lambda; (3) host do ClickHouse e senha vêm de variáveis de ambiente da função.
+      </p>
+      <p>
+        <strong>Fallback se Lambda estiver bloqueada no Lab:</strong> rodar o mesmo handler como cron <em>systemd</em> dentro da EC2 do Streamlit, fazendo
+        <code>aws s3 sync</code> e processando arquivos novos a cada 60s. O código do handler é exatamente o mesmo &mdash; só muda como ele é invocado.
+      </p>
+
+      <h3>8.6 Passo 2.6 &mdash; Lambda handler Python</h3>
+<pre><code>import os, json, time, urllib.parse, boto3
+import pandas as pd, clickhouse_connect
+
+s3 = boto3.client("s3")
+ch = clickhouse_connect.get_client(
+    host=os.environ["CLICKHOUSE_HOST"],
+    username="dashboard",
+    password=os.environ["CLICKHOUSE_PASSWORD"],
+)
+
+def handler(event, context):
+    unixtime = int(time.time())
+    total = 0
+    for rec in event["Records"]:
+        bucket = rec["s3"]["bucket"]["name"]
+        key = urllib.parse.unquote_plus(rec["s3"]["object"]["key"])
+        obj = s3.get_object(Bucket=bucket, Key=key)
+        df = pd.read_csv(obj["Body"], dtype=str).where(pd.notnull, None)
+        rows = [(unixtime, json.dumps(r.to_dict()), key) for _, r in df.iterrows()]
+        for i in range(0, len(rows), 50_000):
+            ch.insert("olist_raw.ingestion", rows[i:i+50_000],
+                      column_names=["unixtime", "data", "tag"])
+        total += len(rows)
+    return {"ok": True, "rows": total}
+</code></pre>
+      <p>
+        Empacotamento e deploy:
+      </p>
+<pre><code># 1. Empacotar com dependencias
+mkdir -p build
+pip install -r lambda/requirements.txt -t build/
+cp lambda/lambda_handler.py build/
+cd build &amp;&amp; zip -r ../olist-ingestor.zip . &amp;&amp; cd ..
+
+# 2. Criar a funcao (LabRole é a role pré-aprovada do Lab)
+LAB_ROLE=$(aws iam get-role --role-name LabRole --query Role.Arn --output text)
+
+aws lambda create-function \
+  --function-name olist-ingestor \
+  --runtime python3.11 \
+  --role "$LAB_ROLE" \
+  --handler lambda_handler.handler \
+  --timeout 300 \
+  --memory-size 1024 \
+  --zip-file fileb://olist-ingestor.zip \
+  --environment "Variables={CLICKHOUSE_HOST=&lt;ip-privado-ch&gt;,CLICKHOUSE_PASSWORD=$CH_PASSWORD}"
+
+# 3. Conectar trigger S3 -> Lambda
+aws lambda add-permission \
+  --function-name olist-ingestor \
+  --action lambda:InvokeFunction \
+  --principal s3.amazonaws.com \
+  --statement-id s3-trigger \
+  --source-arn "arn:aws:s3:::${BUCKET}"
+
+aws s3api put-bucket-notification-configuration \
+  --bucket "$BUCKET" \
+  --notification-configuration '{
+    "LambdaFunctionConfigurations": [{
+      "LambdaFunctionArn": "'"$(aws lambda get-function --function-name olist-ingestor --query Configuration.FunctionArn --output text)"'",
+      "Events": ["s3:ObjectCreated:*"],
+      "Filter": {"Key": {"FilterRules": [{"Name": "suffix", "Value": ".csv"}]}}
+    }]
+  }'
+</code></pre>
+
+      <h3>8.7 Passo 2.7 &mdash; IAM e Security Groups encadeados</h3>
+      <p>
+        A regra é simples: cada SG aceita só o que precisa, na porta que precisa, vindo de quem precisa. No Lab, IAM é toda <code>LabRole</code>.
       </p>
       <table>
-        <thead><tr><th>ID</th><th>Falha</th><th>Ferramenta</th><th>Loop validado</th></tr></thead>
+        <thead>
+          <tr><th>Recurso</th><th>SG / Role</th><th>Regra</th></tr>
+        </thead>
         <tbody>
-          <tr><td>CHAOS-01</td><td>Kill de processo ETL</td><td><code>kill -9 $(pgrep etl)</code></td><td>Backpressure / restart</td></tr>
-          <tr><td>CHAOS-02</td><td>Latência ETL &harr; Postgres</td><td>Toxiproxy <code>add_latency</code></td><td>Circuit breaker</td></tr>
-          <tr><td>CHAOS-03</td><td>Perda de pacote 30%</td><td><code>tc qdisc add netem loss</code></td><td>Retry idempotente</td></tr>
-          <tr><td>CHAOS-04</td><td>Disco cheio</td><td><code>fallocate -l 9G /tmp/x</code></td><td>Quarentena de payload</td></tr>
-          <tr><td>CHAOS-05</td><td>CPU saturada</td><td><code>stress-ng --cpu 4</code></td><td>Freeze por error budget</td></tr>
-          <tr><td>CHAOS-06</td><td>Falha de DNS</td><td><code>echo 127.0.0.1 db &gt; /etc/hosts</code></td><td>Drift / circuit breaker</td></tr>
+          <tr><td>EC2 ClickHouse</td><td><code>sg-clickhouse</code> + <code>LabInstanceProfile</code></td><td>Inbound 8123 &larr; <code>sg-streamlit</code> e <code>sg-lambda</code>; 22 &larr; IP do aluno; outbound livre.</td></tr>
+          <tr><td>EC2 Streamlit</td><td><code>sg-streamlit</code> + <code>LabInstanceProfile</code></td><td>Inbound 8501 &larr; <code>0.0.0.0/0</code>; 22 &larr; IP do aluno; outbound livre.</td></tr>
+          <tr><td>Lambda ingestor</td><td><code>LabRole</code></td><td>Acesso S3 e Secrets Manager via role; rede default da Lambda (sem VPC) ou attach numa subnet privada que enxergue o CH.</td></tr>
+          <tr><td>S3 bucket</td><td>Bucket policy default</td><td>Sem acesso público; somente <code>LabRole</code> acessa.</td></tr>
         </tbody>
       </table>
 
-      <h3>3.3 Anatomia de um experimento</h3>
-      <div class="m06-mermaid">
-        <pre class="mermaid">
-flowchart LR
-  H["1. Hipótese<br/>(estado estacionário)"]
-  B["2. Baseline<br/>medir SLI normal"]
-  I["3. Injeção<br/>(SSM + Toxiproxy)"]
-  O["4. Observação<br/>(CW Logs + métricas)"]
-  C["5. Conclusão<br/>+ ADR"]
-
-  H --> B --> I --> O --> C
-
-  KS["Kill switch<br/>(CW alarm + ssm cancel)"]
-  I -.->|aborta se SLO crítico| KS
-  KS -.->|stop| O
-        </pre>
-      </div>
+      <h3>8.8 Passo 2.8 &mdash; validação end-to-end</h3>
       <p>
-        Cada experimento é um YAML com hipótese, baseline, ações, salvaguardas e critério de aceitação. Forma canônica:
+        Suba um CSV novo no S3. A Lambda dispara automaticamente; logs vão para CloudWatch. ClickHouse ganha linhas. Dashboard atualiza.
       </p>
-<pre>id: CHAOS-02
-titulo: Latencia ETL -&gt; Postgres por 60s
-hipotese: |
-  Se a latencia entre ETL e Postgres subir para 2000ms por 60s,
-  o circuit breaker abre em &lt;= 10s e o ETL faz freeze do
-  proximo run sem perder mensagens em flight.
-estado_estacionario:
-  sli: pg_query_p95_ms
-  baseline: "&lt; 80 ms por 5 min"
-acoes:
-  - toxiproxy-cli toxic add -t latency -a latency=2000 etl-pg
-  - sleep 60
-  - toxiproxy-cli toxic remove --toxicName etl-pg-latency etl-pg
-salvaguardas:
-  kill_switch: "alarm SLO_BREACH ON =&gt; ssm cancel-command"
-  blast_radius: "apenas instancia tag Role=etl-lab"
-  duracao_max: 90s
-aceitacao:
-  - circuit_breaker_aberto_em: "&lt;= 10 s"
-  - mensagens_perdidas: "= 0"
-  - retorno_ao_baseline_em: "&lt;= 30 s pos-fim"</pre>
+<pre><code># 1. Subir um CSV novo no S3
+aws s3 cp data/olist_orders_dataset.csv \
+  "s3://${BUCKET}/olist/olist_orders_dataset.csv"
 
-      <h3>3.4 Game day &mdash; a cerimônia</h3>
+# 2. Lambda dispara automaticamente (logs no CloudWatch)
+aws logs tail /aws/lambda/olist-ingestor --since 2m
+
+# 3. Conferir no ClickHouse (via Streamlit EC2 que ja sabe falar com o CH)
+ssh -i ~/labsuser.pem ec2-user@$ST_EC2_IP \
+  "curl -s http://&lt;ch-private&gt;:8123/?query=SELECT+count()+FROM+olist_raw.ingestion"
+
+# 4. Abrir o dashboard
+echo "http://${ST_EC2_IP}:8501"
+</code></pre>
       <p>
-        Game day é o ritual em que o time roda chaos junto, na mesma sala (virtual ou física), com papéis claros:
-        <strong>Comandante</strong> (decide go/no-go), <strong>Operador</strong> (injeta a falha),
-        <strong>Observador</strong> (lê CW Logs em tempo real) e <strong>Escriba</strong> (transcreve o que vê).
-        Sem ritual, chaos vira <em>blame</em>. Saída obrigatória: arquivo <code>15_chaos_runs/&lt;timestamp&gt;.md</code>
-        com hipótese, execução, resultado e ADR.
+        Critério de pronto da Etapa 2: <strong>upload de CSV no S3 popula o dashboard via Streamlit sem nenhuma intervenção manual</strong>.
       </p>
     </section>
 
     <section class="content-block">
-      <h2>4. Os cinco closed loops da Aula 03 sob fogo</h2>
+      <h2>9. Critério de pronto da Aula 06</h2>
       <p>
-        A arquitetura desenhada na Aula 03 introduziu cinco malhas fechadas de controle &mdash; sensores no CloudWatch,
-        controlador (EventBridge + SSM) e atuadores no ETL e no Postgres. Cada loop foi proposto para resolver um RNF
-        específico. Hoje cada um ganha um experimento que prova que ele reage como prometido. Se algum não reagir,
-        a malha não existe &mdash; é decoração.
-      </p>
-      <div class="m06-mermaid">
-        <pre class="mermaid">
-flowchart LR
-  CTRL(("Controlador SRE<br/>EventBridge + SSM"))
-  L1["Backpressure<br/>RNF-PERF-01"]
-  L2["Circuit breaker<br/>RNF-REL-01"]
-  L3["Freeze por error budget<br/>RNF-SAFE-01"]
-  L4["Quarentena de payload<br/>RNF-REL-02"]
-  L5["Drift / DNS<br/>RNF-MAINT-01"]
-
-  CTRL --- L1
-  CTRL --- L2
-  CTRL --- L3
-  CTRL --- L4
-  CTRL --- L5
-
-  L1 -.->|valida| C1["CHAOS-01<br/>kill ETL"]
-  L2 -.->|valida| C2["CHAOS-02<br/>latência 2s"]
-  L3 -.->|valida| C5["CHAOS-05<br/>CPU 100%"]
-  L4 -.->|valida| C4["CHAOS-04<br/>disco cheio"]
-  L5 -.->|valida| C6["CHAOS-06<br/>DNS quebrado"]
-        </pre>
-      </div>
-      <p>
-        Hoje rodamos apenas <strong>CHAOS-02</strong>. Os outros viram experimentos agendados nas próximas semanas
-        e entram como regressão automática quando o gate de chaos amadurecer.
-      </p>
-    </section>
-
-    <section class="content-block">
-      <h2>5. Qualidade de código mensurada</h2>
-      <p>
-        Engenharia de software produz duas coisas: comportamento e custo de manutenção. Comportamento é exercitado por
-        testes (Aula 05) e por chaos (esta aula). Custo de manutenção é exercitado por métricas que olham o código
-        como artefato &mdash; quantos caminhos ele tem, quão denso é, quanto esforço cognitivo um leitor humano paga
-        para entender. Em SRE, código de baixa qualidade não é estética &mdash; é <em>toil</em> que retorna toda vez
-        que algo precisa mudar.
-      </p>
-
-      <h3>5.1 QM-01 &mdash; Complexidade ciclomática (McCabe, 1976)</h3>
-      <p>
-        McCabe propôs em 1976 a métrica que conta caminhos linearmente independentes pelo grafo de controle de uma
-        função. Em prática, conta os pontos de decisão: cada <code>if</code>, <code>elif</code>, <code>and</code>,
-        <code>or</code>, <code>for</code>, <code>while</code>, <code>except</code>, <code>case</code> incrementa. A
-        fórmula formal é <code>M = E &minus; N + 2P</code> (arestas, nós, componentes conexos), mas equivale a
-        "número de decisões + 1". A leitura prática:
+        Ao final da aula, o aluno deve ter no fork do repositório:
       </p>
       <ul>
-        <li><strong>1&ndash;5</strong> &mdash; baixa, função simples.</li>
-        <li><strong>6&ndash;10</strong> &mdash; média, aceitável.</li>
-        <li><strong>11&ndash;20</strong> &mdash; alta, candidata a refactor.</li>
-        <li><strong>&gt; 20</strong> &mdash; muito alta, dívida explícita.</li>
+        <li><code>infra/userdata-monolito.sh</code>, <code>infra/userdata-clickhouse.sh</code>, <code>infra/userdata-streamlit.sh</code> &mdash; scripts versionados.</li>
+        <li><code>infra/sg.json</code> &mdash; documentação das regras de Security Group aplicadas.</li>
+        <li><code>lambda/lambda_handler.py</code> e <code>lambda/requirements.txt</code> &mdash; código da função.</li>
+        <li>Screenshot do dashboard rodando no IP público da Etapa 1 (lift-and-shift).</li>
+        <li>Screenshot do dashboard rodando no IP público da Etapa 2 (decomposição), com dado fresco vindo do S3 via Lambda.</li>
+        <li>Commit final com a mensagem <em>"Aula 06: migracao para AWS via Gemini CLI"</em>.</li>
       </ul>
-      <p>O gate do curso é <strong>McCabe &le; 10 por função</strong> e <strong>média &le; 8 por arquivo</strong>.</p>
-
-      <h3>5.2 QM-02 &mdash; Cognitive Complexity (SonarSource, 2017)</h3>
-      <p>
-        McCabe não distingue <code>if</code> aninhado de <code>if</code> sequencial &mdash; mas o cérebro humano
-        distingue. Cognitive complexity ajusta McCabe penalizando aninhamento, recursão e quebra de fluxo
-        progressivamente. Cada quebra de fluxo conta +1; cada nível de aninhamento conta +1 extra; sequências de
-        operadores lógicos heterogêneos contam +1; recursão e <code>goto</code> contam +1. O resultado é mais fiel
-        ao tempo que um humano leva para reler a função. Limiar do curso: <strong>&le; 15</strong>.
-      </p>
-
-      <h3>5.3 QM-03 &mdash; Halstead (1977)</h3>
-      <p>
-        Halstead olha a função como texto e conta operadores e operandos &mdash; tipos distintos
-        (<code>n1</code>, <code>n2</code>) e ocorrências totais (<code>N1</code>, <code>N2</code>). A partir disso
-        deriva volume, dificuldade, esforço e tempo estimado. As métricas revelam densidade que McCabe não vê:
-        função curta com vocabulário pesado, função longa com vocabulário pobre.
-      </p>
-      <table>
-        <thead><tr><th>Métrica</th><th>Fórmula</th><th>O que diz</th></tr></thead>
-        <tbody>
-          <tr><td>Vocabulário</td><td><code>n = n1 + n2</code></td><td>Tipos distintos de tokens</td></tr>
-          <tr><td>Comprimento</td><td><code>N = N1 + N2</code></td><td>Total de tokens</td></tr>
-          <tr><td>Volume</td><td><code>V = N · log&#8322;(n)</code></td><td>Tamanho da informação</td></tr>
-          <tr><td>Dificuldade</td><td><code>D = (n1/2) · (N2/n2)</code></td><td>Densidade do código</td></tr>
-          <tr><td>Esforço</td><td><code>E = D · V</code></td><td>Custo cognitivo</td></tr>
-          <tr><td>Tempo (s)</td><td><code>T = E / 18</code></td><td>Estimado para 1 leitor</td></tr>
-        </tbody>
-      </table>
-
-      <h3>5.4 QM-04 &mdash; Maintainability Index</h3>
-      <p>
-        Oman e Hagemeister (1992) compuseram McCabe, Halstead e LOC em uma métrica única, o Maintainability Index.
-        Microsoft popularizou a versão normalizada de 0 a 100 que usamos hoje:
-      </p>
       <div class="m06-callout">
-        <strong>Fórmula clássica (normalizada 0&ndash;100)</strong>
-        <p style="margin: 8px 0 0; font-family: var(--font-mono);">
-          MI = max(0, (171 &minus; 5.2 &middot; ln(V) &minus; 0.23 &middot; G &minus; 16.2 &middot; ln(LOC)) &middot; 100 / 171)
-        </p>
+        <strong>Limpeza obrigatória</strong>
+        Antes de sair: <code>aws ec2 terminate-instances --instance-ids ...</code> em todas as EC2s, <code>aws lambda delete-function</code>, <code>aws s3 rb --force</code> no bucket, <code>aws secretsmanager delete-secret --force-delete-without-recovery</code>. Crédito do Lab é finito.
       </div>
-      <p>
-        Onde <strong>V</strong> é o volume de Halstead, <strong>G</strong> é a complexidade ciclomática (McCabe) e
-        <strong>LOC</strong> é o número de linhas de código. Acima de 65 é considerado manutenível; abaixo, dívida.
-        Em Python: <code>radon mi src/</code>.
-      </p>
-
-      <h3>5.5 Ferramentas que rodam no nosso CI</h3>
-      <table>
-        <thead><tr><th>Ferramenta</th><th>Métrica</th><th>Saída</th></tr></thead>
-        <tbody>
-          <tr><td><code>radon cc</code></td><td>McCabe</td><td>Grade A&ndash;F por função</td></tr>
-          <tr><td><code>radon mi</code></td><td>Maintainability Index</td><td>0&ndash;100 por arquivo</td></tr>
-          <tr><td><code>radon hal</code></td><td>Halstead</td><td>V, D, E, T por função</td></tr>
-          <tr><td><code>xenon</code></td><td>McCabe gate</td><td>Exit 1 se acima do limiar</td></tr>
-          <tr><td><code>ruff check</code></td><td>Lint</td><td>Estatística por regra</td></tr>
-          <tr><td><code>mypy --strict-equality</code></td><td>Tipos</td><td>Erros semânticos</td></tr>
-          <tr><td><code>madge</code> (Node)</td><td>Deps cíclicas</td><td>Lista de ciclos no grafo</td></tr>
-        </tbody>
-      </table>
-      <p>
-        Em Node, equivalentes diretos são <code>complexity-report</code>, <code>plato</code>, <code>eslint --rule
-        complexity</code> e <code>madge</code>. O conceito é o mesmo; muda a sintaxe.
-      </p>
-
-      <h3>5.6 Política de qualidade do projeto</h3>
-      <ul>
-        <li><strong>McCabe</strong> &le; 10 por função; média &le; 8 por arquivo.</li>
-        <li><strong>Cognitive complexity</strong> &le; 15 por função.</li>
-        <li><strong>MI</strong> &ge; 65 em todo módulo crítico.</li>
-        <li><strong>Duplicação</strong> &le; 5% (regra <code>SIM</code> do ruff).</li>
-        <li><strong>Cobertura unit</strong> &ge; 80% (já vinha da Aula 05).</li>
-      </ul>
-      <p>
-        Cada função crítica é vinculada via RTM a pelo menos um RF ou RNF. Quando ela cruza um limiar, o PR não
-        merge sem ADR <code>QUALITY-NN</code> que justifique e proponha plano de refactor. O refactor é orçado pelo
-        <em>error budget</em> restante &mdash; não pela boa vontade.
-      </p>
     </section>
 
     <section class="content-block">
-      <h2>6. Anti-padrões que vamos evitar</h2>
-      <p>Cada item desta lista travou um time real. Eles voltam a aparecer porque são tentadores.</p>
+      <h2>10. Roadmap das próximas aulas</h2>
       <ul>
-        <li><strong>Container persistente entre testes sem reset.</strong> Faz teste 5 passar porque o teste 3 deixou
-          dado lá. Quando rodam isolados, falham. Sintoma: <em>flaky</em> no CI.</li>
-        <li><strong>Pull de imagem em todo job.</strong> Runner gasta 15 s antes de cada execução. Cache local resolve.</li>
-        <li><strong>Mock e Testcontainer misturados sem critério.</strong> O mesmo módulo usa mock em um teste e TC em
-          outro &mdash; o teste com mock vira referência falsa.</li>
-        <li><strong>Chaos sem kill switch.</strong> Algo dá errado, ninguém sabe parar. Por menor que seja a janela,
-          kill switch é obrigatório.</li>
-        <li><strong>Toxiproxy esquecido ligado.</strong> Experimento acaba, ninguém remove o toxic. Daqui a duas
-          horas, todo mundo culpa rede.</li>
-        <li><strong>Experimento sem hipótese.</strong> Quebrar coisa por curiosidade não é chaos engineering &mdash;
-          é vandalismo. A hipótese diz o que esperar.</li>
-        <li><strong>Métrica vista nunca aplicada.</strong> Relatório bonito que ninguém usa para decidir merge.
-          O conteúdo só vira realidade quando vira gate.</li>
-        <li><strong>Limiar negociado por sprint.</strong> Hoje McCabe é 12, semana que vem é 15. Métrica vira piada.</li>
-        <li><strong>Refactor sem orçamento.</strong> "Quando der tempo" nunca dá. Refactor patrocinado pelo error
-          budget é ritual: a equipe vê quanto sobrou e decide o que pagar.</li>
+        <li>
+          <strong>Aula 07 &middot; 28/05/2026 &mdash; Bass para sistemas distribuídos.</strong>
+          A Aula 07 volta à <strong>tabela ATAM construída na Aula 05</strong> e ataca cada <em>sensitivity point</em> agora no contexto distribuído da AWS.
+          Cenários típicos: derrubar a EC2 do ClickHouse e medir recuperação; rodar Lambdas concorrentes sobre o mesmo CSV para testar idempotência;
+          simular S3 retornando 503 e contar retries; empilhar 50 reingestões e medir p95 da view do top-products; auditar Security Groups e blast radius.
+          Cada cenário ganha uma tática de Bass aplicada (<em>redundancy</em>, <em>idempotency</em>, <em>retry com backoff</em>, <em>circuit breaker</em>,
+          <em>least privilege</em>).
+        </li>
+        <li>
+          <strong>Aula 08 &middot; 11/06/2026 &mdash; projeto final no GitHub.</strong>
+          Consolidação. Repositório com tudo: stack local (Aula 04), ATAM e Bass local (Aula 05), infra AWS (Aula 06), testes de stress distribuídos (Aula 07).
+          Entrega via GitHub.
+        </li>
       </ul>
     </section>
 
     <section class="content-block">
-      <h2>7. Roteiro da prática</h2>
-      <p>
-        A prática é guiada passo a passo, organizada em três blocos lógicos. Saímos com <code>tests/integration/</code>
-        migrado para Testcontainers, Toxiproxy provisionado, um chaos run documentado, um relatório de qualidade gerado
-        e um job <code>quality</code> novo no <code>wb.yml</code>. Tudo via CLI &mdash; nada de console AWS.
-      </p>
-
-      <h3>7.A &mdash; Bloco 1 &middot; Testcontainers</h3>
-      <p>
-        Substituímos o mock do Postgres por container efêmero controlado pelo teste e validamos o workflow localmente
-        antes do push. <strong>Entregáveis:</strong> token renovado, branch nova, skill <code>migrate_to_testcontainers</code>,
-        <code>conftest.py</code> com Postgres + LocalStack e <code>wb.yml</code> verde via <code>act</code>.
-        <strong>Critério parcial:</strong> <code>pytest tests/integration/</code> passa sem mock, em &le; 90 s, sem
-        dependência de ordem entre testes.
-      </p>
-
-      <h4>Passo 1 &mdash; renovar token, branch nova, esqueleto de skills</h4>
-<pre>cd ~/olist-sre-pipeline
-git pull origin main
-git checkout -b aula-06-chaos-quality
-
-# (re)conectar AWS CLI - bloco do Learner Lab
-nano ~/.aws/credentials   # cola access_key, secret, session_token
-aws sts get-caller-identity
-
-# Skeleton de skills e diretorios
-mkdir -p agents/skills chaos/experiments documents/15_chaos_runs
-touch agents/skills/migrate_to_testcontainers.md \
-      agents/skills/design_chaos_experiment.md \
-      agents/skills/measure_quality.md \
-      documents/16_quality_report.md</pre>
-
-      <h4>Passo 2 &mdash; skill <code>migrate_to_testcontainers</code></h4>
-      <p>
-        A skill instrui o agente Tester a ler o estado atual de <code>tests/integration/</code> e o
-        <code>documents/03_architecture.md</code>, e produzir um diff que substitui mocks por Testcontainers,
-        com seed mínimo do gold dimensional (5 dimensões &times; 50 fatos). A entrada da skill é o estado do repo;
-        a saída é o diff em <code>tests/integration/</code> &mdash; nada além.
-      </p>
-<pre># agents/skills/migrate_to_testcontainers.md
-
-## Quando acionar
-Quando o usuario pedir para sair do mock e usar Postgres real
-em tests/integration/.
-
-## Entrada esperada
-- documents/03_architecture.md  (versao do Postgres alvo)
-- tests/integration/  (estado atual mockado)
-- documents/01_functional_requirements.md  (escopo do gold)
-
-## Passos
-1. Ler a versao do Postgres em documents/03_architecture.md.
-2. Substituir mocks por fixture session-scoped com PostgresContainer.
-3. Carregar seed minimo do gold dimensional (5 dim x 50 fato).
-4. Garantir TRUNCATE entre testes (escopo function).
-5. Ajustar pyproject.toml: testcontainers[postgres] como dev dep.
-
-## Aceitacao
-- pytest tests/integration/ passa sem mock.
-- Tempo total &lt;= 90 s.
-- Nenhum teste depende de outro (ordem livre).</pre>
-
-      <h4>Passo 3 &mdash; rodar a skill e validar localmente com <code>act</code></h4>
-      <p>
-        Antes de gastar minuto de runner ou quebrar a branch protection, rodamos o workflow no Codespace via
-        <code>act</code>. Ele simula o ambiente do GitHub Actions. Esperado: <code>pytest tests/integration/</code>
-        verde com Postgres real.
-      </p>
-<pre># Instalar act (uma vez)
-curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
-
-# Rodar so o job 'integration' do wb.yml
-act -W .github/workflows/wb.yml -j integration \
-    --container-architecture linux/amd64 \
-    -P self-hosted=catthehacker/ubuntu:act-latest
-
-# Esperado: pytest tests/integration/ verde com Postgres real
-# Tempo aproximado: 60-90 s na primeira run, 20-30 s nas seguintes.</pre>
-
-      <h3>7.B &mdash; Bloco 2 &middot; Chaos engineering</h3>
-      <p>
-        Provisionamos o Toxiproxy como sidecar do ETL, desenhamos o experimento via skill, injetamos latência por SSM
-        e registramos o run com baseline, observação e ADR. <strong>Entregáveis:</strong> Toxiproxy via CFN, skill
-        <code>design_chaos_experiment</code>, comando SSM com kill switch e arquivo em
-        <code>documents/15_chaos_runs/</code>. <strong>Critério parcial:</strong> YAML de experimento com hipótese,
-        baseline, salvaguardas e <code>duracao_max</code>; kill switch testado; Toxiproxy <em>OFF</em> ao final;
-        1 ADR por descoberta.
-      </p>
-
-      <h4>Passo 4 &mdash; Toxiproxy via CFN ao lado do ETL</h4>
-      <p>
-        Estendemos <code>iac/cloudformation/compute.yaml</code> da Aula 04 com o Toxiproxy rodando como container
-        sidecar na mesma EC2 ETL, ouvindo só na rede interna (<code>127.0.0.1</code>). O ETL passa a falar com o
-        Postgres pela porta <code>5433</code> do Toxiproxy &mdash; em modo normal, é transparente. Quando vamos
-        injetar latência, o Toxiproxy intercepta.
-      </p>
-<pre># Adendo ao compute.yaml (UserData da EC2 ETL)
-docker run -d --name toxiproxy \
-  --restart unless-stopped \
-  -p 127.0.0.1:8474:8474 \
-  -p 127.0.0.1:5433:5433 \
-  ghcr.io/shopify/toxiproxy:latest
-
-docker exec toxiproxy /toxiproxy-cli create -l 0.0.0.0:5433 \
-  -u $PG_HOST:5432 etl-pg
-
-# Re-deploy
-aws cloudformation deploy \
-  --template-file iac/cloudformation/compute.yaml \
-  --stack-name olist-sre-pipeline-lab \
-  --capabilities CAPABILITY_IAM</pre>
-
-      <h4>Passo 5 &mdash; skill <code>design_chaos_experiment</code></h4>
-      <p>
-        A skill obriga a IA a escrever YAML válido contra <code>chaos/experiments/_schema.json</code>. Sem
-        <code>kill_switch</code>, sem <code>duracao_max</code> e sem <code>blast_radius</code>, a skill recusa.
-      </p>
-<pre># agents/skills/design_chaos_experiment.md
-
-## Quando acionar
-Quando o usuario pedir para desenhar um experimento de chaos.
-
-## Entrada esperada
-- ID do loop a validar (ex.: "circuit breaker do RNF-REL-01")
-- SLI alvo
-- Janela maxima permitida
-
-## Passos
-1. Escrever YAML em chaos/experiments/CHAOS-NN.yaml com:
-   hipotese, baseline, acoes, salvaguardas, aceitacao.
-2. Anexar comando aws ssm send-command para injetar.
-3. Anexar comando de kill switch.
-4. Listar metricas CW que sustentam aceitacao.
-5. Recusar experimento sem kill switch ou sem janela.
-
-## Aceitacao
-- YAML valida contra schema chaos/experiments/_schema.json.
-- duracao_max obrigatoria.
-- blast_radius descrito por tag.</pre>
-
-      <h4>Passo 6 &mdash; injetar a falha via SSM Run Command</h4>
-      <p>
-        Com o YAML pronto, transformamos a sequência de ações em um <code>aws ssm send-command</code> que distribui
-        para a EC2 alvo (selecionada por tag). O ID do comando volta como variável de ambiente; é ele que usamos no
-        kill switch.
-      </p>
-<pre># Injetar latencia 2000ms por 60s no proxy etl-pg
-CMD_ID=$(aws ssm send-command \
-  --document-name "AWS-RunShellScript" \
-  --targets "Key=tag:Role,Values=etl-lab" \
-  --parameters 'commands=[
-    "docker exec toxiproxy /toxiproxy-cli toxic add -t latency -a latency=2000 etl-pg",
-    "sleep 60",
-    "docker exec toxiproxy /toxiproxy-cli toxic remove --toxicName etl-pg-latency etl-pg"
-  ]' \
-  --query "Command.CommandId" --output text)
-
-echo "$CMD_ID" &gt; /tmp/last_chaos_cmd
-
-# Kill switch (executar se algo sair do controle)
-aws ssm cancel-command --command-id "$CMD_ID"
-
-# Observar
-aws logs tail /aws/ec2/etl-lab --follow --since 2m</pre>
-
-      <h4>Passo 7 &mdash; registrar o run</h4>
-      <p>Sem registro, o experimento não existiu. Um arquivo por run, datado, com hipótese, execução, resultado e ADR.</p>
-<pre># documents/15_chaos_runs/2026-05-21T2105_CHAOS-02.md
-
-## Hipotese
-Se a latencia ETL -&gt; Postgres subir para 2000ms por 60s,
-o circuit breaker abre em &lt;= 10s e nao perde mensagens.
-
-## Baseline
-pg_query_p95_ms = 42 ms (5 min antes)
-
-## Execucao
-- T-0:    latencia injetada via toxiproxy
-- T+7s:   circuit_breaker_open=true (CW Logs)
-- T+60s:  latencia removida
-- T+78s:  pg_query_p95_ms = 51 ms (volta ao baseline)
-
-## Resultado
-PASSOU. Aceitacao integralmente atendida.
-
-## ADR gerado
-ADR-12 - circuit breaker abre em 7s, dentro do limite de 10s.
-Manter threshold atual. Proximo experimento: latencia 5000ms.</pre>
-
-      <h3>7.C &mdash; Bloco 3 &middot; Qualidade &amp; gate</h3>
-      <p>
-        Rodamos as métricas de qualidade no <code>src/</code>, consolidamos em relatório com plano de refactor e
-        transformamos os limiares em gate obrigatório do <code>wb.yml</code>. <strong>Entregáveis:</strong> skill
-        <code>measure_quality</code>, <code>documents/16_quality_report.md</code> com top-5 funções, job
-        <code>quality</code> dependente de <code>unit</code> e <code>integration</code>, tag <code>aula-06</code> no
-        remoto. <strong>Critério parcial:</strong> <code>xenon</code> verde com gate B-A-A; MI &ge; 65 em todo módulo
-        crítico; job <code>quality</code> verde; cada função fora do limite tem ADR <code>QUALITY-NN</code>.
-      </p>
-
-      <h4>Passo 8 &mdash; skill <code>measure_quality</code> e relatório</h4>
-      <p>
-        O agente Reviewer roda <code>radon</code>, <code>xenon</code> e <code>ruff</code>, consolida tudo em
-        <code>documents/16_quality_report.md</code> com top-5 funções por complexidade, vínculo de cada item à RTM
-        e plano de refactor priorizado pelo error budget.
-      </p>
-<pre>opencode
-
-&gt; Aplique a skill agents/skills/measure_quality.md em src/.
-&gt; Gere documents/16_quality_report.md com:
-&gt;   - tabela radon cc -s -a (media e grade)
-&gt;   - resultado xenon (gate B-A-A)
-&gt;   - radon mi (MI por arquivo, alerta &lt; 65)
-&gt;   - ruff check --statistics
-&gt;   - top-5 funcoes mais complexas
-&gt;   - plano de refactor com horas estimadas
-&gt;   - vinculo de cada item ao RF/RNF da RTM
-
-# Comandos crus para fallback
-radon cc -s -a src/  &gt; reports/cc.txt
-xenon --max-absolute B --max-modules A --max-average A src/
-radon mi src/        &gt; reports/mi.txt
-ruff check --statistics src/ &gt; reports/ruff.txt</pre>
-
-      <h4>Passo 9 &mdash; gate de qualidade no <code>wb.yml</code></h4>
-      <p>
-        A métrica só vira realidade quando vira CI gate. PR que cruzar o limiar não merge sem ADR. Adicionamos um
-        job novo, dependente dos jobs <code>unit</code> e <code>integration</code>:
-      </p>
-<pre># .github/workflows/wb.yml (adendo)
-quality:
-  runs-on: [self-hosted, lab]
-  needs: [unit, integration]
-  steps:
-    - uses: actions/checkout@v4
-    - run: pip install radon xenon ruff
-    - name: McCabe gate
-      run: xenon --max-absolute B --max-modules A --max-average A src/
-    - name: MI gate
-      run: |
-        python - &lt;&lt;'EOF'
-        import subprocess, sys, json
-        out = subprocess.check_output(["radon","mi","-j","src/"]).decode()
-        data = json.loads(out)
-        bad = [f for f, m in data.items() if m["mi"] &lt; 65]
-        if bad:
-            print("MI &lt; 65 em:", bad); sys.exit(1)
-        EOF
-    - name: Ruff gate
-      run: ruff check src/</pre>
-
-      <h4>Passo 10 &mdash; critério de pronto, commit e tag</h4>
-      <p>Antes do <code>git push</code>, cada item verde:</p>
-      <ul>
-        <li><code>tests/integration/</code> migrado para Testcontainers, sem mock.</li>
-        <li>Toxiproxy provisionado e <em>OFF</em> ao final.</li>
-        <li>1 chaos run completo em <code>documents/15_chaos_runs/</code>.</li>
-        <li><code>documents/16_quality_report.md</code> gerado.</li>
-        <li>Job <code>quality</code> verde no <code>wb.yml</code>.</li>
-        <li>3 skills novas em <code>agents/skills/</code>.</li>
-        <li>1 ADR (<code>ADR-NN</code>) por descoberta.</li>
-        <li>Tag <code>aula-06</code> no remoto.</li>
-      </ul>
-<pre>git add tests/integration chaos documents agents .github
-git commit -m "feat(aula-06): testcontainers + chaos run + quality gate"
-git tag aula-06
-git push origin aula-06-chaos-quality --tags</pre>
-    </section>
-
-    <section class="content-block">
-      <h2>8. Restrições duras desta aula</h2>
-      <ul>
-        <li><strong>Sem console AWS.</strong> Tudo via CLI / SSM.</li>
-        <li><strong>Chaos só no stack lab.</strong> Nunca em produção sem ADR específico e janela negociada.</li>
-        <li><strong>Kill switch obrigatório</strong> em todo experimento &mdash; sem ele, a skill recusa.</li>
-        <li><strong>Toxiproxy nunca em prod</strong> sem ADR e sem revisão de blast radius.</li>
-        <li><strong>FIS está bloqueado</strong> no Learner Lab &mdash; usar SSM Run Command como substituto.</li>
-        <li><strong>Métrica de qualidade</strong> não negociável por sprint &mdash; só por ADR <code>QUALITY-NN</code>.</li>
-      </ul>
-    </section>
-
-    <section class="content-block">
-      <h2>9. Continuidade &mdash; ponte para a Aula 07</h2>
-      <p>
-        As métricas medidas hoje (McCabe médio, MI, taxa de chaos passados, tempo médio de retorno ao baseline) viram
-        <strong>SLIs internos</strong> na Aula 07. Entram nos dashboards CloudWatch consolidados e passam a ter SLO
-        próprio. Quando o SLI cair abaixo do SLO, o controlador SRE da Aula 03 dispara &mdash; freeze de feature,
-        prioridade para refactor, escalonamento. O ciclo da Aula 07 é: medir, comparar com meta, decidir trabalho.
-      </p>
-    </section>
-
-    <section class="content-block">
-      <h2>10. Glossário consolidado</h2>
-      <p>
-        Vocabulário usado nesta aula. As três tabelas de glossário em slide são compactas; aqui há descrições mais
-        longas para consulta.
-      </p>
-
-      <h3>10.1 Testes e Testcontainers</h3>
+      <h2>11. Glossário</h2>
       <table>
-        <thead><tr><th style="width:18%;">Sigla</th><th>Significado</th></tr></thead>
+        <thead><tr><th>Termo</th><th>Significado</th></tr></thead>
         <tbody>
-          <tr><td><strong>TC</strong></td><td>Testcontainer &mdash; container Docker descartável controlado pelo teste.</td></tr>
-          <tr><td><strong>WB</strong></td><td>White Box test &mdash; teste com conhecimento da estrutura interna.</td></tr>
-          <tr><td><strong>BB</strong></td><td>Black Box test &mdash; teste pelo contrato externo do sistema.</td></tr>
-          <tr><td><strong>e2e</strong></td><td>End-to-End &mdash; teste do fluxo completo, ponta a ponta.</td></tr>
-          <tr><td><strong>BDD</strong></td><td>Behavior-Driven Development &mdash; especificação executável (Given/When/Then).</td></tr>
-          <tr><td><strong>SUT</strong></td><td>System Under Test &mdash; o sistema sendo testado.</td></tr>
-          <tr><td><strong>DI</strong></td><td>Dependency Injection &mdash; injetar dependências para facilitar substituição.</td></tr>
-          <tr><td><strong>OCI</strong></td><td>Open Container Initiative &mdash; padrão de imagens e runtime de containers.</td></tr>
-          <tr><td><strong>LS</strong></td><td>LocalStack &mdash; emulador de APIs AWS dentro de container.</td></tr>
-          <tr><td><strong>JDBC</strong></td><td>Java Database Connectivity &mdash; padrão de conexão com bancos.</td></tr>
-          <tr><td><strong>DSN</strong></td><td>Data Source Name &mdash; URI/identificador da conexão.</td></tr>
-          <tr><td><strong>PG</strong></td><td>PostgreSQL &mdash; o nosso banco do gold.</td></tr>
-        </tbody>
-      </table>
-
-      <h3>10.2 Chaos engineering e SRE</h3>
-      <table>
-        <thead><tr><th style="width:18%;">Sigla</th><th>Significado</th></tr></thead>
-        <tbody>
-          <tr><td><strong>FIS</strong></td><td>AWS Fault Injection Service &mdash; gerenciado, mas <strong>não disponível no Learner Lab</strong>.</td></tr>
-          <tr><td><strong>SSM</strong></td><td>AWS Systems Manager &mdash; agrega Run Command, Session Manager, Parameter Store.</td></tr>
-          <tr><td><strong>Toxiproxy</strong></td><td>Proxy TCP que injeta falhas (latência, perda, banda). Mantido pela Shopify.</td></tr>
-          <tr><td><strong>tc</strong></td><td>Linux traffic control &mdash; ferramenta do <code>iproute2</code> para qdisc.</td></tr>
-          <tr><td><strong>netem</strong></td><td>Network emulator do kernel Linux &mdash; latência, perda, reordenamento.</td></tr>
-          <tr><td><strong>Blast radius</strong></td><td>Raio de explosão &mdash; quantos componentes/usuários o experimento afeta.</td></tr>
-          <tr><td><strong>Steady state</strong></td><td>Estado estacionário medido por uma SLI antes do experimento.</td></tr>
-          <tr><td><strong>Game day</strong></td><td>Cerimônia em que o time roda chaos junto com papéis claros.</td></tr>
-          <tr><td><strong>SRE</strong></td><td>Site Reliability Engineering &mdash; disciplina e papel.</td></tr>
-          <tr><td><strong>SLI</strong></td><td>Service Level Indicator &mdash; métrica observável.</td></tr>
-          <tr><td><strong>SLO</strong></td><td>Service Level Objective &mdash; meta interna sobre a SLI.</td></tr>
-          <tr><td><strong>SLA</strong></td><td>Service Level Agreement &mdash; contrato externo, com consequência.</td></tr>
-          <tr><td><strong>MTBF</strong></td><td>Mean Time Between Failures &mdash; tempo médio entre falhas.</td></tr>
-          <tr><td><strong>MTTR</strong></td><td>Mean Time To Recovery &mdash; tempo médio de recuperação.</td></tr>
-          <tr><td><strong>RTO</strong></td><td>Recovery Time Objective &mdash; tempo máximo aceitável para recuperar.</td></tr>
-          <tr><td><strong>RPO</strong></td><td>Recovery Point Objective &mdash; perda máxima de dado aceitável.</td></tr>
-          <tr><td><strong>Toil</strong></td><td>Trabalho repetitivo, sem valor duradouro, que escala com o serviço.</td></tr>
-        </tbody>
-      </table>
-
-      <h3>10.3 Qualidade de código e métricas</h3>
-      <table>
-        <thead><tr><th style="width:18%;">Sigla</th><th>Significado</th></tr></thead>
-        <tbody>
-          <tr><td><strong>McCabe</strong></td><td>Complexidade ciclomática &mdash; caminhos linearmente independentes (1976).</td></tr>
-          <tr><td><strong>CC</strong></td><td>Cyclomatic Complexity &mdash; sigla usual de McCabe.</td></tr>
-          <tr><td><strong>Cognitive</strong></td><td>Cognitive Complexity &mdash; ajuste à McCabe que pesa aninhamento (SonarSource, 2017).</td></tr>
-          <tr><td><strong>MI</strong></td><td>Maintainability Index &mdash; métrica composta, normalizada 0&ndash;100.</td></tr>
-          <tr><td><strong>LOC</strong></td><td>Lines Of Code &mdash; total de linhas, incluindo comentários.</td></tr>
-          <tr><td><strong>SLOC</strong></td><td>Source Lines Of Code &mdash; só linhas com código de fato.</td></tr>
-          <tr><td><strong>QM</strong></td><td>Quality Metric &mdash; ID estável das métricas no curso (QM-NN).</td></tr>
-          <tr><td><strong>RPN</strong></td><td>Risk Priority Number &mdash; do FMEA (Aula 03).</td></tr>
-          <tr><td><strong>ADR</strong></td><td>Architecture Decision Record &mdash; registro de decisão.</td></tr>
-          <tr><td><strong>radon</strong></td><td>Toolkit Python para CC, MI e Halstead.</td></tr>
-          <tr><td><strong>xenon</strong></td><td>Gate sobre radon &mdash; falha o build se cruzar limiar.</td></tr>
-          <tr><td><strong>ruff</strong></td><td>Linter Python rápido (Astral).</td></tr>
-          <tr><td><strong>act</strong></td><td>Roda GitHub Actions localmente em Docker.</td></tr>
-          <tr><td><strong>YAML</strong></td><td>YAML Ain't Markup Language &mdash; formato declarativo.</td></tr>
-        </tbody>
-      </table>
-
-      <h3>10.4 Normas e organizações</h3>
-      <table>
-        <thead><tr><th style="width:18%;">Sigla</th><th>Significado</th></tr></thead>
-        <tbody>
-          <tr><td><strong>ISO/IEC 25010</strong></td><td>Quality model &mdash; atributos de qualidade de software.</td></tr>
-          <tr><td><strong>IEEE 982</strong></td><td>IEEE Standard Dictionary of Measures of the Software Aspects of Dependability.</td></tr>
-          <tr><td><strong>NIST</strong></td><td>National Institute of Standards and Technology (EUA).</td></tr>
-          <tr><td><strong>SonarSource</strong></td><td>Empresa autora do conceito de Cognitive Complexity (white paper 2017).</td></tr>
+          <tr><td><strong>Learner Lab</strong></td><td>Sandbox AWS gratuito do AWS Academy com crédito limitado e role pré-pronta.</td></tr>
+          <tr><td><strong>LabRole</strong></td><td>IAM role pronta do Learner Lab; aluno não cria roles próprias.</td></tr>
+          <tr><td><strong>LabInstanceProfile</strong></td><td>Instance profile que envelopa a LabRole; usado em EC2.</td></tr>
+          <tr><td><strong>Gemini CLI</strong></td><td>Agente de linha de comando do Google, usado como copiloto para gerar AWS CLI.</td></tr>
+          <tr><td><strong>Lift-and-shift</strong></td><td>Mover sistema "como está" para a nuvem antes de redesenhar &mdash; minimiza downtime.</td></tr>
+          <tr><td><strong>Decomposição</strong></td><td>Separar serviços do monolito em recursos gerenciados independentes.</td></tr>
+          <tr><td><strong>Secrets Manager</strong></td><td>Serviço AWS para armazenar segredos com rotação e auditoria.</td></tr>
+          <tr><td><strong>Instance profile</strong></td><td>Mecanismo que entrega credenciais IAM para uma EC2 sem precisar de <code>.env</code>.</td></tr>
+          <tr><td><strong>Security Group (SG)</strong></td><td>Firewall stateful por ENI/recurso na AWS; aceita regras por porta + origem.</td></tr>
+          <tr><td><strong>S3 PutObject trigger</strong></td><td>Evento que dispara uma Lambda quando um objeto é criado num bucket S3.</td></tr>
+          <tr><td><strong>user-data</strong></td><td>Script executado pela EC2 no primeiro boot; usado para bootstrap autônomo.</td></tr>
         </tbody>
       </table>
     </section>
 
     <section class="content-block">
-      <h2>11. Referências</h2>
+      <h2>12. Referências</h2>
       <ul>
-        <li>McCabe, T. J. &mdash; <em>A Complexity Measure</em>, IEEE Transactions on Software Engineering, 1976.</li>
-        <li>Halstead, M. &mdash; <em>Elements of Software Science</em>, Elsevier, 1977.</li>
-        <li>Oman, P.; Hagemeister, J. &mdash; <em>Metrics for Assessing a Software System's Maintainability</em>, IEEE ICSM, 1992.</li>
-        <li>SonarSource &mdash; <em>Cognitive Complexity, a new way of measuring understandability</em>, white paper, 2017.</li>
-        <li>Basiri, A. et al. &mdash; <em>Chaos Engineering</em>, IEEE Software, 2016.</li>
-        <li>Rosenthal, C.; Jones, N. et al. &mdash; <em>Chaos Engineering &mdash; System Resiliency in Practice</em>, O'Reilly, 2020.</li>
-        <li>principlesofchaos.org &mdash; <em>Principles of Chaos Engineering</em>.</li>
-        <li>Beyer et al. &mdash; <em>Site Reliability Engineering &mdash; How Google Runs Production Systems</em>, O'Reilly.</li>
-        <li>ISO/IEC 25010:2023 &mdash; <em>Systems and software Quality Requirements and Evaluation</em>.</li>
-        <li>Testcontainers docs &mdash; <code>testcontainers.com</code>; <code>testcontainers-python</code> docs.</li>
-        <li>Toxiproxy &mdash; <code>github.com/Shopify/toxiproxy</code>.</li>
-        <li>radon docs &mdash; <code>radon.readthedocs.io</code>; xenon docs; ruff (Astral) docs.</li>
-        <li>nektos/act &mdash; <code>github.com/nektos/act</code> (rodar workflows GitHub Actions localmente).</li>
-        <li>AWS Systems Manager Run Command &mdash; documentação oficial.</li>
+        <li>AWS Academy &mdash; <em>Learner Lab Student Guide</em>, disponível dentro do curso em <a href="https://awsacademy.instructure.com/" target="_blank" rel="noopener">awsacademy.instructure.com</a>.</li>
+        <li>AWS &mdash; <em>AWS CLI Command Reference v2</em>, <a href="https://docs.aws.amazon.com/cli/latest/" target="_blank" rel="noopener">docs.aws.amazon.com/cli/latest</a>.</li>
+        <li>AWS &mdash; <em>EC2 User Guide for Linux Instances</em>, <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/" target="_blank" rel="noopener">docs.aws.amazon.com/AWSEC2/latest/UserGuide</a>.</li>
+        <li>AWS &mdash; <em>S3 User Guide</em>, <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/" target="_blank" rel="noopener">docs.aws.amazon.com/AmazonS3</a>.</li>
+        <li>AWS &mdash; <em>Lambda Developer Guide &mdash; using S3 as a trigger</em>, <a href="https://docs.aws.amazon.com/lambda/latest/dg/with-s3.html" target="_blank" rel="noopener">docs.aws.amazon.com/lambda</a>.</li>
+        <li>AWS &mdash; <em>Secrets Manager User Guide</em>, <a href="https://docs.aws.amazon.com/secretsmanager/latest/userguide/" target="_blank" rel="noopener">docs.aws.amazon.com/secretsmanager</a>.</li>
+        <li>AWS &mdash; <em>IAM User Guide &mdash; Roles for EC2</em>, <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2.html" target="_blank" rel="noopener">docs.aws.amazon.com/IAM</a>.</li>
+        <li>Google &mdash; <em>Gemini CLI documentation</em>, <a href="https://github.com/google-gemini/gemini-cli" target="_blank" rel="noopener">github.com/google-gemini/gemini-cli</a>.</li>
+        <li>ClickHouse &mdash; <em>Installation on Linux</em>, <a href="https://clickhouse.com/docs/en/install" target="_blank" rel="noopener">clickhouse.com/docs/en/install</a>.</li>
       </ul>
     </section>
 
     <section class="content-block">
-      <nav class="material-nav">
-        <a href="../slides/slide_aula_06_data_warehousing_na_nuvem_de_alta_performance.html">&larr; Ir para os slides da Aula 06</a>
-        <span> &nbsp;&middot;&nbsp; </span>
-        <a href="../../../index.html">Voltar ao índice do curso</a>
-      </nav>
+      <h2>13. Encerramento &mdash; atividade prática da aula</h2>
+      <p>
+        Esta disciplina é 100% prática. O exercício da Aula 06 não tem questionário escrito &mdash; tem entregável vivo. Cada participante deve:
+      </p>
+      <ol>
+        <li>Renovar credenciais do AWS Learner Lab e exportá-las no terminal.</li>
+        <li>Instalar e autenticar o Gemini CLI; rodar um prompt-teste para confirmar.</li>
+        <li>Executar a Etapa 1 (lift-and-shift) com Gemini gerando os comandos AWS CLI. Capturar screenshot do dashboard no IP público.</li>
+        <li>Executar a Etapa 2 (decomposição) passo a passo. Capturar screenshot do dashboard servindo dados frescos vindos do S3 via Lambda (ou cron fallback).</li>
+        <li>Commit dos arquivos no fork (<code>infra/</code>, <code>lambda/</code>, screenshots) e submissão do link do repositório.</li>
+        <li><strong>Antes de fechar o Lab</strong>: terminar todas as instâncias, deletar Lambda, deletar bucket, deletar secret. Confirmar com <code>aws ec2 describe-instances</code> que não sobrou nada rodando.</li>
+      </ol>
+      <p>
+        <span class="m06-tag">Entrega</span>
+        Link do fork no GitHub com:
+        (a) <code>infra/</code> com os scripts de user-data e <code>sg.json</code>,
+        (b) <code>lambda/lambda_handler.py</code>,
+        (c) screenshots no <code>docs/img/</code> ou no README.
+      </p>
+      <p>
+        <a class="m06-repo-cta" href="https://github.com/afonsolelis/20261sre-primeironome-ultimonome" target="_blank" rel="noopener">
+          <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+          </svg>
+          Abrir o repositório da aula
+        </a>
+        &nbsp;
+        <a class="m06-lab-cta" href="https://awsacademy.instructure.com/" target="_blank" rel="noopener">AWS Academy Learner Lab &rarr;</a>
+      </p>
+    </section>
+
+    <section class="content-block">
+      <p>
+        <a href="../slides/slide_aula_06_data_warehousing_na_nuvem_de_alta_performance.html">Voltar aos slides desta aula</a>
+        &nbsp;&middot;&nbsp;
+        <a href="../../../index.html">Índice do curso</a>
+      </p>
     </section>
 
   </main>
 
-  <!-- Mermaid v11 — diagramas (chaos flow + radial loops) -->
+  <!-- Mermaid v11 — aws-diagram -->
   <script type="module">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
     mermaid.initialize({

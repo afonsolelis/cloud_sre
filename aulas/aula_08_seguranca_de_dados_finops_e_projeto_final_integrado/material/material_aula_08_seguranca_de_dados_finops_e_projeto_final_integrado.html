@@ -4,12 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/png" href="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" />
-  <title>Material Aula 08 — Projeto final em sala: análise de série temporal 100% AWS Student</title>
+  <title>Material Aula 08 — Projeto final — desafio entregue no GitHub</title>
   <link rel="stylesheet" href="../../../assets/styles.css" />
   <link rel="stylesheet" href="../../../assets/slides.css" />
   <style data-material08-local>
-    /* Material is a long-form document — neutralize the height/overflow rules
-       that slides.css applies to html, body. */
+    /* Material é documento longo — neutraliza height/overflow do slides.css */
     html, body.material {
       height: auto !important;
       min-height: 100%;
@@ -28,8 +27,8 @@
       margin: 14px 0;
     }
     body.material code {
-      background: var(--surface);
-      border: 1px solid var(--line-soft);
+      background: var(--deck-surface);
+      border: 1px solid var(--deck-line-soft);
       padding: 1px 6px;
       border-radius: 3px;
       font-family: var(--font-mono);
@@ -51,60 +50,99 @@
       padding: 10px 12px;
       border-top: 1px solid #0f0f0f;
       border-bottom: 1px solid #0f0f0f;
-      background: var(--surface);
+      background: var(--deck-surface);
     }
     body.material tbody td {
       padding: 10px 12px;
-      border-bottom: 1px solid var(--line-soft);
+      border-bottom: 1px solid var(--deck-line-soft);
       vertical-align: top;
     }
     body.material tbody tr:last-child td { border-bottom: 1px solid #0f0f0f; }
+
     .m08-callout {
       border-left: 3px solid #0f0f0f;
-      background: var(--surface);
+      background: var(--deck-surface);
       padding: 18px 22px;
       margin: 18px 0;
       border-radius: 0 4px 4px 0;
     }
     .m08-callout strong:first-child { display: block; margin-bottom: 6px; }
-    .m08-mermaid {
-      background: var(--panel, #ffffff);
-      border: 1px solid var(--line, #d6d6d1);
-      border-radius: 4px;
-      padding: 18px;
-      margin: 18px 0;
-      overflow: auto;
+
+    .m08-placeholder {
+      border: 1px solid var(--deck-line);
+      border-left: 6px solid #0f0f0f;
+      background: #ffffff;
+      padding: 22px 26px;
+      margin: 22px 0;
+      border-radius: 0 4px 4px 0;
     }
-    .m08-mermaid pre.mermaid {
-      background: transparent !important;
-      color: var(--text, #0f0f0f) !important;
-      padding: 0 !important;
-      margin: 0 !important;
-      box-shadow: none !important;
-      border: none !important;
-      border-radius: 0 !important;
-      overflow: visible;
-    }
-    .m08-mermaid pre.mermaid::before { display: none !important; }
-    .m08-mermaid svg {
-      max-width: 100%;
-      height: auto;
-      display: block;
-      margin: 0 auto;
-      background: transparent;
-    }
+    .m08-placeholder h3 { margin: 0 0 8px; }
+    .m08-placeholder p:last-child { margin-bottom: 0; }
+
     .m08-tag {
       display: inline-block;
       font-family: var(--font-mono);
       font-size: 11px;
       letter-spacing: .14em;
       text-transform: uppercase;
-      color: var(--muted);
+      color: var(--deck-muted);
       padding: 2px 8px;
-      border: 1px solid var(--line);
+      border: 1px solid var(--deck-line);
       border-radius: 3px;
       margin-right: 6px;
+      margin-bottom: 10px;
     }
+
+    .m08-block {
+      border: 1px solid var(--deck-line);
+      border-left: 3px solid #0f0f0f;
+      padding: 18px 22px;
+      margin: 22px 0;
+      border-radius: 0 4px 4px 0;
+      background: #ffffff;
+    }
+    .m08-block h3 { margin-top: 0; }
+
+    .m08-naming-pill {
+      font-family: var(--font-mono);
+      background: #0d1117;
+      color: #e6edf3;
+      padding: 16px 20px;
+      border-radius: 6px;
+      font-size: 1.02rem;
+      letter-spacing: 0.02em;
+      box-shadow: 0 10px 24px rgba(13, 17, 23, 0.18);
+      word-break: break-all;
+      margin: 14px 0;
+    }
+    .m08-naming-pill strong { color: #ffd479; font-weight: 700; }
+
+    .m08-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin: 18px 0;
+    }
+    @media (max-width: 720px) {
+      .m08-grid-2 { grid-template-columns: 1fr; }
+    }
+    .m08-grid-2 .m08-card {
+      border: 1px solid var(--deck-line);
+      border-radius: 4px;
+      background: #ffffff;
+      padding: 18px 20px;
+    }
+    .m08-grid-2 .m08-card h4 {
+      margin: 0 0 8px;
+      font-family: var(--font-mono);
+      font-size: .82rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--deck-line);
+    }
+    .m08-grid-2 .m08-card ul { margin: 8px 0 0; padding-left: 18px; }
+    .m08-grid-2 .m08-card li { margin-bottom: 6px; }
   </style>
 </head>
 <body class="material">
@@ -112,830 +150,371 @@
 
     <section class="content-block">
       <p class="meta">Aula 08 &nbsp;&bull;&nbsp; 11/06/2026</p>
-      <h1>Projeto final em sala &mdash; análise de série temporal 100% AWS Student, com IA na cavalaria</h1>
+      <h1>Projeto final — desafio entregue no GitHub</h1>
       <p class="summary">
-        Este material acompanha a Aula 08, última da disciplina <strong>Cloud Computing e SRE &mdash; Visão Prática com AWS</strong>
-        do MBA em Engenharia de Dados. A aula é um dia de execução pura: três horas, repositório novo,
-        dataset trazido da semana, IA orquestrada por skill. O aluno entrega um mini-observatório de série temporal
-        com três abas, infraestrutura provisionada via CloudFormation, observabilidade conectada e closed loop ativo.
-        Ao final, demonstra em três minutos diante da turma. Quem não demonstra, não fecha o projeto.
+        Este material acompanha a Aula 08 da disciplina <strong>Cloud Computing e SRE &mdash; Visão Prática com AWS</strong>
+        do MBA em Engenharia de Dados. Hoje não há conteúdo teórico novo: a aula é 100% dedicada à entrega do projeto
+        final. O <em>output</em> da disciplina deixa de ser anotação de aula e vira <strong>repositório público no
+        GitHub</strong>, com arquitetura documentada, infra reprodutível, testes verdes e evidências de execução.
+        O desafio específico será publicado em arquivo separado a partir de <strong>04/06/2026</strong>.
       </p>
       <p>
-        <span class="m08-tag">Pré-requisito</span> Aula 07 entregue: pipeline observável com CloudWatch, EventBridge e SSM via CloudFormation.
-        <span class="m08-tag">Tarefa de casa</span> Dataset escolhido no Kaggle, repositório <code>tsa-{iniciais}-{slug}</code> criado, CSV uploadado na branch <code>data/</code>, issue documentando fonte e hipótese.
+        <span class="m08-tag">Pré-requisitos</span> Repositório individual com a stack das Aulas 04 a 07 funcionando:
+        <code>docker-compose</code> da Aula 04, Bass local da Aula 05, migração AWS com ATAM da Aula 06 e Bass distribuído
+        com estresse sob carga da Aula 07. Branch <code>main</code> protegida, CI verde.
       </p>
-
-      <h2>Links de navegação</h2>
-      <ul>
-        <li><a href="../slides/slide_aula_08_seguranca_de_dados_finops_e_projeto_final_integrado.html">Slide da Aula 08</a></li>
-        <li><a href="../../../index.html">Voltar ao índice do curso</a></li>
-      </ul>
+      <p>
+        <span class="m08-tag">Sumário</span>
+        Tese &middot; recap do arco Aulas 04→07 &middot; convenção de repositório &middot; critérios de avaliação &middot;
+        como organizar o README de um projeto SRE/Cloud &middot; orientação para a apresentação &middot;
+        <em>placeholders</em> do desafio específico e da dinâmica da aula.
+      </p>
     </section>
 
     <section class="content-block">
-      <h2>1. Por que este formato &mdash; teoria curta e prática em três blocos</h2>
+      <h2>1. Tese da aula</h2>
       <p>
-        As Aulas 02 a 07 construíram repertório suficiente para que a Aula 08 não precise repetir conceitos. Em 02, instalamos
-        Spec-Driven Development com OpenCode e Gemini CLI. Em 03, escrevemos RF, RNF, RTM e system design em Mermaid. Em 04,
-        montamos squad de agentes e provisionamos via CloudFormation. Em 05, automatizamos com GitHub Actions e self-hosted runner.
-        Em 06, blindamos a base de código com Testcontainers e chaos engineering. Em 07, ligamos CloudWatch, EventBridge e SSM
-        em closed loop, também via CloudFormation. Tudo isso já é vocabulário do aluno. A Aula 08 é o dia de aplicar &mdash; em um
-        repositório novo, com um dataset autoral.
-      </p>
-      <p>
-        A inversão de prioridade (teoria curta + execução longa) é deliberada. Teoria longa neste momento seria recapitulação
-        preguiçosa; prática curta seria desperdício do laboratório. A teoria cobre exatamente três coisas: o briefing do cliente
-        fictício, os critérios de avaliação, e a estrutura dos três blocos práticos. A execução depois acontece em três blocos
-        lógicos &mdash; <strong>Bloco 1: Bootstrap &amp; arquitetura</strong>, <strong>Bloco 2: App + observabilidade</strong>,
-        <strong>Bloco 3: Validação &amp; demo</strong> &mdash; cada um com objetivo claro, entregáveis explícitos e checkpoint.
-      </p>
-
-      <h3>1.1 O caminho até aqui &mdash; visão de arco</h3>
-      <div class="m08-mermaid">
-        <pre class="mermaid">
-flowchart LR
-  A01["Aula 01<br/>Fundamentos cloud<br/>governanca de acessos"]
-  A02["Aula 02<br/>SDD + OpenCode<br/>Gemini CLI"]
-  A03["Aula 03<br/>RF RNF RTM<br/>system design Mermaid"]
-  A04["Aula 04<br/>squad de agentes<br/>CFN templates"]
-  A05["Aula 05<br/>GitHub Actions<br/>EC2 self-hosted runner"]
-  A06["Aula 06<br/>Testcontainers<br/>chaos engineering"]
-  A07["Aula 07<br/>CloudWatch CFN<br/>EventBridge SSM"]
-  A08(("Aula 08<br/>projeto final<br/>3h execucao"))
-
-  A01 --> A02 --> A03 --> A04 --> A05 --> A06 --> A07 --> A08
-  A03 -.->|RF/RNF| A08
-  A04 -.->|CFN| A08
-  A05 -.->|CI/CD| A08
-  A06 -.->|qualidade| A08
-  A07 -.->|observabilidade| A08
-        </pre>
-      </div>
-    </section>
-
-    <section class="content-block">
-      <h2>2. O briefing &mdash; cliente fictício, escopo apertado</h2>
-      <p>
-        A diretoria de uma empresa imaginária pede um <strong>mini-observatório de série temporal</strong> sobre o tema escolhido
-        pelo aluno. O pedido vem em uma frase: <em>"Quero entender o passado, decompor o sinal e ver para onde isso vai nos próximos 30 períodos
-        &mdash; com um link público que funciona enquanto eu apresento."</em> A frase carrega três entregas distintas e uma restrição operacional.
-      </p>
-
-      <h3>2.1 As três abas do front</h3>
-      <p>
-        O front, em Streamlit ou Plotly Dash, precisa ter exatamente três abas. Não duas, não quatro. Cada aba responde uma pergunta diferente sobre a série,
-        e a ausência de qualquer uma derruba o critério 4 da avaliação. As três abas, em ordem, são:
-      </p>
-      <ul>
-        <li>
-          <strong>Histórico</strong> &mdash; gráfico de linha da série completa, com seletor de janela (7d, 30d, 1y, "all"). No rodapé,
-          estatísticas básicas: mínimo, máximo, média, desvio padrão. Esta aba estabelece a baseline e ancora a leitura das outras duas.
-        </li>
-        <li>
-          <strong>Decomposição STL</strong> &mdash; três sub-gráficos verticais mostrando tendência, sazonalidade e resíduo. A função
-          recomendada é <code>statsmodels.tsa.seasonal.STL</code>, com período inferido do dataset (12 para mensal, 7 para diário,
-          24 para horário, etc.). STL é mais robusto que clássicos como X-13 porque tolera tendências não-lineares e outliers.
-        </li>
-        <li>
-          <strong>Forecast 30 períodos</strong> &mdash; previsão dos próximos 30 pontos, com intervalo de confiança 95%. Modelos
-          aceitos: ARIMA (via <code>statsmodels</code>), ExponentialSmoothing/Holt-Winters (também <code>statsmodels</code>), ou
-          Prophet. No rodapé, MAPE e RMSE calculados sobre split temporal (últimos 20% como validação).
-        </li>
-      </ul>
-
-      <h3>2.2 O que fica fora do escopo</h3>
-      <p>
-        Tão importante quanto o que entra é o que <em>não</em> entra. O aluno é tentado a sofisticar &mdash; a aula penaliza esse instinto.
-        Ficam fora: análise multi-séries, modelos avançados (LSTM, Transformer, N-BEATS), pipeline ETL ao vivo, autenticação de usuário, CDN,
-        domínio próprio, deploy em múltiplas regiões. O CSV vai estático no S3, o front é HTTP simples na porta 8501, o domínio é o IP público do EC2.
+        Ao longo de cinco aulas (Aulas 04 a 07) construímos, em conjunto, uma plataforma de dados que sai do laptop e
+        vai para a nuvem. Hoje cada aluno mostra, por conta própria, que sabe replicar e estender esse caminho. O semestre,
+        que começou como sequência de exercícios assistidos, agora se materializa como <strong>repositório versionado</strong>.
+        O critério é simples e severo: <em>se um colega abre seu repositório e não consegue subir a stack em 15 minutos
+        a partir do README, a entrega não está pronta</em>.
       </p>
       <div class="m08-callout">
-        <strong>Princípio operacional</strong>
-        Em três horas, o melhor projeto não é o mais ambicioso &mdash; é o que terminou e está demonstrável. Sofisticação custa tempo;
-        tempo é a restrição mais dura da aula.
+        <strong>Tese</strong>
+        <p style="margin: 0;">
+          O semestre virou repositório. Hoje é dia de provar que a stack vive sem o professor por perto — com
+          arquitetura clara, infra reprodutível, testes verdes e evidências reais commitadas.
+        </p>
       </div>
+      <p>
+        A aula é deliberadamente sem conteúdo teórico novo. Não há slide com conceito a memorizar, nem laboratório
+        guiado a copiar. Há um desafio individual, três horas de trabalho assistido em sala e um repositório no GitHub
+        com a sua entrega. Esse é o exame prático da disciplina.
+      </p>
     </section>
 
     <section class="content-block">
-      <h2>3. Padrão de naming &mdash; <code>tsa-{iniciais}-{slug-tema}</code></h2>
+      <h2>2. Recap — Aulas 04 a 07</h2>
       <p>
-        Toda aula cria nome. Um padrão de naming previsível elimina ambiguidade no momento de avaliar e cria um índice navegável da turma.
-        A convenção desta aula é estrita:
+        Antes de mergulhar na entrega, vale revisitar o arco que cada aluno percorreu. O projeto final não é um
+        artefato isolado: ele é a colheita do que foi plantado nas quatro aulas anteriores. Se algum dos blocos abaixo
+        não está sólido no seu repositório, esta é a hora de fechar a lacuna antes da apresentação.
       </p>
+      <div class="m08-grid-2">
+        <div class="m08-card">
+          <h4>Aula 04 &middot; 07/05/2026</h4>
+          <p><strong>Stack Docker local Olist.</strong></p>
+          <ul>
+            <li>Ingestão e processamento near real-time em containers locais.</li>
+            <li><code>docker-compose.yml</code> como ponto único de partida.</li>
+            <li>Pipeline ponta-a-ponta antes de qualquer serviço gerenciado.</li>
+          </ul>
+        </div>
+        <div class="m08-card">
+          <h4>Aula 05 &middot; 14/05/2026</h4>
+          <p><strong>Bass local em Docker.</strong></p>
+          <ul>
+            <li>Avaliação de arquitetura no ambiente local antes da nuvem.</li>
+            <li>Identificação de cenários, respostas táticas e <em>trade-offs</em>.</li>
+            <li>Documento de Bass commitado em <code>documents/</code>.</li>
+          </ul>
+        </div>
+        <div class="m08-card">
+          <h4>Aula 06 &middot; 21/05/2026</h4>
+          <p><strong>Migração para AWS com ATAM.</strong></p>
+          <ul>
+            <li>Stack local migra para AWS — IaC versionado.</li>
+            <li>Análise ATAM expõe pontos de sensibilidade e risco.</li>
+            <li>Decisões de arquitetura documentadas e justificadas.</li>
+          </ul>
+        </div>
+        <div class="m08-card">
+          <h4>Aula 07 &middot; 28/05/2026</h4>
+          <p><strong>Bass distribuído + estresse do ATAM.</strong></p>
+          <ul>
+            <li>Bass aplicado à versão distribuída na AWS.</li>
+            <li>Validação sob carga: a plataforma posta à prova.</li>
+            <li>Evidências de resiliência commitadas no repositório.</li>
+          </ul>
+        </div>
+      </div>
+      <p>
+        Os quatro blocos juntos formam o material bruto da entrega. O projeto final pede que você os apresente como
+        uma <strong>narrativa única</strong> dentro do mesmo repositório &mdash; não como pastas desconexas.
+      </p>
+    </section>
+
+    <section class="content-block" id="convencao-do-repo">
+      <h2>3. Convenção do repositório</h2>
+      <p>
+        Todos os projetos seguem o mesmo padrão de naming usado desde a Aula 04. O nome do repositório é parte da entrega:
+        não use nome criativo, não inverta a ordem, não use acento ou caractere especial. O <em>matching</em> do
+        nome com o padrão simplifica avaliação, busca e comparação entre projetos.
+      </p>
+      <div class="m08-naming-pill">
+        <strong>20261sre-&lt;primeironome&gt;-&lt;ultimonome&gt;</strong>
+      </div>
+      <h3>3.1 Como criar o repositório</h3>
+      <ol>
+        <li>Acesse o repositório base: <a href="https://github.com/afonsolelis/20261sre-primeironome-ultimonome" target="_blank" rel="noopener">https://github.com/afonsolelis/20261sre-primeironome-ultimonome</a>.</li>
+        <li>Clique em <em>Fork</em> para criar uma cópia na sua conta pessoal do GitHub.</li>
+        <li>Renomeie o fork em <em>Settings → Repository name</em> seguindo o padrão acima, em minúsculas e sem acento. Exemplo: <code>20261sre-maria-souza</code>.</li>
+        <li>Garanta que o repositório está <strong>público</strong> &mdash; repositórios privados não são aceitos para avaliação.</li>
+        <li>Confirme que a branch padrão é <code>main</code> e que <em>branch protection</em> está ativa (mesmo padrão da Aula 05).</li>
+      </ol>
+
+      <h3>3.2 Fluxo de trabalho até a entrega</h3>
       <ul>
-        <li><strong>Prefixo</strong> &mdash; <code>tsa-</code>. <em>TSA</em> é Time Series Analysis. Não é Transportation Security Administration.</li>
-        <li><strong>Iniciais</strong> &mdash; três letras minúsculas, sem ponto, sem espaço. Ex.: <code>jps</code> para João Pedro Silva.</li>
-        <li><strong>Slug do tema</strong> &mdash; minúsculas, hífens entre palavras, sem acento, sem caractere especial.</li>
+        <li>Trabalhe em <em>branches</em> de feature (<code>feat/...</code>, <code>fix/...</code>); não commite direto em <code>main</code>.</li>
+        <li>Abra <em>pull request</em> contra <code>main</code> para cada bloco relevante de mudança.</li>
+        <li>Mantenha CI verde antes de fazer <em>merge</em>: workflow <code>wb.yml</code> e <code>bb.yml</code> herdados das aulas anteriores.</li>
+        <li>Antes da apresentação, garanta que o último commit em <code>main</code> contém a entrega completa.</li>
+        <li>(Opcional, recomendado) Aplique a tag <code>aula-08-entrega</code> no commit final para marcar o ponto de avaliação.</li>
       </ul>
-      <p>Cinco exemplos canônicos para a turma:</p>
-      <table>
-        <thead>
-          <tr><th>Aluno (exemplo)</th><th>Tema</th><th>Repositório</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>João Pedro Silva</td><td>Bitcoin price</td><td><code>tsa-jps-bitcoin</code></td></tr>
-          <tr><td>Maria Lima Lara</td><td>Walmart sales</td><td><code>tsa-mll-walmart-sales</code></td></tr>
-          <tr><td>Afonso F. Lelis</td><td>Air Passengers</td><td><code>tsa-afl-air-passengers</code></td></tr>
-          <tr><td>Rafael C. Souza</td><td>Energy consumption</td><td><code>tsa-rcs-energy-consumption</code></td></tr>
-          <tr><td>Vitor R. Mendes</td><td>NYC taxi</td><td><code>tsa-vrm-nyc-taxi</code></td></tr>
-        </tbody>
-      </table>
-      <p>
-        Repositórios fora do padrão são rejeitados pela primeira passada do reviewer &mdash; o aluno precisa renomear no GitHub
-        e refazer push antes de pedir nova avaliação. Custa minutos preciosos do bloco final, normalmente sob estresse de demo.
-      </p>
-    </section>
 
-    <section class="content-block">
-      <h2>4. Datasets sugeridos do Kaggle</h2>
-      <p>
-        Aluno escolhe o dataset durante a semana entre Aula 07 e Aula 08. A lista abaixo é o catálogo seguro &mdash;
-        todos têm timestamp confiável, série numérica única e volume suficiente para os modelos. O critério mínimo é fixo:
-        <strong>timestamp + 1 série numérica + ≥ 1000 pontos</strong>.
-      </p>
-      <table>
-        <thead>
-          <tr><th>Dataset</th><th>Granularidade</th><th>Slug Kaggle</th><th>Período STL recomendado</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Bitcoin Historical Data</td><td>minuto</td><td><code>mzgolden/bitcoin-historical-data</code></td><td>1440 (diário)</td></tr>
-          <tr><td>Walmart Sales Forecasting</td><td>semana / loja</td><td><code>mikhail1681/walmart-sales</code></td><td>52 (anual)</td></tr>
-          <tr><td>Air Passengers</td><td>mês 1949&ndash;1960</td><td><code>rakannimer/air-passengers</code></td><td>12 (anual)</td></tr>
-          <tr><td>Hourly Energy Consumption</td><td>hora AEP/COMED</td><td><code>robikscube/hourly-energy-consumption</code></td><td>24 (diário)</td></tr>
-          <tr><td>NYC Taxi Trip Duration</td><td>hora agregada</td><td><code>c/nyc-taxi-trip-duration</code></td><td>24 (diário)</td></tr>
-          <tr><td>Daily Climate Time Series</td><td>dia</td><td><code>sumanthvrao/daily-climate-time-series-data</code></td><td>365 (anual)</td></tr>
-        </tbody>
-      </table>
-      <p>
-        Outros datasets são bem-vindos &mdash; basta o aluno justificar na issue de abertura do repositório que o critério
-        mínimo é atendido. Datasets agregados (Olist da Aula 02, dados do BCB, IBGE) entram, desde que se prepare uma extração
-        que produza um único CSV com timestamp + valor.
-      </p>
-    </section>
-
-    <section class="content-block">
-      <h2>5. System design &mdash; arquitetura genérica do projeto</h2>
-      <p>
-        O desenho é deliberadamente simples. Um único EC2 t3.small com a aplicação Streamlit, lendo o CSV do S3, escrevendo
-        métricas e logs no CloudWatch. Quando o alarm de health check dispara, EventBridge aciona um SSM Run Command que reinicia
-        o serviço. É o mesmo closed loop da Aula 07, em escala mínima.
-      </p>
-      <div class="m08-mermaid">
-        <pre class="mermaid">
-flowchart LR
-  USR["Diretoria<br/>(navegador)"]
-  subgraph EC2["EC2 t3.small (LabRole)"]
-    APP["Streamlit/Dash<br/>3 abas: Historico / STL / Forecast"]
-  end
-  subgraph S3["S3 bucket TSA"]
-    CSV["dataset.csv<br/>(estatico)"]
-  end
-  subgraph CW["CloudWatch"]
-    LOG["log group"]
-    DASH["dashboard 3 SLIs"]
-    ALR["alarm health check"]
-  end
-  EVB["EventBridge rule"]
-  SSM["SSM Run Command<br/>restart_streamlit"]
-
-  USR -->|HTTP :8501| APP
-  APP -->|read csv| CSV
-  APP -.->|logs/metrics| LOG
-  LOG --> DASH
-  LOG --> ALR
-  ALR ==>|alarme| EVB
-  EVB ==>|trigger| SSM
-  SSM ==>|reinicia| APP
-        </pre>
+      <div class="m08-callout">
+        <strong>Critério de pronto do naming</strong>
+        <p style="margin: 0;">
+          Repositório público, nome no padrão <code>20261sre-&lt;primeironome&gt;-&lt;ultimonome&gt;</code>, branch
+          <code>main</code> contendo a entrega final, README na raiz, último CI verde.
+        </p>
       </div>
-      <p>
-        Nada nessa figura é negociável. Substituir EC2 por Lambda complica o cold start do Streamlit e mata a aba Forecast por
-        timeout. Substituir S3 por upload direto no EC2 mata a portabilidade do dataset. Tirar o EventBridge mata o closed loop.
-        A arquitetura é o teto da entrega &mdash; o aluno otimiza dentro dela.
-      </p>
     </section>
 
     <section class="content-block">
-      <h2>6. SLOs mínimos &mdash; o contrato com a demo</h2>
+      <h2>4. Critérios de avaliação (esqueleto)</h2>
       <p>
-        O aluno declara três SLOs antes de fazer deploy. Os três viram metric filters em CloudWatch e widgets no dashboard.
-        Sem essa declaração explícita, a demo de 3 minutos não tem critério para ser julgada saudável.
+        Os critérios abaixo formam o esqueleto fixo da avaliação. O peso de cada eixo e os <em>cut-offs</em> exatos
+        serão fechados na semana da entrega, em conjunto com o desafio específico. O conjunto, porém, não muda:
+        sem repositório no padrão, sem README, sem evidência, não há nota.
       </p>
       <table>
         <thead>
-          <tr><th>ID</th><th>SLO</th><th>SLI medindo</th><th>Meta</th><th>Onde vive</th></tr>
+          <tr>
+            <th>#</th>
+            <th>Critério</th>
+            <th>O que avaliamos no repositório</th>
+          </tr>
         </thead>
         <tbody>
-          <tr><td>SLO-01</td><td>Disponibilidade durante a demo</td><td>HTTP 200 a cada 30s no <code>/</code></td><td>&ge; 95% das checagens</td><td>CW alarm + EventBridge</td></tr>
-          <tr><td>SLO-02</td><td>Latência de carregamento</td><td>tempo até primeiro byte</td><td>&lt; 5 s p95</td><td>CW metric filter</td></tr>
-          <tr><td>SLO-03</td><td>Latência do forecast</td><td>tempo de render da aba 3</td><td>&lt; 10 s p95</td><td>CW metric filter</td></tr>
+          <tr>
+            <td>01</td>
+            <td>Arquitetura documentada</td>
+            <td><code>README.md</code> com seção de arquitetura, diagrama (Mermaid ou imagem), descrição dos serviços e justificativa das decisões.</td>
+          </tr>
+          <tr>
+            <td>02</td>
+            <td>Infra reprodutível</td>
+            <td><code>docker-compose.yml</code> e/ou templates AWS (CloudFormation) com comando único de subida (<code>make up</code>, <code>docker compose up</code>, <code>aws cloudformation deploy</code>).</td>
+          </tr>
+          <tr>
+            <td>03</td>
+            <td>Testes automatizados</td>
+            <td>Suite de testes rodando em CI (GitHub Actions), com badge ou print do último run verde anexado ao README.</td>
+          </tr>
+          <tr>
+            <td>04</td>
+            <td>Evidências de execução</td>
+            <td>Logs, prints, vídeo curto (até 3 min) ou pasta <code>documents/</code> com saída real do pipeline, métricas observadas e respostas a falhas induzidas.</td>
+          </tr>
+          <tr>
+            <td>05</td>
+            <td>Commits limpos</td>
+            <td>Histórico legível, mensagens descritivas, sem <code>WIP</code>, <code>fix fix</code> ou <em>force push</em> destrutivo em <code>main</code>.</td>
+          </tr>
         </tbody>
       </table>
       <p>
-        SLO-01 é especial: ele é o gatilho do closed loop. Se o alarm associado dispara, o EventBridge chama o SSM Run Command
-        <code>restart_streamlit</code> e o serviço sobe sem intervenção humana. Esse é o ato de mais alto valor da demo &mdash;
-        provar, ao vivo, que o sistema se cura sozinho dentro do error budget definido.
+        Cada eixo é binário em sua versão mínima (existe / não existe) e graduado em sua versão completa. O peso final
+        de cada eixo será publicado junto com o enunciado do desafio.
       </p>
     </section>
 
     <section class="content-block">
-      <h2>7. Expectativas SRE mínimas &mdash; cinco regras duras</h2>
+      <h2>5. Como organizar o README de um projeto SRE/Cloud</h2>
       <p>
-        O reviewer recusa pull request que falha em qualquer um dos cinco pontos abaixo. As regras existem para impedir entrega
-        que parece pronta mas não é defensável.
+        O <code>README.md</code> é o cartão de visita do seu repositório. Em projetos SRE/Cloud, ele deveria conseguir
+        responder cinco perguntas para um leitor que nunca abriu seu código antes. Estruture seu README respondendo,
+        nesta ordem, às perguntas abaixo.
+      </p>
+
+      <div class="m08-block">
+        <h3>5.1 O que é este projeto?</h3>
+        <p>
+          Em um parágrafo: qual problema ele resolve, em que domínio, com qual dataset. Evite <em>buzzwords</em>;
+          escreva como quem explica para um analista de negócio.
+        </p>
+      </div>
+
+      <div class="m08-block">
+        <h3>5.2 Qual é a arquitetura?</h3>
+        <p>
+          Inclua um diagrama (Mermaid no próprio README ou imagem em <code>docs/</code>) mostrando os componentes:
+          fontes de dados, serviços de ingestão, processamento, armazenamento, observabilidade. Explique cada caixa
+          em uma frase. Cite as escolhas de Bass/ATAM que justificam o desenho.
+        </p>
+      </div>
+
+      <div class="m08-block">
+        <h3>5.3 Como subo isso na minha máquina?</h3>
+        <p>
+          Seção <em>Quick start</em> com pré-requisitos (Docker, AWS CLI, conta AWS Student), comando único de subida
+          (<code>make up</code> ou equivalente) e tempo estimado até <em>up &amp; running</em>. Um colega deve conseguir
+          subir tudo em até 15 minutos sem perguntar nada.
+        </p>
+      </div>
+
+      <div class="m08-block">
+        <h3>5.4 Como sei que está funcionando?</h3>
+        <p>
+          Seção de validação: como rodar os testes (<code>make test</code>), onde ver métricas em tempo real
+          (dashboard, CloudWatch, Grafana), exemplos de queries de validação, badges de CI. Inclua um <em>screenshot</em>
+          ou snippet de log de uma execução real.
+        </p>
+      </div>
+
+      <div class="m08-block">
+        <h3>5.5 O que aprendi construindo isso?</h3>
+        <p>
+          Seção curta de <em>trade-offs</em> e decisões: o que você considerou e descartou, onde a arquitetura tem
+          dívida técnica conhecida, o que faria diferente em produção. Essa seção transforma o repositório de
+          exercício em portfólio.
+        </p>
+      </div>
+
+      <p>
+        Estruture a raiz do repositório com pastas reconhecíveis: <code>infra/</code> (IaC), <code>services/</code> ou
+        <code>src/</code> (código), <code>tests/</code> (testes), <code>documents/</code> (Bass, ATAM, relatórios),
+        <code>.github/workflows/</code> (CI). Quem abre o repositório enxerga a estrutura antes de ler qualquer linha
+        de prosa.
+      </p>
+    </section>
+
+    <section class="content-block">
+      <h2>6. Orientação para a apresentação em sala</h2>
+      <p>
+        No bloco 3 da aula (apresentações curtas), cada aluno tem um intervalo de alguns minutos para mostrar o repositório.
+        Tempo exato por apresentação será calibrado em sala conforme o tamanho da turma. Prepare-se para apresentar
+        nesta ordem:
       </p>
       <ol>
-        <li>
-          <strong>IaC obrigatório.</strong> Toda criação de recurso passa por <code>aws cloudformation deploy</code>. Console
-          AWS é proibido em sala &mdash; nem para criar SG, nem para anexar role, nem para subir log group. CloudTrail
-          mostra quem clicou; o reviewer audita.
-        </li>
-        <li>
-          <strong>Observabilidade desde o deploy.</strong> Log group, dashboard e alarm aparecem na <em>primeira</em> versão
-          do template, não em uma atualização posterior. Sem essas três peças, o app não é deployável.
-        </li>
-        <li>
-          <strong>SLOs declarados.</strong> Os três SLOs do projeto vivem no <code>README.md</code> e no <code>release_checklist.md</code>,
-          com meta numérica e janela de medição. Aspirações em prosa não contam.
-        </li>
-        <li>
-          <strong>Closed loop ativo.</strong> Alarm de health check &rarr; EventBridge rule &rarr; SSM Run Command que reinicia o serviço.
-          O aluno deve conseguir simular falha (kill do processo) e mostrar o sistema voltando, na frente da turma.
-        </li>
-        <li>
-          <strong>README com runbook ≤ 10 min.</strong> Reviewer cronometra. O texto deve permitir, a partir de zero, recriar
-          a stack inteira em menos de dez minutos. Se o reviewer precisar perguntar algo durante a recriação, o critério falha.
-        </li>
+        <li><strong>Abra o GitHub</strong> &mdash; mostre o repositório, o naming, a árvore de pastas e o último CI verde.</li>
+        <li><strong>Mostre o diagrama de arquitetura</strong> &mdash; explique a stack em 60 segundos, citando Bass/ATAM.</li>
+        <li><strong>Mostre uma evidência de execução</strong> &mdash; abra um log, um dashboard, um print de run de teste sob carga.</li>
+        <li><strong>Apresente uma decisão de trade-off</strong> &mdash; o que você escolheu, o que descartou, por quê.</li>
+        <li><strong>Encerre com a próxima coisa</strong> &mdash; o que faria se tivesse mais uma semana.</li>
       </ol>
-      <div class="m08-callout">
-        <strong>Restrição zero</strong>
-        Sem credencial permanente em código. Apenas session token do Learner Lab, vivo durante a aula. <code>~/.aws/credentials</code>
-        fora do <code>git</code>, <code>git secrets</code> rodando no pre-commit hook, e nenhuma ARN vazada no repo público.
+      <p>
+        Não use slide de PowerPoint &mdash; o repositório é o slide. Apresente direto do GitHub, do terminal e do console
+        de observabilidade. Apresentações que terminam dentro do tempo, com evidência real na tela, valem mais que
+        apresentações longas com promessas.
+      </p>
+    </section>
+
+    <section class="content-block">
+      <h2>7. O desafio específico &mdash; placeholder</h2>
+      <div class="m08-placeholder">
+        <span class="m08-tag">Desafio detalhado &middot; a definir</span>
+        <h3>O enunciado do desafio será divulgado a partir de 04/06/2026.</h3>
+        <p>
+          <strong>[Desafio detalhado será divulgado a partir de 04/06/2026]</strong>. O enunciado será publicado em
+          arquivo separado no repositório do curso e anunciado em sala. Esta seção do material será atualizada com o
+          texto definitivo assim que o desafio for fechado.
+        </p>
+        <p>
+          <strong>Direções possíveis</strong> (sem comprometimento ainda): variação do Olist com um <em>dataset</em> novo;
+          uma nova <em>feature</em> analítica acoplada à plataforma existente; ou um pivô para outro domínio
+          (logística, saúde, energia) reaproveitando a stack das Aulas 04 a 07. Em todos os cenários, a stack-base
+          permanece a mesma &mdash; o desafio mexe na ponta, não no esqueleto.
+        </p>
+      </div>
+      <p>
+        Até a publicação do desafio, o aluno consegue se preparar de duas formas. Primeiro, garantindo que a stack
+        atual (Aulas 04 a 07) está sólida no repositório individual: <em>up</em> reproduzível, CI verde, README minimamente
+        coerente. Segundo, lendo os <em>documents/</em> de Bass e ATAM produzidos nas aulas anteriores &mdash; qualquer
+        desafio nesta linha vai pedir que esses documentos sejam revisados e estendidos.
+      </p>
+    </section>
+
+    <section class="content-block">
+      <h2>8. Dinâmica do dia &mdash; placeholder</h2>
+      <p>
+        Distribuição preliminar de tempo. A divisão respeita o intervalo regulamentar 19h00 → 22h00 e será calibrada
+        no início da aula conforme o número de alunos presentes e o número de apresentações.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Bloco</th>
+            <th>Duração estimada</th>
+            <th>O que acontece</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Briefing do desafio</td>
+            <td>~30 min</td>
+            <td>Apresentação do enunciado, regras de entrega, critérios de avaliação e dúvidas iniciais.</td>
+          </tr>
+          <tr>
+            <td>Trabalho assistido</td>
+            <td>~90 min</td>
+            <td>Cada aluno avança no próprio repositório; professor faz tira-dúvidas individuais e revisão de README/diagrama.</td>
+          </tr>
+          <tr>
+            <td>Apresentações curtas</td>
+            <td>~60 min</td>
+            <td>Cada aluno mostra repositório, diagrama, evidências e recebe feedback do professor e da turma.</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="m08-placeholder">
+        <span class="m08-tag">Detalhes finos &middot; a definir</span>
+        <h3>Tempo por apresentação e ordem da fila</h3>
+        <p>
+          <strong>[Detalhes serão divulgados a partir de 04/06/2026 com o enunciado do desafio]</strong>. Tempo
+          individual de apresentação, ordem da fila (sorteio ou por inscrição) e formato exato de feedback serão
+          fechados em conjunto com o desafio específico.
+        </p>
       </div>
     </section>
 
     <section class="content-block">
-      <h2>8. Squad de IA &mdash; os cinco papéis e seus produtos</h2>
+      <h2>9. Atividade prática em sala &mdash; entrega final no GitHub</h2>
       <p>
-        O squad é a mesma estrutura criada na Aula 04, agora aplicada a entrega de produto em três horas. Cada agente tem
-        uma skill específica e um produto específico. O aluno chama as skills no OpenCode (ou Gemini CLI), revisa os diffs e
-        commita. A IA é cavalaria, não piloto automático.
-      </p>
-      <table>
-        <thead>
-          <tr><th>Agente</th><th>Skill</th><th>Produto</th><th>Bloco que aciona</th></tr>
-        </thead>
-        <tbody>
-          <tr><td><strong>Architect</strong></td><td><code>gen_app_template --kind system_design</code></td><td><code>documents/system_design.md</code></td><td>Bloco 1</td></tr>
-          <tr><td><strong>DevOps</strong></td><td><code>gen_app_template --kind cfn</code> e <code>gen_observability</code></td><td><code>iac/cloudformation/app.yaml</code></td><td>Blocos 1 e 2</td></tr>
-          <tr><td><strong>DataDev</strong></td><td><code>gen_streamlit_tsa_app</code></td><td><code>src/app.py</code> + <code>requirements.txt</code></td><td>Bloco 2</td></tr>
-          <tr><td><strong>Tester</strong></td><td><code>gen_smoke_tests</code></td><td><code>tests/smoke/test_url.py</code></td><td>Bloco 3</td></tr>
-          <tr><td><strong>Reviewer</strong></td><td><code>gen_release_checklist</code></td><td><code>documents/release_checklist.md</code></td><td>Bloco 3</td></tr>
-        </tbody>
-      </table>
-      <p>
-        O <code>AGENTS.md</code> simplificado, gerado pela skill <code>bootstrap_tsa_project</code> na abertura do Bloco 1, contém a
-        descrição de cada papel, as restrições (sem credenciais em prompts, sem reescrita silenciosa de arquivos sensíveis)
-        e o output esperado por cada skill.
-      </p>
-    </section>
-
-    <section class="content-block">
-      <h2>9. Estrutura do repositório &mdash; o que existe ao fim da abertura do Bloco 1</h2>
-      <p>
-        A estrutura é simétrica à da Aula 03, em escala reduzida. <code>spec/</code> guarda o contrato com o cliente.
-        <code>documents/</code> guarda artefatos de arquitetura e release. <code>iac/</code> guarda CloudFormation. <code>src/</code>
-        guarda o app. <code>tests/</code> guarda smoke. <code>runbooks/</code> guarda o documento SSM.
-      </p>
-<pre>tsa-{iniciais}-{slug}/
-├── AGENTS.md                          # squad de IA simplificada
-├── README.md                          # runbook ≤ 10 min
-├── spec/
-│   └── 00_problem.md                  # 5 RFs + 5 RNFs
-├── documents/
-│   ├── system_design.md               # Mermaid 1 pagina
-│   └── release_checklist.md           # checklist do reviewer
-├── iac/
-│   └── cloudformation/
-│       └── app.yaml                   # EC2 + SG + S3 + CW + alarm + EVB + SSM
-├── src/
-│   ├── app.py                         # Streamlit/Dash 3 abas
-│   └── requirements.txt
-├── tests/
-│   └── smoke/
-│       └── test_url.py                # httpx contra IP publico
-├── runbooks/
-│   └── restart_streamlit.yaml         # SSM document
-└── data/                              # branch separada com CSV (≥ 1000 pontos)</pre>
-      <p>
-        A branch <code>data/</code> é separada de <code>main</code> intencionalmente. Datasets podem ser pesados, e algumas
-        bibliotecas de CI/CD (incluindo a self-hosted runner da Aula 05) sofrem com clones grandes. Mantê-los em branch dedicada
-        permite checkout seletivo no EC2.
-      </p>
-    </section>
-
-    <section class="content-block">
-      <h2>10. Critérios de avaliação &mdash; oito itens binários</h2>
-      <p>
-        A avaliação é pública e binária. Cada critério vale um ponto. A demo de três minutos é gate &mdash; sem demo, o projeto
-        não é avaliado, mesmo que todos os outros sete itens estejam cumpridos.
-      </p>
-      <table>
-        <thead>
-          <tr><th>#</th><th>Critério</th><th>Como o reviewer verifica</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>1</td><td>Repo no padrão <code>tsa-{iniciais}-{slug}</code></td><td>Nome do repo no GitHub.</td></tr>
-          <tr><td>2</td><td>System design Mermaid commitado</td><td>Arquivo <code>documents/system_design.md</code> renderiza SVG.</td></tr>
-          <tr><td>3</td><td>CFN template aplicável</td><td><code>aws cloudformation validate-template</code> retorna <code>Capabilities</code> sem erro.</td></tr>
-          <tr><td>4</td><td>3 abas funcionais com dataset real</td><td>Navegação ao vivo durante a demo.</td></tr>
-          <tr><td>5</td><td>1 dashboard CW com 3 SLIs</td><td>Print do dashboard mostrando os widgets dos SLIs.</td></tr>
-          <tr><td>6</td><td>1 alarm ligado a runbook automatizado</td><td>Simulação de falha durante a demo &mdash; alarm acende, serviço volta.</td></tr>
-          <tr><td>7</td><td>README com instruções &le; 10 min</td><td>Reviewer cronometra a recriação a partir do zero.</td></tr>
-          <tr><td>8</td><td>Demo de 3 min ao fechamento</td><td>Cronômetro na sala. Gate da entrega.</td></tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section class="content-block">
-      <h2>11. Bloco 1 &middot; Bootstrap &amp; arquitetura</h2>
-      <p>
-        O primeiro bloco prático funde duas etapas distintas: configurar ambiente e escrever o contrato
-        com o cliente, depois desenhar arquitetura e levantar a infra base. Ao final, o repositório existe, a spec está commitada,
-        o system design está em Mermaid, a stack CFN base está aplicada e EC2 + S3 estão de pé.
-      </p>
-
-      <h3>11.1 Etapa 1 &mdash; bootstrap + spec do problema</h3>
-      <p>
-        A primeira etapa do Bloco 1 é, ao mesmo tempo, configuração de ambiente e contrato com o cliente. Renovar token, abrir
-        Codespace, gerar a estrutura do repositório com a skill, escrever a mini-spec.
-      </p>
-
-      <h4>11.1.1 Renovação do session token</h4>
-      <p>
-        O token do Learner Lab dura cerca de três horas, contadas do clique em <em>Start Lab</em>. Pelo cronograma da aula,
-        o token sobrevive até o Bloco 3 &mdash; mas a margem é apertada, e qualquer pausa ou reinício de lab quebra
-        a continuidade. O aluno deve renovar o token antes de cada deploy CloudFormation, mesmo que pareça desnecessário:
-      </p>
-<pre># Sempre que renovar, atualizar ~/.aws/credentials no Codespace
-mkdir -p ~/.aws
-cat &gt; ~/.aws/credentials &lt;&lt;'EOF'
-[default]
-aws_access_key_id=ASIA...
-aws_secret_access_key=...
-aws_session_token=...
-EOF
-chmod 600 ~/.aws/credentials
-aws sts get-caller-identity</pre>
-
-      <h4>11.1.2 Skill <code>bootstrap_tsa_project</code></h4>
-      <p>
-        A skill clona o esqueleto da Aula 03 e simplifica para o escopo desta aula. Ela é parametrizada por iniciais e slug,
-        e cria todos os diretórios e arquivos vazios listados na seção 9.
-      </p>
-<pre># No OpenCode
-&gt; /bootstrap_tsa_project --slug "{slug}" --iniciais "{iniciais}"
-
-# Resultado: estrutura completa criada,
-# AGENTS.md preenchido com os 5 papéis e suas skills,
-# README.md com placeholder de runbook,
-# .gitignore cobrindo ~/.aws/ e *.csv grande.</pre>
-
-      <h4>11.1.3 Mini-spec do problema</h4>
-      <p>
-        O <code>spec/00_problem.md</code> tem cinco requisitos funcionais e cinco não-funcionais. A IA escreve a primeira passada,
-        o aluno revisa e aceita. Exemplo de RF para o dataset Air Passengers:
-      </p>
-<pre>RF-01: Quando o usuario abrir a aba Historico, o sistema deve exibir
-       o grafico de linha completo do dataset, com seletor de janela
-       (7d, 30d, 1y, all), em ate 5 segundos.
-
-RNF-PERF-01: O p95 do tempo de render da aba Forecast deve ser &lt; 10s
-             em datasets de ate 10k pontos.</pre>
-      <div class="m08-callout">
-        <strong>Checkpoint da etapa 1</strong>
-        <code>spec/00_problem.md</code> commitado, estrutura completa, <code>aws sts get-caller-identity</code> retornando ARN,
-        AGENTS.md preenchido. Faltando algum item, o aluno entra na etapa 2 com dívida.
-      </div>
-
-      <h3>11.2 Etapa 2 &mdash; system design + CFN base</h3>
-      <p>
-        A segunda etapa do Bloco 1 produz a arquitetura no markdown e a primeira versão executável do template. EC2 sobe,
-        S3 recebe o dataset, SG fica aberto na porta 8501. Não há observabilidade ainda &mdash; ela entra no Bloco 2.
-      </p>
-
-      <h4>11.2.1 Architect &mdash; system design Mermaid</h4>
-      <p>
-        A skill <code>gen_app_template --kind system_design</code> recebe o slug do dataset e devolve o desenho da seção 5
-        já escrito no formato Mermaid. O aluno revisa os labels (substituindo "diretoria" pelo persona apropriado, ajustando
-        nomes de buckets) e commita.
-      </p>
-
-      <h4>11.2.2 DevOps &mdash; CloudFormation base</h4>
-      <p>
-        A skill <code>gen_app_template --kind cfn</code> gera <code>iac/cloudformation/app.yaml</code> contendo:
-      </p>
-      <ul>
-        <li>VPC default da conta + Subnet pública (referenciada por <code>!ImportValue</code> ou parameter).</li>
-        <li>Security Group permitindo TCP 8501 origem 0.0.0.0/0 (apenas para a demo &mdash; aceitável neste contexto).</li>
-        <li>S3 bucket privado com nome <code>tsa-{iniciais}-data</code>, versionamento desligado.</li>
-        <li>EC2 t3.small com LabRole anexada e UserData que instala Python 3.11, baixa o app do GitHub e prepara o ambiente.</li>
-      </ul>
-<pre># Validacao
-aws cloudformation validate-template \
-  --template-body file://iac/cloudformation/app.yaml
-
-# Deploy
-aws cloudformation deploy \
-  --stack-name tsa-{iniciais} \
-  --template-file iac/cloudformation/app.yaml \
-  --parameter-overrides Iniciais={iniciais} DatasetSlug={slug} \
-  --capabilities CAPABILITY_IAM
-
-# Upload do dataset
-aws s3 cp data/dataset.csv s3://tsa-{iniciais}-data/dataset.csv
-
-# Conferir
-aws ec2 describe-instances \
-  --filters "Name=tag:Project,Values=tsa-{iniciais}" \
-  --query "Reservations[].Instances[].PublicIpAddress" \
-  --output text</pre>
-      <div class="m08-callout">
-        <strong>Checkpoint do Bloco 1</strong>
-        Stack <code>tsa-{iniciais}</code> em <code>CREATE_COMPLETE</code>. EC2 com IP público anotado. S3 listado com o CSV.
-        SG permitindo 8501. Nada de Streamlit ainda &mdash; isso entra no Bloco 2.
-      </div>
-    </section>
-
-    <section class="content-block">
-      <h2>12. Bloco 2 &middot; App + observabilidade</h2>
-      <p>
-        O segundo bloco prático é o de maior densidade. DataDev produz o app. DevOps adiciona log group, metric filters, dashboard,
-        alarm e EventBridge rule. SSM document do runbook é commitado. O template é re-deployado. Ao final, a URL pública abre
-        as três abas e o closed loop está armado.
-      </p>
-
-      <h3>12.1 DataDev &mdash; <code>app.py</code> com 3 abas</h3>
-      <p>
-        A skill <code>gen_streamlit_tsa_app</code> recebe três parâmetros: as abas desejadas (sempre <code>historico,stl,forecast</code>),
-        o modelo de forecast (sugestão: <code>expsmoothing</code> por estabilidade) e o bucket S3 de origem. Saída: um <code>app.py</code>
-        de cerca de 200 linhas, mais um <code>requirements.txt</code> com pandas, numpy, statsmodels, plotly, streamlit, boto3 e httpx.
-      </p>
-<pre>&gt; /gen_streamlit_tsa_app --abas historico,stl,forecast \
-                         --modelo expsmoothing \
-                         --bucket tsa-{iniciais}-data</pre>
-      <p>
-        O app emite um log JSON estruturado a cada render. Esse log é o input para os metric filters do CloudWatch.
-        Exemplo de log de render da aba forecast:
-      </p>
-<pre>{"event":"render","aba":"forecast","duration_ms":4820,"points":120,
- "mape":0.073,"rmse":12.4,"ts":"2026-06-11T20:18:32Z"}</pre>
-
-      <h3>12.2 DevOps &mdash; observabilidade no template</h3>
-      <p>
-        A skill <code>gen_observability</code> aceita os SLOs e o nome do runbook. Ela aumenta o template com:
-      </p>
-      <ul>
-        <li>Log group <code>/tsa/{iniciais}/app</code> com retention 7 dias.</li>
-        <li>3 metric filters: <code>http_2xx_rate</code>, <code>load_p95_ms</code>, <code>forecast_p95_ms</code>.</li>
-        <li>Dashboard <code>tsa-{iniciais}</code> com 3 widgets (um por SLI).</li>
-        <li>Alarm <code>SLO-01-availability</code> em <code>http_2xx_rate &lt; 0.95</code> por 1 datapoint de 60s.</li>
-        <li>EventBridge rule disparada pelo alarm, target = SSM Run Command document <code>restart-streamlit-{iniciais}</code>.</li>
-        <li>SSM Document local em <code>runbooks/restart_streamlit.yaml</code>, registrado no template.</li>
-      </ul>
-
-      <h3>12.3 Deploy do app no EC2 (sem SSH)</h3>
-      <p>
-        O aluno não usa SSH. O deploy do código no EC2 passa por SSM Run Command, que executa um shell script que faz pull do
-        repositório, instala dependências e sobe o Streamlit:
-      </p>
-<pre>aws ssm send-command \
-  --document-name "AWS-RunShellScript" \
-  --targets "Key=tag:Project,Values=tsa-{iniciais}" \
-  --parameters 'commands=[
-    "cd /opt/app &amp;&amp; git pull origin main",
-    "pip install -r requirements.txt -q",
-    "pkill -f streamlit || true",
-    "nohup streamlit run app.py --server.port 8501 &gt; /var/log/streamlit.log 2&gt;&amp;1 &amp;"
-  ]'
-
-# Re-deploy do stack com observabilidade
-aws cloudformation deploy --stack-name tsa-{iniciais} \
-  --template-file iac/cloudformation/app.yaml \
-  --parameter-overrides Iniciais={iniciais} DatasetSlug={slug} \
-  --capabilities CAPABILITY_IAM</pre>
-      <div class="m08-callout">
-        <strong>Checkpoint do Bloco 2</strong>
-        URL pública abre as 3 abas. Dashboard CW mostra os 3 SLIs preenchidos. Alarm em estado <em>OK</em>. EventBridge rule
-        ligada ao SSM document. SSM document executável manualmente como teste.
-      </div>
-    </section>
-
-    <section class="content-block">
-      <h2>13. Bloco 3 &middot; Validação &amp; demo</h2>
-      <p>
-        Bloco final. Tester roda smoke. Reviewer marca o checklist. Aluno simula falha e demonstra closed loop. Push da tag
-        <code>final-v1</code>. Demo de 3 minutos &mdash; gate da entrega.
-      </p>
-
-      <h3>13.1 Tester &mdash; smoke contra a URL</h3>
-<pre># tests/smoke/test_url.py (gerado pela skill)
-import httpx, os
-
-URL = os.environ["TSA_URL"]  # ex: http://3.83.x.y:8501
-
-def test_smoke_01_home_200():
-    r = httpx.get(URL, timeout=5.0)
-    assert r.status_code == 200
-
-def test_smoke_02_aba_stl():
-    r = httpx.get(URL + "/?aba=stl", timeout=5.0)
-    assert r.status_code == 200
-
-def test_smoke_03_aba_forecast():
-    r = httpx.get(URL + "/?aba=forecast", timeout=10.0)
-    assert r.status_code == 200</pre>
-<pre>TSA_URL="http://&lt;ip-publico&gt;:8501" pytest tests/smoke/ -v</pre>
-
-      <h3>13.2 Reviewer &mdash; release checklist</h3>
-      <p>
-        A skill <code>gen_release_checklist</code> gera <code>documents/release_checklist.md</code> com os oito critérios da
-        seção 10. O reviewer marca cada item, anexando print ou comando que prova cumprimento. Critérios não marcados ficam
-        explícitos no documento, e o aluno tem até o início da demo para corrigir.
-      </p>
-
-      <h3>13.3 Simulação de falha &mdash; o ato 4 da demo</h3>
-      <p>
-        O closed loop é demonstrado matando o processo Streamlit via SSM e observando o sistema voltar sozinho. Sequência:
-      </p>
-<pre># 1) Em uma aba, abrir o dashboard CW (graf SLO-01)
-# 2) Em outra aba, abrir a URL publica do app
-
-# 3) No terminal, matar o processo
-aws ssm send-command --document-name "AWS-RunShellScript" \
-  --targets "Key=tag:Project,Values=tsa-{iniciais}" \
-  --parameters 'commands=["pkill -9 -f streamlit"]'
-
-# 4) Esperar &lt; 60s. O alarm dispara.
-#    EventBridge chama o runbook restart-streamlit-{iniciais}.
-#    O runbook reinicia o Streamlit no EC2.
-#    A URL volta a responder 200.
-
-# 5) Tag e push
-git tag final-v1
-git push origin main --tags</pre>
-
-      <h3>13.4 Roteiro da demo de 3 minutos</h3>
-      <table>
-        <thead>
-          <tr><th>Tempo</th><th>Ato</th><th>O que mostrar</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>0:00 &ndash; 0:30</td><td>Abertura</td><td>Nome do repo, dataset, hipótese inicial.</td></tr>
-          <tr><td>0:30 &ndash; 1:30</td><td>Front</td><td>Navegar as 3 abas: histórico, STL, forecast 30.</td></tr>
-          <tr><td>1:30 &ndash; 2:15</td><td>Observabilidade</td><td>Dashboard CW com os 3 SLIs em verde.</td></tr>
-          <tr><td>2:15 &ndash; 2:45</td><td>Closed loop</td><td>Kill do processo via SSM &mdash; alarm acende &mdash; serviço sobe.</td></tr>
-          <tr><td>2:45 &ndash; 3:00</td><td>Encerramento</td><td>Comando de destruir a stack + URL do repo público.</td></tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section class="content-block">
-      <h2>14. Erros frequentes e atalhos defensivos</h2>
-      <p>
-        A lista abaixo concentra os defeitos vistos em turmas anteriores ao executar projeto sob essa pressão. Antecipar
-        cada um economiza idas e vindas nos Blocos 2 e 3.
-      </p>
-      <table>
-        <thead>
-          <tr><th>Sintoma</th><th>Causa raiz comum</th><th>Atalho defensivo</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>UnauthorizedOperation</code> no meio do Bloco 2</td>
-            <td>Token expirado.</td>
-            <td>Renovar token antes de cada <code>cloudformation deploy</code>.</td>
-          </tr>
-          <tr>
-            <td>URL não abre, EC2 está rodando</td>
-            <td>SG sem inbound 8501.</td>
-            <td>Conferir <code>SecurityGroupIngress</code> no template antes do deploy.</td>
-          </tr>
-          <tr>
-            <td>SSM Run Command não responde</td>
-            <td>EC2 sem LabRole anexada.</td>
-            <td><code>IamInstanceProfile: !Ref LabRoleProfile</code> obrigatório no recurso EC2.</td>
-          </tr>
-          <tr>
-            <td>STL falha em runtime</td>
-            <td><code>statsmodels</code> ausente do <code>requirements.txt</code>.</td>
-            <td>Skill <code>gen_streamlit_tsa_app</code> já injeta &mdash; não remover.</td>
-          </tr>
-          <tr>
-            <td>Dashboard CW vazio</td>
-            <td>Metric filter criado mas widget aponta para namespace errado.</td>
-            <td>Conferir o <code>MetricNamespace</code> dos filters e dos widgets antes do re-deploy.</td>
-          </tr>
-          <tr>
-            <td>Alarm não dispara após kill</td>
-            <td>Janela de avaliação alta (5 datapoints) ou <code>TreatMissingData</code> errado.</td>
-            <td>1 datapoint, 60s, <code>TreatMissingData: breaching</code>.</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h3>14.1 Comandos de diagnóstico úteis durante a demo</h3>
-<pre># Stack events em ordem cronologica
-aws cloudformation describe-stack-events \
-  --stack-name tsa-{iniciais} \
-  --query "StackEvents[*].[Timestamp,LogicalResourceId,ResourceStatus,ResourceStatusReason]" \
-  --output table
-
-# Logs do Streamlit em modo follow
-aws logs tail /tsa/{iniciais}/app --follow
-
-# Status do alarm em tempo real
-aws cloudwatch describe-alarms \
-  --alarm-names SLO-01-availability \
-  --query "MetricAlarms[0].StateValue"</pre>
-    </section>
-
-    <section class="content-block">
-      <h2>15. Restrições duras &mdash; linhas vermelhas</h2>
-      <div class="m08-callout">
-        <strong>Cinco regras inegociáveis</strong>
-        <ol>
-          <li><strong>Sem console AWS.</strong> Só CLI + CFN. Reviewer audita histórico do CloudTrail.</li>
-          <li><strong>Sem credencial permanente em código.</strong> Só session token. <code>git secrets</code> roda no pre-commit.</li>
-          <li><strong>Repositório no padrão</strong> <code>tsa-{iniciais}-{slug-tema}</code>. Sem variação.</li>
-          <li><strong>Sem trabalho prévio à aula.</strong> Apenas escolher dataset e abrir o repo. Aluno que codar antes não cumpre o exercício.</li>
-          <li><strong>Demo de 3 minutos ao fim.</strong> Quem não entrega demo não fecha o projeto.</li>
-        </ol>
-      </div>
-      <p>
-        As cinco regras existem por razão didática: o objetivo da aula não é avaliar quem chegou com mais código pronto, e sim
-        provar que o aluno é capaz de orquestrar IA, IaC e observabilidade dentro de um cronograma curto. A entrega ideal é
-        produzida em sala, com cavalaria, sob pressão.
-      </p>
-    </section>
-
-    <section class="content-block">
-      <h2>16. Glossário &mdash; séries temporais e modelagem</h2>
-      <table>
-        <thead>
-          <tr><th>Sigla</th><th>Significado</th><th>Onde aparece nesta aula</th></tr>
-        </thead>
-        <tbody>
-          <tr><td><strong>TSA</strong></td><td>Time Series Analysis</td><td>Prefixo do repositório.</td></tr>
-          <tr><td><strong>STL</strong></td><td>Seasonal-Trend decomposition using Loess</td><td>Aba 2 do front, <code>statsmodels.tsa.seasonal.STL</code>.</td></tr>
-          <tr><td><strong>ARIMA</strong></td><td>AutoRegressive Integrated Moving Average</td><td>Modelo aceito para a aba Forecast.</td></tr>
-          <tr><td><strong>SARIMA</strong></td><td>Seasonal ARIMA</td><td>Variante para datasets sazonais fortes.</td></tr>
-          <tr><td><strong>ETS</strong></td><td>Exponential Smoothing State Space</td><td>Holt-Winters &mdash; default sugerido pela skill.</td></tr>
-          <tr><td><strong>Loess</strong></td><td>Locally estimated scatterplot smoothing</td><td>Suavizador interno do STL.</td></tr>
-          <tr><td><strong>ACF</strong></td><td>AutoCorrelation Function</td><td>Auxilia escolha do <code>p</code> em ARIMA.</td></tr>
-          <tr><td><strong>PACF</strong></td><td>Partial AutoCorrelation Function</td><td>Auxilia escolha do <code>q</code> em ARIMA.</td></tr>
-          <tr><td><strong>MAE</strong></td><td>Mean Absolute Error</td><td>Métrica de erro do forecast.</td></tr>
-          <tr><td><strong>RMSE</strong></td><td>Root Mean Squared Error</td><td>Métrica de erro do forecast (penaliza outliers).</td></tr>
-          <tr><td><strong>MAPE</strong></td><td>Mean Absolute Percentage Error</td><td>Métrica de erro relativa, no rodapé da aba Forecast.</td></tr>
-          <tr><td><strong>SMAPE</strong></td><td>Symmetric MAPE</td><td>Variante simétrica, mais estável quando série tem zeros.</td></tr>
-          <tr><td><strong>CI 95%</strong></td><td>Intervalo de Confiança 95%</td><td>Faixa de incerteza no forecast.</td></tr>
-          <tr><td><strong>STL-period</strong></td><td>Período sazonal inferido</td><td>12 mensal, 7 diário, 24 horário.</td></tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section class="content-block">
-      <h2>17. Glossário &mdash; AWS, SRE e infra</h2>
-      <table>
-        <thead>
-          <tr><th>Sigla</th><th>Significado</th><th>Onde aparece nesta aula</th></tr>
-        </thead>
-        <tbody>
-          <tr><td><strong>EC2</strong></td><td>Elastic Compute Cloud</td><td>Host único do app Streamlit.</td></tr>
-          <tr><td><strong>S3</strong></td><td>Simple Storage Service</td><td>Bucket com o CSV estático.</td></tr>
-          <tr><td><strong>CW</strong></td><td>CloudWatch</td><td>Log group, dashboard, alarm.</td></tr>
-          <tr><td><strong>SSM</strong></td><td>Systems Manager</td><td>Run Command + Document <code>restart_streamlit</code>.</td></tr>
-          <tr><td><strong>CFN</strong></td><td>CloudFormation</td><td>IaC obrigatória da aula.</td></tr>
-          <tr><td><strong>EVB</strong></td><td>EventBridge</td><td>Rule que liga alarm a SSM.</td></tr>
-          <tr><td><strong>SG</strong></td><td>Security Group</td><td>Inbound 8501 0.0.0.0/0.</td></tr>
-          <tr><td><strong>IAM</strong></td><td>Identity and Access Management</td><td>LabRole pré-existente do Learner Lab.</td></tr>
-          <tr><td><strong>LabRole</strong></td><td>Role pré-definida do Learner Lab</td><td><code>IamInstanceProfile</code> do EC2.</td></tr>
-          <tr><td><strong>SLI</strong></td><td>Service Level Indicator</td><td>Os 3 SLIs do projeto.</td></tr>
-          <tr><td><strong>SLO</strong></td><td>Service Level Objective</td><td>SLO-01, SLO-02, SLO-03.</td></tr>
-          <tr><td><strong>EMF</strong></td><td>Embedded Metric Format</td><td>Formato dos logs JSON estruturados.</td></tr>
-          <tr><td><strong>MTTR</strong></td><td>Mean Time To Recovery</td><td>Métrica do closed loop.</td></tr>
-          <tr><td><strong>Closed loop</strong></td><td>Sensor &rarr; controlador &rarr; atuador &rarr; nova medição</td><td>Alarm &rarr; EVB &rarr; SSM &rarr; CW.</td></tr>
-          <tr><td><strong>IaC</strong></td><td>Infrastructure as Code</td><td>CloudFormation, sem clique.</td></tr>
-          <tr><td><strong>Runbook</strong></td><td>Procedimento operacional executável</td><td><code>runbooks/restart_streamlit.yaml</code>.</td></tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section class="content-block">
-      <h2>18. Glossário &mdash; projeto, IA e entrega</h2>
-      <table>
-        <thead>
-          <tr><th>Sigla / termo</th><th>Significado</th><th>Onde aparece nesta aula</th></tr>
-        </thead>
-        <tbody>
-          <tr><td><strong>RF</strong></td><td>Requisito Funcional</td><td><code>spec/00_problem.md</code>, IDs <code>RF-NN</code>.</td></tr>
-          <tr><td><strong>RNF</strong></td><td>Requisito Não-Funcional</td><td><code>spec/00_problem.md</code>, IDs <code>RNF-NN</code>.</td></tr>
-          <tr><td><strong>RTM</strong></td><td>Requirements Traceability Matrix</td><td>Implícita no release checklist (rastreabilidade RF &rarr; teste).</td></tr>
-          <tr><td><strong>SDD</strong></td><td>Spec-Driven Development</td><td>Filosofia herdada da Aula 02.</td></tr>
-          <tr><td><strong>TC-SMOKE</strong></td><td>Smoke test case</td><td><code>tests/smoke/test_url.py</code>, IDs <code>TC-SMOKE-NN</code>.</td></tr>
-          <tr><td><strong>AGENTS.md</strong></td><td>Manifesto do squad de agentes</td><td>Raiz do repositório, gerado pelo bootstrap.</td></tr>
-          <tr><td><strong>Skill</strong></td><td>Comando reutilizável da IA</td><td><code>bootstrap_tsa_project</code>, <code>gen_app_template</code>, etc.</td></tr>
-          <tr><td><strong>Architect</strong></td><td>Agente que produz o system design</td><td>Bloco 1.</td></tr>
-          <tr><td><strong>DevOps</strong></td><td>Agente que produz CFN</td><td>Blocos 1 e 2.</td></tr>
-          <tr><td><strong>DataDev</strong></td><td>Agente que produz o app Streamlit/Dash</td><td>Bloco 2.</td></tr>
-          <tr><td><strong>Tester</strong></td><td>Agente que produz smoke tests</td><td>Bloco 3.</td></tr>
-          <tr><td><strong>Reviewer</strong></td><td>Agente que audita o release</td><td>Bloco 3.</td></tr>
-          <tr><td><strong>final-v1</strong></td><td>Tag git do release</td><td>Push obrigatório no Bloco 3.</td></tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section class="content-block">
-      <h2>19. Referências &mdash; para continuar depois da Aula 08</h2>
-      <h3>19.1 Séries temporais</h3>
-      <ul>
-        <li>Hyndman, R. J., &amp; Athanasopoulos, G. <em>Forecasting: Principles and Practice</em> (3rd ed., 2021). Disponível online.</li>
-        <li><code>statsmodels</code> &mdash; documentação de <code>tsa.seasonal.STL</code> e <code>tsa.holtwinters.ExponentialSmoothing</code>.</li>
-        <li>Prophet &mdash; documentação oficial Meta/Facebook (<em>github.com/facebook/prophet</em>).</li>
-        <li>Kaggle &mdash; trilha "Time Series" e competições históricas (M4, M5).</li>
-      </ul>
-      <h3>19.2 AWS, IaC e SRE</h3>
-      <ul>
-        <li>AWS CloudFormation User Guide &mdash; <em>aws.amazon.com/cloudformation/</em>.</li>
-        <li>AWS Well-Architected Framework &mdash; Reliability Pillar.</li>
-        <li>Beyer, B., et al. <em>Site Reliability Engineering</em> e <em>The Site Reliability Workbook</em>. Google, O'Reilly.</li>
-        <li>EventBridge &mdash; <em>Developer Guide</em>, focando em rules e targets.</li>
-        <li>Systems Manager &mdash; <em>Run Command</em> e <em>SSM Documents</em>.</li>
-      </ul>
-      <h3>19.3 Front e produto</h3>
-      <ul>
-        <li>Streamlit &mdash; <em>Deployment Guide</em> e <em>API reference</em>.</li>
-        <li>Plotly Dash &mdash; <em>Layout</em> e <em>Callbacks</em>.</li>
-        <li>httpx &mdash; cliente HTTP usado no smoke test.</li>
-      </ul>
-    </section>
-
-    <section class="content-block">
-      <h2>20. Atividade prática em sala &mdash; o que executar</h2>
-      <p>
-        O fechamento deste material aponta para a atividade prática que ocupa a parte de execução da aula. A trilha é a
-        sequência dos três blocos, executada com Codespace aberto, OpenCode (ou Gemini CLI) carregado com as skills do
-        AGENTS.md, e AWS CLI autenticado pelo session token do Learner Lab.
+        Esta é a aula prática de fechamento da disciplina. O exercício prático em sala é a própria entrega do projeto
+        final. Use as três horas para:
       </p>
       <ol>
-        <li>
-          <strong>Bloco 1 &middot; Bootstrap &amp; arquitetura.</strong> Renovar token. Abrir Codespace do <code>tsa-{iniciais}-{slug}</code>.
-          Rodar <code>/bootstrap_tsa_project</code>. Escrever <code>spec/00_problem.md</code> com 5 RFs e 5 RNFs. Em seguida, rodar
-          <code>/gen_app_template</code> nos modos <code>system_design</code> e <code>cfn</code>. Validar template.
-          <code>aws cloudformation deploy</code>. Subir CSV para o S3.
-        </li>
-        <li>
-          <strong>Bloco 2 &middot; App + observabilidade.</strong> Rodar <code>/gen_streamlit_tsa_app</code>. Deploy do app via SSM.
-          Rodar <code>/gen_observability</code>. Re-deploy do template com log group, dashboard, alarm e EventBridge.
-        </li>
-        <li>
-          <strong>Bloco 3 &middot; Validação &amp; demo.</strong> Rodar <code>pytest tests/smoke/</code>. Marcar <code>release_checklist.md</code>.
-          Simular falha via SSM. Mostrar closed loop. <code>git tag final-v1 &amp;&amp; git push --tags</code>. Demo de 3 minutos.
-        </li>
+        <li><strong>Antes da aula:</strong> garanta que seu fork do repositório base está renomeado para <code>20261sre-&lt;primeironome&gt;-&lt;ultimonome&gt;</code>, público, com a stack das Aulas 04 a 07 commitada em <code>main</code>.</li>
+        <li><strong>Bloco 1 (briefing):</strong> tome nota do desafio específico, das regras e dos critérios. Faça perguntas &mdash; esse é o único momento em que o professor responde dúvidas sobre o enunciado.</li>
+        <li><strong>Bloco 2 (trabalho assistido):</strong> abra Codespace ou ambiente local, crie uma branch de feature, implemente a entrega, faça push, abra PR contra <code>main</code>, merge.</li>
+        <li><strong>Bloco 3 (apresentação):</strong> apresente seu repositório seguindo a ordem da seção 6 deste material.</li>
+        <li><strong>Após a apresentação:</strong> aplique a tag <code>aula-08-entrega</code> no commit final; deixe o repositório público para avaliação posterior.</li>
       </ol>
+      <p>
+        Não há lista de exercícios escritos nesta aula. A entrega é o repositório, e o repositório é o exame.
+        Boa entrega &mdash; e obrigado por percorrerem o arco completo do semestre.
+      </p>
       <div class="m08-callout">
-        <strong>Critério de pronto da aula</strong>
-        Tag <code>final-v1</code> empurrada para o GitHub público, URL pública aberta na frente da turma, três SLIs verdes no
-        dashboard, simulação de falha demonstrada com closed loop respondendo. Repositório navegável pelo reviewer com README
-        que recria a stack em &le; 10 minutos.
+        <strong>Encerramento da disciplina</strong>
+        <p style="margin: 0;">
+          Esta é a última aula do curso. O repositório de cada aluno permanece como portfólio público: continue
+          mexendo nele depois da disciplina, use-o em entrevistas, mostre evolução. Cloud e SRE se aprendem fazendo,
+          e o que está no GitHub é a prova de que você fez.
+        </p>
       </div>
-      <p style="margin-top:18px;">
-        <a href="../slides/slide_aula_08_seguranca_de_dados_finops_e_projeto_final_integrado.html">&larr; Slide da Aula 08</a>
-        &nbsp;&middot;&nbsp;
+    </section>
+
+    <section class="content-block">
+      <nav class="material-nav">
+        <a href="../slides/slide_aula_08_seguranca_de_dados_finops_e_projeto_final_integrado.html">&larr; Ir para os slides da Aula 08</a>
+        <span> &nbsp;&middot;&nbsp; </span>
         <a href="../../../index.html">Voltar ao índice do curso</a>
-      </p>
+      </nav>
     </section>
 
   </main>
-
-  <!-- Mermaid v11 — render dos diagramas do material -->
-  <script type="module">
-    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-    mermaid.initialize({
-      startOnLoad: true,
-      theme: 'neutral',
-      securityLevel: 'loose',
-      flowchart: { htmlLabels: true, curve: 'basis' },
-      themeVariables: {
-        fontFamily: 'JetBrains Mono, ui-monospace, monospace',
-        primaryColor: '#ffffff',
-        primaryBorderColor: '#0f0f0f',
-        primaryTextColor: '#0f0f0f',
-        lineColor: '#5c5c5c',
-        clusterBkg: '#fafaf7',
-        clusterBorder: '#d6d6d1'
-      }
-    });
-  </script>
 </body>
 </html>

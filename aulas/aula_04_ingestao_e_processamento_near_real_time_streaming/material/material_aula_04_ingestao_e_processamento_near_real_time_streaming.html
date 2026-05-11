@@ -4,12 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/png" href="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" />
-  <title>Material Aula 04 — Equipe de agentes IA + CloudFormation: do markdown ao stack provisionado</title>
+  <title>Material Aula 04 — Ingestão e Processamento Near Real-time com Streaming</title>
   <link rel="stylesheet" href="../../../assets/styles.css" />
   <link rel="stylesheet" href="../../../assets/slides.css" />
   <style data-material04-local>
-    /* Material is a long-form document — neutralize the height/overflow rules
-       that slides.css applies to html, body. */
+    /* Material é documento longo — neutralizar overflow/height de slides.css. */
     html, body.material {
       height: auto !important;
       min-height: 100%;
@@ -105,6 +104,25 @@
       border-radius: 3px;
       margin-right: 6px;
     }
+    .m04-repo-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 22px;
+      border: 1px solid #0f0f0f;
+      border-radius: 4px;
+      background: #0f0f0f;
+      color: #ffffff;
+      text-decoration: none;
+      font-family: var(--font-mono);
+      font-size: .92rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      margin: 16px 0;
+    }
+    .m04-repo-cta:hover { background: #2a2a2a; }
+    .m04-repo-cta svg { width: 20px; height: 20px; fill: currentColor; }
   </style>
 </head>
 <body class="material">
@@ -112,793 +130,829 @@
 
     <section class="content-block">
       <p class="meta">Aula 04 &nbsp;&bull;&nbsp; 07/05/2026 &nbsp;&bull;&nbsp; Aula presencial</p>
-      <h1>Equipe de agentes IA + CloudFormation: do markdown ao stack provisionado</h1>
+      <h1>Ingestão e Processamento Near Real-time com Streaming</h1>
       <p class="summary">
-        Este material acompanha a Aula 04 da disciplina <strong>Cloud Computing e SRE &mdash; Visão Prática com AWS</strong>
-        do MBA em Engenharia de Dados. A aula tira a arquitetura do papel e a põe na conta AWS &mdash; mas com regras: nada manual, tudo declarativo via
-        CloudFormation, e quem propõe o template é uma <em>squad</em> de agentes IA com papéis bem cortados, não um agente solitário.
-        Entrega: stack <code>olist-sre-pipeline-lab</code> em <code>CREATE_COMPLETE</code>, ETL dummy escrevendo no S3 raw, drift detection rodada
-        e dois novos arquivos em <code>/documents</code>: <code>10_deploy_log.md</code> e <code>11_drift_runbook.md</code>.
+        Este material acompanha a Aula 04 da disciplina <strong>Cloud Computing e SRE &mdash; Visão Prática com AWS</strong> do MBA em Engenharia de Dados.
+        A aula desce do plano abstrato para o teclado: subimos uma stack inteira de ingestão near real-time no laptop, com
+        <strong>MinIO</strong> no papel de S3, <strong>ClickHouse</strong> como warehouse colunar, um <strong>ingestor Python</strong> em Docker e um
+        <strong>dashboard Streamlit</strong> consumindo as métricas. O dataset é o já clássico <em>Olist Brazilian E-commerce Public Dataset</em>.
       </p>
       <p>
-        <span class="m04-tag">Pré-requisitos</span> Aula 03 entregue: <code>/documents/01..09</code> preenchidos, pasta
-        <code>documents/agents/</code> com <code>AGENTS.md</code>, <code>GEMINI.md</code> e seis skills, AWS CLI conectado pelo session
-        token do Learner Lab, tag <code>aula-03</code> no git.
+        <span class="m04-tag">Pré-requisitos</span> Docker Desktop (ou Docker Engine + Compose v2), Git, navegador web e ~2&nbsp;GB de RAM livre.
+        Portas <code>8123</code>, <code>8501</code>, <code>9000</code>, <code>9002</code> e <code>9003</code> precisam estar livres no host.
       </p>
       <p>
-        <span class="m04-tag">Restrições duras</span> Sem clicar no console AWS &middot; sem secrets em template &middot; sem Glue, Redshift ou SageMaker (Learner Lab
-        não habilita) &middot; tudo idempotente: re-rodar o deploy não pode mudar estado.
+        <span class="m04-tag">Restrições da aula</span> Sem clicar em console AWS hoje &middot; sem Kafka/Flink/Kinesis &middot; nada manual fora do que está
+        no <code>docker-compose.yaml</code> &middot; tudo idempotente, reingestões precisam ser seguras.
+      </p>
+      <p>
+        <span class="m04-tag">Repositório</span>
+        Todo o código que rodamos em sala está no GitHub. Faça <em>fork</em> antes de modificar.
+      </p>
+      <p>
+        <a class="m04-repo-cta" href="https://github.com/afonsolelis/20261sre-primeironome-ultimonome" target="_blank" rel="noopener">
+          <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+          </svg>
+          Abrir repositório no GitHub
+        </a>
       </p>
     </section>
 
     <section class="content-block">
-      <h2>1. Da arquitetura ao stack</h2>
+      <h2>1. Por que stack local antes da nuvem</h2>
       <p>
-        Na Aula 03 modelamos a arquitetura em RM-ODP, escrevemos a RTM e desenhamos o system design em Mermaid mapeando RF/RNF.
-        Tudo isso vive em markdown na pasta <code>/documents</code>. O problema agora muda: <em>como tirar a arquitetura do papel sem
-        introduzir dívida operacional?</em> A resposta da disciplina tem duas partes inseparáveis.
+        A primeira tentação ao aprender uma plataforma de dados é abrir o console do provedor e começar a clicar. O custo dessa rota é triplo:
+        cada erro custa hora-recurso, cada clique não deixa rastro reproduzível, e cada participante depende de um <em>session token</em> instável
+        para sequer começar. A proposta desta aula é inverter a ordem: <strong>subir a stack inteira no laptop, falar exatamente as mesmas
+        interfaces que a nuvem oferece</strong>, validar o pipeline ponta a ponta, e só depois discutir como esse mesmo pipeline migraria para
+        S3, Redshift ou Kinesis.
       </p>
       <p>
-        A primeira é <strong>Infrastructure as Code</strong> &mdash; toda decisão de infra é arquivo versionado, revisado em PR e auditável.
-        Cliques no console são proibidos porque cliques não deixam rastro. A segunda parte é <strong>multi-agente</strong> &mdash; em vez de pedir para
-        uma única IA "gerar tudo", separamos em quatro papéis com escopos curtos. Architect lê arquitetura, DevOps gera YAML, Tester valida, Reviewer
-        veta. O humano é o árbitro e o único que aciona <code>aws cloudformation deploy</code>.
+        A engenharia mora nas interfaces. <strong>MinIO</strong> implementa a API S3 que o boto3 e o AWS CLI já falam. <strong>ClickHouse</strong>
+        é o mesmo binário no laptop, no servidor on-premise e no ClickHouse Cloud. <strong>Streamlit</strong> roda igual em qualquer lugar. O contrato
+        é a interface; o provedor é detalhe de implementação. Quando você fala S3 API e SQL, você não está aprendendo "MinIO" &mdash; está aprendendo
+        S3 e ClickHouse com latência menor e custo zero.
       </p>
-
-      <h3>1.1 As cinco regras desta aula</h3>
       <div class="m04-callout">
-        <strong>Não-negociáveis</strong>
-        <ol>
-          <li>Toda decisão de infra é arquivo YAML versionado &mdash; nada de cliques no console.</li>
-          <li>Quatro papéis distintos na squad: Architect, DevOps, Tester, Reviewer.</li>
-          <li>Cada recurso provisionado nasce com tag, log group e métrica.</li>
-          <li>Re-rodar o deploy não pode mudar estado &mdash; idempotência ou nada.</li>
-          <li>Recurso sem caminho de remediação no closed loop não entra no stack.</li>
-        </ol>
+        <strong>Tese</strong>
+        Antes de pagar nuvem, sobe local. A interface é o contrato &mdash; não o fornecedor. Quem fala S3 API e SQL fala com MinIO+ClickHouse hoje e
+        com S3+Redshift amanhã. A engenharia mora nas interfaces; a fatura, no provedor.
       </div>
+      <h3>1.1 Quatro regras desta aula</h3>
+      <ol>
+        <li>A stack inteira sobe com <code>docker compose up -d</code> &mdash; nada de clique em console cloud hoje.</li>
+        <li>Ingestão é <strong>append-only</strong>: cada execução marca <code>unixtime</code> e <code>tag</code> próprios e não sobrescreve nada.</li>
+        <li>A modelagem é <strong>schema-on-read</strong>: landing como <code>JSON</code> bruto, modelagem nas views.</li>
+        <li>Healthcheck obrigatório em todo serviço crítico &mdash; <code>depends_on: condition: service_healthy</code> orquestra startup.</li>
+      </ol>
     </section>
 
     <section class="content-block">
-      <h2>2. Por que sair do prompt único</h2>
+      <h2>2. Espectro batch &mdash; micro-batch &mdash; streaming</h2>
       <p>
-        Um agente sozinho funciona bem para tarefas curtas. Quando o pedido cresce &mdash; gerar templates, escrever testes, fazer ATAM, atualizar
-        runbook &mdash; ele começa a perder aderência: esquece que IAM com <code>Action: '*'</code> está proibido, mistura saídas (joga ATAM dentro do YAML),
-        e propaga alucinações entre artefatos. Um erro na primeira etapa contamina as próximas.
+        "Near real-time" não é um ponto fixo; é uma faixa do espectro entre o lote diário tradicional e o evento processado em milissegundos. A
+        engenharia de dados moderna escolhe o regime certo para cada caso de uso. Forçar streaming verdadeiro onde basta micro-batch é caro;
+        forçar batch onde a janela de decisão é curta deixa dinheiro na mesa.
       </p>
-      <p>
-        Multi-agente resolve isso dividindo cognição. Cada papel tem prompt curto, lê arquivos específicos e escreve em pasta específica.
-        Saídas são separadas, comparáveis e comitáveis. O custo é orquestração: alguém precisa coordenar a sequência. Em troca, a auditoria
-        fica trivial &mdash; você sabe quem produziu cada arquivo.
-      </p>
-
-      <h3>2.1 Padrões de orquestração</h3>
       <table>
         <thead>
-          <tr><th>Padrão</th><th>Como funciona</th><th>Quando usar</th><th>Risco</th></tr>
+          <tr><th>Modo</th><th>Latência típica</th><th>Mecânica</th><th>Quando aplicar</th></tr>
         </thead>
         <tbody>
-          <tr><td>Planner + Executor</td><td>Um agente planeja, outro(s) executam tarefas pequenas.</td><td>Pipeline previsível com etapas claras.</td><td>Plano ruim se propaga.</td></tr>
-          <tr><td>Hierárquico</td><td>Manager delega para sub-agentes especializados.</td><td>Tarefas com dependências fortes entre subtarefas.</td><td>Latência cumulativa.</td></tr>
-          <tr><td>Blackboard</td><td>Agentes leem e escrevem em quadro comum.</td><td>Problemas exploratórios, sem ordem fixa.</td><td>Difícil auditar quem mudou o quê.</td></tr>
-          <tr><td>Swarm</td><td>Vários agentes paralelos, sem coordenador central.</td><td>Geração de variantes, brainstorming.</td><td>Pode divergir; precisa redutor.</td></tr>
+          <tr>
+            <td>Batch</td>
+            <td>Horas a dia</td>
+            <td>Janela longa, processa o conjunto inteiro de uma vez. Job dispara em horário fixo.</td>
+            <td>Relatório diário, fechamento contábil, BI clássico.</td>
+          </tr>
+          <tr>
+            <td>Micro-batch</td>
+            <td>Segundos a minutos</td>
+            <td>Lotes pequenos e frequentes. Loop curto de leitura/transformação/escrita.</td>
+            <td>Dashboards "vivos", agregações leves, análises operacionais.</td>
+          </tr>
+          <tr>
+            <td>Streaming verdadeiro</td>
+            <td>Sub-segundo</td>
+            <td>Evento a evento via broker (Kafka, Kinesis) + processador (Flink, Spark Structured Streaming).</td>
+            <td>Detecção de fraude, telemetria crítica, matching em tempo real.</td>
+          </tr>
         </tbody>
       </table>
       <p>
-        Hoje rodamos um híbrido <strong>planner+executor com revisão humana</strong>. O Architect planeja, DevOps executa, Tester e Reviewer fecham o loop, e o
-        humano dá o "go" antes do deploy. É o padrão que cabe na prática guiada sem perder rastreabilidade.
+        Nesta aula rodamos micro-batch via <code>ingest_minio.py</code> &mdash; lê todos os CSVs do bucket, transforma e escreve no ClickHouse em
+        lotes de 50&nbsp;mil linhas. Pode ser disparado manualmente, por cron, por evento de upload no MinIO, ou em loop infinito. Deliberadamente
+        evitamos Kafka/Flink: o custo de operação de um broker mais um processador stateful não compensa para o volume e a janela de decisão de
+        um dashboard analítico.
       </p>
     </section>
 
     <section class="content-block">
-      <h2>3. A squad canônica</h2>
+      <h2>3. Docker Compose como contrato de stack</h2>
       <p>
-        Quatro papéis. Cada um com escopo de leitura, escopo de escrita e critério de aceitação. Nenhum papel pode invadir o outro &mdash; o Architect
-        não escreve YAML, o DevOps não escreve ADR, o Tester não decide arquitetura, o Reviewer não fecha PR sozinho.
+        Docker Compose é um arquivo YAML que descreve todo o sistema: cada serviço (container), suas portas, volumes, variáveis de ambiente,
+        healthchecks e dependências. É um único artefato versionado que substitui dezenas de comandos manuais de <code>docker run</code>. Para
+        ambientes locais e de desenvolvimento, é o equivalente prático de um pequeno Kubernetes &mdash; sem a sobrecarga conceitual.
       </p>
-
-      <h3>3.1 Architect</h3>
-      <p>
-        Lê <code>documents/03_architecture.md</code> da Aula 03 e devolve um plano de módulos CFN em <code>iac/cloudformation/PLAN.md</code>. O plano descreve cada
-        módulo (network, storage, compute, observability, sre-loop) com parâmetros esperados, outputs e qual RF/RNF da Aula 03 ele atende. Nenhuma linha de YAML.
-        A saída é texto em markdown, fácil de revisar e diffar.
-      </p>
-
-      <h3>3.2 DevOps</h3>
-      <p>
-        Recebe o <code>PLAN.md</code> do Architect e gera <code>root.yaml</code> + cinco módulos. Aplica a skill <code>gen_cfn_template</code> (ver seção 6).
-        Tags obrigatórias, Outputs por módulo, <code>DeletionPolicy</code> escolhido por recurso. Saída entra como diff revisável; nada vai direto para a AWS.
-      </p>
-
-      <h3>3.3 Tester</h3>
-      <p>
-        Gera <code>tests/iac/test_templates.py</code>. Roda <code>cfn-lint</code> em todos os YAMLs e adiciona asserts pytest sobre Outputs esperados,
-        ausência de <code>Action: '*'</code> em IAM, presença de <code>DeletionPolicy</code> em recursos críticos. Falha do Tester é blocker do deploy.
-      </p>
-
-      <h3>3.4 Reviewer</h3>
-      <p>
-        Faz ATAM enxuto sobre o template, reusando a skill <code>review_architecture</code> da Aula 03 e a nova <code>review_cfn</code>. Lista cinco riscos,
-        três sensibilidades e dois trade-offs. Decide explicitamente: APROVADO PARA DEPLOY ou VETO + razão. A saída do Reviewer vai para a primeira seção
-        do <code>10_deploy_log.md</code>.
-      </p>
-
-      <div class="m04-callout">
-        <strong>Regra de veto</strong>
-        Se o Reviewer disser VETO, o ciclo volta para o DevOps com a lista de problemas. Não dá deploy "para ver no que dá". Custo de errar no Lab é tempo,
-        mas a disciplina é hábito que precisa ser construído antes de chegar em produção.
-      </div>
-    </section>
-
-    <section class="content-block">
-      <h2>4. AIOX e alternativas pragmáticas</h2>
-      <p>
-        AIOX é o orquestrador CLI multi-agente que adotamos como default da disciplina. A ideia é pequena: um binário Python que lê um <code>squad.yml</code>
-        descrevendo papéis, skills e arquivos compartilhados, e roda cada papel chamando o LLM com o prompt certo. Logs por papel/turno ficam em arquivos auditáveis.
-      </p>
-      <p>
-        O nome do binário pode mudar &mdash; o que importa é o <strong>comportamento</strong>. Se a turma não conseguir instalar AIOX (cache do PyPI vazio,
-        rede do Codespace bloqueando, versão Python inadequada), caímos para um plano B equivalente:
-      </p>
+      <h3>3.1 Conceitos centrais</h3>
       <ul>
-        <li><strong>CrewAI</strong> &mdash; framework Python de squads, declarativo via YAML/Python.</li>
-        <li><strong>AutoGen</strong> &mdash; multi-agent dialog da Microsoft, usado em pesquisa.</li>
-        <li><strong>LangGraph CLI</strong> &mdash; grafo de estados para LLM workflows.</li>
-        <li><strong>Caseiro</strong> &mdash; <code>Makefile</code> chamando Gemini CLI ou OpenCode com cada skill em sequência. Mais simples, audita do mesmo jeito.</li>
+        <li><strong><code>services</code></strong>: lista de containers do sistema, cada um com imagem ou build próprio.</li>
+        <li><strong><code>volumes</code></strong>: persistência fora do container &mdash; o estado sobrevive a <code>down</code> e <code>up</code>.</li>
+        <li><strong><code>ports</code></strong>: mapeamento <code>host:container</code>; expõe portas para acesso a partir do host.</li>
+        <li><strong><code>environment</code></strong>: variáveis injetadas no processo do container.</li>
+        <li><strong><code>healthcheck</code></strong>: comando que reporta a saúde do serviço; é o SLO local.</li>
+        <li><strong><code>depends_on</code></strong> com <code>condition: service_healthy</code>: bloqueia o startup do dependente até o healthcheck passar.</li>
       </ul>
       <p>
-        Critério de escolha: roda no Codespace sem chave paga, lê markdown como input, escreve markdown e YAML como saída, deixa rastro no <code>git</code>.
-        Nada além disso. A discussão sobre qual é "o melhor framework" fica fora desta aula.
+        Healthchecks merecem destaque. Sem eles, o Compose marca um serviço como "up" assim que o processo inicia &mdash; mesmo que ainda não esteja
+        respondendo. Com healthcheck, o status só vira <em>healthy</em> quando o comando externo confirma. Para ClickHouse usamos
+        <code>wget --spider http://localhost:8123/ping</code>; para MinIO, <code>curl /minio/health/live</code>. O resultado é que o
+        <code>ingestor</code> só sobe quando seus dois backends estão genuinamente prontos &mdash; eliminando uma classe inteira de race conditions
+        do startup.
       </p>
     </section>
 
     <section class="content-block">
-      <h2>5. Fluxo da squad &mdash; visão de cima</h2>
+      <h2>4. A stack: visão de cima</h2>
       <p>
-        Cada agente lê um insumo, produz um artefato versionado e passa adiante. O humano é o árbitro &mdash; e o único que aciona o deploy. O diagrama abaixo
-        mostra o caminho completo, dos arquivos da Aula 03 até o stack vivo na AWS.
+        São quatro serviços orquestrados em um único <code>docker-compose.yaml</code>. O caminho do dado é linear: CSVs entram pelo MinIO,
+        o ingestor lê via S3 SDK, transforma em NDJSON e escreve no ClickHouse, views derivam métricas, e o Streamlit lê o resultado por HTTP.
       </p>
       <div class="m04-mermaid">
-        <pre class="mermaid">
+<pre class="mermaid">
 flowchart LR
-  subgraph IN["Insumos (Aula 03)"]
-    ARCH["documents/<br/>03_architecture.md"]
-    AGENTS["documents/agents/<br/>AGENTS.md + skills"]
+  subgraph host[Laptop do aluno - docker compose]
+    direction LR
+    subgraph minio_box[MinIO :9002 / :9003]
+      bucket[(bucket: olist<br/>CSVs Olist)]
+    end
+    subgraph ingestor_box[Ingestor - python:3.9-slim]
+      script[ingest_minio.py<br/>boto3 + pandas + clickhouse-connect]
+    end
+    subgraph ch_box[ClickHouse :8123 / :9000]
+      raw[(olist_raw.ingestion<br/>JSON + unixtime + tag)]
+      view[v_top_products<br/>filtra max unixtime por tag]
+    end
+    subgraph st_box[Streamlit :8501]
+      app[streamlit_app.py]
+    end
   end
-
-  subgraph SQUAD["Squad (Aula 04)"]
-    A["Architect<br/>plano de modulos"]
-    D["DevOps<br/>gera CFN YAML"]
-    T["Tester<br/>cfn-lint + asserts"]
-    R["Reviewer<br/>ATAM no template"]
-  end
-
-  subgraph OUT["Artefatos versionados"]
-    PLAN["iac/.../PLAN.md"]
-    YAML["iac/cloudformation/<br/>root.yaml + modulos"]
-    TESTS["tests/iac/<br/>test_templates.py"]
-    LOG["documents/<br/>10_deploy_log.md"]
-  end
-
-  subgraph AWS["AWS Student Lab"]
-    STACK["CloudFormation Stack<br/>olist-sre-pipeline-lab"]
-    RES["S3 + EC2 + IAM + CW<br/>EventBridge + SSM"]
-  end
-
-  ARCH --> A
-  AGENTS --> A
-  AGENTS --> D
-  AGENTS --> T
-  AGENTS --> R
-  A --> PLAN --> D
-  D --> YAML --> T
-  T --> R
-  R ==> |"veto / ok"| HUMAN["Humano (voce)"]
-  HUMAN ==> |"aws cfn deploy"| STACK
-  STACK --> RES
-  STACK -.-> LOG
-        </pre>
+  bucket -->|S3 API<br/>boto3| script
+  script -->|INSERT NDJSON| raw
+  raw --> view
+  view -->|HTTP :8123| app
+</pre>
       </div>
+      <h3>4.1 Os quatro serviços, em detalhe</h3>
+      <table>
+        <thead>
+          <tr><th>Serviço</th><th>Imagem / Build</th><th>Portas</th><th>Papel</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>clickhouse</code></td>
+            <td><code>clickhouse/clickhouse-server:latest</code></td>
+            <td><code>8123</code> (HTTP), <code>9000</code> (nativo)</td>
+            <td>Data warehouse analítico colunar.</td>
+          </tr>
+          <tr>
+            <td><code>minio</code></td>
+            <td><code>minio/minio</code></td>
+            <td><code>9002</code> (S3 API), <code>9003</code> (console)</td>
+            <td>Object storage S3-compatible.</td>
+          </tr>
+          <tr>
+            <td><code>ingestor</code></td>
+            <td>Build local sobre <code>python:3.9-slim</code></td>
+            <td>&mdash;</td>
+            <td>Worker idle de ingestão (executado sob demanda via <code>docker exec</code>).</td>
+          </tr>
+          <tr>
+            <td><code>dashboard</code></td>
+            <td>Build local sobre <code>python:3.9-slim</code></td>
+            <td><code>8501</code></td>
+            <td>Frontend Streamlit lendo métricas do ClickHouse.</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3>4.2 docker-compose.yaml &mdash; resumo</h3>
+      <pre><code>services:
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: olist_analytics
+    ports: ["8123:8123", "9000:9000"]
+    volumes: ["clickhouse_data:/var/lib/clickhouse"]
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:8123/ping"]
+      interval: 10s
+
+  minio:
+    image: minio/minio
+    container_name: olist_minio
+    ports: ["9002:9000", "9003:9001"]
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes: ["minio_data:/data"]
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+
+  ingestor:
+    build: .
+    container_name: olist_ingestor
+    volumes:
+      - ./app:/app
+      - ./data:/data
+    environment:
+      CLICKHOUSE_HOST: clickhouse
+      CLICKHOUSE_PORT: 8123
+      CLICKHOUSE_USER: default
+      CLICKHOUSE_PASSWORD: ""
+      S3_BUCKET_NAME: olist
+      S3_ENDPOINT_URL: http://minio:9000
+      AWS_ACCESS_KEY_ID: minioadmin
+      AWS_SECRET_ACCESS_KEY: minioadmin
+    depends_on:
+      clickhouse: { condition: service_healthy }
+      minio:      { condition: service_healthy }
+    command: tail -f /dev/null
+
+  dashboard:
+    build: .
+    container_name: olist_dashboard
+    ports: ["8501:8501"]
+    environment:
+      CLICKHOUSE_HOST: clickhouse
+      CLICKHOUSE_USER: dashboard
+      CLICKHOUSE_PASSWORD: dashboard
+    depends_on:
+      clickhouse: { condition: service_healthy }
+    command: streamlit run streamlit_app.py --server.address=0.0.0.0 --server.headless=true
+
+volumes:
+  clickhouse_data:
+  minio_data:</code></pre>
+      <h3>4.3 Dockerfile e requirements.txt</h3>
+      <p>
+        O <code>Dockerfile</code> é o mesmo para <code>ingestor</code> e <code>dashboard</code> &mdash; o que muda entre eles é só o <code>command</code>.
+        Usa Python 3.9 slim para minimizar a imagem e instala dependências do sistema para compilar wheels nativos.
+      </p>
+      <pre><code>FROM python:3.9-slim
+WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      build-essential libpq-dev && rm -rf /var/lib/apt/lists/*
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY app/ .</code></pre>
+      <pre><code># requirements.txt
+clickhouse-connect
+streamlit
+pandas
+openpyxl
+boto3
+sqlalchemy
+python-dotenv</code></pre>
     </section>
 
     <section class="content-block">
-      <h2>6. CloudFormation 101</h2>
+      <h2>5. MinIO 101 &mdash; S3 API no laptop</h2>
       <p>
-        Antes de revisar o YAML que a IA gera, é preciso saber para que serve cada seção. CFN é declarativo: você descreve o estado desejado e o serviço da AWS
-        cuida do diff. Não há comando <em>create</em> e comando <em>delete</em> separados &mdash; há um único objeto chamado <strong>stack</strong> que tem ciclo de vida.
+        MinIO é um servidor de objetos open source que implementa a API S3 da Amazon. "Implementa" aqui é literal: os mesmos verbos REST,
+        os mesmos cabeçalhos de assinatura V4, os mesmos formatos de resposta XML. Como consequência, qualquer cliente que fala S3
+        &mdash; boto3, AWS CLI, Spark, Trino, DuckDB &mdash; fala com MinIO trocando apenas o <em>endpoint URL</em>.
       </p>
-
-      <h3>6.1 Anatomia do template</h3>
-      <table>
-        <thead>
-          <tr><th>Seção</th><th>Para que serve</th><th>Obrigatória?</th></tr>
-        </thead>
-        <tbody>
-          <tr><td><code>AWSTemplateFormatVersion</code></td><td>Versão do schema (sempre <code>2010-09-09</code>).</td><td>Recomendada</td></tr>
-          <tr><td><code>Description</code></td><td>O que o template provisiona, em uma frase.</td><td>Recomendada</td></tr>
-          <tr><td><code>Parameters</code></td><td>Entradas do stack (env, iniciais, sizing).</td><td>Não</td></tr>
-          <tr><td><code>Mappings</code></td><td>Tabelas estáticas (ex.: AMI por região).</td><td>Não</td></tr>
-          <tr><td><code>Conditions</code></td><td>Liga/desliga recursos por env.</td><td>Não</td></tr>
-          <tr><td><code>Resources</code></td><td>O que vai existir na conta.</td><td>Sim</td></tr>
-          <tr><td><code>Outputs</code></td><td>Valores expostos pelo stack (ARNs, URLs).</td><td>Recomendada</td></tr>
-        </tbody>
-      </table>
-
-      <h3>6.2 Funções intrínsecas</h3>
-      <p>
-        A IA vai gerar template recheado de funções intrínsecas. Saber decodificar é a diferença entre revisar e copiar cego.
-      </p>
-      <table>
-        <thead>
-          <tr><th>Função</th><th>Para quê</th><th>Exemplo</th></tr>
-        </thead>
-        <tbody>
-          <tr><td><code>!Ref</code></td><td>Referencia parâmetro ou resource.</td><td><code>!Ref BucketRaw</code></td></tr>
-          <tr><td><code>!Sub</code></td><td>Interpola variável em string.</td><td><code>!Sub "${Iniciais}-raw"</code></td></tr>
-          <tr><td><code>!GetAtt</code></td><td>Lê atributo de outro resource.</td><td><code>!GetAtt MyEC2.PublicIp</code></td></tr>
-          <tr><td><code>!ImportValue</code></td><td>Lê Output exportado por outro stack.</td><td><code>!ImportValue VpcId-lab</code></td></tr>
-          <tr><td><code>!Join</code></td><td>Concatena lista com separador.</td><td><code>!Join ["/", [a, b]]</code></td></tr>
-          <tr><td><code>!If</code></td><td>Condicional baseado em Conditions.</td><td><code>!If [IsProd, t3.large, t3.micro]</code></td></tr>
-        </tbody>
-      </table>
-
-      <h3>6.3 Lifecycle do stack</h3>
-      <p>
-        Stack tem máquina de estados explícita. Conhecer os estados é condição para depurar deploy travado sem chutar.
-      </p>
-      <table>
-        <thead>
-          <tr><th>Operação</th><th>Estados principais</th><th>Quando ocorre</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>CREATE</td><td>CREATE_IN_PROGRESS &rarr; CREATE_COMPLETE</td><td>Primeiro <code>deploy</code> com stack inexistente.</td></tr>
-          <tr><td>CREATE c/ falha</td><td>CREATE_FAILED &rarr; ROLLBACK_IN_PROGRESS &rarr; ROLLBACK_COMPLETE</td><td>Recurso falha; tudo é desfeito.</td></tr>
-          <tr><td>UPDATE</td><td>UPDATE_IN_PROGRESS &rarr; UPDATE_COMPLETE</td><td>Template muda; aplica diff.</td></tr>
-          <tr><td>UPDATE c/ falha</td><td>UPDATE_ROLLBACK_IN_PROGRESS &rarr; UPDATE_ROLLBACK_COMPLETE</td><td>Reverte para estado anterior.</td></tr>
-          <tr><td>DELETE</td><td>DELETE_IN_PROGRESS &rarr; DELETE_COMPLETE</td><td><code>delete-stack</code> respeita DeletionPolicy.</td></tr>
-        </tbody>
-      </table>
-
-      <h3>6.4 Capabilities, Stack Policy e DeletionPolicy</h3>
+      <h3>5.1 Conceitos S3 que importam</h3>
       <ul>
-        <li><strong>Capabilities</strong> &mdash; <code>CAPABILITY_IAM</code> autoriza CFN a criar IAM Roles. Sem isso, deploy falha por segurança. <code>CAPABILITY_NAMED_IAM</code> aceita nome customizado.</li>
-        <li><strong>Stack Policy</strong> &mdash; JSON inline que protege resources críticos contra UPDATE acidental. Útil para banco de dados e buckets de raw.</li>
-        <li><strong>DeletionPolicy</strong> &mdash; <code>Delete</code> (default) &middot; <code>Retain</code> (mantém recurso após delete-stack) &middot; <code>Snapshot</code> (faz snapshot antes de deletar). Bucket S3 e RDS nunca devem ser <code>Delete</code> em prod. No Lab, usamos <code>Retain</code> só para o bucket raw.</li>
+        <li><strong>Bucket</strong>: container nomeado, único em todo o servidor. No MinIO é só uma pasta no disco.</li>
+        <li><strong>Objeto</strong>: arquivo binário + metadados (Content-Type, ETag, timestamps), identificado por <em>key</em> dentro do bucket.</li>
+        <li><strong>Endpoint URL</strong>: a URL base do servidor. Para AWS S3 default é <code>https://s3.amazonaws.com</code>; para o nosso MinIO é
+            <code>http://minio:9000</code> de dentro da rede do Compose, ou <code>http://localhost:9002</code> a partir do host.</li>
+        <li><strong>Path-style vs virtual-hosted</strong>: na S3 moderna o bucket vira subdomínio (<code>bucket.s3.amazonaws.com</code>); em MinIO
+            local usa-se path-style (<code>localhost:9000/olist/key</code>). O boto3 detecta automaticamente.</li>
+        <li><strong>Credenciais</strong>: par <code>access_key</code> + <code>secret_key</code>. No MinIO local default é
+            <code>minioadmin / minioadmin</code> &mdash; apenas para laboratório.</li>
       </ul>
+      <h3>5.2 boto3 falando com MinIO</h3>
+      <pre><code>import boto3, os
 
-      <h3>6.5 Drift detection</h3>
-      <p>
-        Drift é a diferença entre o que está no template e o que está vivo na conta. Se alguém abre o console e edita um Security Group "só para ver",
-        o template mente. CFN consegue detectar drift em propriedades de resources (não consegue detectar drift em <em>dados</em> dentro de S3 ou RDS).
-        Roda hoje, antes que algum colega edite no console e quebre o ciclo.
-      </p>
+s3 = boto3.client(
+    "s3",
+    endpoint_url=os.getenv("S3_ENDPOINT_URL"),         # http://minio:9000
+    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),  # minioadmin
+    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
+)
 
-      <h3>6.6 Composição: nested vs cross-stack</h3>
+# Listar objetos do bucket "olist"
+resp = s3.list_objects_v2(Bucket="olist")
+for obj in resp.get("Contents", []):
+    print(obj["Key"], obj["Size"])</code></pre>
       <p>
-        Stack único e gigante é difícil de revisar e ainda mais difícil de atualizar. O padrão é quebrar em módulos por domínio.
-      </p>
-      <ul>
-        <li><strong>Nested stacks</strong> &mdash; pai inclui filhos via <code>AWS::CloudFormation::Stack</code>. Atualização do pai propaga. Bom quando o ciclo de vida é compartilhado.</li>
-        <li><strong>Cross-stack via Outputs/Exports</strong> &mdash; stack A exporta valor; stack B faz <code>!ImportValue</code>. Ciclos de vida independentes. Cuidado: Export usado não pode mudar nome.</li>
-      </ul>
-      <p>
-        Nesta aula usamos nested stacks com <code>root.yaml</code> incluindo <code>network</code>, <code>storage</code>, <code>compute</code>, <code>observability</code> e <code>sre-loop</code>.
-        Ciclo de vida único: o stack do laboratório.
+        O console web do MinIO em <code>http://localhost:9003</code> é o análogo direto do AWS Console &mdash; permite criar bucket, fazer
+        upload de arquivos por drag-and-drop, configurar policies. Para a aula vamos usá-lo para criar o bucket <code>olist</code> e popular
+        os CSVs.
       </p>
     </section>
 
     <section class="content-block">
-      <h2>7. CloudFormation vs Terraform vs CDK</h2>
+      <h2>6. ClickHouse 101 &mdash; OLAP colunar</h2>
       <p>
-        Por que CFN é o default da disciplina? Porque é o que cabe no Learner Lab sem instalar nada além do AWS CLI já presente.
+        ClickHouse é um banco de dados analítico colunar, vetorizado, open source. "Colunar" significa que dados da mesma coluna ficam
+        contíguos no disco &mdash; queries que tocam poucas colunas leem pouco. "Vetorizado" significa que operadores processam vetores de
+        valores ao invés de linhas uma a uma, multiplicando a vazão. É o tipo de banco onde <code>SELECT count(*) FROM x</code> sobre bilhões
+        de linhas devolve em segundos.
+      </p>
+      <h3>6.1 MergeTree, a engine padrão</h3>
+      <p>
+        Tabelas em ClickHouse são criadas com uma <em>engine</em>; a padrão da família OLAP é <code>MergeTree</code>. Características essenciais:
+      </p>
+      <ul>
+        <li><strong><code>ORDER BY</code></strong> define a chave de ordenação. Não é uma chave primária no sentido SQL clássico &mdash; é a
+            ordem física dos dados em disco e o índice primário esparso.</li>
+        <li>Inserts criam "parts" novos no diretório da tabela. Em background, o ClickHouse faz <em>merges</em> entre parts &mdash; daí o nome.</li>
+        <li>A primeira coluna do <code>ORDER BY</code> tende a ter alto poder de poda &mdash; queries que filtram por ela só leem os parts
+            relevantes.</li>
+      </ul>
+      <h3>6.2 Tipo JSON</h3>
+      <p>
+        Coluna <code>JSON</code> é um tipo semi-estruturado nativo do ClickHouse moderno (24.x+). Permite armazenar objetos JSON arbitrários
+        sem definir schema antecipado &mdash; o engine indexa subcaminhos automaticamente e expõe acesso via notação ponto:
+        <code>data.product_id</code>. É o que torna o padrão schema-on-read prático no ClickHouse.
+      </p>
+      <h3>6.3 LowCardinality</h3>
+      <p>
+        Wrapper de tipo para colunas com poucos valores distintos. Internamente armazena um dicionário (valor &rarr; código) e usa o código
+        nas linhas. Compressão fica drasticamente melhor e operadores como <code>GROUP BY</code> e filtros ficam mais rápidos. Casos típicos:
+        <code>tag</code>, <code>status</code>, <code>region</code>, <code>category</code>.
+      </p>
+    </section>
+
+    <section class="content-block">
+      <h2>7. Schema-on-read vs schema-on-write</h2>
+      <p>
+        Schema-on-write é o regime clássico de bancos OLTP: a estrutura é definida no DDL, e qualquer inserção que não bata o tipo é
+        rejeitada na hora. Funciona ótimo quando o schema é estável e poucos sistemas escrevem &mdash; aplicação web típica. Sofre quando
+        fontes mudam de forma frequente, porque cada alteração vira migração coordenada.
+      </p>
+      <p>
+        Schema-on-read inverte o jogo: dados entram no formato bruto que apareceram (JSON, NDJSON, Parquet semi-estruturado), e o schema
+        é aplicado <em>na hora da query</em>, geralmente em views. O ganho é absorver mudança de fonte sem migração; o custo é mover
+        validação para a leitura, o que pode atrasar relatório.
       </p>
       <table>
         <thead>
-          <tr><th>Critério</th><th>CloudFormation</th><th>Terraform</th><th>CDK</th></tr>
+          <tr><th>Aspecto</th><th>Schema-on-write</th><th>Schema-on-read</th></tr>
         </thead>
         <tbody>
-          <tr><td>Linguagem</td><td>YAML/JSON declarativo</td><td>HCL declarativo</td><td>TS/Python imperativo</td></tr>
-          <tr><td>Estado</td><td>Gerenciado pela AWS</td><td>State file externo (S3 + lock)</td><td>Sintetiza CFN; usa state da AWS</td></tr>
-          <tr><td>Multi-cloud</td><td>Não</td><td>Sim</td><td>Não</td></tr>
-          <tr><td>No Learner Lab</td><td>Funciona out-of-the-box</td><td>Exige bucket de state &mdash; complica</td><td>Funciona, exige Node/Python e bootstrap</td></tr>
-          <tr><td>Curva</td><td>Média (YAML longo)</td><td>Média (HCL+providers)</td><td>Alta (modelo OOP)</td></tr>
+          <tr><td>Quando o tipo é validado</td><td>Na ingestão.</td><td>Na query.</td></tr>
+          <tr><td>Custo de mudar schema</td><td>Alto &mdash; <code>ALTER</code>, migration.</td><td>Baixo &mdash; muda só a view.</td></tr>
+          <tr><td>Onde quebra primeiro</td><td>Cedo &mdash; rejeita dado na ingestão.</td><td>Tarde &mdash; quebra ao consultar.</td></tr>
+          <tr><td>Exemplos clássicos</td><td>Postgres, Redshift.</td><td>Data Lake, ClickHouse JSON, BigQuery STRUCT.</td></tr>
+          <tr><td>Nossa escolha hoje</td><td>&mdash;</td><td>Landing como JSON, modelagem nas views.</td></tr>
         </tbody>
       </table>
       <p>
-        Decisão da disciplina: CFN puro nesta aula. CDK fica como leitura complementar para quem já programa em TS/Python e quer abstrair templates atrás de classes.
+        A escolha tem implicações organizacionais. Schema-on-read empurra responsabilidade para o time de modelagem analítica &mdash; é
+        ali que o tipo "produto" emerge de centenas de campos JSON. Schema-on-write empurra para o time de produção &mdash; é ali que
+        cada mudança de fonte precisa virar pull request no DDL. Para um pipeline de descoberta como o desta aula, schema-on-read
+        ganha de longe.
       </p>
     </section>
 
     <section class="content-block">
-      <h2>8. SRE começa no template</h2>
+      <h2>8. A tabela landing &mdash; uma só, para tudo</h2>
       <p>
-        Cada recurso provisionado já nasce com tag de SLO, log group e métrica. Observabilidade adicionada depois é dívida garantida &mdash; o time esquece, o
-        budget aperta, e o recurso fica sem dono. Por isso a Aula 04 adota um conjunto pequeno de regras que entram diretamente no template gerado pela squad.
+        Em vez de criar uma tabela por CSV do Olist, criamos uma única tabela landing genérica. Toda ingestão escreve nela. A diferenciação
+        entre arquivos vem por uma coluna <code>tag</code> &mdash; o nome do CSV de origem.
       </p>
+      <pre><code>CREATE DATABASE IF NOT EXISTS olist_raw;
 
-      <h3>8.1 Higiene mínima por recurso</h3>
-      <ul>
-        <li>Tags <code>Project</code>, <code>Env</code>, <code>SLO</code>, <code>Owner</code> em 100% dos resources tagueáveis.</li>
-        <li>Log group dedicado quando aplicável (Lambda, EC2 com agent, EventBridge target).</li>
-        <li>Métricas customizadas via CloudWatch Embedded Metric Format quando o caso justifica.</li>
-        <li><code>DeletionPolicy</code> e <code>UpdateReplacePolicy</code> escolhidos explicitamente.</li>
-      </ul>
-
-      <h3>8.2 Closed loop herdado da Aula 03</h3>
+CREATE TABLE IF NOT EXISTS olist_raw.ingestion
+(
+  unixtime Int64,
+  data     JSON,
+  tag      LowCardinality(String)
+)
+ENGINE = MergeTree
+ORDER BY (tag, unixtime);</code></pre>
       <p>
-        O system design da Aula 03 já desenhou o closed loop CW &rarr; Controlador SRE &rarr; ETL/Postgres. Hoje ele vira YAML em <code>sre-loop.yaml</code>:
+        Análise rápida das três colunas:
       </p>
       <ul>
-        <li><strong>Sensor</strong> &mdash; CloudWatch alarm de frescor (idade do último arquivo no bucket raw).</li>
-        <li><strong>Comparador/Controlador</strong> &mdash; EventBridge rule que escuta o alarm.</li>
-        <li><strong>Atuador</strong> &mdash; SSM Run Command que tenta retry no ETL.</li>
-        <li><strong>Audit</strong> &mdash; log group dedicado do controlador.</li>
+        <li><code>unixtime</code> &mdash; Unix epoch (segundos) no momento de início da execução do ingestor. É <em>único por run</em>: todas
+            as linhas inseridas em uma execução compartilham o mesmo valor.</li>
+        <li><code>data</code> &mdash; o registro original, JSON. Cada linha do CSV vira um objeto com as colunas como chaves.</li>
+        <li><code>tag</code> &mdash; o nome do CSV de origem. Funciona como discriminador. <code>LowCardinality</code> porque temos no máximo
+            uma dúzia de tags possíveis.</li>
       </ul>
       <p>
-        Recurso que não tem caminho de remediação no closed loop não entra no stack. Se alguém propõe um componente novo, a primeira pergunta é
-        <em>"o que acontece quando ele falha?"</em>.
+        <code>ORDER BY (tag, unixtime)</code> é deliberada: queries vão quase sempre filtrar por tag (uma "tabela lógica" por vez) e
+        depois por unixtime (a execução mais recente). Essa ordem maximiza a poda de parts no MergeTree.
       </p>
     </section>
 
     <section class="content-block">
-      <h2>9. Anti-padrões em template CFN</h2>
+      <h2>9. Idempotência sem MERGE nem UPSERT</h2>
       <p>
-        A IA vai acertar 80% do template na primeira tentativa. Os 20% restantes geralmente são variações desta lista. O Reviewer existe para pegá-los antes do deploy.
+        Idempotência é a propriedade de uma operação cujo resultado, após N execuções (N &ge; 1), é o mesmo de uma única execução. Em
+        pipelines de dados é o que permite retries seguros, recuperação após falha parcial e <em>backfills</em> sem corromper estado.
       </p>
-      <table>
-        <thead>
-          <tr><th>Anti-padrão</th><th>Por que dói</th><th>Como evitar</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Secret no template</td><td>Vai parar no git e nos logs do stack.</td><td>SSM Parameter Store + <code>!Sub</code>.</td></tr>
-          <tr><td>IAM com <code>Action: '*'</code></td><td>Privilege escalation pronta.</td><td>Action mínimo + Resource mínimo.</td></tr>
-          <tr><td>Sem <code>DeletionPolicy</code></td><td>Bucket de raw some no <code>delete-stack</code>.</td><td>Definir explícito por resource crítico.</td></tr>
-          <tr><td>ARN hardcoded</td><td>Quebra ao trocar de conta/região.</td><td><code>!Sub</code> com <code>${AWS::AccountId}</code> e <code>${AWS::Region}</code>.</td></tr>
-          <tr><td>Sem Outputs</td><td>Outros stacks não conseguem consumir.</td><td>Exportar IDs e ARNs relevantes.</td></tr>
-          <tr><td>Tags ausentes</td><td>FinOps cego, SLO sem dono.</td><td>Tags obrigatórias no padrão da turma.</td></tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section class="content-block">
-      <h2>10. Prática guiada</h2>
       <p>
-        Treze passos organizados em três blocos lógicos. Cada um tem um comando ou prompt pronto. Nada é feito clicando &mdash; tudo via CLI ou via skill
-        da squad. Ao final, stack vivo, smoke test passando e drift detection rodada.
+        Bancos OLTP resolvem idempotência com <code>MERGE</code>/<code>UPSERT</code>: a operação verifica chave primária e decide inserir ou
+        atualizar. ClickHouse, otimizado para inserts em massa, não tem <code>MERGE</code> barato &mdash; e <code>UPSERT</code> via
+        <code>ReplacingMergeTree</code> só consolida em background. Nosso pipeline contorna isso com um padrão mais simples:
       </p>
-      <ul>
-        <li><strong>Bloco 1 &middot; Bootstrap &amp; squad</strong> &mdash; passos 1 a 4: token AWS renovado, orquestrador instalado, <code>squad.yml</code> e skills novas commitadas.</li>
-        <li><strong>Bloco 2 &middot; Squad gera</strong> &mdash; passos 5 a 8: Architect produz <code>PLAN.md</code>, DevOps gera os templates, Tester valida e Reviewer decide APROVADO ou VETO.</li>
-        <li><strong>Bloco 3 &middot; Deploy &amp; validação</strong> &mdash; passos 9 a 13: validate-template, deploy, verificação por CLI, smoke test no S3 raw e drift detection.</li>
-      </ul>
-
-      <h3>10.A Bloco 1 &mdash; Bootstrap &amp; squad</h3>
-      <p>
-        Antes de pedir IA para gerar qualquer coisa, deixar o Codespace conectado na AWS, instalar o orquestrador e formalizar a squad em arquivo versionado.
-        <strong>Critério parcial</strong> para seguir adiante: token válido, <code>--version</code> retornando OK no orquestrador e no <code>cfn-lint</code>, e
-        <code>agents/squad.yml</code> commitado com os 4 papéis.
-      </p>
-
-      <h4>10.1 Passo 1 &mdash; renovar credenciais AWS</h4>
-      <p>
-        O session token do Learner Lab tem validade curta. Toda aula começa colando o bloco novo. Sem isso, todo comando devolve <code>ExpiredToken</code>.
-      </p>
-<pre># 1) AWS Academy: Start Lab -&gt; AWS Details -&gt; Show -&gt; copiar bloco "AWS CLI"
-
-# 2) No Codespace, sobrescrever credenciais
-cat &gt; ~/.aws/credentials &lt;&lt;'EOF'
-[default]
-aws_access_key_id=ASIA...
-aws_secret_access_key=...
-aws_session_token=...
-EOF
-chmod 600 ~/.aws/credentials
-
-# 3) Validar
-aws sts get-caller-identity
-aws cloudformation list-stacks --query "StackSummaries[?StackStatus!='DELETE_COMPLETE'].StackName"</pre>
-
-      <h4>10.2 Passo 2 &mdash; instalar a squad</h4>
-      <p>
-        AIOX como default; se a instalação falhar, caímos para o plano B. O importante é a forma da squad &mdash; não o nome do binário.
-      </p>
-<pre># Tentativa 1 - AIOX
-pipx install aiox || pip install --user aiox
-aiox --version
-
-# Plano B (se AIOX nao existir/instalar)
-pip install --user crewai || pip install --user pyautogen
-# ou orquestrador caseiro com Makefile chamando gemini/opencode
-
-# cfn-lint para o Tester
-pipx install cfn-lint || pip install --user cfn-lint
-cfn-lint --version</pre>
-
-      <h4>10.3 Passo 3 &mdash; criar <code>agents/squad.yml</code></h4>
-      <p>
-        Configuração declarativa da squad. Mesmo formato funciona em AIOX, CrewAI e no orquestrador caseiro.
-      </p>
-<pre># agents/squad.yml
-shared_context:
-  - documents/agents/AGENTS.md
-  - documents/03_architecture.md
-
-roles:
-  architect:
-    reads:  [documents/03_architecture.md]
-    writes: [iac/cloudformation/PLAN.md]
-    skills: [review_architecture]
-
-  devops:
-    reads:  [iac/cloudformation/PLAN.md]
-    writes: [iac/cloudformation/*.yaml]
-    skills: [gen_cfn_template]
-
-  tester:
-    reads:  [iac/cloudformation/*.yaml]
-    writes: [tests/iac/test_templates.py]
-    skills: [lint_cfn]
-
-  reviewer:
-    reads:  [iac/cloudformation/*.yaml, tests/iac/]
-    writes: [documents/10_deploy_log.md]
-    skills: [review_cfn, review_architecture]</pre>
-
-      <h4>10.4 Passo 4 &mdash; escrever as três skills novas</h4>
-      <p>
-        Mesmo padrão das skills da Aula 03: nome verbo+objeto, quando usar, entrada, passos, saída, critério de aceitação. Esqueleto de uma delas:
-      </p>
-<pre># documents/agents/skills/gen_cfn_template.md
-
-## Quando usar
-Quando existir iac/cloudformation/PLAN.md descrevendo modulos.
-
-## Entrada
-- iac/cloudformation/PLAN.md
-- documents/03_architecture.md
-
-## Passos
-1. Para cada modulo do PLAN.md, gere um YAML em iac/cloudformation/.
-2. Inclua AWSTemplateFormatVersion, Description, Parameters, Resources, Outputs.
-3. Tags obrigatorias: Project=olist-sre, Env=!Ref Env, Owner=!Ref Iniciais, SLO=...
-4. DeletionPolicy: Retain em S3 raw; Delete no resto do Lab.
-5. Sem secrets. Sem Action:'*' em IAM. Sem ARN hardcoded.
-6. root.yaml inclui modulos via AWS::CloudFormation::Stack.
-
-## Saida
-- iac/cloudformation/{root,network,storage,compute,observability,sre-loop}.yaml
-
-## Aceitacao
-- cfn-lint passa em todos os arquivos.
-- Cada modulo tem ao menos 1 Output.
-- Tags presentes em 100% dos resources tagueaveis.</pre>
-      <p>
-        Faça <code>lint_cfn.md</code> e <code>review_cfn.md</code> análogas. <code>lint_cfn</code> descreve como o Tester chama <code>cfn-lint</code> e
-        gera asserts pytest. <code>review_cfn</code> descreve o ATAM enxuto que o Reviewer aplica sobre YAML.
-      </p>
-
-      <h3>10.B Bloco 2 &mdash; Squad gera</h3>
-      <p>
-        Quatro turnos da squad rodam em sequência. Cada turno produz um artefato versionado &mdash; nenhum recurso na conta AWS ainda. Tudo é diff revisável no git.
-        <strong>Critério parcial</strong> para seguir adiante: <code>cfn-lint</code> sem erro, asserts pytest verdes e Reviewer marcou APROVADO PARA DEPLOY no
-        <code>10_deploy_log.md</code>. Se VETO, voltar para o DevOps com a lista de problemas.
-      </p>
-
-      <h4>10.5 Passo 5 &mdash; Architect produz o plano</h4>
-<pre>aiox run architect \
-  --shared documents/agents/AGENTS.md \
-  --input  documents/03_architecture.md \
-  --output iac/cloudformation/PLAN.md \
-  --task   "Decomponha a arquitetura em modulos CFN.
-            Para cada modulo: nome, recursos, parametros,
-            outputs esperados, qual RF/RNF ele atende e
-            qual ramo do closed loop ele toca.
-            Modulos esperados: network, storage, compute,
-            observability, sre-loop."
-
-# Plano B (caseiro com Gemini)
-gemini -p "Aplique review_architecture sobre
-documents/03_architecture.md. Em seguida produza
-iac/cloudformation/PLAN.md no formato acima."</pre>
-
-      <h4>10.6 Passo 6 &mdash; DevOps gera os templates</h4>
-<pre>aiox run devops \
-  --shared documents/agents/AGENTS.md,iac/cloudformation/PLAN.md \
-  --skill  gen_cfn_template \
-  --output iac/cloudformation/
-
-# Estrutura esperada apos o turno
-iac/cloudformation/
-├── PLAN.md
-├── root.yaml          # nested stacks orchestrator
-├── network.yaml       # VPC default + SG
-├── storage.yaml       # S3 raw / trusted / refined
-├── compute.yaml       # EC2 ETL (tag Role=runner)
-├── observability.yaml # CW log groups + alarms + EventBridge
-└── sre-loop.yaml      # SSM Document + role do controlador
-
-git status iac/
-git diff  iac/cloudformation/</pre>
-      <p>
-        Antes de seguir, leia ao menos um template inteiro. Se algo assustar (IAM larga, ARN fixo, recurso sem tag), volte um turno e peça correção
-        ao DevOps com a lista de problemas.
-      </p>
-
-      <h4>10.7 Passo 7 &mdash; Tester gera lint e asserts</h4>
-<pre>aiox run tester \
-  --shared documents/agents/AGENTS.md \
-  --input  iac/cloudformation/ \
-  --skill  lint_cfn \
-  --output tests/iac/test_templates.py
-
-# Rodar localmente
-cfn-lint iac/cloudformation/*.yaml
-python -m pytest tests/iac/test_templates.py -v
-
-# Asserts esperados em test_templates.py
-# - cada YAML tem Description nao vazio
-# - cada YAML tem ao menos 1 Output
-# - root.yaml referencia os 5 modulos
-# - nenhum recurso usa Action:"*" em IAM
-# - bucket S3 raw tem DeletionPolicy: Retain</pre>
-
-      <h4>10.8 Passo 8 &mdash; Reviewer faz ATAM e decide</h4>
-<pre>aiox run reviewer \
-  --shared documents/agents/AGENTS.md \
-  --input  iac/cloudformation/,tests/iac/ \
-  --skills review_cfn,review_architecture \
-  --task   "Liste 5 riscos, 3 sensibilidades e 2 trade-offs
-            do template. Marque qualquer recurso sem
-            DeletionPolicy, Tag ou Output. Decida:
-            APROVADO PARA DEPLOY ou VETO + razao."
-
-# Saida vai para documents/10_deploy_log.md (secao 'pre-deploy')</pre>
       <div class="m04-callout">
-        <strong>Regra de veto</strong>
-        Reviewer marcou VETO &rArr; voltamos para o DevOps com a lista. Não dá deploy "para ver no que dá". A disciplina de não pular essa etapa é o
-        que diferencia time SRE de time apagador-de-incêndio.
+        <strong>O padrão</strong>
+        Append-only no <code>ingestion</code>, com <code>unixtime</code> único por execução. Views filtram <code>WHERE unixtime = (SELECT max(unixtime)
+        FROM ingestion WHERE tag = '&lt;arquivo&gt;')</code>. Reingerir adiciona linhas com novo <code>unixtime</code>, e a view passa a enxergar apenas
+        a execução mais recente. Histórico fica registrado de graça &mdash; vira auditoria de linhagem.
       </div>
-
-      <h3>10.C Bloco 3 &mdash; Deploy &amp; validação</h3>
+      <h3>9.1 O que esse padrão compra</h3>
+      <ul>
+        <li><strong>Reingestões sempre seguras</strong> &mdash; nunca corrompem o estado, no máximo aumentam o histórico.</li>
+        <li><strong>Histórico preservado</strong> &mdash; cada execução fica como "fotografia" da fonte naquele instante.</li>
+        <li><strong>Reverter para versão anterior</strong> = filtrar outro <code>unixtime</code> na view. Operação puramente lógica.</li>
+        <li><strong>Zero locks, zero transações distribuídas</strong> &mdash; ClickHouse processa em paralelo sem orquestração.</li>
+      </ul>
+      <h3>9.2 O custo</h3>
       <p>
-        Aprovado pelo Reviewer, agora a infra entra na conta. Validate no servidor, deploy nested, verificação por CLI, smoke test no S3 raw e drift
-        detection &mdash; tudo via CLI, nada de console. <strong>Critério final</strong>: stack em <code>CREATE_COMPLETE</code>, smoke test escreveu, drift =
-        <code>IN_SYNC</code>, e tag <code>aula-04</code> empurrada para o repositório.
-      </p>
-
-      <h4>10.9 Passo 9 &mdash; validar template no servidor</h4>
-      <p>
-        <code>validate-template</code> roda no lado da AWS. Pega erro de schema/intrinsic function que o lint local pode não cobrir. Em seguida,
-        <code>package</code> sobe os módulos filhos para um bucket de artefatos e gera <code>root.packaged.yaml</code>.
-      </p>
-<pre>for f in iac/cloudformation/*.yaml; do
-  echo "==== $f ===="
-  aws cloudformation validate-template \
-    --template-body "file://$f" \
-    --query "Description" --output text
-done
-
-# Empacotar nested stacks (sobe filhos para S3)
-aws s3 mb s3://${INICIAIS}-cfn-artifacts-lab 2&gt;/dev/null || true
-
-aws cloudformation package \
-  --template-file iac/cloudformation/root.yaml \
-  --s3-bucket    ${INICIAIS}-cfn-artifacts-lab \
-  --output-template-file iac/cloudformation/root.packaged.yaml</pre>
-
-      <h4>10.10 Passo 10 &mdash; deploy</h4>
-      <p>
-        Único comando que cria recursos. Acompanhe pela CLI; se quiser ver eventos, use <code>describe-stack-events</code>.
-        <strong>Nada de console.</strong>
-      </p>
-<pre>export INICIAIS=afn   # suas iniciais
-
-aws cloudformation deploy \
-  --stack-name olist-sre-pipeline-lab \
-  --template-file iac/cloudformation/root.packaged.yaml \
-  --capabilities CAPABILITY_IAM \
-  --parameter-overrides \
-      Env=lab \
-      Iniciais=${INICIAIS} \
-  --tags Project=olist-sre Env=lab Owner=${INICIAIS}
-
-# Acompanhar (em outro shell)
-aws cloudformation describe-stack-events \
-  --stack-name olist-sre-pipeline-lab \
-  --max-items 20 \
-  --query "StackEvents[].[Timestamp,LogicalResourceId,ResourceStatus]" \
-  --output table</pre>
-
-      <h4>10.11 Passo 11 &mdash; verificar pelo CLI</h4>
-<pre>aws cloudformation describe-stacks \
-  --stack-name olist-sre-pipeline-lab \
-  --query "Stacks[0].[StackStatus,Outputs]" \
-  --output json | tee documents/10_deploy_log.md.tmp
-
-aws cloudformation describe-stack-resources \
-  --stack-name olist-sre-pipeline-lab \
-  --query "StackResources[].[LogicalResourceId,ResourceType,ResourceStatus]" \
-  --output table
-
-aws cloudformation list-exports \
-  --query "Exports[?starts_with(Name, 'olist-')].[Name,Value]" \
-  --output table</pre>
-      <p>
-        Critério: <code>StackStatus = CREATE_COMPLETE</code> e ao menos uma EC2 com tag <code>Role=runner</code> nos resources. Esse runner é a ponte para
-        a Aula 05, que vai usá-lo como GitHub Actions self-hosted runner.
-      </p>
-
-      <h4>10.12 Passo 12 &mdash; smoke test no S3 raw</h4>
-<pre># Ler o nome do bucket diretamente do Output do stack
-RAW=$(aws cloudformation describe-stacks \
-  --stack-name olist-sre-pipeline-lab \
-  --query "Stacks[0].Outputs[?OutputKey=='BucketRaw'].OutputValue" \
-  --output text)
-
-echo "id,event_ts" &gt; /tmp/dummy.csv
-echo "1,$(date -u +%FT%TZ)" &gt;&gt; /tmp/dummy.csv
-
-aws s3 cp /tmp/dummy.csv s3://${RAW}/smoke/dummy.csv
-
-# Ver os logs do controlador SRE
-aws logs describe-log-groups \
-  --log-group-name-prefix "/olist-sre" \
-  --query "logGroups[].logGroupName" --output table</pre>
-
-      <h4>10.13 Passo 13 &mdash; drift detection</h4>
-      <p>
-        Roda agora, antes que alguém edite um SG no console. Resultado vai para <code>11_drift_runbook.md</code> como referência da próxima aula.
-      </p>
-<pre>DRIFT_ID=$(aws cloudformation detect-stack-drift \
-  --stack-name olist-sre-pipeline-lab \
-  --query "StackDriftDetectionId" --output text)
-
-while true; do
-  STATUS=$(aws cloudformation describe-stack-drift-detection-status \
-    --stack-drift-detection-id $DRIFT_ID \
-    --query "DetectionStatus" --output text)
-  [ "$STATUS" = "DETECTION_COMPLETE" ] && break
-  [ "$STATUS" = "DETECTION_FAILED" ]   && break
-  sleep 5
-done
-
-aws cloudformation describe-stack-resource-drifts \
-  --stack-name olist-sre-pipeline-lab \
-  --query "StackResourceDrifts[].[LogicalResourceId,StackResourceDriftStatus]" \
-  --output table</pre>
-      <p>
-        Esperado hoje: <code>IN_SYNC</code> em todos os recursos. Se aparecer <code>MODIFIED</code>, alguém clicou no console e o ciclo do template já está quebrado.
+        Disco cresce monotonicamente. Para pipelines de produção isso vira política de retenção: <code>OPTIMIZE TABLE ... FINAL</code>
+        periódico ou TTL no MergeTree (<code>TTL toDateTime(unixtime) + INTERVAL 30 DAY</code>). Para a aula, o reset é
+        <code>docker compose down -v</code>.
       </p>
     </section>
 
     <section class="content-block">
-      <h2>11. Critério de pronto e commit</h2>
+      <h2>10. O ingestor &mdash; app/ingest_minio.py</h2>
       <p>
-        Antes do <code>git push</code>, cada item verde. Se faltar, próxima aula herda dívida.
+        O ingestor é um script Python único, ~120 linhas, que faz todo o caminho: lista o bucket, lê cada CSV com pandas, converte para
+        registros, e insere em lotes no ClickHouse. Não usa Kafka, não usa Airflow, não usa Spark &mdash; é o tipo de "Hello World" honesto
+        de pipeline near real-time que cabe na cabeça.
+      </p>
+      <pre><code>import os, time, json, boto3, pandas as pd, clickhouse_connect
+
+UNIXTIME = int(time.time())  # marca unica desta execucao
+
+BUCKET = os.getenv("S3_BUCKET_NAME", "olist")
+
+s3 = boto3.client(
+    "s3",
+    endpoint_url=os.getenv("S3_ENDPOINT_URL"),
+    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
+)
+
+ch = clickhouse_connect.get_client(
+    host=os.getenv("CLICKHOUSE_HOST"),
+    port=int(os.getenv("CLICKHOUSE_PORT", "8123")),
+    username=os.getenv("CLICKHOUSE_USER", "default"),
+    password=os.getenv("CLICKHOUSE_PASSWORD", ""),
+)
+
+resp = s3.list_objects_v2(Bucket=BUCKET)
+for obj in resp.get("Contents", []):
+    key = obj["Key"]
+    if not key.endswith(".csv"):
+        continue
+
+    body = s3.get_object(Bucket=BUCKET, Key=key)["Body"]
+    df = pd.read_csv(body, dtype=str).where(pd.notnull, None)
+
+    rows = [
+        (UNIXTIME, json.dumps(row.to_dict()), key)
+        for _, row in df.iterrows()
+    ]
+
+    BATCH = 50_000
+    for i in range(0, len(rows), BATCH):
+        ch.insert(
+            "olist_raw.ingestion",
+            rows[i : i + BATCH],
+            column_names=["unixtime", "data", "tag"],
+        )
+    print(f"[ingest] {key}: {len(rows)} linhas em unixtime={UNIXTIME}")</code></pre>
+      <h3>10.1 Decisões de design</h3>
+      <ul>
+        <li><strong><code>dtype=str</code></strong> no pandas. Não tentamos inferir tipo na ingestão &mdash; isso é trabalho da view. CSV é
+            texto; tratamos como texto. <code>NaN</code> vira <code>None</code> para serializar como <code>null</code> no JSON.</li>
+        <li><strong>Batch de 50&nbsp;mil linhas</strong>. Equilíbrio entre throughput (ClickHouse prefere inserts grandes) e memória
+            (mais que isso pressiona o pod Python no laptop).</li>
+        <li><strong><code>UNIXTIME</code> fora do loop</strong>. Calculado uma vez no início e reusado &mdash; é o que garante que todo o run
+            compartilha a mesma marca temporal.</li>
+        <li><strong>Sem retry sofisticado</strong>. Se quebrar no meio, basta rodar de novo &mdash; o append-only torna isso seguro.</li>
+      </ul>
+    </section>
+
+    <section class="content-block">
+      <h2>11. A view v_top_products</h2>
+      <p>
+        A view é onde o schema-on-read materializa. Pegamos três CSVs (<code>order_items</code>, <code>products</code> e
+        <code>product_category_name_translation</code>), pegamos apenas a execução mais recente de cada um, fazemos os joins e agregamos
+        por produto.
+      </p>
+      <pre><code>CREATE OR REPLACE VIEW olist_raw.v_top_products AS
+WITH
+  order_items AS (
+    SELECT data FROM olist_raw.ingestion
+    WHERE tag = 'olist_order_items_dataset.csv'
+      AND unixtime = (
+        SELECT max(unixtime) FROM olist_raw.ingestion
+        WHERE tag = 'olist_order_items_dataset.csv'
+      )
+  ),
+  products AS (
+    SELECT data FROM olist_raw.ingestion
+    WHERE tag = 'olist_products_dataset.csv'
+      AND unixtime = (
+        SELECT max(unixtime) FROM olist_raw.ingestion
+        WHERE tag = 'olist_products_dataset.csv'
+      )
+  ),
+  translations AS (
+    SELECT data FROM olist_raw.ingestion
+    WHERE tag = 'product_category_name_translation.csv'
+      AND unixtime = (
+        SELECT max(unixtime) FROM olist_raw.ingestion
+        WHERE tag = 'product_category_name_translation.csv'
+      )
+  )
+SELECT
+  oi.data.product_id                          AS product_id,
+  p.data.product_category_name                AS category_pt,
+  t.data.product_category_name_english        AS category_en,
+  count()                                     AS units_sold,
+  round(sum(toFloat64(oi.data.price)))        AS revenue,
+  round(avg(toFloat64(oi.data.price)))        AS avg_price
+FROM order_items oi
+LEFT JOIN products     p ON p.data.product_id            = oi.data.product_id
+LEFT JOIN translations t ON t.data.product_category_name = p.data.product_category_name
+GROUP BY product_id, category_pt, category_en;</code></pre>
+      <p>
+        Observações importantes sobre essa view:
       </p>
       <ul>
-        <li><code>agents/squad.yml</code> com 4 papéis.</li>
-        <li>Três skills novas em <code>documents/agents/skills/</code>: <code>gen_cfn_template</code>, <code>lint_cfn</code>, <code>review_cfn</code>.</li>
-        <li><code>iac/cloudformation/</code> com <code>root.yaml</code> + 5 módulos.</li>
-        <li><code>tests/iac/test_templates.py</code> passando, <code>cfn-lint</code> sem erro.</li>
-        <li>Stack <code>olist-sre-pipeline-lab</code> em <code>CREATE_COMPLETE</code>.</li>
-        <li>Pelo menos uma EC2 com tag <code>Role=runner</code>.</li>
-        <li>Smoke test no S3 raw OK.</li>
-        <li>Drift = <code>IN_SYNC</code>.</li>
-        <li><code>10_deploy_log.md</code> e <code>11_drift_runbook.md</code> commitados.</li>
+        <li>Cada CTE filtra pelo <code>max(unixtime)</code> da própria tag &mdash; isso é o que torna a view <em>idempotente em relação a
+            reingestões</em>. Se rodarmos o ingestor 10 vezes, a view continua devolvendo os mesmos números.</li>
+        <li>A view é <em>metadado puro</em> &mdash; nada é materializado em disco. Reexecutar a query roda os CTEs do zero. Para volumes
+            grandes evoluiríamos para uma <code>MATERIALIZED VIEW</code>.</li>
+        <li>O acesso a campos JSON é com notação ponto: <code>data.product_id</code>. O ClickHouse converte transparente.</li>
+        <li><code>toFloat64()</code> aparece porque o campo <code>price</code> chega como string (ingerimos com <code>dtype=str</code>).
+            Conversão tipo "tardia" é a marca registrada do schema-on-read.</li>
       </ul>
-<pre>git add iac/ agents/ tests/iac/ documents/10_deploy_log.md documents/11_drift_runbook.md
-git commit -m "feat(aula-04): squad CFN + stack olist-sre-pipeline-lab provisionado"
-git tag aula-04
-git push origin main --tags</pre>
     </section>
 
     <section class="content-block">
-      <h2>12. Ponte para a Aula 05</h2>
+      <h2>12. O dashboard &mdash; app/streamlit_app.py</h2>
       <p>
-        A arquitetura modelada virou stack vivo. Próxima aula transforma o repo em pipeline de CI/CD &mdash; usando o EC2 com tag <code>Role=runner</code> que
-        provisionamos hoje como GitHub Actions self-hosted runner. A RTM ganha casos de teste automatizados, e o ciclo SDD da disciplina passa a ter
-        validação contínua a cada PR.
+        Streamlit é um framework Python para construir dashboards interativos com mínima cerimônia. Cada interação reexecuta o script;
+        widgets viram variáveis. Para o nosso caso, lê a view, aplica filtros, renderiza tabela e gráficos.
       </p>
-    </section>
-
-    <section class="content-block">
-      <h2>13. Glossário</h2>
-      <p>
-        Vocabulário usado nesta aula, organizado em três blocos.
-      </p>
-
-      <h3>13.1 Agentes e orquestração</h3>
-      <table>
-        <thead>
-          <tr><th>Sigla</th><th>Significado</th></tr>
-        </thead>
-        <tbody>
-          <tr><td><strong>AIOX</strong></td><td>Orquestrador CLI multi-agente da disciplina</td></tr>
-          <tr><td><strong>CrewAI</strong></td><td>Framework Python de squads de agentes</td></tr>
-          <tr><td><strong>AutoGen</strong></td><td>Framework Microsoft de multi-agent dialog</td></tr>
-          <tr><td><strong>LangGraph</strong></td><td>Grafo de estados para LLM workflows</td></tr>
-          <tr><td><strong>CLI</strong></td><td>Command Line Interface</td></tr>
-          <tr><td><strong>SDK</strong></td><td>Software Development Kit</td></tr>
-          <tr><td><strong>YAML</strong></td><td>YAML Ain't Markup Language</td></tr>
-          <tr><td><strong>JSON</strong></td><td>JavaScript Object Notation</td></tr>
-          <tr><td><strong>ATAM</strong></td><td>Architecture Tradeoff Analysis Method</td></tr>
-          <tr><td><strong>SDD</strong></td><td>Spec-Driven Development</td></tr>
-          <tr><td><strong>RM-ODP</strong></td><td>Reference Model for Open Distributed Processing</td></tr>
-          <tr><td><strong>OOP</strong></td><td>Object-Oriented Programming</td></tr>
-          <tr><td><strong>HCL</strong></td><td>HashiCorp Configuration Language</td></tr>
-          <tr><td><strong>OIDC</strong></td><td>OpenID Connect</td></tr>
-          <tr><td><strong>RTM</strong></td><td>Requirements Traceability Matrix</td></tr>
-          <tr><td><strong>ADR</strong></td><td>Architecture Decision Record</td></tr>
-        </tbody>
-      </table>
-
-      <h3>13.2 CloudFormation e IaC</h3>
-      <table>
-        <thead>
-          <tr><th>Sigla / Termo</th><th>Significado</th></tr>
-        </thead>
-        <tbody>
-          <tr><td><strong>IaC</strong></td><td>Infrastructure as Code</td></tr>
-          <tr><td><strong>CFN</strong></td><td>CloudFormation</td></tr>
-          <tr><td><strong>CDK</strong></td><td>Cloud Development Kit (AWS)</td></tr>
-          <tr><td><strong>TF</strong></td><td>Terraform (HashiCorp)</td></tr>
-          <tr><td><strong>cfn-lint</strong></td><td>Linter open-source para templates CFN</td></tr>
-          <tr><td><strong>CI / CD</strong></td><td>Continuous Integration / Delivery</td></tr>
-          <tr><td><strong>PR</strong></td><td>Pull Request</td></tr>
-          <tr><td><strong>SCM</strong></td><td>Source Code Management</td></tr>
-          <tr><td><strong>Stack</strong></td><td>Conjunto de resources gerenciados juntos pelo CFN</td></tr>
-          <tr><td><strong>Change Set</strong></td><td>Diff simulado antes do UPDATE</td></tr>
-          <tr><td><strong>Drift</strong></td><td>Diferença entre template e realidade</td></tr>
-          <tr><td><strong>Nested Stack</strong></td><td>Stack incluído por outro</td></tr>
-          <tr><td><strong>Output</strong></td><td>Valor exposto pelo stack</td></tr>
-          <tr><td><strong>Export</strong></td><td>Output cross-stack</td></tr>
-          <tr><td><strong>Parameter</strong></td><td>Entrada do template</td></tr>
-          <tr><td><strong>Capability</strong></td><td>Permissão explícita ao deploy (<code>CAPABILITY_IAM</code>)</td></tr>
-        </tbody>
-      </table>
-
-      <h3>13.3 AWS e SRE</h3>
-      <table>
-        <thead>
-          <tr><th>Sigla</th><th>Significado</th></tr>
-        </thead>
-        <tbody>
-          <tr><td><strong>AWS</strong></td><td>Amazon Web Services</td></tr>
-          <tr><td><strong>ARN</strong></td><td>Amazon Resource Name</td></tr>
-          <tr><td><strong>IAM</strong></td><td>Identity and Access Management</td></tr>
-          <tr><td><strong>EC2</strong></td><td>Elastic Compute Cloud</td></tr>
-          <tr><td><strong>S3</strong></td><td>Simple Storage Service</td></tr>
-          <tr><td><strong>CW</strong></td><td>CloudWatch</td></tr>
-          <tr><td><strong>SSM</strong></td><td>Systems Manager (Run Command, Parameter Store)</td></tr>
-          <tr><td><strong>STS</strong></td><td>Security Token Service</td></tr>
-          <tr><td><strong>SG</strong></td><td>Security Group</td></tr>
-          <tr><td><strong>VPC</strong></td><td>Virtual Private Cloud</td></tr>
-          <tr><td><strong>SRE</strong></td><td>Site Reliability Engineering</td></tr>
-          <tr><td><strong>SLI</strong></td><td>Service Level Indicator</td></tr>
-          <tr><td><strong>SLO</strong></td><td>Service Level Objective</td></tr>
-          <tr><td><strong>SLA</strong></td><td>Service Level Agreement</td></tr>
-          <tr><td><strong>MTTR</strong></td><td>Mean Time To Recovery</td></tr>
-          <tr><td><strong>EMF</strong></td><td>Embedded Metric Format (CloudWatch)</td></tr>
-          <tr><td><strong>ETL</strong></td><td>Extract, Transform, Load</td></tr>
-          <tr><td><strong>FinOps</strong></td><td>Disciplina financeira de cloud</td></tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section class="content-block">
-      <h2>14. Referências</h2>
+      <h3>12.1 Estrutura da página</h3>
       <ul>
-        <li>Park, J. et al. &mdash; <em>Generative Agents: Interactive Simulacra of Human Behavior</em>.</li>
-        <li>Microsoft Research &mdash; <em>AutoGen: Enabling Next-Gen LLM Apps via Multi-Agent Conversation</em>.</li>
-        <li>LangGraph docs &mdash; <em>State machines for LLM apps</em>.</li>
-        <li>CrewAI docs &mdash; <em>Role-based agent orchestration</em>.</li>
-        <li>Spec Kit, AGENTS.md spec, Gemini CLI, OpenCode docs.</li>
-        <li>AWS &mdash; <em>CloudFormation User Guide</em> (Template Reference, Drift Detection, Change Sets).</li>
-        <li>HashiCorp &mdash; <em>Terraform vs CloudFormation</em> (technical comparison).</li>
-        <li>AWS &mdash; <em>CDK Best Practices</em>.</li>
-        <li>Beyer et al. &mdash; <em>Site Reliability Engineering</em> (Google), capítulo de Configuration.</li>
-        <li>Burns &amp; Beda &mdash; <em>Designing Distributed Systems</em>.</li>
+        <li><strong>Sidebar</strong>: controles &mdash; Top N (5 a 100), métrica (units sold / revenue / avg price), filtro de categoria.</li>
+        <li><strong>Header</strong>: métricas resumo &mdash; total de produtos distintos, receita acumulada, pedido médio.</li>
+        <li><strong>Tabela top-N</strong>: ordenada pela métrica escolhida.</li>
+        <li><strong>Gráfico de barras</strong>: visualização da mesma seleção.</li>
+        <li><strong>Breakdown por categoria</strong>: agregação adicional.</li>
+        <li><strong>Rodapé</strong>: timestamp UTC da última ingestão (lido de <code>max(unixtime)</code>).</li>
       </ul>
+      <h3>12.2 Decisões técnicas</h3>
+      <ul>
+        <li><code>@st.cache_data(ttl=60)</code> na função que executa a query da view. Sem isso, cada slider mexido refaria o JOIN
+            inteiro no ClickHouse.</li>
+        <li>Conexão com ClickHouse via <code>clickhouse-connect</code> usando um usuário <code>dashboard</code> com permissão apenas de
+            leitura sobre <code>olist_raw</code>. Princípio do menor privilégio.</li>
+        <li><code>--server.headless=true</code> para que o Streamlit não tente abrir browser dentro do container.</li>
+        <li>Porta <code>8501</code> exposta no host &mdash; o aluno acessa em <code>http://localhost:8501</code>.</li>
+      </ul>
+    </section>
+
+    <section class="content-block">
+      <h2>13. Near real-time pragmático &mdash; quando trocar por streaming verdadeiro</h2>
+      <p>
+        Micro-batch resolve a esmagadora maioria dos dashboards analíticos. O upgrade para streaming verdadeiro (Kafka/MSK + Flink/Spark Structured
+        Streaming, ou Kinesis Data Streams + Lambda) só compensa quando alguma das condições abaixo aparece:
+      </p>
+      <ol>
+        <li><strong>Janela de decisão menor que o intervalo do lote</strong>. Detecção de fraude que precisa rodar em &lt; 5&nbsp;segundos
+            não cabe em micro-batch de 5&nbsp;minutos.</li>
+        <li><strong>Volume torna lotes inviáveis</strong>. O ingestor passa a ficar permanentemente atrasado &mdash; sinal de
+            backpressure. Brokers permitem buferizar com semântica conhecida.</li>
+        <li><strong>Múltiplos consumidores independentes</strong>. Quando os mesmos eventos precisam alimentar 5+ destinos com lógicas
+            diferentes, um broker entrega <em>fan-out</em> nativo.</li>
+        <li><strong>Maturidade operacional já existe no time</strong>. Operar Kafka exige investimento em monitoramento, replicação,
+            tuning de retenção. Sem isso, o ganho de latência é comido pelo custo de operação.</li>
+      </ol>
+      <p>
+        A versão na nuvem do nosso pipeline migraria assim: <strong>MinIO</strong> &rarr; <strong>S3</strong> (mesmo SDK boto3, só muda
+        endpoint); <strong>ClickHouse local</strong> &rarr; <strong>ClickHouse Cloud</strong> ou <strong>Redshift Serverless</strong>;
+        <strong>ingestor Python</strong> &rarr; <strong>AWS Lambda</strong> ou <strong>Fargate task</strong> em cron;
+        <strong>Streamlit local</strong> &rarr; <strong>ECS / App Runner</strong>. A topologia lógica não muda &mdash; só os endereços e os modelos
+        de cobrança.
+      </p>
+    </section>
+
+    <section class="content-block">
+      <h2>14. Prática guiada &mdash; passo a passo</h2>
+      <p>
+        Esta seção é o roteiro literal da segunda metade da aula. Cada passo é independente e idempotente: se algo der errado, basta
+        rodar de novo. O critério de pronto é: dashboard em <code>localhost:8501</code> mostrando produtos top-N com categoria PT/EN
+        e revenue.
+      </p>
+      <h3>Passo 1 &mdash; Clonar o repositório</h3>
+      <pre><code>git clone https://github.com/afonsolelis/20261sre-primeironome-ultimonome.git
+cd 20261sre-primeironome-ultimonome
+cp .env.example .env   # defaults locais ja funcionam</code></pre>
+      <p>
+        Você deve ver no repo: <code>docker-compose.yaml</code>, pasta <code>app/</code> (com <code>ingest_minio.py</code> e
+        <code>streamlit_app.py</code>), pasta <code>sql/</code> (com <code>raw/01_schema.sql</code> e
+        <code>views/01_top_products.sql</code>), pasta <code>data/</code> (com os CSVs do Olist) e o <code>Dockerfile</code>.
+      </p>
+      <h3>Passo 2 &mdash; Subir a stack</h3>
+      <pre><code>docker compose up -d --build
+docker compose ps</code></pre>
+      <p>
+        Espere até que os quatro serviços apareçam como <code>healthy</code> ou <code>running</code>. Se algo ficar em <code>starting</code>
+        por mais de 30 segundos, inspecione os logs:
+      </p>
+      <pre><code>docker compose logs -f clickhouse
+docker compose logs -f minio</code></pre>
+      <h3>Passo 3 &mdash; Criar o bucket no MinIO</h3>
+      <p>
+        Abra <code>http://localhost:9003</code> no navegador, logue com <code>minioadmin / minioadmin</code>, vá em <em>Buckets &rarr;
+        Create Bucket</em> e crie um bucket chamado exatamente <code>olist</code>. Não use letras maiúsculas; a regra do S3 vale aqui.
+      </p>
+      <h3>Passo 4 &mdash; Subir os CSVs do Olist para o bucket</h3>
+      <p>
+        Os CSVs estão na pasta <code>data/</code> do repo. Duas formas de fazer o upload:
+      </p>
+      <ol>
+        <li><strong>Via console MinIO</strong>: arrastar todos os CSVs do <code>data/</code> para dentro do bucket <code>olist</code> na
+            interface web.</li>
+        <li><strong>Via cliente <code>mc</code></strong> (MinIO Client): mais rápido para muitos arquivos.
+          <pre><code>mc alias set local http://localhost:9002 minioadmin minioadmin
+mc cp data/*.csv local/olist/</code></pre>
+        </li>
+      </ol>
+      <p>
+        Confira pelo console que aparecem 9 arquivos &mdash; <code>olist_orders_dataset.csv</code>, <code>olist_order_items_dataset.csv</code>,
+        <code>olist_customers_dataset.csv</code>, <code>olist_products_dataset.csv</code>, <code>olist_sellers_dataset.csv</code>,
+        <code>olist_order_reviews_dataset.csv</code>, <code>olist_order_payments_dataset.csv</code>,
+        <code>olist_geolocation_dataset.csv</code> e <code>product_category_name_translation.csv</code>.
+      </p>
+      <h3>Passo 5 &mdash; Aplicar o schema raw</h3>
+      <pre><code>docker exec -i olist_analytics clickhouse-client --multiquery &lt; sql/raw/01_schema.sql</code></pre>
+      <p>
+        Cria a database <code>olist_raw</code> e a tabela <code>ingestion</code>. Reexecutar o comando é seguro &mdash; o DDL usa
+        <code>IF NOT EXISTS</code>.
+      </p>
+      <h3>Passo 6 &mdash; Rodar a ingestão</h3>
+      <pre><code>docker exec olist_ingestor python /app/ingest_minio.py</code></pre>
+      <p>
+        Vai imprimir uma linha por CSV processado com a contagem de linhas. Em um laptop mediano, a ingestão completa do Olist demora
+        em torno de 30&nbsp;segundos a 1&nbsp;minuto.
+      </p>
+      <h3>Passo 7 &mdash; Conferir a landing</h3>
+      <pre><code>docker exec -it olist_analytics clickhouse-client --query \
+  "SELECT tag, count() FROM olist_raw.ingestion GROUP BY tag ORDER BY tag"</code></pre>
+      <p>
+        Deve aparecer uma linha por CSV ingerido com a contagem total. Compare com o número de linhas dos arquivos originais &mdash;
+        precisa bater.
+      </p>
+      <h3>Passo 8 &mdash; Aplicar a view top-products</h3>
+      <pre><code>docker exec -i olist_analytics clickhouse-client --multiquery &lt; sql/views/01_top_products.sql</code></pre>
+      <h3>Passo 9 &mdash; Validar a view</h3>
+      <pre><code>docker exec -it olist_analytics clickhouse-client --query \
+  "SELECT * FROM olist_raw.v_top_products ORDER BY revenue DESC LIMIT 10"</code></pre>
+      <p>
+        Deve retornar os 10 produtos com maior receita, com <code>product_id</code>, categoria PT, categoria EN, unidades vendidas, receita e
+        ticket médio.
+      </p>
+      <h3>Passo 10 &mdash; Abrir o dashboard</h3>
+      <p>
+        Acesse <code>http://localhost:8501</code> no navegador. Brinque com os controles da sidebar: mude Top N, alterne a métrica entre
+        "units sold" e "revenue", filtre por categoria. Observe o timestamp da última ingestão exibido no rodapé.
+      </p>
+      <h3>Passo 11 &mdash; Reingerir e observar a idempotência</h3>
+      <pre><code>docker exec olist_ingestor python /app/ingest_minio.py
+docker exec -it olist_analytics clickhouse-client --query \
+  "SELECT tag, count(DISTINCT unixtime) AS execucoes FROM olist_raw.ingestion GROUP BY tag"</code></pre>
+      <p>
+        A coluna <code>execucoes</code> aumentou de 1 para 2 em todas as tags. Volte ao dashboard e dê um <em>refresh</em>: os números
+        devem permanecer iguais, porque a view filtra pelo <code>max(unixtime)</code>. O timestamp da "última ingestão" no rodapé,
+        porém, mudou. Esse é o coração do padrão.
+      </p>
+      <h3>Passo 12 &mdash; Encerrar</h3>
+      <pre><code>docker compose down       # mantem volumes (e os dados)
+# ou
+docker compose down -v    # apaga volumes (reset completo)</code></pre>
+      <p>
+        Faça commit do que mudou no seu fork. Esse é o seu artefato entregável da aula.
+      </p>
+    </section>
+
+    <section class="content-block">
+      <h2>15. Troubleshooting</h2>
+      <table>
+        <thead>
+          <tr><th>Sintoma</th><th>Causa provável</th><th>Ação rápida</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Porta 8123, 8501, 9002 ou 9003 já em uso</td>
+            <td>Outro processo no host ocupando a porta.</td>
+            <td>Editar o mapeamento <code>host:container</code> no <code>docker-compose.yaml</code> para uma porta livre.</td>
+          </tr>
+          <tr>
+            <td><code>ingestor</code> ou <code>dashboard</code> não inicia</td>
+            <td>Dependências (<code>clickhouse</code>, <code>minio</code>) ainda em <em>starting</em>.</td>
+            <td>Esperar healthcheck completar ou rodar <code>docker compose up -d</code> novamente.</td>
+          </tr>
+          <tr>
+            <td>boto3 retorna <code>NoSuchBucket: olist</code></td>
+            <td>Bucket não foi criado no console MinIO.</td>
+            <td>Criar manualmente em <code>http://localhost:9003</code> ou via <code>mc mb local/olist</code>.</td>
+          </tr>
+          <tr>
+            <td><code>v_top_products</code> retorna zero linhas</td>
+            <td>Algum CSV foi ingerido com nome diferente do esperado pela view.</td>
+            <td>Conferir as tags presentes: <code>SELECT DISTINCT tag FROM olist_raw.ingestion</code>. Renomear o arquivo no bucket se necessário.</td>
+          </tr>
+          <tr>
+            <td>Streamlit em loop de erro</td>
+            <td>View ainda não foi criada quando a primeira request chegou.</td>
+            <td>Aplicar <code>01_top_products.sql</code> e dar refresh na página.</td>
+          </tr>
+          <tr>
+            <td>Disco cheio após várias reingestões</td>
+            <td><code>ingestion</code> acumulou todas as execuções.</td>
+            <td><code>OPTIMIZE TABLE olist_raw.ingestion FINAL</code> ou reset total com <code>docker compose down -v</code>.</td>
+          </tr>
+          <tr>
+            <td>boto3 erra <code>SignatureDoesNotMatch</code></td>
+            <td>Endpoint URL omitido ou credenciais erradas.</td>
+            <td>Conferir <code>S3_ENDPOINT_URL=http://minio:9000</code> no env do container <code>ingestor</code>.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="content-block">
+      <h2>16. Glossário</h2>
+      <table>
+        <thead><tr><th>Termo</th><th>Definição</th></tr></thead>
+        <tbody>
+          <tr><td><strong>MinIO</strong></td><td>Object storage open source compatível com a API S3 da Amazon.</td></tr>
+          <tr><td><strong>ClickHouse</strong></td><td>Banco analítico colunar vetorizado, foco em OLAP.</td></tr>
+          <tr><td><strong>MergeTree</strong></td><td>Engine padrão do ClickHouse, dados ordenados pelo <code>ORDER BY</code> e merges em background.</td></tr>
+          <tr><td><strong>LowCardinality</strong></td><td>Wrapper de tipo no ClickHouse para colunas com poucos valores distintos &mdash; dicionário + códigos.</td></tr>
+          <tr><td><strong>JSON (tipo)</strong></td><td>Coluna semi-estruturada nativa do ClickHouse moderno.</td></tr>
+          <tr><td><strong>Schema-on-read</strong></td><td>Tipagem aplicada na hora da query, não na ingestão.</td></tr>
+          <tr><td><strong>Schema-on-write</strong></td><td>Tipagem validada no momento da inserção.</td></tr>
+          <tr><td><strong>NDJSON</strong></td><td>Newline-Delimited JSON &mdash; um documento JSON por linha.</td></tr>
+          <tr><td><strong>S3 API</strong></td><td>Conjunto de verbos REST do Amazon S3 (PutObject, GetObject, ListObjectsV2).</td></tr>
+          <tr><td><strong>Endpoint URL</strong></td><td>URL base onde o SDK envia requisições.</td></tr>
+          <tr><td><strong>Path-style</strong></td><td>Convenção S3 em que o bucket aparece no path da URL.</td></tr>
+          <tr><td><strong>Virtual-hosted</strong></td><td>Convenção S3 em que o bucket vira subdomínio.</td></tr>
+          <tr><td><strong>Healthcheck</strong></td><td>Comando que reporta saúde de um container para o Docker.</td></tr>
+          <tr><td><strong>depends_on: service_healthy</strong></td><td>Bloqueia o startup do dependente até o healthcheck do alvo passar.</td></tr>
+          <tr><td><strong>Volume</strong></td><td>Persistência fora do container; sobrevive a <code>down</code>.</td></tr>
+          <tr><td><strong>Micro-batch</strong></td><td>Processamento em lotes pequenos e frequentes.</td></tr>
+          <tr><td><strong>Streaming verdadeiro</strong></td><td>Processamento evento a evento, sub-segundo, com broker + processador.</td></tr>
+          <tr><td><strong>Idempotência</strong></td><td>Propriedade de uma operação cujo efeito após N execuções é o mesmo de 1.</td></tr>
+          <tr><td><strong>Append-only</strong></td><td>Inserção sem update nem delete; histórico fica preservado.</td></tr>
+          <tr><td><strong>Streamlit</strong></td><td>Framework Python para dashboards de dados com mínima cerimônia.</td></tr>
+          <tr><td><strong>boto3</strong></td><td>SDK oficial da AWS para Python.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="content-block">
+      <h2>17. Referências</h2>
+      <ul>
+        <li><em>Docker Compose specification</em> &mdash; <a href="https://docs.docker.com/compose/" target="_blank" rel="noopener">docs.docker.com/compose</a>.</li>
+        <li><em>MinIO Server Documentation</em> &mdash; <a href="https://min.io/docs" target="_blank" rel="noopener">min.io/docs</a>.</li>
+        <li><em>ClickHouse Documentation</em> &mdash; <a href="https://clickhouse.com/docs" target="_blank" rel="noopener">clickhouse.com/docs</a>, em especial os capítulos de MergeTree, tipo JSON e LowCardinality.</li>
+        <li><em>Streamlit Docs</em> &mdash; <a href="https://docs.streamlit.io" target="_blank" rel="noopener">docs.streamlit.io</a>.</li>
+        <li><em>boto3 Docs</em> &mdash; <a href="https://boto3.amazonaws.com/v1/documentation/api/latest/index.html" target="_blank" rel="noopener">boto3.amazonaws.com</a>.</li>
+        <li>Kleppmann, M. &mdash; <em>Designing Data-Intensive Applications</em>, cap. 11 (Stream Processing).</li>
+        <li>Akidau, T. et al. &mdash; <em>Streaming Systems</em> (O'Reilly).</li>
+        <li>AWS &mdash; <em>Lake House Architecture</em> whitepaper (referência conceitual para a migração futura para nuvem).</li>
+        <li><em>Olist Brazilian E-commerce Public Dataset</em> &mdash; Kaggle.</li>
+      </ul>
+    </section>
+
+    <section class="content-block">
+      <h2>18. Encerramento &mdash; atividade prática da aula</h2>
+      <p>
+        Esta disciplina é 100% prática. O exercício da Aula 04 não tem questionário escrito &mdash; tem entregável vivo. Cada participante
+        deve:
+      </p>
+      <ol>
+        <li>Fazer fork do repositório da aula no seu GitHub pessoal, renomeando para <code>20261sre-&lt;primeironome&gt;-&lt;ultimonome&gt;</code>.</li>
+        <li>Subir a stack inteira via <code>docker compose up -d</code> e validar que os 4 containers estão <code>healthy</code>.</li>
+        <li>Popular o bucket, rodar a ingestão e aplicar a view conforme os Passos 1 a 9 desta seção 14.</li>
+        <li>Acessar o dashboard em <code>localhost:8501</code> e capturar uma <em>screenshot</em> dos top-10 produtos por receita.</li>
+        <li>Executar reingestão (Passo 11) e demonstrar que o dashboard se mantém estável &mdash; idempotência funcionando.</li>
+        <li>Fazer commit dos arquivos no fork e submeter o link do repositório.</li>
+      </ol>
+      <p>
+        <span class="m04-tag">Entrega</span>
+        Link do fork no GitHub com:
+        (a) <code>docker-compose.yaml</code> rodando sem alterações destrutivas,
+        (b) screenshot do dashboard em <code>docs/</code> ou no README,
+        (c) opcional &mdash; uma view adicional sua em <code>sql/views/02_&lt;sua_metrica&gt;.sql</code>.
+      </p>
+      <p>
+        <a class="m04-repo-cta" href="https://github.com/afonsolelis/20261sre-primeironome-ultimonome" target="_blank" rel="noopener">
+          <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+          </svg>
+          Abrir o repositório da aula
+        </a>
+      </p>
     </section>
 
     <section class="content-block">
@@ -911,7 +965,7 @@ git push origin main --tags</pre>
 
   </main>
 
-  <!-- Mermaid v11 — squad flow diagram -->
+  <!-- Mermaid v11 — stack diagram -->
   <script type="module">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
     mermaid.initialize({

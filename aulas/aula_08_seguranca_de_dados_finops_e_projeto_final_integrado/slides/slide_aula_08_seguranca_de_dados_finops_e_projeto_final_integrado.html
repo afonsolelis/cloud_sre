@@ -4,41 +4,54 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" />
-  <title>Aula 08 — Projeto final em sala: análise de série temporal 100% AWS Student</title>
+  <title>Aula 08 — Projeto final — desafio entregue no GitHub</title>
   <link href="../../../assets/slides.css" rel="stylesheet">
   <style data-aula08-local>
-    /* Estilos scoped da Aula 08 — projeto final, IA na cavalaria.
-       Tokens e componentes base vêm de assets/slides.css. */
+    /* Tokens e componentes base vêm de assets/slides.css.
+       Aqui ficam apenas utilitários scoped à Aula 08:
+       - compactação para viewport baixo;
+       - grid de 4 colunas para recap de Aulas 04→07;
+       - CTA do repositório (estilo a04-repo-cta no escopo a08-);
+       - placeholder do desafio. */
 
-    /* Em viewport curto (laptop padrão), reduz padding/tipografia para evitar overflow */
     @media (max-height: 900px) {
-      .deck-shell { min-height: 520px; padding: 32px 44px; margin: 14px; gap: 14px; }
-      .deck-shell .deck-title { font-size: 2.05em; }
+      .deck-shell { min-height: 520px; padding: 32px 44px; margin: 14px; gap: 16px; }
+      .deck-shell .deck-title { font-size: 2.1em; }
       .deck-shell .deck-year  { font-size: 3em; margin: 4px 0; }
       .deck-shell .deck-summary { margin-bottom: 6px; }
       .deck-shell h2.deck-title { margin-bottom: 4px; }
     }
     @media (max-height: 820px) {
-      .deck-shell { min-height: 470px; padding: 24px 38px; margin: 10px; gap: 10px; }
-      .deck-shell .deck-title { font-size: 1.9em; }
-      .deck-shell .deck-year  { font-size: 2.5em; }
+      .deck-shell { min-height: 480px; padding: 26px 40px; margin: 10px; gap: 12px; }
+      .deck-shell .deck-title { font-size: 1.95em; }
+      .deck-shell .deck-year  { font-size: 2.6em; }
     }
 
-    /* Grid de 3 colunas para slides com 3 cards */
-    .a08-grid-3 {
+    /* Grid de 4 colunas para recap das aulas anteriores */
+    .a08-grid-4 {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 14px;
     }
-    .a08-grid-3 .deck-card { padding: 16px 18px; }
-    .a08-grid-3 .deck-card h3 { font-size: 1em; margin-bottom: 6px; }
-    .a08-grid-3 .deck-card ul { margin: 6px 0 0; }
-    .a08-grid-3 .deck-card li { margin-bottom: 4px; font-size: .92em; line-height: 1.45; }
+    .a08-grid-4 .deck-card { padding: 16px 18px; }
+    .a08-grid-4 .deck-card h3 { font-size: .92em; margin-bottom: 6px; }
+    .a08-grid-4 .deck-card p { margin: 0; font-size: .9em; line-height: 1.45; color: #2a2a2a; }
+    .a08-grid-4 .a08-card-step {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.18em;
+      color: var(--deck-muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
     @media (max-width: 1100px) {
-      .a08-grid-3 { grid-template-columns: 1fr; }
+      .a08-grid-4 { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .a08-grid-4 { grid-template-columns: 1fr; }
     }
 
-    /* Versão compacta de cards/painéis para slides densos */
     .a08-compact .deck-card { padding: 16px 18px; }
     .a08-compact .deck-card h3 { font-size: 1em; margin-bottom: 6px; }
     .a08-compact .deck-card ul { margin: 6px 0 0; }
@@ -47,77 +60,157 @@
     .a08-compact .deck-panel li { margin-bottom: 4px; font-size: .92em; line-height: 1.45; }
     .a08-compact .deck-summary { margin-bottom: 10px; }
     .a08-compact .deck-callout { padding: 16px 20px; }
-    .a08-compact .deck-callout li,
-    .a08-compact .deck-callout ol li { margin-bottom: 4px; }
 
-    /* Tabela compacta */
-    .a08-table-compact .deck-table th,
-    .a08-table-compact .deck-table td {
-      padding: 7px 10px;
-      font-size: .9em;
-      line-height: 1.4;
-    }
-
-    /* Mermaid container (timeline + system design) */
-    .a08-mermaid {
+    /* Placeholder do desafio — destaque editorial sem comprometer com texto que ainda não existe */
+    .a08-challenge-card {
+      border: 1px solid var(--deck-accent);
+      border-left: 6px solid var(--deck-accent);
       background: var(--deck-panel);
-      border: 1px solid var(--deck-line);
+      padding: 28px 32px;
       border-radius: 4px;
-      padding: 16px;
-      margin-top: 8px;
-      overflow: auto;
+      box-shadow: 0 1px 2px rgba(15, 15, 15, .04), 0 10px 24px rgba(15, 15, 15, .08);
     }
-    .a08-mermaid pre.mermaid {
-      background: transparent !important;
-      color: var(--deck-text) !important;
-      padding: 0 !important;
-      margin: 0 !important;
-      box-shadow: none !important;
-      border: none !important;
-      border-radius: 0 !important;
-      overflow: visible;
-    }
-    .a08-mermaid pre.mermaid::before { display: none !important; }
-    .a08-mermaid svg {
-      max-width: 100%;
-      height: auto;
-      display: block;
-      margin: 0 auto;
-      background: transparent;
-    }
-
-    /* Bloco de prompt/CLI inline scoped */
-    .a08-prompt {
-      background: #0d1117;
-      color: #e6edf3;
-      padding: 14px 16px;
-      border-radius: 6px;
+    .a08-challenge-card .a08-challenge-tag {
+      display: inline-block;
       font-family: var(--font-mono);
-      font-size: .88rem;
-      line-height: 1.6;
-      overflow-x: auto;
-      margin: 10px 0 0;
-    }
-    .a08-prompt-label {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--deck-muted);
-      margin-bottom: 4px;
-      display: block;
-    }
-
-    /* Cerimônia de fechamento — slide especial */
-    .a08-closing { text-align: center; }
-    .a08-closing .deck-title { font-size: 2.3em; }
-    .a08-closing .a08-thanks {
-      font-family: var(--font-mono);
-      font-size: 12px;
+      font-size: 0.7rem;
       letter-spacing: 0.16em;
       text-transform: uppercase;
       color: var(--deck-muted);
+      border: 1px solid var(--deck-line);
+      padding: 3px 8px;
+      margin-bottom: 14px;
+      border-radius: 3px;
+    }
+    .a08-challenge-card h3 {
+      margin: 0 0 12px;
+      font-size: 1.7em;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      font-weight: 800;
+    }
+    .a08-challenge-card p {
+      margin: 8px 0 0;
+      font-size: 1.02em;
+      line-height: 1.55;
+      color: #2a2a2a;
+    }
+    .a08-challenge-card .a08-challenge-meta {
       margin-top: 18px;
+      font-family: var(--font-mono);
+      font-size: 0.78em;
+      color: var(--deck-muted);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* Tabela de critérios + dinâmica */
+    .a08-table-compact .deck-table th,
+    .a08-table-compact .deck-table td {
+      padding: 9px 12px;
+      font-size: .92em;
+      line-height: 1.45;
+    }
+
+    /* Convenção do repo — bloco mono */
+    .a08-naming {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    .a08-naming .a08-naming-pill {
+      font-family: var(--font-mono);
+      background: var(--deck-code-bg);
+      color: var(--deck-code-fg);
+      padding: 18px 22px;
+      border-radius: 6px;
+      font-size: 1.05em;
+      letter-spacing: 0.02em;
+      box-shadow: 0 10px 24px rgba(13, 17, 23, 0.18);
+      word-break: break-all;
+    }
+    .a08-naming .a08-naming-pill strong { color: #ffd479; font-weight: 700; }
+
+    /* CTA do repositório no slide final (escopo a08-, baseado em .a04-repo-cta) */
+    .a08-repo-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 18px;
+      padding: 22px 32px;
+      border: 1px solid var(--deck-accent);
+      border-radius: 4px;
+      background: var(--deck-accent);
+      color: #ffffff;
+      text-decoration: none;
+      font-family: var(--font-mono);
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      transition: background 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+      box-shadow: 0 1px 2px rgba(15, 15, 15, 0.06), 0 10px 24px rgba(15, 15, 15, 0.12);
+    }
+    .a08-repo-cta:hover {
+      background: #2a2a2a;
+      transform: translateY(-2px);
+      box-shadow: 0 1px 2px rgba(15, 15, 15, 0.06), 0 16px 32px rgba(15, 15, 15, 0.18);
+    }
+    .a08-repo-cta:focus {
+      outline: 2px solid var(--deck-accent);
+      outline-offset: 4px;
+    }
+    .a08-repo-cta svg {
+      width: 28px;
+      height: 28px;
+      flex-shrink: 0;
+      fill: currentColor;
+    }
+    .a08-repo-cta .a08-repo-cta-text {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      line-height: 1.1;
+    }
+    .a08-repo-cta .a08-repo-cta-text .a08-repo-cta-kicker {
+      font-size: 0.62rem;
+      letter-spacing: 0.18em;
+      color: rgba(255, 255, 255, 0.66);
+      font-weight: 500;
+    }
+    .a08-repo-cta-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      margin-top: 24px;
+    }
+    .a08-repo-url {
+      font-family: var(--font-mono);
+      font-size: 0.84rem;
+      color: var(--deck-muted);
+      letter-spacing: 0.02em;
+      word-break: break-all;
+      text-align: center;
+      max-width: 60ch;
+    }
+    .a08-naming-link {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--deck-text);
+      border: 1px solid var(--deck-line);
+      background: var(--deck-panel);
+      padding: 10px 16px;
+      border-radius: 4px;
+      text-decoration: none;
+      transition: background 0.18s ease;
+    }
+    .a08-naming-link:hover { background: var(--deck-surface); }
+    @media (max-width: 600px) {
+      .a08-repo-cta { padding: 16px 22px; font-size: 0.92rem; gap: 12px; }
+      .a08-repo-cta svg { width: 22px; height: 22px; }
     }
   </style>
 </head>
@@ -125,139 +218,61 @@
   <div class="slide-container">
 
     <!-- ============================================================ -->
-    <!-- SLIDE 1 - CAPA                                               -->
+    <!-- SLIDE 1 — CAPA                                                -->
     <!-- ============================================================ -->
-    <div class="slide">
+    <div class="slide active">
       <div class="deck-shell" data-aula-number="08">
         <div>
-          <img class="deck-logo-full" src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_e4vyyw.png" alt="Universidade Presbiteriana Mackenzie" />
-          <span class="deck-kicker">Cloud Computing e SRE &middot; MBA Engenharia de Dados</span>
-          <h1 class="deck-title">Projeto final em sala &mdash; análise de série temporal 100% AWS Student</h1>
-          <p class="deck-meta">Aula 08 &nbsp;&bull;&nbsp; 11/06/2026</p>
+          <span class="deck-kicker">Aula 08 &middot; 11/06/2026</span>
+          <h1 class="deck-title">Projeto final — desafio entregue no GitHub</h1>
+          <p class="deck-subtitle">
+            O semestre virou repositório. Hoje cada aluno entrega seu projeto resolvendo um desafio novo,
+            aplicando tudo que foi construído nas Aulas 04 a 07.
+          </p>
+        </div>
+        <div>
           <p class="deck-year">2026</p>
-          <p class="deck-subtitle">Repositório novo, dataset trazido da semana, IA orquestrada. Três horas de execução, demo no fim.</p>
+          <p class="deck-meta">Cloud Computing e SRE &middot; MBA em Engenharia de Dados &middot; Mackenzie</p>
         </div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 2 - AGENDA                                             -->
+    <!-- SLIDE 2 — AGENDA                                              -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Agenda</span>
-          <h2 class="deck-title">O que vai acontecer nesta aula</h2>
-          <p class="deck-summary">Teoria curta para alinhar contrato e execução em três blocos lógicos. A fundação já veio das Aulas 02 a 07 — hoje é dia de entregar.</p>
+          <span class="deck-kicker">Agenda do dia</span>
+          <h2 class="deck-title">Três blocos, uma entrega</h2>
+          <p class="deck-summary">
+            Aula 100% dedicada ao projeto dos alunos. Sem conteúdo teórico novo. Briefing curto,
+            trabalho assistido e apresentações finais — tudo amarrado em um repositório no GitHub.
+          </p>
         </div>
-        <div class="deck-grid">
-          <article class="deck-card">
-            <h3>Bloco teórico</h3>
+        <div class="deck-grid a08-compact">
+          <div class="deck-card">
+            <h3>Bloco 1 &middot; Briefing</h3>
             <ul>
-              <li>Recap visual das 7 aulas em mini-mapa</li>
-              <li>Briefing do projeto: cliente, escopo, 3 abas</li>
-              <li>Padrão de naming <code>tsa-{iniciais}-{slug}</code></li>
-              <li>Datasets sugeridos do Kaggle</li>
-              <li>SLOs mínimos, IaC obrigatório, closed loop</li>
-              <li>Squad de IA (Architect, DevOps, DataDev, Tester, Reviewer)</li>
-              <li>Critérios de avaliação transparentes</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Prática em 3 blocos</h3>
-            <ul>
-              <li>Bloco 1 &middot; Bootstrap &amp; arquitetura</li>
-              <li>Bloco 2 &middot; App + observabilidade</li>
-              <li>Bloco 3 &middot; Validação &amp; demo</li>
-              <li>Demo de 3 minutos por dupla &mdash; URL pública</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 3 - PLACEHOLDER INICIAL EXIGIDO                        -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Abertura &middot; Posição no curso</span>
-          <h2 class="deck-title">Aula 08 de 8 &mdash; o dia em que o aluno entrega</h2>
-          <p class="deck-summary">Última aula do semestre. As 7 anteriores construíram repertório &mdash; agora é hora de aplicar tudo num repositório novo, com dataset autoral, em 3 horas.</p>
-        </div>
-        <div class="deck-callout">
-          <strong>Promessa desta aula</strong>
-          <ul>
-            <li>Repositório novo no padrão <code>tsa-{iniciais}-{slug-tema}</code> criado, deployado e demonstrado.</li>
-            <li>Front com 3 abas (Histórico, Decomposição STL, Forecast) servindo o dataset escolhido pelo aluno.</li>
-            <li>Stack EC2 + S3 + CloudWatch provisionado 100% via CloudFormation, sem clique no console.</li>
-            <li>Closed loop: alarm de health check &rarr; SSM Run Command que reinicia o serviço.</li>
-            <li>Demo pública de 3 minutos defendendo o projeto. Quem não demonstra, não fecha.</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 4 - RECAP DAS 7 AULAS — TIMELINE MERMAID               -->
-    <!-- ============================================================ -->
-    <div class="slide" data-slide="recap-timeline">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Recap &middot; 7 aulas em 1 imagem</span>
-          <h2 class="deck-title">O caminho até aqui</h2>
-          <p class="deck-summary">Cada aula entregou uma camada. A Aula 08 amarra tudo num único repositório &mdash; novo, mas com o repertório acumulado.</p>
-        </div>
-        <div class="a08-mermaid">
-          <pre class="mermaid">
-flowchart LR
-  A01["Aula 01<br/>Fundamentos cloud<br/>governanca de acessos"]
-  A02["Aula 02<br/>SDD + OpenCode<br/>Gemini CLI"]
-  A03["Aula 03<br/>RF RNF RTM<br/>system design Mermaid"]
-  A04["Aula 04<br/>squad de agentes<br/>CFN templates"]
-  A05["Aula 05<br/>GitHub Actions<br/>EC2 self-hosted runner"]
-  A06["Aula 06<br/>Testcontainers<br/>chaos engineering"]
-  A07["Aula 07<br/>CloudWatch CFN<br/>EventBridge SSM"]
-  A08(("Aula 08<br/>projeto final<br/>3h execucao"))
-
-  A01 --> A02 --> A03 --> A04 --> A05 --> A06 --> A07 --> A08
-  A03 -.->|RF/RNF| A08
-  A04 -.->|CFN| A08
-  A05 -.->|CI/CD| A08
-  A06 -.->|qualidade| A08
-  A07 -.->|observabilidade| A08
-          </pre>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 5 - O QUE A AULA 07 PEDIU (TAREFA DE CASA)             -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell a08-compact">
-        <div>
-          <span class="deck-kicker">Recap &middot; o anuncio veio na Aula 07</span>
-          <h2 class="deck-title">Tarefa de casa que abriu a Aula 08</h2>
-          <p class="deck-summary">Quem chegou com a lição feita, ganha tempo. Quem não chegou, escolhe dataset no Bloco 1 &mdash; com a janela mais apertada.</p>
-        </div>
-        <div class="deck-columns">
-          <div class="deck-panel">
-            <strong>O que deveria estar pronto antes de hoje</strong>
-            <ul>
-              <li>Dataset escolhido no Kaggle (timestamp + 1 série numérica + &ge; 1000 pontos).</li>
-              <li>Repositório criado no padrão <code>tsa-{iniciais}-{slug}</code>.</li>
-              <li>Dataset uploadado na branch <code>data/</code>.</li>
-              <li>Issue documentando fonte, periodicidade e hipótese inicial.</li>
+              <li>Tese da aula e recap do arco Aulas 04→07.</li>
+              <li>Apresentação do desafio específico desta turma.</li>
+              <li>Convenção de repositório e critérios de avaliação.</li>
             </ul>
           </div>
-          <div class="deck-panel">
-            <strong>Restrição dura</strong>
+          <div class="deck-card">
+            <h3>Bloco 2 &middot; Trabalho assistido</h3>
             <ul>
-              <li>Quem codou app antes da aula <strong>não cumpre o exercício</strong> &mdash; o ponto é executar com IA em sala.</li>
-              <li>Aceito: escolher dataset, abrir repo, fazer upload do CSV.</li>
-              <li>Não aceito: <code>app.py</code>, CFN, dashboard, gráficos prontos.</li>
+              <li>Cada aluno trabalha no próprio fork no Codespace ou local.</li>
+              <li>Tira-dúvidas individuais e revisão de README/diagrama.</li>
+              <li>Push para a branch <code>main</code> antes da apresentação.</li>
+            </ul>
+          </div>
+          <div class="deck-card">
+            <h3>Bloco 3 &middot; Apresentações e fechamento</h3>
+            <ul>
+              <li>Apresentações curtas: arquitetura, decisões, evidências.</li>
+              <li>Feedback do professor e da turma.</li>
+              <li>Encerramento da disciplina.</li>
             </ul>
           </div>
         </div>
@@ -265,884 +280,268 @@ flowchart LR
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 6 - BRIEFING DO CLIENTE FICTICIO                       -->
+    <!-- SLIDE 3 — TESE                                                -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Teoria &middot; Abertura</span>
-          <h2 class="deck-title">O briefing do cliente</h2>
-          <p class="deck-summary">Você foi contratado pela diretoria para construir um <strong>mini-observatório de série temporal</strong> sobre o tema escolhido. 3 abas, deploy AWS, demo viva ao fim do dia.</p>
+          <span class="deck-kicker">Tese da aula</span>
+          <h2 class="deck-title">O semestre virou repositório</h2>
         </div>
-        <div class="deck-callout">
-          <strong>Pedido em uma frase</strong>
-          <p style="margin:8px 0 0;">"Quero entender o passado, decompor o sinal e ver para onde isso vai nos próximos 30 períodos &mdash; com um link público que funciona enquanto eu apresento."</p>
+        <div class="deck-callout" style="font-size: 1.15em; line-height: 1.55;">
+          <strong>Hoje é dia de provar que a stack vive sem o professor por perto.</strong>
+          <p style="margin: 0;">
+            Cada aluno recebe um desafio novo e mostra, em código versionado, que aprendeu a desenhar,
+            provisionar, instrumentar e estressar uma plataforma de dados na nuvem. O que vale é o repositório:
+            arquitetura documentada, infra reprodutível, testes verdes e evidências reais de execução.
+          </p>
         </div>
-        <div class="deck-grid" style="margin-top:14px;">
-          <article class="deck-card">
-            <h3>O que entra no escopo</h3>
-            <ul>
-              <li>1 dataset, 1 série numérica principal.</li>
-              <li>3 abas: Histórico, Decomposição STL, Forecast 30 períodos.</li>
-              <li>Front leve em Streamlit ou Plotly Dash.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>O que fica fora</h3>
-            <ul>
-              <li>Multi-séries cruzadas, modelos avançados (LSTM, Transformer).</li>
-              <li>Pipeline ETL ao vivo &mdash; o CSV vai estático no S3.</li>
-              <li>Autenticação, CDN, domínio próprio.</li>
-            </ul>
-          </article>
+        <p class="deck-note">
+          Sem PowerPoint salvador, sem demonstração ao vivo do professor. O <em>output</em> é o
+          <code>README.md</code> de cada um e o que está commitado na <code>main</code>.
+        </p>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 4 — RECAP DO CURSO (AULAS 04 → 07)                      -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell">
+        <div>
+          <span class="deck-kicker">Recap &middot; Aulas 04 a 07</span>
+          <h2 class="deck-title">O arco que sustenta o projeto final</h2>
+          <p class="deck-summary">
+            Cada aula anterior deixou uma capacidade que o projeto final exercita.
+            Olhe para os quatro cards na ordem — é a trilha que você percorreu.
+          </p>
+        </div>
+        <div class="a08-grid-4">
+          <div class="deck-card">
+            <span class="a08-card-step">Aula 04 &middot; 07/05</span>
+            <h3>Stack Docker local Olist</h3>
+            <p>Ingestão e processamento near real-time rodando em containers locais — base do pipeline.</p>
+          </div>
+          <div class="deck-card">
+            <span class="a08-card-step">Aula 05 &middot; 14/05</span>
+            <h3>Bass local em Docker</h3>
+            <p>Avaliação arquitetural local, cenários e respostas táticas mapeados antes da nuvem.</p>
+          </div>
+          <div class="deck-card">
+            <span class="a08-card-step">Aula 06 &middot; 21/05</span>
+            <h3>Migração para AWS com ATAM</h3>
+            <p>A stack vai para a nuvem; trade-offs analisados sob a lente do ATAM (riscos, sensibilidade).</p>
+          </div>
+          <div class="deck-card">
+            <span class="a08-card-step">Aula 07 &middot; 28/05</span>
+            <h3>Bass distribuído + estresse ATAM</h3>
+            <p>Bass aplicado à versão distribuída e validação sob carga: a plataforma sob estresse real.</p>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 7 - PADRAO DE NAMING DO REPOSITORIO                    -->
+    <!-- SLIDE 5 — CONVENÇÃO DO REPO                                   -->
     <!-- ============================================================ -->
     <div class="slide">
-      <div class="deck-shell a08-compact">
+      <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Teoria &middot; convenção</span>
-          <h2 class="deck-title">Padrão de naming &mdash; <code>tsa-{iniciais}-{slug-tema}</code></h2>
-          <p class="deck-summary">TSA = <strong>Time Series Analysis</strong> (não confundir com aeroporto). Tudo em minúsculas, hífens, sem acentos. O nome do repo é a primeira impressão da entrega.</p>
+          <span class="deck-kicker">Convenção do repositório</span>
+          <h2 class="deck-title">Um repositório por aluno, padrão fixo</h2>
+          <p class="deck-summary">
+            Todos os projetos seguem o mesmo padrão do repositório base usado desde a Aula 04.
+            Sem variação, sem nome criativo — o naming é parte da entrega.
+          </p>
+        </div>
+        <div class="a08-naming">
+          <div class="a08-naming-pill">
+            <strong>20261sre-&lt;primeironome&gt;-&lt;ultimonome&gt;</strong>
+          </div>
+        </div>
+        <div class="deck-grid a08-compact">
+          <div class="deck-card">
+            <h3>Como organizar</h3>
+            <ul>
+              <li><strong>Fork</strong> do repositório base da Aula 04.</li>
+              <li>Renomear o fork seguindo o padrão acima, em minúsculas, sem acento.</li>
+              <li>Repositório <strong>público</strong>, branch padrão <code>main</code>.</li>
+            </ul>
+          </div>
+          <div class="deck-card">
+            <h3>Como entregar</h3>
+            <ul>
+              <li>Trabalhar em <em>branches</em> de feature; abrir <em>pull request</em> contra <code>main</code>.</li>
+              <li>Merge da entrega final em <code>main</code> antes da apresentação.</li>
+              <li>Tag opcional <code>aula-08-entrega</code> no commit final.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 6 — CRITÉRIOS DE AVALIAÇÃO (ESQUELETO)                  -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a08-table-compact">
+        <div>
+          <span class="deck-kicker">Critérios de avaliação &middot; esqueleto</span>
+          <h2 class="deck-title">O que o repositório precisa provar</h2>
+          <p class="deck-summary">
+            Cinco eixos compõem a avaliação. O peso de cada eixo será fechado na semana da entrega,
+            mas o conjunto não muda — sem README, sem nota.
+          </p>
         </div>
         <table class="deck-table">
           <thead>
-            <tr><th>Aluno</th><th>Tema</th><th>Repositório</th></tr>
+            <tr>
+              <th>#</th>
+              <th>Critério</th>
+              <th>Evidência mínima esperada no repositório</th>
+            </tr>
           </thead>
           <tbody>
-            <tr><td>João Pedro Silva</td><td>Bitcoin price</td><td><code>tsa-jps-bitcoin</code></td></tr>
-            <tr><td>Maria Lima Lara</td><td>Walmart sales</td><td><code>tsa-mll-walmart-sales</code></td></tr>
-            <tr><td>Afonso F. Lelis</td><td>Air Passengers</td><td><code>tsa-afl-air-passengers</code></td></tr>
-            <tr><td>Rafael C. Souza</td><td>Energy consumption</td><td><code>tsa-rcs-energy-consumption</code></td></tr>
-            <tr><td>Vitor R. Mendes</td><td>NYC taxi</td><td><code>tsa-vrm-nyc-taxi</code></td></tr>
+            <tr>
+              <td>01</td>
+              <td>Arquitetura documentada</td>
+              <td><code>README.md</code> com diagrama (Mermaid/desenho), decisões e trade-offs explícitos.</td>
+            </tr>
+            <tr>
+              <td>02</td>
+              <td>Infra reprodutível</td>
+              <td><code>docker-compose.yml</code> e/ou templates AWS; <code>make up</code> ou comando equivalente.</td>
+            </tr>
+            <tr>
+              <td>03</td>
+              <td>Testes automatizados</td>
+              <td>Suite executando em CI, com <em>badge</em> ou print do último run verde.</td>
+            </tr>
+            <tr>
+              <td>04</td>
+              <td>Evidências de execução</td>
+              <td>Logs, prints, vídeo curto ou <code>documents/</code> com saída real do pipeline.</td>
+            </tr>
+            <tr>
+              <td>05</td>
+              <td>Commits limpos</td>
+              <td>Histórico legível, mensagens descritivas, sem <code>WIP</code> ou <code>fix fix fix</code> na <code>main</code>.</td>
+            </tr>
           </tbody>
         </table>
-        <p style="margin-top:10px;font-size:.92em;color:var(--deck-muted);"><em>Iniciais 3 letras. Slug em minúsculas com hífens. Sem espaços, sem underscore, sem caractere especial.</em></p>
+        <p class="deck-note">
+          Peso e <em>cut-off</em> de cada eixo serão divulgados junto com o desafio específico.
+        </p>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 8 - DATASETS SUGERIDOS DO KAGGLE                       -->
+    <!-- SLIDE 7 — DESAFIO (PLACEHOLDER EXPLÍCITO)                     -->
     <!-- ============================================================ -->
     <div class="slide">
-      <div class="deck-shell a08-compact a08-table-compact">
+      <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Teoria &middot; datasets sugeridos</span>
-          <h2 class="deck-title">Kaggle &mdash; opções batidas e seguras</h2>
-          <p class="deck-summary">Critério mínimo: <strong>timestamp + 1 série numérica + ≥ 1000 pontos</strong>. Outros datasets são bem-vindos se respeitarem o mínimo.</p>
+          <span class="deck-kicker">O desafio &middot; placeholder</span>
+          <h2 class="deck-title">Tema específico ainda não publicado</h2>
+        </div>
+        <div class="a08-challenge-card">
+          <span class="a08-challenge-tag">A definir &middot; turma 2026/1</span>
+          <h3>O desafio específico será divulgado na semana da entrega (a partir de 04/06/2026).</h3>
+          <p>
+            <strong>Direções possíveis</strong> (sem comprometimento ainda): variação do Olist com um dataset novo,
+            uma nova feature analítica acoplada à plataforma existente, ou um pivô para outro domínio (logística,
+            saúde, energia) reaproveitando a stack construída no semestre.
+          </p>
+          <p>
+            O enunciado final será publicado em arquivo separado no repositório do curso e anunciado em sala.
+            Até lá, o foco é manter a stack das Aulas 04 a 07 sob controle e o repositório individual em dia.
+          </p>
+          <p class="a08-challenge-meta">Publicação prevista: a partir de 04/06/2026</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 8 — DINÂMICA DO DIA (PLACEHOLDER)                       -->
+    <!-- ============================================================ -->
+    <div class="slide">
+      <div class="deck-shell a08-table-compact">
+        <div>
+          <span class="deck-kicker">Dinâmica do dia &middot; placeholder</span>
+          <h2 class="deck-title">Como o tempo será usado em sala</h2>
+          <p class="deck-summary">
+            Distribuição preliminar de tempo. Ajustes finos serão feitos no início da aula, dependendo do número
+            de apresentações.
+          </p>
         </div>
         <table class="deck-table">
           <thead>
-            <tr><th>Dataset</th><th>Granularidade</th><th>Slug Kaggle</th></tr>
+            <tr>
+              <th>Bloco</th>
+              <th>Duração estimada</th>
+              <th>O que acontece</th>
+            </tr>
           </thead>
           <tbody>
-            <tr><td>Bitcoin Historical Data</td><td>minuto</td><td><code>mzgolden/bitcoin-historical-data</code></td></tr>
-            <tr><td>Walmart Sales Forecasting</td><td>semana / loja</td><td><code>mikhail1681/walmart-sales</code></td></tr>
-            <tr><td>Air Passengers</td><td>mês 1949&ndash;1960</td><td><code>rakannimer/air-passengers</code></td></tr>
-            <tr><td>Hourly Energy Consumption</td><td>hora AEP/COMED</td><td><code>robikscube/hourly-energy-consumption</code></td></tr>
-            <tr><td>NYC Taxi Trip Duration</td><td>hora agregada</td><td><code>c/nyc-taxi-trip-duration</code></td></tr>
-            <tr><td>Daily Climate Time Series</td><td>dia</td><td><code>sumanthvrao/daily-climate-time-series-data</code></td></tr>
+            <tr>
+              <td>Briefing do desafio</td>
+              <td>~30 min</td>
+              <td>Apresentação do enunciado, regras, critérios e dúvidas iniciais.</td>
+            </tr>
+            <tr>
+              <td>Trabalho assistido</td>
+              <td>~90 min</td>
+              <td>Cada aluno avança no próprio repositório; tira-dúvidas individuais.</td>
+            </tr>
+            <tr>
+              <td>Apresentações curtas</td>
+              <td>~60 min</td>
+              <td>Cada aluno mostra repositório, diagrama e evidências — recebe feedback.</td>
+            </tr>
           </tbody>
         </table>
+        <p class="deck-note">
+          A divisão respeita o intervalo regulamentar 19h00→22h00. Tempo por apresentação será calibrado
+          conforme tamanho da turma.
+        </p>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 9 - SYSTEM DESIGN GENERICO DO PROJETO                  -->
-    <!-- ============================================================ -->
-    <div class="slide" data-slide="system-design">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Teoria &middot; arquitetura</span>
-          <h2 class="deck-title">System design genérico &mdash; 3 abas até o EC2</h2>
-          <p class="deck-summary">Um único EC2 t3.small servindo Streamlit ou Dash. S3 com o dataset. CloudWatch capturando 3 SLIs. Closed loop com alarm + EventBridge + SSM.</p>
-        </div>
-        <div class="a08-mermaid">
-          <pre class="mermaid">
-flowchart LR
-  USR["Diretoria<br/>(navegador)"]
-  subgraph EC2["EC2 t3.small (LabRole)"]
-    APP["Streamlit/Dash<br/>3 abas: Historico / STL / Forecast"]
-  end
-  subgraph S3["S3 bucket TSA"]
-    CSV["dataset.csv<br/>(estatico)"]
-  end
-  subgraph CW["CloudWatch"]
-    LOG["log group"]
-    DASH["dashboard 3 SLIs"]
-    ALR["alarm health check"]
-  end
-  EVB["EventBridge rule"]
-  SSM["SSM Run Command<br/>restart_streamlit"]
-
-  USR -->|HTTP :8501| APP
-  APP -->|read csv| CSV
-  APP -.->|logs/metrics| LOG
-  LOG --> DASH
-  LOG --> ALR
-  ALR ==>|alarme| EVB
-  EVB ==>|trigger| SSM
-  SSM ==>|reinicia| APP
-          </pre>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 10 - 3 ABAS DO FRONT                                   -->
+    <!-- SLIDE 9 — ENCERRAMENTO + CTA REPO + CONVENÇÃO NAMING          -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Teoria &middot; produto</span>
-          <h2 class="deck-title">As 3 abas que o cliente vai abrir</h2>
-          <p class="deck-summary">Cada aba responde uma pergunta diferente sobre a série. Sem essas três, o front não está completo.</p>
+          <span class="deck-kicker">Encerramento &middot; entrega final</span>
+          <h2 class="deck-title">Boa entrega.</h2>
+          <p class="deck-summary">
+            Use o repositório base abaixo como ponto de partida. Faça um fork, renomeie seguindo a convenção
+            <code>20261sre-&lt;primeironome&gt;-&lt;ultimonome&gt;</code> e empurre seu projeto para a <code>main</code>.
+          </p>
         </div>
-        <div class="a08-grid-3">
-          <article class="deck-card">
-            <h3>Aba 1 &middot; Histórico</h3>
-            <ul>
-              <li>Gráfico de linha da série.</li>
-              <li>Seletor de janela (7d, 30d, 1y, all).</li>
-              <li>Estatísticas básicas: min, max, média, desvio.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Aba 2 &middot; Decomposição STL</h3>
-            <ul>
-              <li>Tendência, sazonalidade e resíduo separados.</li>
-              <li><code>statsmodels.tsa.seasonal.STL</code>.</li>
-              <li>Period inferido do dataset (mensal=12, diário=7, etc).</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Aba 3 &middot; Forecast 30</h3>
-            <ul>
-              <li>Modelo simples: ARIMA, Prophet ou ExponentialSmoothing.</li>
-              <li>Intervalo de confiança 95%.</li>
-              <li>MAPE/RMSE no rodapé do gráfico.</li>
-            </ul>
-          </article>
+        <div class="a08-repo-cta-wrap">
+          <a class="a08-repo-cta"
+             href="https://github.com/afonsolelis/20261sre-primeironome-ultimonome"
+             target="_blank"
+             rel="noopener">
+            <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+            </svg>
+            <span class="a08-repo-cta-text">
+              <span class="a08-repo-cta-kicker">GitHub &middot; Repositório base</span>
+              <span>Abrir repositório no GitHub</span>
+            </span>
+          </a>
+          <p class="a08-repo-url">https://github.com/afonsolelis/20261sre-primeironome-ultimonome</p>
+          <a class="a08-naming-link"
+             href="../material/material_aula_08_seguranca_de_dados_finops_e_projeto_final_integrado.html#convencao-do-repo">
+            Convenção de naming &amp; checklist no material
+          </a>
         </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 11 - SLOs MINIMOS                                      -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell a08-compact">
-        <div>
-          <span class="deck-kicker">Teoria &middot; expectativas SRE</span>
-          <h2 class="deck-title">SLOs mínimos &mdash; não-negociáveis</h2>
-          <p class="deck-summary">Três SLOs declarados antes do deploy. Sem isso, não há critério para julgar se a entrega está saudável durante a demo.</p>
-        </div>
-        <table class="deck-table">
-          <thead>
-            <tr><th>ID</th><th>SLO</th><th>SLI medindo</th><th>Meta</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>SLO-01</td><td>Disponibilidade durante a demo</td><td>HTTP 200 a cada 30s no <code>/</code></td><td>&ge; 95% das checagens</td></tr>
-            <tr><td>SLO-02</td><td>Latência de carregamento</td><td>tempo até primeiro byte da home</td><td>&lt; 5 s p95</td></tr>
-            <tr><td>SLO-03</td><td>Latência do forecast</td><td>tempo de render da aba 3</td><td>&lt; 10 s p95</td></tr>
-          </tbody>
-        </table>
-        <p style="margin-top:10px;"><em>SLOs viram metric filters em CloudWatch e alimentam o dashboard. SLO-01 vira alarm + closed loop.</em></p>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 12 - EXPECTATIVAS SRE NAO-NEGOCIAVEIS                  -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell a08-compact">
-        <div>
-          <span class="deck-kicker">Teoria &middot; entrega mínima</span>
-          <h2 class="deck-title">SRE mínimo &mdash; o que não pode faltar</h2>
-          <p class="deck-summary">Cinco regras duras que separam um projeto entregue de um projeto demonstrado. Reviewer rejeita PR sem todas as cinco.</p>
-        </div>
-        <div class="deck-grid">
-          <article class="deck-card">
-            <h3>1. IaC obrigatório</h3>
-            <ul>
-              <li>Tudo via CloudFormation.</li>
-              <li><code>aws cloudformation deploy ...</code> e nada mais.</li>
-              <li>Zero clique no console &mdash; nem para criar SG.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>2. Observabilidade desde o deploy</h3>
-            <ul>
-              <li>1 log group + 1 dashboard + 1 alarm por aplicação.</li>
-              <li>Metric filters para os 3 SLIs.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>3. SLOs declarados</h3>
-            <ul>
-              <li>3 SLOs no README e no documento de release.</li>
-              <li>Mensuráveis e visíveis no dashboard.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>4. Closed loop</h3>
-            <ul>
-              <li>Alarm de health check &rarr; EventBridge &rarr; SSM Run Command.</li>
-              <li>Reinício automático do Streamlit. Demonstrável.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>5. README com runbook</h3>
-            <ul>
-              <li>Recriar a stack do zero em &le; 10 min.</li>
-              <li>Comando único copiável para deploy.</li>
-              <li>Comando único copiável para destruir.</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>0. Restrição dura</h3>
-            <ul>
-              <li>Sem credencial permanente em código.</li>
-              <li>Apenas session token do Learner Lab.</li>
-              <li><code>~/.aws/credentials</code> fora do git.</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 13 - SQUAD DE IA DA AULA                               -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell a08-compact">
-        <div>
-          <span class="deck-kicker">Teoria &middot; cavalaria</span>
-          <h2 class="deck-title">Squad de IA &mdash; 5 papéis em sala</h2>
-          <p class="deck-summary">Mesma estrutura da Aula 04, agora orquestrando entrega de produto. Cada agente tem skill específica e produto específico.</p>
-        </div>
-        <table class="deck-table">
-          <thead>
-            <tr><th>Agente</th><th>Skill</th><th>Produto</th></tr>
-          </thead>
-          <tbody>
-            <tr><td><strong>Architect</strong></td><td><code>gen_app_template</code></td><td><code>documents/system_design.md</code> (Mermaid 1 página)</td></tr>
-            <tr><td><strong>DevOps</strong></td><td><code>gen_app_template</code> + <code>gen_observability</code></td><td><code>iac/cloudformation/app.yaml</code></td></tr>
-            <tr><td><strong>DataDev</strong></td><td><code>gen_streamlit_tsa_app</code></td><td><code>src/app.py</code> + <code>requirements.txt</code></td></tr>
-            <tr><td><strong>Tester</strong></td><td><code>gen_smoke_tests</code></td><td><code>tests/smoke/test_url.py</code> (httpx)</td></tr>
-            <tr><td><strong>Reviewer</strong></td><td><code>gen_release_checklist</code></td><td><code>documents/release_checklist.md</code></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 14 - ESTRUTURA DO REPO NOVO                            -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Teoria &middot; estrutura</span>
-          <h2 class="deck-title">Estrutura do repositório <code>tsa-{iniciais}-{slug}</code></h2>
-          <p class="deck-summary">Mesma filosofia da Aula 03: <code>spec/</code>, <code>documents/</code>, <code>iac/</code>, <code>src/</code>, <code>tests/</code>, <code>runbooks/</code>. Skill <code>bootstrap_tsa_project</code> gera tudo no início do Bloco 1.</p>
-        </div>
-<pre class="a08-prompt">tsa-{iniciais}-{slug}/
-├── AGENTS.md                          # squad de IA simplificada
-├── README.md                          # runbook ≤ 10 min
-├── spec/
-│   └── 00_problem.md                  # 5 RFs + 5 RNFs
-├── documents/
-│   ├── system_design.md               # Mermaid 1 pagina
-│   └── release_checklist.md           # checklist do reviewer
-├── iac/
-│   └── cloudformation/
-│       └── app.yaml                   # EC2 + SG + S3 + CW + alarm
-├── src/
-│   ├── app.py                         # Streamlit/Dash 3 abas
-│   └── requirements.txt
-├── tests/
-│   └── smoke/
-│       └── test_url.py                # httpx contra IP publico
-├── runbooks/
-│   └── restart_streamlit.yaml         # SSM document
-└── data/                              # branch separada com CSV</pre>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 15 - CRITERIOS DE AVALIACAO                            -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell a08-compact">
-        <div>
-          <span class="deck-kicker">Teoria &middot; nota</span>
-          <h2 class="deck-title">Critérios de avaliação &mdash; checklist público</h2>
-          <p class="deck-summary">Oito itens binários. Cada um vale 1 ponto. Demo de 3 minutos é gate &mdash; sem demo, projeto não é avaliado.</p>
-        </div>
-        <table class="deck-table">
-          <thead>
-            <tr><th>#</th><th>Critério</th><th>Como verifico</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>1</td><td>Repo no padrão <code>tsa-{iniciais}-{slug}</code></td><td>nome do repo no GitHub</td></tr>
-            <tr><td>2</td><td>System design Mermaid commitado</td><td><code>documents/system_design.md</code></td></tr>
-            <tr><td>3</td><td>CFN template aplicável</td><td><code>aws cloudformation validate-template</code></td></tr>
-            <tr><td>4</td><td>3 abas funcionais com dataset real</td><td>navegação ao vivo</td></tr>
-            <tr><td>5</td><td>1 dashboard CW com 3 SLIs</td><td>screenshot do CW</td></tr>
-            <tr><td>6</td><td>1 alarm ligado a runbook automatizado</td><td>simulação de falha</td></tr>
-            <tr><td>7</td><td>README com instruções &le; 10 min</td><td>cronômetro do reviewer</td></tr>
-            <tr><td>8</td><td>Demo de 3 min ao fechamento</td><td>obrigatório &mdash; gate da entrega</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 16 - RESTRICOES DURAS — CALLOUT DEDICADO                -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell a08-compact">
-        <div>
-          <span class="deck-kicker">Teoria &middot; o que vai derrubar a entrega</span>
-          <h2 class="deck-title">Restrições duras &mdash; ler com atenção</h2>
-          <p class="deck-summary">Cinco linhas vermelhas. Cruzar qualquer uma invalida a entrega, mesmo que o app esteja perfeito.</p>
-        </div>
-        <div class="deck-callout">
-          <strong>Linhas vermelhas</strong>
-          <ol>
-            <li><strong>Sem console AWS</strong> &mdash; só CLI + CFN. Reviewer audita histórico do CloudTrail.</li>
-            <li><strong>Sem credencial permanente em código</strong> &mdash; só session token. <code>git secrets</code> vai checar.</li>
-            <li><strong>Repositório no padrão</strong> <code>tsa-{iniciais}-{slug-tema}</code>. Sem variação.</li>
-            <li><strong>Sem trabalho prévio à aula</strong> &mdash; apenas escolher dataset e abrir o repo. Aluno que codar antes não cumpre o exercício.</li>
-            <li><strong>Demo de 3 minutos ao fim</strong> &mdash; quem não entrega demo não fecha o projeto.</li>
-          </ol>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 17 - ABERTURA DA PRATICA                               -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Prática &middot; Abertura</span>
-          <h2 class="deck-title">A partir daqui é execução &mdash; 3 blocos lógicos</h2>
-          <p class="deck-summary">Teoria fechada. Daqui em diante cada bloco tem checkpoint claro &mdash; quem fica para trás, encurta o app, não estica a entrega.</p>
-        </div>
-        <div class="a08-grid-3">
-          <article class="deck-card">
-            <h3>Bloco 1 &middot; Bootstrap &amp; arquitetura</h3>
-            <ul>
-              <li>Bootstrap + spec do problema</li>
-              <li>System design + IaC base</li>
-              <li>EC2 ativa, S3 com dataset</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Bloco 2 &middot; App + observabilidade</h3>
-            <ul>
-              <li>App 3 abas implementado</li>
-              <li>Dashboard CW com 3 SLIs</li>
-              <li>Closed loop ligado</li>
-            </ul>
-          </article>
-          <article class="deck-card">
-            <h3>Bloco 3 &middot; Validação &amp; demo</h3>
-            <ul>
-              <li>Smoke test verde + checklist do reviewer</li>
-              <li>Simulação de falha visível</li>
-              <li>Demo de 3 min por dupla</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE - ABERTURA DO BLOCO 1                                  -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell a08-compact">
-        <div>
-          <span class="deck-kicker">Prática &middot; Bloco 1 &middot; Bootstrap &amp; arquitetura</span>
-          <h2 class="deck-title">Bloco 1 &mdash; do repo vazio à infra de pé</h2>
-          <p class="deck-summary">Dois movimentos no mesmo bloco: contrato escrito (spec do problema) e arquitetura no ar (CFN base). Ao fim, EC2 sobe e S3 já tem o dataset.</p>
-        </div>
-        <div class="deck-columns">
-          <div class="deck-panel">
-            <strong>Objetivo</strong>
-            <ul>
-              <li>Repositório <code>tsa-{iniciais}-{slug}</code> com estrutura completa.</li>
-              <li>Spec do problema (5 RF + 5 RNF) commitada.</li>
-              <li>System design Mermaid em <code>documents/</code>.</li>
-              <li>Stack CFN base aplicada na conta do Learner Lab.</li>
-            </ul>
-          </div>
-          <div class="deck-panel">
-            <strong>Entregáveis &amp; critério parcial</strong>
-            <ul>
-              <li><code>spec/00_problem.md</code>, <code>system_design.md</code>, <code>iac/cloudformation/app.yaml</code>.</li>
-              <li>Stack <code>tsa-{iniciais}</code> em <code>CREATE_COMPLETE</code>.</li>
-              <li>EC2 com IP público anotado, SG aberto na 8501.</li>
-              <li>S3 com <code>dataset.csv</code> listado via <code>aws s3 ls</code>.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 18 - BLOCO 1 — BOOTSTRAP                               -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Prática &middot; Bloco 1 &middot; Bootstrap &amp; arquitetura</span>
-          <h2 class="deck-title">Bootstrap + spec do problema</h2>
-          <p class="deck-summary">Renovar token, abrir Codespace, gerar estrutura. Spec do problema escrita à mão (com IA refinando) &mdash; é o contrato com o cliente fictício.</p>
-        </div>
-<pre class="a08-prompt"># 1) Renovar session token do Learner Lab e atualizar ~/.aws/credentials.
-# 2) Abrir Codespace do repositorio tsa-{iniciais}-{slug}.
-
-# 3) Skill bootstrap (no OpenCode)
-> /bootstrap_tsa_project --slug "{slug}" --iniciais "{iniciais}"
-
-# 4) Gera:
-#    spec/, documents/, iac/cloudformation/, src/, tests/,
-#    runbooks/, README.md e AGENTS.md simplificado.
-
-# 5) Mini-spec do problema (IA escreve, voce revisa)
-> /draft_problem_spec --dataset {slug-kaggle}
-# Saida: 5 RF + 5 RNF em spec/00_problem.md</pre>
-        <div class="deck-callout" style="margin-top:14px;">
-          <strong>Checkpoint do Bloco 1 &middot; etapa 1</strong>
-          <p style="margin:8px 0 0;"><code>spec/00_problem.md</code> commitado, estrutura completa, AWS CLI respondendo <code>aws sts get-caller-identity</code>.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 19 - SPRINT 2 — ARQUITETURA + IaC                       -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Prática &middot; Bloco 1 &middot; Bootstrap &amp; arquitetura</span>
-          <h2 class="deck-title">System design + CFN base</h2>
-          <p class="deck-summary">Architect produz Mermaid de 1 página. DevOps gera <code>app.yaml</code>. Deploy roda. EC2 ativa, S3 recebe o CSV via <code>aws s3 cp</code>.</p>
-        </div>
-<pre class="a08-prompt"># Architect (skill gen_app_template -> diagrama Mermaid)
-> /gen_app_template --kind system_design
-
-# DevOps (skill gen_app_template -> CFN)
-> /gen_app_template --kind cfn --output iac/cloudformation/app.yaml
-
-# Validacao local
-aws cloudformation validate-template \
-  --template-body file://iac/cloudformation/app.yaml
-
-# Deploy
-aws cloudformation deploy \
-  --stack-name tsa-{iniciais} \
-  --template-file iac/cloudformation/app.yaml \
-  --parameter-overrides Iniciais={iniciais} DatasetSlug={slug} \
-  --capabilities CAPABILITY_IAM
-
-# Upload do dataset
-aws s3 cp data/dataset.csv s3://tsa-{iniciais}-data/dataset.csv</pre>
-        <div class="deck-callout" style="margin-top:14px;">
-          <strong>Checkpoint do Bloco 1 &middot; fechamento</strong>
-          <p style="margin:8px 0 0;">EC2 visível em <code>aws ec2 describe-instances</code>, IP público anotado, S3 com CSV listado, SG aberto na porta 8501.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE - ABERTURA DO BLOCO 2                                  -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell a08-compact">
-        <div>
-          <span class="deck-kicker">Prática &middot; Bloco 2 &middot; App + observabilidade</span>
-          <h2 class="deck-title">Bloco 2 &mdash; do produto à observabilidade</h2>
-          <p class="deck-summary">Com a infra de pé, agora o app entra no ar e a observabilidade sobe junto. Sem dashboard e sem closed loop, a entrega não defende a demo final.</p>
-        </div>
-        <div class="deck-columns">
-          <div class="deck-panel">
-            <strong>Objetivo</strong>
-            <ul>
-              <li><code>app.py</code> com 3 abas (Histórico, STL, Forecast).</li>
-              <li>Deploy do app no EC2 via SSM Run Command (sem SSH).</li>
-              <li>Log group, dashboard, alarm e EventBridge no template.</li>
-              <li>Closed loop SLO-01 &rarr; EVB &rarr; SSM ligado.</li>
-            </ul>
-          </div>
-          <div class="deck-panel">
-            <strong>Entregáveis &amp; critério parcial</strong>
-            <ul>
-              <li>URL pública abre as 3 abas com dados reais.</li>
-              <li>Dashboard CW com 3 widgets dos SLIs preenchidos.</li>
-              <li>Alarm <code>SLO-01-availability</code> em estado <em>OK</em>.</li>
-              <li>SSM document <code>restart-streamlit-{iniciais}</code> executável.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 20 - BLOCO 2 — APP + OBSERVABILIDADE                   -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Prática &middot; Bloco 2 &middot; App + observabilidade</span>
-          <h2 class="deck-title">App 3 abas + observabilidade ligada</h2>
-          <p class="deck-summary">DataDev gera <code>app.py</code>. DevOps adiciona log group, metric filters, dashboard, alarm e EventBridge rule. Re-deploy.</p>
-        </div>
-<pre class="a08-prompt"># DataDev (skill gen_streamlit_tsa_app)
-> /gen_streamlit_tsa_app --abas historico,stl,forecast \
-                         --modelo expsmoothing \
-                         --bucket tsa-{iniciais}-data
-
-# Deploy do app no EC2 via SSM (sem SSH)
-aws ssm send-command \
-  --document-name "AWS-RunShellScript" \
-  --targets "Key=tag:Project,Values=tsa-{iniciais}" \
-  --parameters 'commands=[
-    "cd /opt/app && git pull origin main",
-    "pip install -r requirements.txt -q",
-    "pkill -f streamlit || true",
-    "nohup streamlit run app.py --server.port 8501 &amp;"
-  ]'
-
-# DevOps (skill gen_observability)
-> /gen_observability --slos SLO-01,SLO-02,SLO-03 \
-                     --runbook restart_streamlit
-
-# Re-deploy do stack com observabilidade
-aws cloudformation deploy --stack-name tsa-{iniciais} ...</pre>
-        <div class="deck-callout" style="margin-top:14px;">
-          <strong>Checkpoint do Bloco 2 &middot; fechamento</strong>
-          <p style="margin:8px 0 0;">URL pública abre as 3 abas. Dashboard CW mostra os 3 SLIs. Alarm está em <em>OK</em>. EventBridge rule conectada ao SSM document.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE - ABERTURA DO BLOCO 3                                  -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell a08-compact">
-        <div>
-          <span class="deck-kicker">Prática &middot; Bloco 3 &middot; Validação &amp; demo</span>
-          <h2 class="deck-title">Bloco 3 &mdash; validar, simular falha e defender</h2>
-          <p class="deck-summary">Smoke verde, checklist marcado, falha simulada com closed loop respondendo, tag <code>final-v1</code> empurrada. Demo de 3 minutos por dupla é o fechamento.</p>
-        </div>
-        <div class="deck-columns">
-          <div class="deck-panel">
-            <strong>Objetivo</strong>
-            <ul>
-              <li>Smoke test contra a URL pública passando.</li>
-              <li>Release checklist com os 8 critérios marcados.</li>
-              <li>Simulação de falha (kill via SSM) demonstrando closed loop.</li>
-              <li>Tag <code>final-v1</code> empurrada para o GitHub.</li>
-            </ul>
-          </div>
-          <div class="deck-panel">
-            <strong>Entregáveis &amp; critério parcial</strong>
-            <ul>
-              <li><code>pytest tests/smoke/</code> verde.</li>
-              <li><code>documents/release_checklist.md</code> com 8/8.</li>
-              <li>Alarm dispara após kill, serviço retorna sozinho.</li>
-              <li>Demo de 3 min apresentada &mdash; gate da entrega.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 21 - BLOCO 3 — VALIDACAO + DEMO                        -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Prática &middot; Bloco 3 &middot; Validação &amp; demo</span>
-          <h2 class="deck-title">Smoke + checklist + demo</h2>
-          <p class="deck-summary">Tester roda smoke contra a URL. Reviewer audita o checklist. Aluno simula falha (kill do processo via SSM) e mostra o closed loop subindo o serviço de novo.</p>
-        </div>
-<pre class="a08-prompt"># Tester
-pytest tests/smoke/test_url.py -v
-# TC-SMOKE-01: GET / -> 200 em &lt; 5s
-# TC-SMOKE-02: GET /aba=stl -> 200
-# TC-SMOKE-03: GET /aba=forecast -> 200 em &lt; 10s
-
-# Reviewer
-> /gen_release_checklist
-# Marca os 8 criterios em documents/release_checklist.md
-
-# Simulacao de falha (demonstra closed loop)
-aws ssm send-command --document-name "AWS-RunShellScript" \
-  --targets "Key=tag:Project,Values=tsa-{iniciais}" \
-  --parameters 'commands=["pkill -9 -f streamlit"]'
-# Em &lt; 60s o alarm dispara, EventBridge chama o runbook
-# e o servico volta. Ato 1 da demo.
-
-# Tag de release + push
-git tag final-v1
-git push origin main --tags</pre>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 22 - ROTEIRO DA DEMO DE 3 MIN                          -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell a08-compact">
-        <div>
-          <span class="deck-kicker">Prática &middot; Bloco 3 &middot; demo</span>
-          <h2 class="deck-title">Roteiro da demo de 3 minutos</h2>
-          <p class="deck-summary">Tempo é fixo. Quem ultrapassa, perde a parte final. Pratique antes &mdash; nessa ordem, sem improviso.</p>
-        </div>
-        <table class="deck-table">
-          <thead>
-            <tr><th>Tempo</th><th>Ato</th><th>O que mostrar</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>0:00 &ndash; 0:30</td><td>Abertura</td><td>Nome do repo, dataset, hipótese inicial.</td></tr>
-            <tr><td>0:30 &ndash; 1:30</td><td>Front</td><td>Navegar as 3 abas: histórico, STL, forecast 30.</td></tr>
-            <tr><td>1:30 &ndash; 2:15</td><td>Observabilidade</td><td>Dashboard CW com os 3 SLIs em verde.</td></tr>
-            <tr><td>2:15 &ndash; 2:45</td><td>Closed loop</td><td>Kill do processo via SSM &mdash; alarm acende &mdash; serviço sobe.</td></tr>
-            <tr><td>2:45 &ndash; 3:00</td><td>Encerramento</td><td>Comando de destruir a stack + URL do repo público.</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 23 - APROVACAO E DEFEITOS COMUNS                       -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell a08-compact">
-        <div>
-          <span class="deck-kicker">Prática &middot; Bloco 3 &middot; armadilhas</span>
-          <h2 class="deck-title">O que costuma quebrar &mdash; e como evitar</h2>
-          <p class="deck-summary">Lista curta dos erros mais comuns no Learner Lab. Antecipá-los economiza muitas idas e vindas no bloco final.</p>
-        </div>
-        <div class="deck-columns">
-          <div class="deck-panel">
-            <strong>Erros frequentes</strong>
-            <ul>
-              <li>Token expirado no meio do Bloco 2 &rarr; renovar antes de cada deploy.</li>
-              <li>SG sem inbound 8501 &rarr; conferir no template.</li>
-              <li>EC2 sem LabRole anexado &rarr; <code>IamInstanceProfile</code> obrigatório.</li>
-              <li><code>requirements.txt</code> sem <code>statsmodels</code> &rarr; STL falha em runtime.</li>
-              <li>Dashboard sem widget &rarr; metric filters criados mas não plotados.</li>
-            </ul>
-          </div>
-          <div class="deck-panel">
-            <strong>Atalhos defensivos</strong>
-            <ul>
-              <li><code>aws cloudformation describe-stack-events</code> a cada erro.</li>
-              <li><code>aws logs tail</code> em modo follow durante o restart.</li>
-              <li>Smoke test rodando local em loop enquanto valida UI.</li>
-              <li>Plano B se forecast estourar &mdash; cair para média móvel.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 24 - GLOSSARIO 1/3 — TIME SERIES                        -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell a08-compact a08-table-compact">
-        <div>
-          <span class="deck-kicker">Glossário &middot; 1 / 3</span>
-          <h2 class="deck-title">Siglas &mdash; séries temporais e modelagem</h2>
-          <p class="deck-summary">Vocabulário das 3 abas do front e dos modelos de forecast.</p>
-        </div>
-        <div class="deck-columns">
-          <div class="deck-panel">
-            <strong>Análise</strong>
-            <table class="deck-table">
-              <tbody>
-                <tr><td><strong>TSA</strong></td><td>Time Series Analysis</td></tr>
-                <tr><td><strong>STL</strong></td><td>Seasonal-Trend decomposition using Loess</td></tr>
-                <tr><td><strong>ARIMA</strong></td><td>AutoRegressive Integrated Moving Average</td></tr>
-                <tr><td><strong>SARIMA</strong></td><td>Seasonal ARIMA</td></tr>
-                <tr><td><strong>ETS</strong></td><td>Exponential Smoothing State Space</td></tr>
-                <tr><td><strong>ACF / PACF</strong></td><td>Auto / Partial Auto-Correlation</td></tr>
-                <tr><td><strong>STL-period</strong></td><td>Período sazonal inferido (12 mensal, 7 diário, 24 horário&hellip;)</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="deck-panel">
-            <strong>Métricas de erro</strong>
-            <table class="deck-table">
-              <tbody>
-                <tr><td><strong>MAE</strong></td><td>Mean Absolute Error</td></tr>
-                <tr><td><strong>RMSE</strong></td><td>Root Mean Squared Error</td></tr>
-                <tr><td><strong>MAPE</strong></td><td>Mean Absolute Percentage Error</td></tr>
-                <tr><td><strong>SMAPE</strong></td><td>Symmetric MAPE</td></tr>
-                <tr><td><strong>CI 95%</strong></td><td>Intervalo de confiança 95%</td></tr>
-                <tr><td><strong>Loess</strong></td><td>Locally estimated scatterplot smoothing</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 25 - GLOSSARIO 2/3 — AWS                                -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell a08-compact a08-table-compact">
-        <div>
-          <span class="deck-kicker">Glossário &middot; 2 / 3</span>
-          <h2 class="deck-title">Siglas &mdash; AWS e SRE</h2>
-          <p class="deck-summary">Vocabulário do CFN, observabilidade e closed loop usados nos Blocos 1, 2 e 3.</p>
-        </div>
-        <div class="deck-columns">
-          <div class="deck-panel">
-            <strong>Serviços AWS</strong>
-            <table class="deck-table">
-              <tbody>
-                <tr><td><strong>EC2</strong></td><td>Elastic Compute Cloud</td></tr>
-                <tr><td><strong>S3</strong></td><td>Simple Storage Service</td></tr>
-                <tr><td><strong>CW</strong></td><td>CloudWatch (logs, metrics, alarms)</td></tr>
-                <tr><td><strong>SSM</strong></td><td>Systems Manager (Run Command, documents)</td></tr>
-                <tr><td><strong>CFN</strong></td><td>CloudFormation</td></tr>
-                <tr><td><strong>EVB</strong></td><td>EventBridge (rules)</td></tr>
-                <tr><td><strong>SG</strong></td><td>Security Group</td></tr>
-                <tr><td><strong>IAM</strong></td><td>Identity and Access Management</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="deck-panel">
-            <strong>SRE / observabilidade</strong>
-            <table class="deck-table">
-              <tbody>
-                <tr><td><strong>SLI</strong></td><td>Service Level Indicator</td></tr>
-                <tr><td><strong>SLO</strong></td><td>Service Level Objective</td></tr>
-                <tr><td><strong>EMF</strong></td><td>Embedded Metric Format (CW)</td></tr>
-                <tr><td><strong>MTTR</strong></td><td>Mean Time To Recovery</td></tr>
-                <tr><td><strong>Closed loop</strong></td><td>Sensor &rarr; controlador &rarr; atuador &rarr; nova medição</td></tr>
-                <tr><td><strong>Runbook</strong></td><td>Procedimento operacional executável</td></tr>
-                <tr><td><strong>IaC</strong></td><td>Infrastructure as Code</td></tr>
-                <tr><td><strong>LabRole</strong></td><td>Role pré-definida do Learner Lab</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 26 - GLOSSARIO 3/3 — PROJETO + IA                       -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell a08-compact a08-table-compact">
-        <div>
-          <span class="deck-kicker">Glossário &middot; 3 / 3</span>
-          <h2 class="deck-title">Siglas &mdash; projeto, IA e entrega</h2>
-          <p class="deck-summary">Vocabulário do squad de IA, do padrão de naming e do pacote de release.</p>
-        </div>
-        <div class="deck-columns">
-          <div class="deck-panel">
-            <strong>Projeto</strong>
-            <table class="deck-table">
-              <tbody>
-                <tr><td><strong>RF</strong></td><td>Requisito Funcional (RF-NN)</td></tr>
-                <tr><td><strong>RNF</strong></td><td>Requisito Não-Funcional (RNF-NN)</td></tr>
-                <tr><td><strong>RTM</strong></td><td>Requirements Traceability Matrix</td></tr>
-                <tr><td><strong>TC-SMOKE</strong></td><td>Smoke test case</td></tr>
-                <tr><td><strong>SDD</strong></td><td>Spec-Driven Development</td></tr>
-                <tr><td><strong>Release</strong></td><td>Tag <code>final-v1</code> + URL pública</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="deck-panel">
-            <strong>IA / squad</strong>
-            <table class="deck-table">
-              <tbody>
-                <tr><td><strong>AGENTS.md</strong></td><td>Manifesto do squad de agentes</td></tr>
-                <tr><td><strong>Skill</strong></td><td>Comando reutilizável da IA</td></tr>
-                <tr><td><strong>Architect</strong></td><td>Agente que produz o system design</td></tr>
-                <tr><td><strong>DevOps</strong></td><td>Agente que produz CFN</td></tr>
-                <tr><td><strong>DataDev</strong></td><td>Agente que produz o app</td></tr>
-                <tr><td><strong>Tester</strong></td><td>Agente que produz smoke tests</td></tr>
-                <tr><td><strong>Reviewer</strong></td><td>Agente que audita o release</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 27 - REFERENCIAS                                       -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell a08-compact">
-        <div>
-          <span class="deck-kicker">Referências</span>
-          <h2 class="deck-title">Para continuar depois da Aula 08</h2>
-          <p class="deck-summary">Leituras curtas e específicas para consolidar séries temporais, IaC e SRE no projeto pessoal.</p>
-        </div>
-        <div class="deck-columns">
-          <div class="deck-panel">
-            <strong>Séries temporais</strong>
-            <ul>
-              <li><em>Forecasting: Principles and Practice</em> &mdash; Hyndman &amp; Athanasopoulos.</li>
-              <li><code>statsmodels</code> &mdash; <code>tsa.seasonal.STL</code> e <code>tsa.holtwinters</code>.</li>
-              <li>Prophet &mdash; documentação oficial.</li>
-              <li>Kaggle &mdash; trilha "Time Series".</li>
-            </ul>
-          </div>
-          <div class="deck-panel">
-            <strong>AWS / SRE</strong>
-            <ul>
-              <li>AWS CloudFormation User Guide.</li>
-              <li>AWS Well-Architected &mdash; Reliability Pillar.</li>
-              <li>SRE Workbook (Google) &mdash; capítulos sobre SLI/SLO.</li>
-              <li>EventBridge + SSM Run Command (developer guides).</li>
-              <li>Streamlit &mdash; deployment guide.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 28 - CERIMONIA DE FECHAMENTO DO SEMESTRE                -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell a08-closing">
-        <div>
-          <span class="deck-kicker">Fechamento do semestre</span>
-          <h2 class="deck-title">Obrigado &mdash; e parabéns pela entrega</h2>
-          <p class="deck-summary">Oito quintas-feiras, oito camadas, um pipeline e um projeto autoral. O que vocês construíram em 24 horas de aula é o que muitos times levam meses para encadear.</p>
-        </div>
-        <div class="deck-callout" style="text-align:left;">
-          <strong>O que vocês saem levando</strong>
-          <ul>
-            <li>Spec-driven development como rotina, não como exceção.</li>
-            <li>IA como copiloto disciplinado &mdash; squad com AGENTS.md e skills.</li>
-            <li>Infra como código, deploy reprodutível, runbook executável.</li>
-            <li>Observabilidade desde o primeiro dia, com closed loop ligado.</li>
-            <li>Um repositório público com tag <code>final-v1</code> e URL ao vivo &mdash; portfólio.</li>
-          </ul>
-        </div>
-        <p class="a08-thanks">Cloud Computing e SRE &middot; MBA Engenharia de Dados &middot; Mackenzie 2026</p>
+        <p style="margin-top: 8px; font-size: .92em; color: var(--deck-muted); text-align: center;">
+          Obrigado por percorrerem o arco completo. Boa entrega &mdash; e nos vemos na avaliação.
+        </p>
       </div>
     </div>
 
@@ -1171,52 +570,26 @@ git push origin main --tags</pre>
     const slides = document.querySelectorAll('.slide');
     const totalSlides = slides.length;
     document.getElementById('total-slides').textContent = totalSlides;
-    function showSlide(i) { slides.forEach(s => s.classList.remove('active')); slides[i].classList.add('active'); currentSlide = i; document.getElementById('current-slide').textContent = i + 1; document.getElementById('prev-btn').disabled = i === 0; document.getElementById('next-btn').disabled = i === totalSlides - 1; }
+    function showSlide(i) {
+      slides.forEach(s => s.classList.remove('active'));
+      slides[i].classList.add('active');
+      currentSlide = i;
+      document.getElementById('current-slide').textContent = i + 1;
+      document.getElementById('prev-btn').disabled = i === 0;
+      document.getElementById('next-btn').disabled = i === totalSlides - 1;
+    }
     function nextSlide() { if (currentSlide < totalSlides - 1) showSlide(currentSlide + 1); }
     function previousSlide() { if (currentSlide > 0) showSlide(currentSlide - 1); }
-    function toggleFullScreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
-    document.addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); } else if (e.key === 'ArrowLeft') { e.preventDefault(); previousSlide(); } else if (e.key.toLowerCase() === 'f') toggleFullScreen(); });
-    showSlide(0);
-  </script>
-
-  <!-- Mermaid v11 — recap timeline (slide 4) e system design (slide 9), lazy render -->
-  <script type="module">
-    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-    mermaid.initialize({
-      startOnLoad: false,
-      theme: 'neutral',
-      securityLevel: 'loose',
-      flowchart: { htmlLabels: true, curve: 'basis' },
-      themeVariables: {
-        fontFamily: 'JetBrains Mono, ui-monospace, monospace',
-        primaryColor: '#ffffff',
-        primaryBorderColor: '#0f0f0f',
-        primaryTextColor: '#0f0f0f',
-        lineColor: '#5c5c5c',
-        clusterBkg: '#fafaf7',
-        clusterBorder: '#d6d6d1'
-      }
-    });
-
-    // Render lazy, por slide com mermaid embutido. Cada slide alvo tem 'data-slide'.
-    const targets = document.querySelectorAll('[data-slide="recap-timeline"], [data-slide="system-design"]');
-    const renderedSet = new WeakSet();
-    async function renderIfNeeded(target) {
-      if (renderedSet.has(target)) return;
-      if (!target.classList.contains('active')) return;
-      renderedSet.add(target);
-      try {
-        await mermaid.run({ nodes: target.querySelectorAll('pre.mermaid') });
-      } catch (e) {
-        renderedSet.delete(target);
-        console.warn('Mermaid render falhou:', e);
-      }
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
     }
-    targets.forEach(t => {
-      const obs = new MutationObserver(() => renderIfNeeded(t));
-      obs.observe(t, { attributes: true, attributeFilter: ['class'] });
-      renderIfNeeded(t);
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); previousSlide(); }
+      else if (e.key.toLowerCase() === 'f') toggleFullScreen();
     });
+    showSlide(0);
   </script>
 </body>
 </html>
