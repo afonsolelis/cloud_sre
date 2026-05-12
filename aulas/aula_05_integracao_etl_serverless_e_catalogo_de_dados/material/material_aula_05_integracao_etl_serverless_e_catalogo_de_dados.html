@@ -710,133 +710,207 @@ AWS_SECRET_ACCESS_KEY=&lt;defina em .env&gt;</code></pre>
     </section>
 
     <section class="content-block">
-      <h2>9. Pratica guiada &mdash; 10 passos</h2>
+      <h2>9. Pratica guiada &mdash; verificacao assistida por IA</h2>
       <p>
-        A pratica e refatorar a stack da Aula 04 aplicando as cinco taticas, escrever testes que comprovam e estressar cada ponto. Dez passos
-        sequenciais, cada um virando uma branch no fork pessoal.
+        O bloco pratico e dividido em duas etapas: <strong>cinco taticas Bass implementadas via prompts</strong> destinados a um assistente
+        de codificacao (Claude Code, Cursor, GitHub Copilot ou Gemini CLI) e <strong>quatro cenarios de estresse</strong> executados
+        manualmente no terminal. Cada prompt esta especificado de modo fechado &mdash; o aluno copia o texto na integra para o assistente,
+        revisa o diff produzido linha a linha, executa a verificacao indicada ao final do prompt e realiza o merge da branch <code>tactic/...</code>
+        no fork pessoal. <strong>O assistente implementa; o aluno verifica.</strong>
       </p>
+      <div class="m05-callout">
+        <strong>Disciplina de uso da IA</strong>
+        Copiar o prompt na integra (nao reescrever); revisar o diff antes do commit; rejeitar inclusoes fora do escopo; executar a verificacao
+        descrita ao final do prompt antes de mesclar; abrir um pull request interno por tatica para registrar a discussao.
+      </div>
 
-      <h3>9.1 Passo 1 &mdash; Refatorar ingestor com retry + idempotencia</h3>
+      <h3>9.1 Tatica 1 &mdash; Retry + Idempotencia</h3>
       <p>
-        Branch <code>tactic/availability-retry</code>. Adicionar <code>tenacity==8.2.3</code> ao <code>requirements.txt</code>; aplicar o
-        refactor do item 8.2; reconstruir a imagem (<code>docker compose build ingestor</code>); rodar a ingestao para validar que o
-        comportamento original foi preservado.
+        Branch <code>tactic/availability-retry</code>. Sensitivity point <code>SP-02</code>. Quality attribute <code>Availability</code>.
+        O prompt abaixo deve ser entregue ao assistente de IA na integra.
       </p>
+      <pre><code>Você vai aplicar a tática Bass "Retry + Exception Handling + Idempotency" no
+ingestor desta stack Olist (Docker compose: clickhouse, minio, ingestor,
+dashboard). O ingestor está em app/ingest_minio.py.
 
-      <h3>9.2 Passo 2 &mdash; Healthcheck robusto</h3>
+Branch: tactic/availability-retry
+
+Checklist obrigatório:
+1. Adicionar tenacity==8.2.3 ao requirements.txt.
+2. Decorar insert_batch e a chamada s3.get_object com:
+     @retry(stop=stop_after_attempt(5),
+            wait=wait_exponential(multiplier=1, min=2, max=30),
+            reraise=True)
+3. Comentar no topo de ingest_minio.py que a idempotência é garantida pelo
+   par (unixtime, tag) somado ao filtro max(unixtime) por tag na view
+   v_top_products. Não introduzir MERGE nem UPSERT.
+4. Substituir prints por logging JSON estruturado, incluindo
+   extra={"unixtime": ..., "tag": ..., "rows": ...}.
+5. NÃO alterar docker-compose.yaml, schema SQL nem dependências adicionais.
+6. Commit final: "feat(tactic): retry exponencial + idempotencia no ingestor".
+
+Verificação (executar e mostrar a saída):
+  docker compose build ingestor
+  docker exec olist_ingestor python /app/ingest_minio.py   # 1a execução
+  docker exec olist_ingestor python /app/ingest_minio.py   # 2a execução
+  docker exec olist_analytics clickhouse-client \
+    -q "SELECT tag, count() FROM olist_raw.ingestion GROUP BY tag"
+A contagem por tag deve permanecer constante entre as duas execuções.</code></pre>
+
+      <h3>9.2 Tatica 2 &mdash; Ping/Echo + Heartbeat</h3>
       <p>
-        Branch <code>tactic/availability-healthcheck</code>. Aplicar o patch do item 8.1 no <code>docker-compose.yaml</code>. Medir o tempo de
-        <code>healthy</code> antes e depois &mdash; comando util:
+        Branch <code>tactic/availability-healthcheck</code>. Sensitivity point <code>SP-01</code>. Quality attribute <code>Availability</code>.
       </p>
-      <pre><code># tempo ate ficar healthy
-docker compose up -d
-while ! docker inspect -f '{{.State.Health.Status}}' olist_analytics | grep -q healthy; do
-  sleep 1
-done
-echo "ClickHouse healthy em $SECONDS s"</code></pre>
+      <pre><code>Você vai aplicar a tática Bass "Ping/Echo + Heartbeat" no docker-compose.yaml
+desta stack Olist (clickhouse, minio, ingestor, dashboard).
+
+Branch: tactic/availability-healthcheck
+
+Checklist obrigatório:
+1. Padronizar, em CADA serviço, o bloco healthcheck:
+     interval: 5s
+     timeout: 3s
+     retries: 12
+     start_period: 15s
+2. Comandos de teste por serviço:
+     clickhouse → wget --spider -q http://localhost:8123/ping
+     minio      → curl -f http://localhost:9000/minio/health/live
+     ingestor   → pgrep -f ingest_minio.py || exit 0
+     dashboard  → wget --spider -q http://localhost:8501/_stcore/health
+3. Manter depends_on com condition: service_healthy em todos os
+   serviços dependentes.
+4. NÃO alterar portas, volumes, redes ou variáveis de ambiente.
+5. Criar docs/healthcheck-baseline.md com tabela markdown:
+     | serviço | tempo até healthy (antes) | tempo após patch |
+6. Commit final: "feat(tactic): healthchecks granulares por servico".
+
+Verificação (executar e mostrar a saída):
+  docker compose down -v
+  time docker compose up -d --wait
+  docker compose ps --format json | jq '.[] | {name, state: .State, health: .Health}'
+Preencher a coluna "tempo após patch" com o resultado.</code></pre>
+
+      <h3>9.3 Tatica 3 &mdash; Circuit Breaker</h3>
       <p>
-        Documentar a medicao em <code>docs/healthcheck-baseline.md</code> &mdash; sera evidencia do passo 10.
+        Branch <code>tactic/availability-circuit-breaker</code>. Sensitivity point <code>SP-03</code>. Quality attribute <code>Availability</code>.
       </p>
+      <pre><code>Você vai aplicar a tática Bass "Circuit Breaker" às chamadas s3.get_object
+do ingestor. O retry exponencial (tarefa anterior) deve ser preservado.
 
-      <h3>9.3 Passo 3 &mdash; Circuit breaker no boto3</h3>
+Branch: tactic/availability-circuit-breaker
+
+Checklist obrigatório:
+1. Criar app/breakers.py com a classe CircuitBreaker usando APENAS stdlib
+   (sem dependências externas):
+   - Estados: CLOSED, OPEN, HALF_OPEN.
+   - Construtor: CircuitBreaker(failure_threshold=5, recovery_seconds=30).
+   - call(fn):
+       em CLOSED, executa fn(); exceção incrementa contador; ao atingir
+         o threshold transita para OPEN e registra opened_at = time().
+       em OPEN, levanta RuntimeError("Circuit open") sem chamar fn,
+         até que recovery_seconds tenham decorrido; então transita
+         para HALF_OPEN.
+       em HALF_OPEN, executa fn(); sucesso → CLOSED e zera contador;
+         falha → volta para OPEN com novo opened_at.
+2. Em app/ingest_minio.py, instanciar no escopo do módulo:
+     cb = CircuitBreaker(failure_threshold=5, recovery_seconds=30)
+   Envolver s3.get_object com cb.call(lambda: s3.get_object(...)).
+   Manter o decorador @retry da tática anterior antes do uso do breaker.
+3. Emitir log JSON estruturado em cada transição de estado:
+     {"event": "circuit_state", "from": "...", "to": "..."}
+4. NÃO acrescentar dependências externas. NÃO alterar a view.
+5. Commit final: "feat(tactic): circuit breaker stdlib para chamadas S3".
+
+Verificação manual:
+  docker compose up -d
+  docker stop olist_minio   # durante a ingestão
+  docker exec olist_ingestor python /app/ingest_minio.py
+Após 5 falhas, o log deve registrar transição CLOSED → OPEN e o ingestor
+deve parar de tentar até recovery_seconds.</code></pre>
+
+      <h3>9.4 Tatica 4 &mdash; Testability (unidade)</h3>
       <p>
-        Branch <code>tactic/availability-circuit-breaker</code>. Criar <code>app/breakers.py</code> com a classe do item 8.3; envolver as
-        chamadas S3 do <code>ingest_minio.py</code>; configurar threshold=5, recovery=30s. Validar manualmente parando o MinIO
-        (<code>docker stop olist_minio</code>) no meio de uma ingestao e observando o log.
+        Branch <code>tactic/testability-pytest</code>. Sensitivity points <code>SP-02 / SP-03</code>. Quality attribute <code>Testability</code>.
       </p>
+      <pre><code>Você vai aplicar a tática Bass "Testability" via componentes de teste,
+escrevendo testes unitários que comprovam o comportamento das três
+táticas implementadas anteriormente (retry, idempotência, circuit breaker).
 
-      <h3>9.4 Passo 4 &mdash; Testes unitarios em pytest</h3>
+Branch: tactic/testability-pytest
+
+Checklist obrigatório:
+1. Adicionar ao requirements.txt:
+     pytest==7.4.0
+     pytest-mock==3.11.1
+2. Criar pytest.ini na raiz:
+     [pytest]
+     testpaths = tests
+     python_files = test_*.py
+3. Criar tests/unit/test_breakers.py com 3 testes:
+   - test_circuit_opens_after_threshold_failures
+       (failure_threshold=3; 3 falhas; a 4a chamada deve lançar
+        RuntimeError com mensagem "Circuit open").
+   - test_circuit_blocks_calls_when_open
+       (verifica que, com circuito aberto, fn que normalmente sucederia
+        NÃO é chamada e a exceção "Circuit open" é levantada).
+   - test_circuit_half_opens_after_recovery_seconds
+       (recovery_seconds=0; sucesso na chamada de teste volta o estado
+        para CLOSED e zera o contador).
+4. Criar tests/unit/test_ingestor.py com 2 testes (usar mocker.patch
+   do pytest-mock; NÃO usar unittest.mock direto):
+   - test_ingestor_retries_on_s3_throttle
+       (mock de s3.get_object com side_effect=[Exception, Exception,
+        valor_ok]; espera exatamente 3 chamadas no mock).
+   - test_idempotency_by_max_unixtime
+       (mock do clickhouse client; após duas execuções de ingestão do
+        mesmo CSV, max(unixtime) cresce mas count via view permanece).
+5. NÃO subir Docker nos testes unitários. Apenas mocks.
+6. Commit final: "test(tactic): testes unitarios para breakers e ingestor".
+
+Verificação:
+  pytest tests/unit -v
+Saída esperada: 5 testes passam.</code></pre>
+
+      <h3>9.5 Tatica 5 &mdash; Testability (integracao)</h3>
       <p>
-        Branch <code>tactic/testability-pytest</code>. Criar <code>tests/unit/test_ingestor.py</code> com testes que comprovem retry,
-        idempotencia, circuit breaker e healthcheck endpoint.
+        Branch <code>tactic/testability-integration</code>. Sensitivity points <code>SP-01 a SP-05</code>. Quality attribute <code>Testability</code>.
       </p>
-      <pre><code># tests/unit/test_ingestor.py
-import pytest
-from unittest.mock import MagicMock
-from app.breakers import CircuitBreaker
+      <pre><code>Você vai aplicar a tática Bass "Testability" no nível end-to-end,
+exercitando a stack real e validando o pipeline completo.
+
+Branch: tactic/testability-integration
+
+Checklist obrigatório:
+1. Criar Makefile na raiz com os alvos:
+     stack-up    → docker compose up -d e loop em docker inspect até
+                   todos os 4 serviços ficarem healthy.
+     seed        → popula o bucket MinIO com os CSVs do dataset Olist
+                   (usar mc ou aws-cli com endpoint http://localhost:9000).
+     ingest      → docker exec olist_ingestor python /app/ingest_minio.py
+     test-int    → pytest tests/integration -v
+     stack-down  → docker compose down -v
+     all         → encadeia: stack-up seed ingest test-int stack-down
+2. Adicionar clickhouse-connect==0.7.0 ao requirements.txt (cliente do host).
+3. Criar tests/integration/test_pipeline.py com 3 testes (conectar em
+   localhost:8123 via clickhouse-connect):
+   - test_landing_has_expected_row_count
+       (após ingestão, SELECT count() FROM olist_raw.ingestion > 0).
+   - test_view_top_products_returns_rows
+       (SELECT * FROM v_top_products LIMIT 5 retorna 5 linhas; o
+        schema bate com tests/baselines/v_top_products.json).
+   - test_ingestion_is_idempotent
+       (executa a ingestão duas vezes; o count por tag permanece igual).
+4. Salvar o baseline em tests/baselines/v_top_products.json na primeira
+   execução bem-sucedida e commitar junto.
+5. Commit final: "test(tactic): testes de integracao end-to-end com makefile".
+
+Verificação:
+  make all
+Saída esperada: stack sobe healthy, ingestão roda, 3 testes passam,
+stack é desligada limpamente.</code></pre>
 
 
-def test_ingestor_retries_on_s3_throttle():
-    """Retry deve tentar N vezes antes de desistir."""
-    from app.ingest_minio import insert_batch
-    ch = MagicMock(side_effect=[Exception("oops"), Exception("oops"), None])
-    insert_batch(ch, [(1, "{}", "x")])
-    assert ch.insert.call_count == 3
-
-
-def test_idempotency_via_max_unixtime():
-    """Reingerir o mesmo CSV nao duplica linhas na view."""
-    from app.helpers import current_max_unixtime
-    before = current_max_unixtime("olist_orders_dataset.csv")
-    # reingere
-    from app.ingest_minio import ingest_one
-    ingest_one("olist_orders_dataset.csv")
-    after = current_max_unixtime("olist_orders_dataset.csv")
-    assert after > before
-    # view ainda devolve mesmo count
-    assert query_view_count() == query_view_count()
-
-
-def test_circuit_breaker_opens_after_threshold():
-    cb = CircuitBreaker(failure_threshold=3, recovery_seconds=1)
-    def boom(): raise RuntimeError("falhou")
-    for _ in range(3):
-        with pytest.raises(RuntimeError):
-            cb.call(boom)
-    with pytest.raises(RuntimeError, match="Circuit open"):
-        cb.call(boom)
-
-
-def test_circuit_breaker_recovers():
-    cb = CircuitBreaker(failure_threshold=2, recovery_seconds=0)
-    def boom(): raise RuntimeError("falhou")
-    for _ in range(2):
-        with pytest.raises(RuntimeError):
-            cb.call(boom)
-    # apos recovery_seconds=0, breaker permite nova tentativa
-    assert cb.call(lambda: "ok") == "ok"</code></pre>
-
-      <h3>9.5 Passo 5 &mdash; Testes de integracao end-to-end</h3>
-      <p>
-        Branch <code>tactic/testability-integration</code>. Subir a stack via <code>make stack-up</code>, rodar a ingestao do dataset Olist
-        completo, validar contagens, conferir a view, derrubar a stack via <code>make stack-down</code>. Tudo automatizado.
-      </p>
-      <pre><code># Makefile
-.PHONY: stack-up stack-down test-integration
-
-stack-up:
-	docker compose up -d
-	until docker inspect -f '{{.State.Health.Status}}' olist_analytics \
-	  | grep -q healthy; do sleep 2; done
-
-stack-down:
-	docker compose down -v
-
-test-integration: stack-up
-	docker exec olist_ingestor python /app/ingest_minio.py
-	pytest tests/integration -v
-	$(MAKE) stack-down</code></pre>
-      <pre><code># tests/integration/test_pipeline.py
-import clickhouse_connect
-
-def test_view_returns_data():
-    ch = clickhouse_connect.get_client(host="localhost", port=8123)
-    result = ch.query("SELECT count() FROM olist_raw.v_top_products")
-    assert result.result_rows[0][0] > 0
-
-def test_each_tag_ingested():
-    ch = clickhouse_connect.get_client(host="localhost", port=8123)
-    tags = ch.query(
-        "SELECT DISTINCT tag FROM olist_raw.ingestion"
-    ).result_rows
-    expected = {
-        "olist_order_items_dataset.csv",
-        "olist_products_dataset.csv",
-        "product_category_name_translation.csv",
-    }
-    assert expected.issubset({t[0] for t in tags})</code></pre>
-
-      <h3>9.6 Passo 6 &mdash; Stress: kill de container</h3>
+      <h3>9.6 Estresse 1 &mdash; Kill de container durante a ingestao</h3>
       <p>
         Branch <code>stress/kill-clickhouse</code>. Iniciar a ingestao em background; em outra janela, <code>docker kill olist_clickhouse</code>;
         observar o retry; subir o CH de novo; ver a ingestao retomar; conferir que o dashboard volta sem perda.
@@ -868,7 +942,7 @@ docker exec olist_analytics clickhouse-client -q "
         sobrevive ao kill &mdash; o gap de 5s e absorvido. Sem o retry, a ingestao abortava e exigia reexecucao manual.
       </p>
 
-      <h3>9.7 Passo 7 &mdash; Stress: latencia injetada</h3>
+      <h3>9.7 Estresse 2 &mdash; Latencia injetada na rede</h3>
       <p>
         Branch <code>stress/network-delay</code>. Injetar 300ms de latencia + 1% de loss no link entre ingestor e MinIO. Duas opcoes:
         <code>tc qdisc</code> dentro do container (precisa <code>NET_ADMIN</code>) ou <code>toxiproxy</code> como proxy intermediario.
@@ -897,7 +971,7 @@ docker exec toxi /toxiproxy-cli toxic add \
         sem injecao. Confirmar que <code>tenacity</code> com backoff absorve o jitter sem aborto.
       </p>
 
-      <h3>9.8 Passo 8 &mdash; Stress: sobrecarga (locust)</h3>
+      <h3>9.8 Estresse 3 &mdash; Sobrecarga do dashboard (locust)</h3>
       <p>
         Branch <code>stress/dashboard-overload</code>. Subir <code>locust</code> apontando para o dashboard com 50 usuarios virtuais por 5 minutos.
         Observar latencia, taxa de erro, e se o cache do Streamlit aguenta. Apos a corrida, conferir saude do ClickHouse.
@@ -927,7 +1001,7 @@ locust -f stress/locustfile.py \
 
 # resultados em stress/results/locust_stats.csv e _stats_history.csv</code></pre>
 
-      <h3>9.9 Passo 9 &mdash; Stress: disco cheio</h3>
+      <h3>9.9 Estresse 4 &mdash; Disco cheio no ClickHouse</h3>
       <p>
         Branch <code>stress/disk-full</code>. Encher artificialmente o volume do ClickHouse com <code>dd</code>; tentar ingerir; observar como
         o MergeTree reage; documentar mensagem de erro; restaurar.
@@ -961,7 +1035,7 @@ docker exec olist_analytics df -h /var/lib/clickhouse</code></pre>
         <code>/</code> principal do host.
       </p>
 
-      <h3>9.10 Passo 10 &mdash; Coletar evidencias e voltar a tabela ATAM</h3>
+      <h3>9.10 Fechamento &mdash; coletar evidencias e revisar a tabela ATAM</h3>
       <p>
         Cada stress gera artefatos: logs, capturas de tela do dashboard, metricas de p95/p99, taxa de erro, MTTR. Documentar em
         <code>docs/stress-evidence.md</code> e <strong>revisitar a tabela ATAM</strong> da secao 4 com uma coluna nova: "como mudou apos aplicar

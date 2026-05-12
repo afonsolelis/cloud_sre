@@ -316,6 +316,80 @@
       font-size: .92em;
     }
     .a05-evidence strong { display: block; margin-bottom: 4px; font-family: var(--font-mono); font-size: .78em; text-transform: uppercase; letter-spacing: .12em; color: var(--deck-muted); }
+
+    /* Prompt para IA - variante do a05-snippet com label e cor de borda destacados. */
+    .a05-prompt {
+      background: #0d1117;
+      color: #e6edf3;
+      padding: 20px 22px 18px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: .82rem;
+      line-height: 1.55;
+      overflow-y: auto;
+      max-height: 380px;
+      margin: 10px 0 0;
+      border: 1px solid #1f242d;
+      border-left: 3px solid var(--deck-accent);
+      box-shadow: 0 10px 24px rgba(13, 17, 23, 0.18);
+      position: relative;
+      white-space: pre-wrap;
+    }
+    .a05-prompt-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--deck-muted);
+      margin: 0 0 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .a05-prompt-label::before {
+      content: "";
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      background: var(--deck-accent);
+      border-radius: 50%;
+    }
+    .a05-prompt pre {
+      background: transparent !important;
+      color: inherit !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      border: none !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+      font-size: inherit !important;
+      line-height: inherit !important;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .a05-prompt pre::before { display: none !important; }
+    .a05-tactic-meta {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--deck-muted);
+      margin-top: 6px;
+    }
+    .a05-tactic-meta code {
+      font-family: inherit;
+      font-size: inherit;
+      background: var(--deck-surface);
+      border: 1px solid var(--deck-line);
+      padding: 2px 8px;
+      border-radius: 3px;
+      letter-spacing: .04em;
+      text-transform: none;
+      color: var(--deck-fg);
+    }
   </style>
 </head>
 <body>
@@ -884,27 +958,28 @@ class CircuitBreaker:
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Prática &middot; Abertura</span>
-          <h2 class="deck-title">Início do bloco prático &mdash; 20h30</h2>
-          <p class="deck-summary">O bloco prático consiste em refatorar a stack da Aula 04 por meio da aplicação das cinco táticas previstas, na escrita de testes que comprovem sua efetividade e na execução de cenários de estresse sobre cada ponto identificado. O roteiro contempla dez passos sequenciais, cada qual associado a uma branch no fork pessoal.</p>
+          <h2 class="deck-title">Início do bloco prático &mdash; verificação assistida por IA</h2>
+          <p class="deck-summary">Cada uma das cinco táticas é introduzida por meio de um <strong>prompt fechado</strong>, destinado a um assistente de codificação (Claude Code, Cursor, GitHub Copilot ou Gemini CLI). O assistente é responsável pela aplicação efetiva da refatoração; o aluno conduz a verificação, valida o diff produzido, executa os testes correspondentes e realiza o merge da branch de tática. Os quatro cenários de estresse subsequentes submetem o artefato resultante a estresse controlado.</p>
         </div>
         <div class="deck-columns">
           <div class="deck-panel">
             <strong>Pré-requisitos</strong>
             <ul>
-              <li>Fork pessoal da Aula 04 devidamente clonado.</li>
+              <li>Fork pessoal da Aula 04 devidamente clonado e aberto no editor integrado ao assistente.</li>
               <li>Execução de <code>docker compose up -d</code>, com os quatro contêineres em estado <em>healthy</em>.</li>
-              <li>Python 3.9 ou superior instalado no host para a execução do <code>pytest</code>.</li>
-              <li>Instalação dos pacotes via <code>pip install tenacity pytest locust</code>.</li>
-              <li>Acesso ao utilitário <code>tc</code> ou a contêiner com capacidade <code>NET_ADMIN</code>; alternativamente, utilização do toxiproxy.</li>
+              <li>Assistente de IA com acesso de leitura e escrita ao repositório (modo agente).</li>
+              <li>Python 3.9+, <code>pip install tenacity pytest pytest-mock locust</code>.</li>
+              <li>Acesso ao utilitário <code>tc</code> ou contêiner com capacidade <code>NET_ADMIN</code>, ou alternativamente toxiproxy.</li>
             </ul>
           </div>
           <div class="deck-panel">
-            <strong>Critério de conclusão</strong>
+            <strong>Disciplina de uso da IA</strong>
             <ul>
-              <li>Cinco branches do tipo <code>tactic/...</code> mescladas no fork pessoal.</li>
-              <li>Execução do <code>pytest</code> com sucesso e cobertura mínima de seis testes.</li>
-              <li>Diretório <code>stress/</code> contendo os comandos executados e os logs produzidos.</li>
-              <li>Tabela ATAM atualizada com a coluna referente à evidência posterior à aplicação das táticas.</li>
+              <li>Copiar o prompt na íntegra; <em>não</em> reescrever.</li>
+              <li>Revisar o diff produzido linha a linha antes do commit.</li>
+              <li>Executar a verificação descrita ao final de cada prompt.</li>
+              <li>Rejeitar inclusões fora do escopo do prompt.</li>
+              <li>Cada tática equivale a uma branch <code>tactic/...</code> mesclada no fork pessoal.</li>
             </ul>
           </div>
         </div>
@@ -912,122 +987,251 @@ class CircuitBreaker:
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 16 - PASSO 1 - REFATORAR INGESTOR                       -->
+    <!-- SLIDE 16 - PASSO 1 - PROMPT RETRY + IDEMPOTENCIA              -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; Passo 1</span>
-          <h2 class="deck-title">Refatoração do ingestor com retry e idempotência</h2>
-          <p class="deck-summary">Branch <code>tactic/availability-retry</code>. A intervenção consiste em adicionar <code>tenacity</code> aos requirements, decorar as funções <code>insert_batch</code> e <code>get_object</code> e explicitar que a combinação <code>unixtime + tag</code> assegura a idempotência. O commit final preserva o comportamento original do sistema.</p>
+          <span class="deck-kicker">Prática &middot; Tática 1 &middot; Retry + Idempotência</span>
+          <h2 class="deck-title">Prompt 1 &mdash; tornar o ingestor resiliente a falhas transitórias</h2>
+          <div class="a05-tactic-meta">
+            <span>Branch <code>tactic/availability-retry</code></span>
+            <span>Quality attribute: <code>Availability</code></span>
+            <span>Sensitivity point: <code>SP-02</code></span>
+          </div>
         </div>
-        <ul class="a05-step-list">
-          <li><code>git checkout -b tactic/availability-retry</code></li>
-          <li>Inclusão de <code>tenacity==8.2.3</code> no arquivo <code>requirements.txt</code>.</li>
-          <li>Refatoração do <code>ingest_minio.py</code> para utilizar <code>@retry</code> nas chamadas a S3 e ao ClickHouse.</li>
-          <li>Adoção de log estruturado em formato JSON com <code>extra={"unixtime":..., "tag":...}</code>.</li>
-          <li>Execução de <code>docker compose build ingestor</code> seguida da ingestão para fins de validação.</li>
-        </ul>
+        <p class="a05-prompt-label">Prompt para o assistente de IA &mdash; copiar na íntegra</p>
+        <div class="a05-prompt"><pre>Você vai aplicar a tática Bass "Retry + Exception Handling + Idempotency" no
+ingestor desta stack Olist (Docker compose: clickhouse, minio, ingestor,
+dashboard). O ingestor está em app/ingest_minio.py.
+
+Branch: tactic/availability-retry
+
+Checklist obrigatório:
+1. Adicionar tenacity==8.2.3 ao requirements.txt.
+2. Decorar insert_batch e a chamada s3.get_object com:
+     @retry(stop=stop_after_attempt(5),
+            wait=wait_exponential(multiplier=1, min=2, max=30),
+            reraise=True)
+3. Comentar no topo de ingest_minio.py que a idempotência é garantida pelo
+   par (unixtime, tag) somado ao filtro max(unixtime) por tag na view
+   v_top_products. Não introduzir MERGE nem UPSERT.
+4. Substituir prints por logging JSON estruturado, incluindo
+   extra={"unixtime": ..., "tag": ..., "rows": ...}.
+5. NÃO alterar docker-compose.yaml, schema SQL nem dependências adicionais.
+6. Commit final: "feat(tactic): retry exponencial + idempotencia no ingestor".
+
+Verificação (executar e mostrar a saída):
+  docker compose build ingestor
+  docker exec olist_ingestor python /app/ingest_minio.py   # 1a execução
+  docker exec olist_ingestor python /app/ingest_minio.py   # 2a execução
+  docker exec olist_analytics clickhouse-client \
+    -q "SELECT tag, count() FROM olist_raw.ingestion GROUP BY tag"
+A contagem por tag deve permanecer constante entre as duas execuções.</pre></div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 17 - PASSO 2 - HEALTHCHECK ROBUSTO                      -->
+    <!-- SLIDE 17 - PASSO 2 - PROMPT HEALTHCHECK                       -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; Passo 2</span>
-          <h2 class="deck-title">Healthcheck robusto por serviço</h2>
-          <p class="deck-summary">Branch <code>tactic/availability-healthcheck</code>. A atividade consiste em ajustar <code>interval/timeout/retries/start_period</code> em cada healthcheck do <code>docker-compose.yaml</code>, preservar a diretiva <code>depends_on: condition: service_healthy</code>, executar <code>docker compose up</code> e mensurar o tempo até a obtenção do estado <em>healthy</em>.</p>
+          <span class="deck-kicker">Prática &middot; Tática 2 &middot; Ping/Echo + Heartbeat</span>
+          <h2 class="deck-title">Prompt 2 &mdash; healthchecks granulares por serviço</h2>
+          <div class="a05-tactic-meta">
+            <span>Branch <code>tactic/availability-healthcheck</code></span>
+            <span>Quality attribute: <code>Availability</code></span>
+            <span>Sensitivity point: <code>SP-01</code></span>
+          </div>
         </div>
-        <ul class="a05-step-list">
-          <li>Aplicação do patch apresentado no slide 11 ao Compose.</li>
-          <li>Adição de healthcheck customizado ao serviço <code>dashboard</code>, utilizando o endpoint <code>/_stcore/health</code> exposto pelo Streamlit.</li>
-          <li>Comparação dos tempos de <em>healthy</em> antes e depois da intervenção, por meio de <code>docker compose ps --format json</code>.</li>
-          <li>Registro da medição em <code>docs/healthcheck-baseline.md</code>.</li>
-        </ul>
+        <p class="a05-prompt-label">Prompt para o assistente de IA &mdash; copiar na íntegra</p>
+        <div class="a05-prompt"><pre>Você vai aplicar a tática Bass "Ping/Echo + Heartbeat" no docker-compose.yaml
+desta stack Olist (clickhouse, minio, ingestor, dashboard).
+
+Branch: tactic/availability-healthcheck
+
+Checklist obrigatório:
+1. Padronizar, em CADA serviço, o bloco healthcheck:
+     interval: 5s
+     timeout: 3s
+     retries: 12
+     start_period: 15s
+2. Comandos de teste por serviço:
+     clickhouse → wget --spider -q http://localhost:8123/ping
+     minio      → curl -f http://localhost:9000/minio/health/live
+     ingestor   → pgrep -f ingest_minio.py || exit 0
+     dashboard  → wget --spider -q http://localhost:8501/_stcore/health
+3. Manter depends_on com condition: service_healthy em todos os
+   serviços dependentes.
+4. NÃO alterar portas, volumes, redes ou variáveis de ambiente.
+5. Criar docs/healthcheck-baseline.md com tabela markdown:
+     | serviço | tempo até healthy (antes) | tempo após patch |
+6. Commit final: "feat(tactic): healthchecks granulares por servico".
+
+Verificação (executar e mostrar a saída):
+  docker compose down -v
+  time docker compose up -d --wait
+  docker compose ps --format json | jq '.[] | {name, state: .State, health: .Health}'
+Preencher a coluna "tempo após patch" com o resultado.</pre></div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 18 - PASSO 3 - CIRCUIT BREAKER                          -->
+    <!-- SLIDE 18 - PASSO 3 - PROMPT CIRCUIT BREAKER                   -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; Passo 3</span>
-          <h2 class="deck-title">Circuit breaker aplicado ao boto3</h2>
-          <p class="deck-summary">Branch <code>tactic/availability-circuit-breaker</code>. A tarefa consiste em implementar a classe <code>CircuitBreaker</code> apresentada no slide 13 em <code>app/breakers.py</code>, encapsular as chamadas a S3 do <code>ingest_minio.py</code> e configurar os parâmetros threshold em 5 falhas e recovery em 30 segundos.</p>
+          <span class="deck-kicker">Prática &middot; Tática 3 &middot; Circuit Breaker</span>
+          <h2 class="deck-title">Prompt 3 &mdash; proteger chamadas S3 contra fan-out de retries</h2>
+          <div class="a05-tactic-meta">
+            <span>Branch <code>tactic/availability-circuit-breaker</code></span>
+            <span>Quality attribute: <code>Availability</code></span>
+            <span>Sensitivity point: <code>SP-03</code></span>
+          </div>
         </div>
-        <div class="a05-snippet">
-          <span class="a05-snippet-label">app/ingest_minio.py (uso do breaker)</span>
-<pre>from breakers import CircuitBreaker
-from tenacity import retry, stop_after_attempt, wait_exponential
+        <p class="a05-prompt-label">Prompt para o assistente de IA &mdash; copiar na íntegra</p>
+        <div class="a05-prompt"><pre>Você vai aplicar a tática Bass "Circuit Breaker" às chamadas s3.get_object
+do ingestor. O retry exponencial (tarefa anterior) deve ser preservado.
 
-cb = CircuitBreaker(failure_threshold=5, recovery_seconds=30)
+Branch: tactic/availability-circuit-breaker
 
-@retry(stop=stop_after_attempt(5),
-       wait=wait_exponential(multiplier=1, min=2, max=30),
-       reraise=True)
-def s3_get(key):
-    return cb.call(lambda: s3.get_object(Bucket=BUCKET, Key=key))</pre>
-        </div>
+Checklist obrigatório:
+1. Criar app/breakers.py com a classe CircuitBreaker usando APENAS stdlib
+   (sem dependências externas):
+   - Estados: CLOSED, OPEN, HALF_OPEN.
+   - Construtor: CircuitBreaker(failure_threshold=5, recovery_seconds=30).
+   - call(fn):
+       em CLOSED, executa fn(); exceção incrementa contador; ao atingir
+         o threshold transita para OPEN e registra opened_at = time().
+       em OPEN, levanta RuntimeError("Circuit open") sem chamar fn,
+         até que recovery_seconds tenham decorrido; então transita
+         para HALF_OPEN.
+       em HALF_OPEN, executa fn(); sucesso → CLOSED e zera contador;
+         falha → volta para OPEN com novo opened_at.
+2. Em app/ingest_minio.py, instanciar no escopo do módulo:
+     cb = CircuitBreaker(failure_threshold=5, recovery_seconds=30)
+   Envolver s3.get_object com cb.call(lambda: s3.get_object(...)).
+   Manter o decorador @retry da tática anterior antes do uso do breaker.
+3. Emitir log JSON estruturado em cada transição de estado:
+     {"event": "circuit_state", "from": "...", "to": "..."}
+4. NÃO acrescentar dependências externas. NÃO alterar a view.
+5. Commit final: "feat(tactic): circuit breaker stdlib para chamadas S3".
+
+Verificação manual:
+  docker compose up -d
+  docker stop olist_minio   # durante a ingestão
+  docker exec olist_ingestor python /app/ingest_minio.py
+Após 5 falhas, o log deve registrar transição CLOSED → OPEN e o ingestor
+deve parar de tentar até recovery_seconds.</pre></div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 19 - PASSO 4 - TESTES UNITARIOS PYTEST                  -->
+    <!-- SLIDE 19 - PASSO 4 - PROMPT TESTES UNITARIOS                  -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; Passo 4</span>
-          <h2 class="deck-title">Testes unitários com pytest</h2>
-          <p class="deck-summary">Branch <code>tactic/testability-pytest</code>. A atividade consiste em criar o arquivo <code>tests/unit/test_ingestor.py</code> com cobertura sobre quatro aspectos: (a) o retry efetua o número esperado de tentativas; (b) a idempotência é mantida via <code>max(unixtime)</code>; (c) o circuit breaker abre após cinco falhas; (d) o endpoint de healthcheck retorna código HTTP 200.</p>
+          <span class="deck-kicker">Prática &middot; Tática 4 &middot; Testability (unidade)</span>
+          <h2 class="deck-title">Prompt 4 &mdash; testes unitários que comprovam retry, idempotência e breaker</h2>
+          <div class="a05-tactic-meta">
+            <span>Branch <code>tactic/testability-pytest</code></span>
+            <span>Quality attribute: <code>Testability</code></span>
+            <span>Sensitivity points: <code>SP-02 / SP-03</code></span>
+          </div>
         </div>
-        <div class="a05-snippet">
-          <span class="a05-snippet-label">tests/unit/test_ingestor.py</span>
-<pre>import pytest
-from unittest.mock import MagicMock
-from app.breakers import CircuitBreaker
+        <p class="a05-prompt-label">Prompt para o assistente de IA &mdash; copiar na íntegra</p>
+        <div class="a05-prompt"><pre>Você vai aplicar a tática Bass "Testability" via componentes de teste,
+escrevendo testes unitários que comprovam o comportamento das três
+táticas implementadas anteriormente (retry, idempotência, circuit breaker).
 
-def test_ingestor_retries_on_s3_throttle():
-    s3 = MagicMock(side_effect=[
-        Exception("SlowDown"), Exception("SlowDown"),
-        {"Body": "ok"}
-    ])
-    from app.ingest_minio import s3_get
-    assert s3_get.retry.statistics["attempt_number"] == 3
+Branch: tactic/testability-pytest
 
-def test_circuit_breaker_opens_after_threshold():
-    cb = CircuitBreaker(failure_threshold=3, recovery_seconds=1)
-    def boom(): raise RuntimeError("falhou")
-    for _ in range(3):
-        with pytest.raises(RuntimeError): cb.call(boom)
-    with pytest.raises(RuntimeError, match="Circuit open"):
-        cb.call(boom)</pre>
-        </div>
+Checklist obrigatório:
+1. Adicionar ao requirements.txt:
+     pytest==7.4.0
+     pytest-mock==3.11.1
+2. Criar pytest.ini na raiz:
+     [pytest]
+     testpaths = tests
+     python_files = test_*.py
+3. Criar tests/unit/test_breakers.py com 3 testes:
+   - test_circuit_opens_after_threshold_failures
+       (failure_threshold=3; 3 falhas; a 4a chamada deve lançar
+        RuntimeError com mensagem "Circuit open").
+   - test_circuit_blocks_calls_when_open
+       (verifica que, com circuito aberto, fn que normalmente sucederia
+        NÃO é chamada e a exceção "Circuit open" é levantada).
+   - test_circuit_half_opens_after_recovery_seconds
+       (recovery_seconds=0; sucesso na chamada de teste volta o estado
+        para CLOSED e zera o contador).
+4. Criar tests/unit/test_ingestor.py com 2 testes (usar mocker.patch
+   do pytest-mock; NÃO usar unittest.mock direto):
+   - test_ingestor_retries_on_s3_throttle
+       (mock de s3.get_object com side_effect=[Exception, Exception,
+        valor_ok]; espera exatamente 3 chamadas no mock).
+   - test_idempotency_by_max_unixtime
+       (mock do clickhouse client; após duas execuções de ingestão do
+        mesmo CSV, max(unixtime) cresce mas count via view permanece).
+5. NÃO subir Docker nos testes unitários. Apenas mocks.
+6. Commit final: "test(tactic): testes unitarios para breakers e ingestor".
+
+Verificação:
+  pytest tests/unit -v
+Saída esperada: 5 testes passam.</pre></div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 20 - PASSO 5 - TESTES DE INTEGRACAO                     -->
+    <!-- SLIDE 20 - PASSO 5 - PROMPT TESTES INTEGRACAO                 -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; Passo 5</span>
-          <h2 class="deck-title">Testes de integração end-to-end</h2>
-          <p class="deck-summary">Branch <code>tactic/testability-integration</code>. O fluxo contempla a inicialização da stack, a ingestão do dataset Olist em sua totalidade, a validação das contagens, a conferência da view e o desligamento da stack. Todas as etapas são automatizadas por meio de <code>pytest-docker</code> ou de um Makefile.</p>
+          <span class="deck-kicker">Prática &middot; Tática 5 &middot; Testability (integração)</span>
+          <h2 class="deck-title">Prompt 5 &mdash; suíte de integração end-to-end com Makefile</h2>
+          <div class="a05-tactic-meta">
+            <span>Branch <code>tactic/testability-integration</code></span>
+            <span>Quality attribute: <code>Testability</code></span>
+            <span>Sensitivity points: <code>SP-01 a SP-05</code></span>
+          </div>
         </div>
-        <ul class="a05-step-list">
-          <li><code>make stack-up</code>: inicializa o Compose e aguarda o estado <em>healthy</em>.</li>
-          <li>Execução da ingestão por meio de <code>docker exec olist_ingestor python /app/ingest_minio.py</code>.</li>
-          <li><code>pytest tests/integration -v</code>: valida o número de linhas em <code>olist_raw.ingestion</code> e o schema da view.</li>
-          <li>Captura de baseline em <code>tests/baselines/v_top_products.json</code> para fins de regressão.</li>
-          <li><code>make stack-down</code>: executa <code>docker compose down -v</code>.</li>
-        </ul>
+        <p class="a05-prompt-label">Prompt para o assistente de IA &mdash; copiar na íntegra</p>
+        <div class="a05-prompt"><pre>Você vai aplicar a tática Bass "Testability" no nível end-to-end,
+exercitando a stack real e validando o pipeline completo.
+
+Branch: tactic/testability-integration
+
+Checklist obrigatório:
+1. Criar Makefile na raiz com os alvos:
+     stack-up    → docker compose up -d e loop em docker inspect até
+                   todos os 4 serviços ficarem healthy.
+     seed        → popula o bucket MinIO com os CSVs do dataset Olist
+                   (usar mc ou aws-cli com endpoint http://localhost:9000).
+     ingest      → docker exec olist_ingestor python /app/ingest_minio.py
+     test-int    → pytest tests/integration -v
+     stack-down  → docker compose down -v
+     all         → encadeia: stack-up seed ingest test-int stack-down
+2. Adicionar clickhouse-connect==0.7.0 ao requirements.txt (cliente do host).
+3. Criar tests/integration/test_pipeline.py com 3 testes (conectar em
+   localhost:8123 via clickhouse-connect):
+   - test_landing_has_expected_row_count
+       (após ingestão, SELECT count() FROM olist_raw.ingestion > 0).
+   - test_view_top_products_returns_rows
+       (SELECT * FROM v_top_products LIMIT 5 retorna 5 linhas; o
+        schema bate com tests/baselines/v_top_products.json).
+   - test_ingestion_is_idempotent
+       (executa a ingestão duas vezes; o count por tag permanece igual).
+4. Salvar o baseline em tests/baselines/v_top_products.json na primeira
+   execução bem-sucedida e commitar junto.
+5. Commit final: "test(tactic): testes de integracao end-to-end com makefile".
+
+Verificação:
+  make all
+Saída esperada: stack sobe healthy, ingestão roda, 3 testes passam,
+stack é desligada limpamente.</pre></div>
       </div>
     </div>
 
@@ -1037,8 +1241,8 @@ def test_circuit_breaker_opens_after_threshold():
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; Passo 6 &middot; Estresse</span>
-          <h2 class="deck-title">Cenário de estresse 1 &mdash; encerramento abrupto durante a ingestão</h2>
+          <span class="deck-kicker">Prática &middot; Estresse 1</span>
+          <h2 class="deck-title">Estresse 1 &mdash; encerramento abrupto durante a ingestão</h2>
           <p class="deck-summary">Branch <code>stress/kill-clickhouse</code>. O procedimento prevê iniciar a ingestão em um terminal; em outro terminal, executar <code>docker kill olist_clickhouse</code>; observar o comportamento do mecanismo de retry; reativar o ClickHouse; verificar a retomada da ingestão; e confirmar que o dashboard recupera o estado sem perda de dados.</p>
         </div>
         <div class="a05-snippet">
@@ -1068,8 +1272,8 @@ docker exec olist_analytics clickhouse-client \
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; Passo 7 &middot; Estresse</span>
-          <h2 class="deck-title">Cenário de estresse 2 &mdash; injeção de latência</h2>
+          <span class="deck-kicker">Prática &middot; Estresse 2</span>
+          <h2 class="deck-title">Estresse 2 &mdash; injeção de latência</h2>
           <p class="deck-summary">Branch <code>stress/network-delay</code>. O cenário consiste em injetar 300ms de latência e 1% de perda no link entre o ingestor e o MinIO, por meio de <code>tc qdisc</code> (que requer a capacidade <code>NET_ADMIN</code>) ou de <code>toxiproxy</code>; mensurar os percentis p95 e p99 do <code>insert_batch</code>; e confirmar que o mecanismo de retry absorve o jitter introduzido.</p>
         </div>
         <div class="a05-snippet">
@@ -1099,8 +1303,8 @@ docker exec toxi /toxiproxy-cli toxic add -t latency \
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; Passo 8 &middot; Estresse</span>
-          <h2 class="deck-title">Cenário de estresse 3 &mdash; sobrecarga no dashboard</h2>
+          <span class="deck-kicker">Prática &middot; Estresse 3</span>
+          <h2 class="deck-title">Estresse 3 &mdash; sobrecarga no dashboard</h2>
           <p class="deck-summary">Branch <code>stress/dashboard-overload</code>. A atividade consiste em executar o <code>locust</code> apontado para o dashboard, com cinquenta usuários virtuais concorrentes, mensurando o tempo de resposta, a taxa de erro e a taxa de acerto do cache, com vistas a identificar o limiar a partir do qual o ClickHouse passa a ser degradado.</p>
         </div>
         <div class="a05-snippet">
@@ -1132,8 +1336,8 @@ class DashboardUser(HttpUser):
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; Passo 9 &middot; Estresse</span>
-          <h2 class="deck-title">Cenário de estresse 4 &mdash; exaustão de disco</h2>
+          <span class="deck-kicker">Prática &middot; Estresse 4</span>
+          <h2 class="deck-title">Estresse 4 &mdash; exaustão de disco</h2>
           <p class="deck-summary">Branch <code>stress/disk-full</code>. O procedimento consiste em preencher artificialmente o volume do ClickHouse por meio do utilitário <code>dd</code>, tentar realizar a ingestão, observar o comportamento do MergeTree diante da indisponibilidade de espaço, registrar a mensagem de erro retornada e, ao final, restaurar o estado original do volume.</p>
         </div>
         <div class="a05-snippet">
@@ -1163,7 +1367,7 @@ docker exec olist_analytics rm -f /var/lib/clickhouse/_fill</pre>
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Prática &middot; Passo 10</span>
+          <span class="deck-kicker">Prática &middot; Fechamento</span>
           <h2 class="deck-title">Coleta de evidências e revisão da tabela ATAM</h2>
           <p class="deck-summary">Cada cenário de estresse produz um conjunto de artefatos, incluindo logs, capturas de tela do dashboard, métricas de p95 e p99, taxa de erro e MTTR. Esses artefatos são documentados em <code>docs/stress-evidence.md</code> e, em seguida, <strong>a tabela ATAM construída no bloco teórico é revisitada</strong>, com a adição de uma nova coluna destinada a registrar as alterações observadas após a aplicação das táticas.</p>
         </div>
