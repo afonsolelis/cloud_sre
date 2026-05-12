@@ -82,3 +82,14 @@ $RECYCLE.BIN/
 *.gz
 *.rar
 *.7z
+
+# Environment & Secrets (AIOX)
+.env.local
+.env.*.local
+*.key
+*.pem
+
+# AIOX Local (AIOX)
+.aiox-core/local/
+.claude/settings.local.json
+.aiox/install-log.txt
