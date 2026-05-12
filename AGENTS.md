@@ -1,127 +1,90 @@
-# Repository Guidelines
+# AGENTS.md — cloud_sre
 
-## Project Structure & Module Organization
+## Project Type
 
-This repository is a static course site. The root contains `index.html`, shared styles in `assets/`, lesson content in `aulas/`, and project contracts in `specs/`.
+Static course site (HTML/CSS, no build pipeline, no test suite).
 
-- `assets/styles.css`: shared page/material styles
-- `assets/reveal_custom.css`: shared `reveal.js` slide styles
-- `aulas/aula_XX.../slides/`: canonical slide files
-- `aulas/aula_XX.../material/`: canonical written materials
-- `specs/`: source of truth for structure, content, schedule, and design
+## Project Structure
 
-Legacy folders like `aulas/aula_1/` still exist. New work should follow the canonical `snake_case` pattern, for example `aulas/aula_01_fundamentos.../slides/slide_aula_01_fundamentos....html`.
+```
+/
+├── index.html              # Central navigation — lists all lessons with slide/material links
+├── assets/
+│   ├── styles.css          # Shared styles: index + materials (editorial design system)
+│   └── slides.css          # Shared slide styles: tokens, shell, cards, tables, footer
+├── specs/
+│   ├── repositorio_de_aulas.md   # Canonical structure, naming, content rules
+│   ├── estrutura_curso.md        # Lesson schedule, folder/file conventions
+│   └── design_system.md          # Visual design tokens, components, typography
+└── aulas/
+    └── aula_XX_nome_da_aula/
+        ├── slides/slide_aula_XX_*.html
+        └── material/material_aula_XX_*.html
+```
 
-## Build, Test, and Development Commands
+Only 2 active surfaces: `index.html` and lesson HTML files.
 
-This project has no build pipeline yet. Use simple local preview and validation commands:
+## Naming Conventions (mandatory)
 
-- `python3 -m http.server 8000`: serve the repository locally
-- `xdg-open http://localhost:8000/index.html` or open it manually in a browser
-- `rg --files aulas specs assets`: inspect repository files quickly
-- `rg -n "AWS Student|index.html" aulas`: verify required patterns
+- Folders: `aula_01_nome_da_aula` — snake_case, starts with `aula_`
+- Slides: `slide_aula_01_nome_da_aula.html` — snake_case, starts with `slide_`
+- Materials: `material_aula_01_nome_da_aula.html` — snake_case, starts with `material_`
+- No spaces, no hyphens, no special characters in names
 
-## Coding Style & Naming Conventions
+## How to Preview
 
-Use HTML/CSS with 2-space indentation. Prefer ASCII unless the file already uses Portuguese accents. Keep names in `snake_case`.
+```bash
+python3 -m http.server 8000
+# then open http://localhost:8000/index.html
+```
 
-- Lesson folders: `aula_01_nome_da_aula`
-- Slides: `slide_aula_01_nome_da_aula.html`
-- Materials: `material_aula_01_nome_da_aula.html`
+## How to Validate
 
-Slides must use the HTML-native slide system and include: cover, `2026`, agenda, placeholder, material link, and index link. Materials must mirror slide topics, expand them with detailed explanation, include longer reflective text, provide step-by-step guidance where relevant, and close with instructions for the in-class hands-on activity. The course is 100% practical — no written exercises section.
+There is no automated test suite. Manual validation checklist:
 
-Every lesson runs from `19h00` to `22h00`: an initial theory block, then two practical hours using `AWS Student`.
+1. Open changed HTML pages in a browser
+2. Verify navigation links work (index → slide → material → index)
+3. Check slide footer has: prev/next buttons, slide counter, index link, material link
+4. Confirm keyboard navigation: `→` / `Space` = next, `←` = prev, `F` = fullscreen
+5. Verify `data-year="2026"` and `deck-year` are present on covers
+6. Confirm lesson timing (`19h00–22h00`) and `AWS Student` practice are in slides and materials
+7. Check visual consistency against `specs/design_system.md`
 
-## Specs First
+## Specs First Rule
 
-Read `specs/repositorio_de_aulas.md`, `specs/estrutura_curso.md`, and `specs/design_system.md` before editing. If code and specs disagree, treat the specs as the contract unless the user changes them first.
+Read `specs/repositorio_de_aulas.md`, `specs/estrutura_curso.md`, and `specs/design_system.md` **before** editing. If code and specs disagree, treat specs as the contract unless the user explicitly overrides them.
 
-## Testing Guidelines
+## Slide Requirements (per spec)
 
-There is no automated test suite. Validate changes by:
+Every slide file must include:
+- **Slide 1 (cover):** title + `2026` year + `.deck-shell data-aula-number` + Mackenzie logo
+- **Slide 2 (agenda):** theory + practice breakdown with time slots
+- **Slide 3 (placeholder):** for content construction
+- **`.slide-footer`:** index link + material link + prev/next + slide counter + fullscreen
+- **Keyboard nav:** `ArrowRight`/`Space`=next, `ArrowLeft`=prev, `F`=fullscreen
+- **No external frameworks** — pure HTML/CSS with `assets/slides.css`
 
-- opening changed HTML pages in a browser
-- checking navigation between `index`, slides, and materials
-- confirming required links are always present
-- checking that lesson timing and `AWS Student` practice are reflected where relevant
-- confirming visual consistency against `specs/design_system.md`
+## Material Requirements (per spec)
 
-## Commit & Pull Request Guidelines
+Every material file must include:
+- `<p class="meta">` with lesson number, date, time range
+- Deep expansion of slide topics (longer than slide, reflective)
+- Step-by-step for labs (AWS Student Lab hands-on)
+- `.material-nav` with link to slide and link to `index.html`
+- No written exercises section — ends with hands-on guidance
 
-Git history is not available in this workspace, so use short imperative commits such as `Add reveal.js slide template for lesson 02`. Keep each commit focused.
+## Style
 
-PRs should include:
+- 2-space indentation for HTML/CSS
+- Fonts: Inter (body) + JetBrains Mono (kickers/meta/code) via Google Fonts
+- Colors: black on off-white (`#fafaf7`) — no decorative colors
+- Border radius: 4px standard, 6px for code blocks
+- Shell: white background, 1px border, layered box-shadow
 
-- a brief summary of what changed
-- affected lesson paths
-- screenshots for `index`, slide, and material changes
-- note of any spec updates in `specs/`
+## Commit Convention
 
----
+Short imperative commits. Example: `Remove minicurso section from index.html`.
 
-<!-- AIOX-MANAGED SECTIONS -->
-<!-- These sections are managed by AIOX. Edit content between markers carefully. -->
-<!-- Your custom content above will be preserved during updates. -->
+## QA Review
 
-<!-- AIOX-MANAGED-START: core -->
-## Core Rules
-
-1. Siga a Constitution em `.aiox-core/constitution.md`
-2. Priorize `CLI First -> Observability Second -> UI Third`
-3. Trabalhe por stories em `docs/stories/`
-4. Nao invente requisitos fora dos artefatos existentes
-<!-- AIOX-MANAGED-END: core -->
-
-<!-- AIOX-MANAGED-START: quality -->
-## Quality Gates
-
-- Rode `npm run lint`
-- Rode `npm run typecheck`
-- Rode `npm test`
-- Atualize checklist e file list da story antes de concluir
-<!-- AIOX-MANAGED-END: quality -->
-
-<!-- AIOX-MANAGED-START: codebase -->
-## Project Map
-
-- Core framework: `.aiox-core/`
-- CLI entrypoints: `bin/`
-- Shared packages: `packages/`
-- Tests: `tests/`
-- Docs: `docs/`
-<!-- AIOX-MANAGED-END: codebase -->
-
-<!-- AIOX-MANAGED-START: commands -->
-## Common Commands
-
-- `npm run sync:ide`
-- `npm run sync:ide:check`
-- `npm run sync:skills:codex`
-- `npm run sync:skills:codex:global` (opcional; neste repo o padrao e local-first)
-- `npm run validate:structure`
-- `npm run validate:agents`
-<!-- AIOX-MANAGED-END: commands -->
-
-<!-- AIOX-MANAGED-START: shortcuts -->
-## Agent Shortcuts
-
-Preferencia de ativacao no Codex CLI:
-1. Use `/skills` e selecione `aiox-<agent-id>` vindo de `.codex/skills` (ex.: `aiox-architect`)
-2. Se preferir, use os atalhos abaixo (`@architect`, `/architect`, etc.)
-
-Interprete os atalhos abaixo carregando o arquivo correspondente em `.aiox-core/development/agents/` (fallback: `.codex/agents/`), renderize o greeting via `generate-greeting.js` e assuma a persona ate `*exit`:
-
-- `@architect`, `/architect`, `/architect.md` -> `.aiox-core/development/agents/architect.md`
-- `@dev`, `/dev`, `/dev.md` -> `.aiox-core/development/agents/dev.md`
-- `@qa`, `/qa`, `/qa.md` -> `.aiox-core/development/agents/qa.md`
-- `@pm`, `/pm`, `/pm.md` -> `.aiox-core/development/agents/pm.md`
-- `@po`, `/po`, `/po.md` -> `.aiox-core/development/agents/po.md`
-- `@sm`, `/sm`, `/sm.md` -> `.aiox-core/development/agents/sm.md`
-- `@analyst`, `/analyst`, `/analyst.md` -> `.aiox-core/development/agents/analyst.md`
-- `@devops`, `/devops`, `/devops.md` -> `.aiox-core/development/agents/devops.md`
-- `@data-engineer`, `/data-engineer`, `/data-engineer.md` -> `.aiox-core/development/agents/data-engineer.md`
-- `@ux-design-expert`, `/ux-design-expert`, `/ux-design-expert.md` -> `.aiox-core/development/agents/ux-design-expert.md`
-- `@squad-creator`, `/squad-creator`, `/squad-creator.md` -> `.aiox-core/development/agents/squad-creator.md`
-- `@aiox-master`, `/aiox-master`, `/aiox-master.md` -> `.aiox-core/development/agents/aiox-master.md`
-<!-- AIOX-MANAGED-END: shortcuts -->
+Run `*review` via the QA agent before significant changes: `curl -s <deployed-url>` to verify the deployed site matches local changes. Wait ~30s for GitHub Pages rebuild after push.
