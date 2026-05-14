@@ -4,15 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="https://res.cloudinary.com/dyhjjms8y/image/upload/v1766252944/logo_mini_wspmx7.png" />
-  <title>Aula 08 — Projeto final — desafio entregue no GitHub</title>
+  <title>Aula 08 — Projeto final — desafio Northwind</title>
   <link href="../../../assets/slides.css" rel="stylesheet">
   <style data-aula08-local>
     /* Tokens e componentes base vêm de assets/slides.css.
        Aqui ficam apenas utilitários scoped à Aula 08:
        - compactação para viewport baixo;
        - grid de 4 colunas para recap de Aulas 04→07;
-       - CTA do repositório (estilo a04-repo-cta no escopo a08-);
-       - placeholder do desafio. */
+       - roadmap de etapas numeradas;
+       - cartão de desafio com destaque editorial. */
 
     @media (max-height: 900px) {
       .deck-shell { min-height: 520px; padding: 32px 44px; margin: 14px; gap: 16px; }
@@ -56,19 +56,103 @@
     .a08-compact .deck-card h3 { font-size: 1em; margin-bottom: 6px; }
     .a08-compact .deck-card ul { margin: 6px 0 0; }
     .a08-compact .deck-card li { margin-bottom: 4px; font-size: .92em; line-height: 1.45; }
-    .a08-compact .deck-panel { padding: 16px 18px; }
-    .a08-compact .deck-panel li { margin-bottom: 4px; font-size: .92em; line-height: 1.45; }
-    .a08-compact .deck-summary { margin-bottom: 10px; }
-    .a08-compact .deck-callout { padding: 16px 20px; }
 
-    /* Placeholder do desafio — destaque editorial sem comprometer com texto que ainda não existe */
+    /* Roadmap horizontal de etapas numeradas */
+    .a08-roadmap {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 0;
+      position: relative;
+    }
+    .a08-roadmap-step {
+      position: relative;
+      padding: 16px 18px 16px 20px;
+      background: var(--deck-panel);
+      border: 1px solid var(--deck-line);
+      border-right: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-height: 150px;
+    }
+    .a08-roadmap-step:first-child { border-radius: 4px 0 0 4px; }
+    .a08-roadmap-step:last-child  { border-radius: 0 4px 4px 0; border-right: 1px solid var(--deck-line); }
+    .a08-roadmap-step::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: -10px;
+      transform: translateY(-50%) rotate(45deg);
+      width: 18px;
+      height: 18px;
+      background: var(--deck-panel);
+      border-top: 1px solid var(--deck-line);
+      border-right: 1px solid var(--deck-line);
+      z-index: 2;
+    }
+    .a08-roadmap-step:last-child::after { display: none; }
+    .a08-roadmap-step .a08-roadmap-num {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      color: var(--deck-muted);
+      text-transform: uppercase;
+    }
+    .a08-roadmap-step .a08-roadmap-num strong {
+      display: inline-block;
+      color: var(--deck-text);
+      font-weight: 800;
+      font-size: 1.6rem;
+      letter-spacing: 0;
+      line-height: 1;
+      margin-right: 6px;
+      vertical-align: -2px;
+    }
+    .a08-roadmap-step h3 {
+      margin: 0;
+      font-size: .92em;
+      font-weight: 700;
+      line-height: 1.25;
+      letter-spacing: -0.005em;
+    }
+    .a08-roadmap-step p {
+      margin: 0;
+      font-size: .82em;
+      line-height: 1.45;
+      color: #2a2a2a;
+    }
+    @media (max-width: 1100px) {
+      .a08-roadmap { grid-template-columns: repeat(3, 1fr); }
+      .a08-roadmap-step:nth-child(3) { border-right: 1px solid var(--deck-line); border-radius: 0 4px 4px 0; }
+      .a08-roadmap-step:nth-child(3)::after { display: none; }
+      .a08-roadmap-step:nth-child(4) { border-left: 1px solid var(--deck-line); border-radius: 4px 0 0 4px; margin-top: -1px; }
+    }
+    @media (max-width: 600px) {
+      .a08-roadmap { grid-template-columns: 1fr; }
+      .a08-roadmap-step,
+      .a08-roadmap-step:first-child,
+      .a08-roadmap-step:last-child,
+      .a08-roadmap-step:nth-child(3),
+      .a08-roadmap-step:nth-child(4) {
+        border: 1px solid var(--deck-line);
+        border-radius: 4px;
+        margin: 0;
+      }
+      .a08-roadmap-step::after { display: none; }
+    }
+
+    /* Cartão de desafio — destaque editorial forte */
     .a08-challenge-card {
       border: 1px solid var(--deck-accent);
       border-left: 6px solid var(--deck-accent);
       background: var(--deck-panel);
-      padding: 28px 32px;
+      padding: 24px 28px;
       border-radius: 4px;
       box-shadow: 0 1px 2px rgba(15, 15, 15, .04), 0 10px 24px rgba(15, 15, 15, .08);
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 22px;
+      align-items: start;
     }
     .a08-challenge-card .a08-challenge-tag {
       display: inline-block;
@@ -79,138 +163,121 @@
       color: var(--deck-muted);
       border: 1px solid var(--deck-line);
       padding: 3px 8px;
-      margin-bottom: 14px;
+      margin-bottom: 10px;
       border-radius: 3px;
     }
     .a08-challenge-card h3 {
-      margin: 0 0 12px;
-      font-size: 1.7em;
-      line-height: 1.15;
-      letter-spacing: -0.02em;
+      margin: 0 0 8px;
+      font-size: 1.6em;
+      line-height: 1.1;
+      letter-spacing: -0.025em;
       font-weight: 800;
     }
+    .a08-challenge-card h3 .a08-challenge-brand {
+      display: inline-block;
+      background: var(--deck-text);
+      color: var(--deck-panel);
+      padding: 2px 10px;
+      margin-right: 6px;
+      border-radius: 3px;
+      font-family: var(--font-mono);
+      font-size: .72em;
+      letter-spacing: 0.04em;
+      vertical-align: 3px;
+      font-weight: 700;
+    }
     .a08-challenge-card p {
-      margin: 8px 0 0;
-      font-size: 1.02em;
-      line-height: 1.55;
+      margin: 6px 0 0;
+      font-size: .95em;
+      line-height: 1.5;
       color: #2a2a2a;
     }
-    .a08-challenge-card .a08-challenge-meta {
-      margin-top: 18px;
+    .a08-challenge-files {
+      border: 1px solid var(--deck-line);
+      background: var(--deck-surface);
+      border-radius: 4px;
+      padding: 14px 16px;
       font-family: var(--font-mono);
-      font-size: 0.78em;
-      color: var(--deck-muted);
-      letter-spacing: 0.04em;
+      font-size: .8rem;
+      line-height: 1.5;
+    }
+    .a08-challenge-files .a08-challenge-files-title {
+      display: block;
+      font-size: 0.66rem;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
+      color: var(--deck-muted);
+      margin-bottom: 10px;
     }
-
-    /* Tabela de critérios + dinâmica */
-    .a08-table-compact .deck-table th,
-    .a08-table-compact .deck-table td {
-      padding: 9px 12px;
-      font-size: .92em;
-      line-height: 1.45;
+    .a08-challenge-files .a08-file-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 6px 0;
+      border-bottom: 1px dashed var(--deck-line);
     }
-
-    /* Convenção do repo — bloco mono */
-    .a08-naming {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 14px;
-    }
-    .a08-naming .a08-naming-pill {
-      font-family: var(--font-mono);
-      background: var(--deck-code-bg);
-      color: var(--deck-code-fg);
-      padding: 18px 22px;
-      border-radius: 6px;
-      font-size: 1.05em;
-      letter-spacing: 0.02em;
-      box-shadow: 0 10px 24px rgba(13, 17, 23, 0.18);
-      word-break: break-all;
-    }
-    .a08-naming .a08-naming-pill strong { color: #ffd479; font-weight: 700; }
-
-    /* CTA do repositório no slide final (escopo a08-, baseado em .a04-repo-cta) */
-    .a08-repo-cta {
+    .a08-challenge-files .a08-file-row:last-child { border-bottom: none; }
+    .a08-challenge-files .a08-file-name { color: var(--deck-text); font-weight: 700; }
+    .a08-challenge-files .a08-file-size { color: var(--deck-muted); }
+    .a08-drive-cta {
       display: inline-flex;
       align-items: center;
-      gap: 18px;
-      padding: 22px 32px;
+      gap: 12px;
+      margin-top: 14px;
+      padding: 12px 18px;
       border: 1px solid var(--deck-accent);
-      border-radius: 4px;
       background: var(--deck-accent);
       color: #ffffff;
       text-decoration: none;
       font-family: var(--font-mono);
-      font-size: 1.05rem;
+      font-size: .82rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
       font-weight: 700;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      transition: background 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
-      box-shadow: 0 1px 2px rgba(15, 15, 15, 0.06), 0 10px 24px rgba(15, 15, 15, 0.12);
-    }
-    .a08-repo-cta:hover {
-      background: #2a2a2a;
-      transform: translateY(-2px);
-      box-shadow: 0 1px 2px rgba(15, 15, 15, 0.06), 0 16px 32px rgba(15, 15, 15, 0.18);
-    }
-    .a08-repo-cta:focus {
-      outline: 2px solid var(--deck-accent);
-      outline-offset: 4px;
-    }
-    .a08-repo-cta svg {
-      width: 28px;
-      height: 28px;
-      flex-shrink: 0;
-      fill: currentColor;
-    }
-    .a08-repo-cta .a08-repo-cta-text {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 4px;
-      line-height: 1.1;
-    }
-    .a08-repo-cta .a08-repo-cta-text .a08-repo-cta-kicker {
-      font-size: 0.62rem;
-      letter-spacing: 0.18em;
-      color: rgba(255, 255, 255, 0.66);
-      font-weight: 500;
-    }
-    .a08-repo-cta-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-      margin-top: 24px;
-    }
-    .a08-repo-url {
-      font-family: var(--font-mono);
-      font-size: 0.84rem;
-      color: var(--deck-muted);
-      letter-spacing: 0.02em;
-      word-break: break-all;
-      text-align: center;
-      max-width: 60ch;
-    }
-    .a08-naming-link {
-      font-family: var(--font-mono);
-      font-size: 0.74rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--deck-text);
-      border: 1px solid var(--deck-line);
-      background: var(--deck-panel);
-      padding: 10px 16px;
       border-radius: 4px;
-      text-decoration: none;
-      transition: background 0.18s ease;
+      transition: background 0.18s ease, transform 0.18s ease;
     }
-    .a08-naming-link:hover { background: var(--deck-surface); }
-    @media (max-width: 600px) {
-      .a08-repo-cta { padding: 16px 22px; font-size: 0.92rem; gap: 12px; }
-      .a08-repo-cta svg { width: 22px; height: 22px; }
+    .a08-drive-cta:hover { background: #2a2a2a; transform: translateY(-1px); }
+    .a08-drive-cta:focus { outline: 2px solid var(--deck-accent); outline-offset: 4px; }
+    .a08-drive-cta svg { width: 18px; height: 18px; fill: currentColor; flex-shrink: 0; }
+
+    .a08-challenge-footnote {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--deck-line);
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      color: var(--deck-muted);
+    }
+    .a08-challenge-footnote .a08-footnote-label {
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--deck-muted);
+      margin-right: 6px;
+    }
+    .a08-challenge-footnote code {
+      font-family: var(--font-mono);
+      background: var(--deck-surface);
+      border: 1px solid var(--deck-line);
+      padding: 2px 6px;
+      border-radius: 3px;
+      color: var(--deck-text);
+      letter-spacing: 0.02em;
+    }
+    .a08-challenge-footnote a {
+      color: var(--deck-text);
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+    }
+
+    @media (max-width: 1100px) {
+      .a08-challenge-card { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -224,11 +291,11 @@
       <div class="deck-shell" data-aula-number="08">
         <div>
           <span class="deck-kicker">Aula 08 &middot; 11/06/2026</span>
-          <h1 class="deck-title">Projeto final — desafio entregue no GitHub</h1>
+          <h1 class="deck-title">Projeto final — desafio Northwind</h1>
           <p class="deck-subtitle">
-            Encerramento integrado do semestre: cada aluno apresenta a entrega final do projeto, materializada
-            em um repositório público no GitHub que aplica os conceitos arquiteturais e de SRE trabalhados ao
-            longo das Aulas 04 a 07.
+            Última sessão do semestre: cada aluno entrega, em repositório público no GitHub, a adaptação da
+            stack construída ao longo das Aulas 04 a 07 para um novo conjunto de dados. O artefato avaliado
+            é o próprio repositório.
           </p>
         </div>
         <div>
@@ -245,36 +312,32 @@
       <div class="deck-shell">
         <div>
           <span class="deck-kicker">Agenda do dia</span>
-          <h2 class="deck-title">Três blocos articulados em uma única entrega</h2>
+          <h2 class="deck-title">Três blocos em uma única sessão de entrega</h2>
           <p class="deck-summary">
-            A sessão é integralmente dedicada ao projeto dos alunos, sem conteúdo teórico novo. A dinâmica
-            articula um briefing inicial, um período de trabalho assistido e a apresentação final, todos
-            consolidados em um repositório individual no GitHub.
+            A aula é integralmente dedicada à entrega final, sem conteúdo teórico novo. Recap rápido,
+            roadmap do que precisa ser feito hoje e enunciado do desafio Northwind.
           </p>
         </div>
         <div class="deck-grid a08-compact">
           <div class="deck-card">
-            <h3>Bloco 1 &middot; Briefing</h3>
+            <h3>Bloco 1 &middot; Recap</h3>
             <ul>
-              <li>Tese da aula e revisão do arco compreendido entre as Aulas 04 e 07.</li>
-              <li>Apresentação do desafio específico atribuído à turma.</li>
-              <li>Convenção de repositório e critérios de avaliação.</li>
+              <li>O arco do semestre, das Aulas 04 a 07, consolidado em um único painel visual.</li>
+              <li>Tese: a stack está pronta para receber um <em>dataset</em> novo.</li>
             </ul>
           </div>
           <div class="deck-card">
-            <h3>Bloco 2 &middot; Trabalho assistido</h3>
+            <h3>Bloco 2 &middot; Roadmap</h3>
             <ul>
-              <li>Cada aluno trabalha em seu próprio fork no Codespace ou em ambiente local.</li>
-              <li>Atendimento individual de dúvidas e revisão do README e do diagrama de arquitetura.</li>
-              <li>Envio (<em>push</em>) para a branch <code>main</code> antes da apresentação.</li>
+              <li>Sequência de seis etapas para a entrega no GitHub.</li>
+              <li>Convenção de nomenclatura do repositório individual.</li>
             </ul>
           </div>
           <div class="deck-card">
-            <h3>Bloco 3 &middot; Apresentações e encerramento</h3>
+            <h3>Bloco 3 &middot; Desafio</h3>
             <ul>
-              <li>Apresentações breves contemplando arquitetura, decisões e evidências de execução.</li>
-              <li>Devolutivas do professor e dos colegas de turma.</li>
-              <li>Encerramento formal da disciplina.</li>
+              <li>Troca do <em>dataset</em> Olist pelo <strong>Northwind</strong>.</li>
+              <li>Origem dos dados no Google Drive, adaptação da <em>stack</em> e apresentação.</li>
             </ul>
           </div>
         </div>
@@ -291,12 +354,12 @@
           <h2 class="deck-title">O semestre consolidado em repositório</h2>
         </div>
         <div class="deck-callout" style="font-size: 1.15em; line-height: 1.55;">
-          <strong>Esta sessão verifica a autonomia dos alunos na operação e evolução da arquitetura proposta.</strong>
+          <strong>Esta é a sessão de entrega final.</strong>
           <p style="margin: 0;">
-            Cada aluno recebe um desafio novo e demonstra, em código versionado, sua capacidade de desenhar,
-            provisionar, instrumentar e submeter a estresse uma plataforma de dados na nuvem. O artefato avaliado
-            é o repositório: arquitetura documentada, infraestrutura reprodutível, testes automatizados aprovados
-            e evidências reais de execução.
+            Cada aluno recebe um <em>dataset</em> novo e demonstra, em código versionado, a capacidade
+            de adaptar a arquitetura construída ao longo do semestre. O artefato avaliado é o repositório:
+            stack reprodutível, modelos analíticos coerentes com a nova fonte e evidências reais de execução
+            sobre os dados do Northwind.
           </p>
         </div>
         <p class="deck-note">
@@ -308,7 +371,7 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 4 — RECAP DO CURSO (AULAS 04 → 07)                      -->
+    <!-- SLIDE 4 — RECAP DO CURSO (AULAS 04 → 07) — SLIDE ÚNICO        -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
@@ -316,16 +379,15 @@
           <span class="deck-kicker">Revisão &middot; Aulas 04 a 07</span>
           <h2 class="deck-title">O arco que sustenta o projeto final</h2>
           <p class="deck-summary">
-            Cada aula anterior consolidou uma capacidade técnica que o projeto final exercita de forma integrada.
-            Os quatro cartões abaixo, dispostos em ordem cronológica, sintetizam a trajetória percorrida pela
-            turma ao longo do semestre.
+            Quatro aulas construíram, de forma incremental, a stack que será adaptada hoje. Os cartões abaixo,
+            em ordem cronológica, sintetizam a trajetória da turma ao longo do semestre.
           </p>
         </div>
         <div class="a08-grid-4">
           <div class="deck-card">
             <span class="a08-card-step">Aula 04 &middot; 07/05</span>
             <h3>Stack Docker local Olist</h3>
-            <p>Ingestão e processamento <em>near real-time</em> executados em contêineres locais, constituindo a base do pipeline.</p>
+            <p>Ingestão e processamento <em>near real-time</em> executados em contêineres locais, constituindo a base do <em>pipeline</em>.</p>
           </div>
           <div class="deck-card">
             <span class="a08-card-step">Aula 05 &middot; 14/05</span>
@@ -347,212 +409,120 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 5 — CONVENÇÃO DO REPO                                   -->
+    <!-- SLIDE 5 — ROADMAP DA ENTREGA                                  -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">Convenção do repositório</span>
-          <h2 class="deck-title">Um repositório por aluno, com padrão fixo de nomenclatura</h2>
+          <span class="deck-kicker">Roadmap da entrega &middot; o que fazer hoje</span>
+          <h2 class="deck-title">Seis etapas, do <em>fork</em> à apresentação</h2>
           <p class="deck-summary">
-            Todos os projetos seguem o mesmo padrão do repositório base utilizado desde a Aula 04. Não são
-            admitidas variações nem nomes alternativos: a nomenclatura constitui parte integrante da entrega
-            e será verificada na avaliação.
+            A entrega final segue uma sequência fixa. Cada etapa deve ser concluída antes da apresentação,
+            com <em>commits</em> visíveis na branch <code>main</code> do repositório individual.
           </p>
         </div>
-        <div class="a08-naming">
-          <div class="a08-naming-pill">
-            <strong>20261sre-&lt;primeironome&gt;-&lt;ultimonome&gt;</strong>
+        <div class="a08-roadmap">
+          <div class="a08-roadmap-step">
+            <span class="a08-roadmap-num"><strong>01</strong> Etapa</span>
+            <h3>Fork do repositório base</h3>
+            <p>Realizar o <em>fork</em> da stack Docker da Aula 04 a partir do repositório oficial do curso.</p>
           </div>
-        </div>
-        <div class="deck-grid a08-compact">
-          <div class="deck-card">
-            <h3>Como organizar</h3>
-            <ul>
-              <li>Realizar o <strong>fork</strong> do repositório base da Aula 04.</li>
-              <li>Renomear o <em>fork</em> seguindo o padrão acima, em minúsculas e sem acentos.</li>
-              <li>Manter o repositório <strong>público</strong>, com a branch padrão <code>main</code>.</li>
-            </ul>
+          <div class="a08-roadmap-step">
+            <span class="a08-roadmap-num"><strong>02</strong> Etapa</span>
+            <h3>Renomear o repositório</h3>
+            <p>Aplicar a convenção <code>20261sre-&lt;primeironome&gt;-&lt;ultimonome&gt;</code>, em minúsculas e sem acentos.</p>
           </div>
-          <div class="deck-card">
-            <h3>Como entregar</h3>
-            <ul>
-              <li>Desenvolver em <em>branches</em> de funcionalidade e abrir <em>pull request</em> contra <code>main</code>.</li>
-              <li>Efetuar o <em>merge</em> da entrega final em <code>main</code> antes da apresentação.</li>
-              <li>Aplicar, opcionalmente, a tag <code>aula-08-entrega</code> no <em>commit</em> final.</li>
-            </ul>
+          <div class="a08-roadmap-step">
+            <span class="a08-roadmap-num"><strong>03</strong> Etapa</span>
+            <h3>Ingerir os dados do desafio</h3>
+            <p>Baixar os CSVs do Northwind no Google Drive e enviá-los para o MinIO da stack local.</p>
+          </div>
+          <div class="a08-roadmap-step">
+            <span class="a08-roadmap-num"><strong>04</strong> Etapa</span>
+            <h3>Adaptar a <em>stack</em></h3>
+            <p>Ajustar o <em>ingestor</em>, os modelos do ClickHouse e o <em>dashboard</em> Streamlit para a nova fonte.</p>
+          </div>
+          <div class="a08-roadmap-step">
+            <span class="a08-roadmap-num"><strong>05</strong> Etapa</span>
+            <h3>Commitar e abrir PR</h3>
+            <p>Versionar a entrega em <em>branch</em> de funcionalidade, abrir <em>pull request</em> e fazer o <em>merge</em> em <code>main</code>.</p>
+          </div>
+          <div class="a08-roadmap-step">
+            <span class="a08-roadmap-num"><strong>06</strong> Etapa</span>
+            <h3>Apresentar</h3>
+            <p>Demonstrar o repositório, o <em>dashboard</em> e as decisões de adaptação para a turma e o professor.</p>
           </div>
         </div>
       </div>
     </div>
 
     <!-- ============================================================ -->
-    <!-- SLIDE 6 — CRITÉRIOS DE AVALIAÇÃO (ESTRUTURA)                  -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell a08-table-compact">
-        <div>
-          <span class="deck-kicker">Critérios de avaliação &middot; estrutura</span>
-          <h2 class="deck-title">O que o repositório deve demonstrar</h2>
-          <p class="deck-summary">
-            A avaliação está organizada em cinco eixos. O peso atribuído a cada eixo será definido na semana
-            da entrega, em conjunto com o desafio específico; o conjunto de critérios, contudo, permanece
-            inalterado. A ausência de <code>README.md</code> inviabiliza a atribuição de nota.
-          </p>
-        </div>
-        <table class="deck-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Critério</th>
-              <th>Evidência mínima esperada no repositório</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>01</td>
-              <td>Arquitetura documentada</td>
-              <td><code>README.md</code> com diagrama (Mermaid/desenho), decisões e trade-offs explícitos.</td>
-            </tr>
-            <tr>
-              <td>02</td>
-              <td>Infra reprodutível</td>
-              <td><code>docker-compose.yml</code> e/ou templates AWS; <code>make up</code> ou comando equivalente.</td>
-            </tr>
-            <tr>
-              <td>03</td>
-              <td>Testes automatizados</td>
-              <td>Suíte de testes em execução na esteira de CI, com <em>badge</em> ou captura de tela da última execução aprovada.</td>
-            </tr>
-            <tr>
-              <td>04</td>
-              <td>Evidências de execução</td>
-              <td>Logs, capturas de tela, vídeo de curta duração ou diretório <code>documents/</code> com a saída real do pipeline.</td>
-            </tr>
-            <tr>
-              <td>05</td>
-              <td>Histórico de <em>commits</em> consistente</td>
-              <td>Histórico legível e mensagens descritivas, sem ocorrências de <code>WIP</code> ou <code>fix fix fix</code> na branch <code>main</code>.</td>
-            </tr>
-          </tbody>
-        </table>
-        <p class="deck-note">
-          O peso e o <em>cut-off</em> de cada eixo serão divulgados em conjunto com o desafio específico.
-        </p>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 7 — DESAFIO (PLACEHOLDER EXPLÍCITO)                     -->
+    <!-- SLIDE 6 — DESAFIO NORTHWIND                                   -->
     <!-- ============================================================ -->
     <div class="slide">
       <div class="deck-shell">
         <div>
-          <span class="deck-kicker">O desafio &middot; placeholder</span>
-          <h2 class="deck-title">Tema específico ainda não publicado</h2>
+          <span class="deck-kicker">O desafio &middot; troca de <em>dataset</em></span>
+          <h2 class="deck-title">Substituir Olist por Northwind, mantendo a arquitetura</h2>
+          <p class="deck-summary">
+            A stack <strong>MinIO + ClickHouse + ingestor + Streamlit</strong> permanece intacta. Apenas os dados
+            de entrada e os modelos analíticos mudam — exercitando a capacidade de adaptar uma plataforma
+            de dados a uma nova fonte com estrutura relacional comparável.
+          </p>
         </div>
         <div class="a08-challenge-card">
-          <span class="a08-challenge-tag">A definir &middot; turma 2026/1</span>
-          <h3>O desafio específico será divulgado na semana da entrega, a partir de 04/06/2026.</h3>
-          <p>
-            <strong>Direções possíveis</strong> (sem comprometimento neste momento): variação do Olist com um
-            <em>dataset</em> distinto; incorporação de uma nova funcionalidade analítica à plataforma existente;
-            ou aplicação a outro domínio (logística, saúde, energia) com reaproveitamento da stack construída
-            ao longo do semestre.
-          </p>
-          <p>
-            O enunciado definitivo será publicado em arquivo separado no repositório do curso e comunicado em
-            sala. Até essa data, recomenda-se manter a stack das Aulas 04 a 07 estável e o repositório individual
-            atualizado.
-          </p>
-          <p class="a08-challenge-meta">Publicação prevista: a partir de 04/06/2026</p>
+          <div>
+            <span class="a08-challenge-tag">Desafio &middot; turma 2026/1</span>
+            <h3><span class="a08-challenge-brand">Dataset</span>Northwind clássico</h3>
+            <p>
+              O conjunto Northwind possui uma estrutura relacional clara: um cabeçalho de pedidos
+              (<code>orders</code>) e suas linhas de itens (<code>order_details</code>). É um caso didático
+              equivalente em complexidade ao Olist, porém com domínio distinto — distribuição de alimentos
+              e bebidas.
+            </p>
+            <p>
+              Faça o <em>download</em> dos arquivos no Google Drive, suba-os para o <em>bucket</em> do MinIO da
+              stack local, adapte o <em>ingestor</em> para o novo <em>schema</em> e refaça os modelos analíticos
+              do ClickHouse e do Streamlit.
+            </p>
+            <a class="a08-drive-cta"
+               href="https://drive.google.com/drive/folders/14qZXIcAf2HNpu_Ara9RPjB5A6BFFYxoy?usp=sharing"
+               target="_blank"
+               rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M7.71 3.5 1.15 15l3.42 6 6.57-11.5L7.71 3.5zm8.58 0H9.07L15.64 15h6.57L16.29 3.5zM10.93 16 7.5 22h9l3.43-6h-9z"/>
+              </svg>
+              Abrir pasta no Google Drive
+            </a>
+          </div>
+          <div>
+            <div class="a08-challenge-files">
+              <span class="a08-challenge-files-title">Arquivos &middot; Google Drive</span>
+              <div class="a08-file-row">
+                <span class="a08-file-name">northwind_orders.csv</span>
+                <span class="a08-file-size">96 KB &middot; cabeçalho</span>
+              </div>
+              <div class="a08-file-row">
+                <span class="a08-file-name">northwind_order_details.csv</span>
+                <span class="a08-file-size">40 KB &middot; linhas</span>
+              </div>
+            </div>
+            <p style="margin-top: 14px; font-size: .88em; line-height: 1.5; color: #2a2a2a;">
+              Mantenha o mesmo padrão de camadas (<em>raw</em>, <em>refined</em>) já adotado no projeto Olist.
+              Documente, no <code>README.md</code>, as decisões de adaptação e os KPIs reformulados.
+            </p>
+          </div>
         </div>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 8 — DINÂMICA DO DIA (PLACEHOLDER)                       -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell a08-table-compact">
-        <div>
-          <span class="deck-kicker">Dinâmica do dia &middot; placeholder</span>
-          <h2 class="deck-title">Distribuição do tempo em sala</h2>
-          <p class="deck-summary">
-            Distribuição preliminar do tempo. Ajustes finos serão realizados no início da aula, em função do
-            número de apresentações previstas.
-          </p>
+        <div class="a08-challenge-footnote">
+          <span>
+            <span class="a08-footnote-label">Convenção</span>
+            <code>20261sre-&lt;primeironome&gt;-&lt;ultimonome&gt;</code>
+          </span>
+          <span>
+            <span class="a08-footnote-label">Repositório base</span>
+            <a href="https://github.com/afonsolelis/20261sre-primeironome-ultimonome" target="_blank" rel="noopener">github.com/afonsolelis/20261sre-primeironome-ultimonome</a>
+          </span>
         </div>
-        <table class="deck-table">
-          <thead>
-            <tr>
-              <th>Bloco</th>
-              <th>Duração estimada</th>
-              <th>O que acontece</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Briefing do desafio</td>
-              <td>~30 min</td>
-              <td>Apresentação do enunciado, regras, critérios de avaliação e esclarecimento de dúvidas iniciais.</td>
-            </tr>
-            <tr>
-              <td>Trabalho assistido</td>
-              <td>~90 min</td>
-              <td>Cada aluno avança no próprio repositório, com atendimento individual de dúvidas.</td>
-            </tr>
-            <tr>
-              <td>Apresentações breves</td>
-              <td>~60 min</td>
-              <td>Cada aluno apresenta o repositório, o diagrama e as evidências, recebendo a devolutiva correspondente.</td>
-            </tr>
-          </tbody>
-        </table>
-        <p class="deck-note">
-          A divisão respeita o intervalo regulamentar entre 19h00 e 22h00. O tempo destinado a cada apresentação
-          será calibrado em função do tamanho da turma.
-        </p>
-      </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- SLIDE 9 — ENCERRAMENTO + CTA REPO + CONVENÇÃO NAMING          -->
-    <!-- ============================================================ -->
-    <div class="slide">
-      <div class="deck-shell">
-        <div>
-          <span class="deck-kicker">Encerramento &middot; entrega final</span>
-          <h2 class="deck-title">Desejamos um bom trabalho a todos os participantes.</h2>
-          <p class="deck-summary">
-            Utilize o repositório base indicado abaixo como ponto de partida. Realize o <em>fork</em>, renomeie-o
-            de acordo com a convenção <code>20261sre-&lt;primeironome&gt;-&lt;ultimonome&gt;</code> e envie o
-            projeto para a branch <code>main</code>.
-          </p>
-        </div>
-        <div class="a08-repo-cta-wrap">
-          <a class="a08-repo-cta"
-             href="https://github.com/afonsolelis/20261sre-primeironome-ultimonome"
-             target="_blank"
-             rel="noopener">
-            <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
-            </svg>
-            <span class="a08-repo-cta-text">
-              <span class="a08-repo-cta-kicker">GitHub &middot; Repositório base</span>
-              <span>Abrir repositório no GitHub</span>
-            </span>
-          </a>
-          <p class="a08-repo-url">https://github.com/afonsolelis/20261sre-primeironome-ultimonome</p>
-          <a class="a08-naming-link"
-             href="../material/material_aula_08_seguranca_de_dados_finops_e_projeto_final_integrado.html#convencao-do-repo">
-            Convenção de naming &amp; checklist no material
-          </a>
-        </div>
-        <p style="margin-top: 8px; font-size: .92em; color: var(--deck-muted); text-align: center;">
-          Agradecemos aos alunos pela dedicação ao longo do arco completo da disciplina. Desejamos um bom
-          trabalho na avaliação final.
-        </p>
       </div>
     </div>
 
